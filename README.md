@@ -29,6 +29,7 @@ The library is distributed as source code. To use it, add the `src` directory to
 - [Tests](#tests)
 - [License](#license)
 
+<a name="overview"></a>
 ## 📖 Overview
 
 `Rick.UIBuilder` exposes `TRickUIBuilder`, the main entry point for the library:
@@ -53,6 +54,7 @@ The three creation styles are intended for different levels of configuration:
 
 Using an `IRickUIBuilder*` interface explicitly is **not a fourth creation style**. It is an alternative way to hold and use the same fluent builders through their public contracts.
 
+<a name="features"></a>
 ## ✨ Features
 
 - Direct creation of FMX text, buttons, badges, and dividers through `TRickUIBuilderFactory`.
@@ -64,11 +66,13 @@ Using an `IRickUIBuilder*` interface explicitly is **not a fourth creation style
 - Badge handles that expose both the generated container and its internal text label.
 - Explicit public interfaces for fluent builders and composition.
 
+<a name="requirements"></a>
 ## 🧰 Requirements
 
 - Delphi with FireMonkey (FMX) support.
 - The RickUIBuilder `src` directory available to the consuming project.
 
+<a name="installation"></a>
 ## 📦 Installation
 
 Clone or copy RickUIBuilder and add its `src` directory to the Delphi project's **Search Path**:
@@ -79,6 +83,7 @@ Clone or copy RickUIBuilder and add its `src` directory to the Delphi project's 
 
 No package installation is required for normal use.
 
+<a name="getting-started"></a>
 ## 🚀 Getting Started
 
 The most direct entry point for fluent usage is `Rick.UIBuilder`:
@@ -107,6 +112,7 @@ The sections below show the available approaches in more detail.
 
 ---
 
+<a name="factory"></a>
 ## 🏭 Factory
 
 **Implementation unit:** `Rick.UIBuilder.Factory`
@@ -204,6 +210,7 @@ For buttons, the direct Factory method creates the visual control but does not a
 
 ---
 
+<a name="label-builder"></a>
 ## 🔤 Label Builder
 
 **Implementation unit:** `Rick.UIBuilder._Label`
@@ -250,6 +257,7 @@ end;
 
 ---
 
+<a name="button-builder"></a>
 ## 🔘 Button Builder
 
 **Implementation unit:** `Rick.UIBuilder.Button`
@@ -303,6 +311,7 @@ When `Enabled(False)` is used, the builder applies the configured `DisabledOpaci
 
 ---
 
+<a name="badge-builder"></a>
 ## 🏷️ Badge Builder
 
 **Implementation unit:** `Rick.UIBuilder.Badge`
@@ -347,6 +356,7 @@ When `Pill(True)` is used, the Factory's pill shape is preserved. With `Pill(Fal
 
 ---
 
+<a name="divider-builder"></a>
 ## ➖ Divider Builder
 
 **Implementation unit:** `Rick.UIBuilder.Divider`
@@ -386,6 +396,7 @@ end;
 
 ---
 
+<a name="composition"></a>
 ## 🧩 Composition
 
 **Implementation unit:** `Rick.UIBuilder.Composition`
@@ -451,6 +462,7 @@ The records above contain additional fields beyond those changed in the example.
 
 ---
 
+<a name="working-with-interfaces"></a>
 ## 🔌 Working with Interfaces
 
 **Unit:** `Rick.UIBuilder.Interfaces`
@@ -492,6 +504,7 @@ This style is useful when code should explicitly depend on the interface contrac
 
 ---
 
+<a name="sample-application"></a>
 ## 🎨 Sample Application
 
 The `sample` project is intentionally small and demonstrates the three main usage styles visually:
@@ -508,6 +521,7 @@ sample\RickUIBuilder.Sample.dproj
 
 The sample is designed as a basic showcase. The examples in this README cover additional options that are available in the public API.
 
+<a name="tests"></a>
 ## ✅ Tests
 
 The project includes a working DUnitX test suite covering the main RickUIBuilder areas, including:
@@ -523,6 +537,7 @@ The project includes a working DUnitX test suite covering the main RickUIBuilder
 
 The test project is available under `tests`.
 
+<a name="license"></a>
 ## 📄 License
 
 See [LICENSE](LICENSE).
