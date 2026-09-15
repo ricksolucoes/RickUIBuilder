@@ -5,6 +5,9 @@
 [![Tests](https://img.shields.io/badge/Tests-DUnitX-2EA44F?style=flat-square)](#tests)
 [![License](https://img.shields.io/badge/License-Revocable%20Software%20License-8250DF?style=flat-square)](LICENSE)
 
+[English](README.md) | **Português (Brasil)**
+**English** | [Português (Brasil)](README.pt-BR.md)
+
 RickUIBuilder is a Delphi FireMonkey (FMX) library for creating and composing UI controls in code. It supports three complementary usage styles: direct creation through a factory, fluent builders for richer component configuration, and composition for creating short sequences of controls on the same parent.
 
 The library is distributed as source code. To use it, add the `src` directory to your Delphi project's Search Path.
