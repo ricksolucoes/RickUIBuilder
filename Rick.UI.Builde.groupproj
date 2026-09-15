@@ -1,0 +1,60 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{44F6CD88-A1A3-4382-9BB1-14A7985FB523}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="tests\RickUIBuilder.Test.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="RickUIBuilder.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="sample\RickUIBuilder.Sample.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="RickUIBuilder_Test">
+        <MSBuild Projects="tests\RickUIBuilder.Test.dproj"/>
+    </Target>
+    <Target Name="RickUIBuilder_Test:Clean">
+        <MSBuild Projects="tests\RickUIBuilder.Test.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RickUIBuilder_Test:Make">
+        <MSBuild Projects="tests\RickUIBuilder.Test.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RickUIBuilder">
+        <MSBuild Projects="RickUIBuilder.dproj"/>
+    </Target>
+    <Target Name="RickUIBuilder:Clean">
+        <MSBuild Projects="RickUIBuilder.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RickUIBuilder:Make">
+        <MSBuild Projects="RickUIBuilder.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RickUIBuilder_Sample">
+        <MSBuild Projects="sample\RickUIBuilder.Sample.dproj"/>
+    </Target>
+    <Target Name="RickUIBuilder_Sample:Clean">
+        <MSBuild Projects="sample\RickUIBuilder.Sample.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RickUIBuilder_Sample:Make">
+        <MSBuild Projects="sample\RickUIBuilder.Sample.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="RickUIBuilder_Test;RickUIBuilder;RickUIBuilder_Sample"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="RickUIBuilder_Test:Clean;RickUIBuilder:Clean;RickUIBuilder_Sample:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="RickUIBuilder_Test:Make;RickUIBuilder:Make;RickUIBuilder_Sample:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
