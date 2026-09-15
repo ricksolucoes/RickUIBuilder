@@ -1,7 +1,7 @@
 # RickUIBuilder
 
 [![Delphi](https://img.shields.io/badge/Delphi-FireMonkey-E62431?style=flat-square)](#requisitos)
-[![FMX](https://img.shields.io/badge/UI-FMX-0E7490?style=flat-square)](#visão-geral)
+[![FMX](https://img.shields.io/badge/UI-FMX-0E7490?style=flat-square)](#visao-geral)
 [![Tests](https://img.shields.io/badge/Tests-DUnitX-2EA44F?style=flat-square)](#testes)
 [![License](https://img.shields.io/badge/License-Revocable%20Software%20License-8250DF?style=flat-square)](LICENSE-pt-BR)
 
@@ -13,10 +13,10 @@ A distribuição é feita em código-fonte. Para usar o RickUIBuilder, basta adi
 
 ## Conteúdo
 
-- [Visão geral](#visão-geral)
+- [Visão geral](#visao-geral)
 - [Recursos](#recursos)
 - [Requisitos](#requisitos)
-- [Instalação](#instalação)
+- [Instalação](#instalacao)
 - [Primeiros passos](#primeiros-passos)
 - [Factory](#factory)
 - [Label Builder](#label-builder)
@@ -27,8 +27,9 @@ A distribuição é feita em código-fonte. Para usar o RickUIBuilder, basta adi
 - [Uso com Interfaces](#uso-com-interfaces)
 - [Sample](#sample)
 - [Testes](#testes)
-- [Licença](#licença)
+- [Licença](#licenca)
 
+<a name="visao-geral"></a>
 ## 📖 Visão geral
 
 A unit `Rick.UIBuilder` expõe `TRickUIBuilder`, que funciona como principal ponto de entrada da biblioteca:
@@ -53,6 +54,7 @@ As três formas de criação atendem a níveis diferentes de configuração:
 
 Usar explicitamente uma interface `IRickUIBuilder*` **não representa uma quarta forma de criação**. É apenas outra maneira de manter e utilizar os mesmos `Fluent Builders` por meio de seus contratos públicos.
 
+<a name="recursos"></a>
 ## ✨ Recursos
 
 - Criação direta de textos, buttons, badges e dividers FMX por meio de `TRickUIBuilderFactory`.
@@ -64,11 +66,13 @@ Usar explicitamente uma interface `IRickUIBuilder*` **não representa uma quarta
 - Badge handles que expõem o container gerado e o `TLabel` interno.
 - Interfaces públicas para os `Fluent Builders` e para `Composition`.
 
+<a name="requisitos"></a>
 ## 🧰 Requisitos
 
 - Delphi com suporte a FireMonkey (FMX).
 - Diretório `src` do RickUIBuilder disponível para o projeto que irá consumir a biblioteca.
 
+<a name="instalacao"></a>
 ## 📦 Instalação
 
 Clone ou copie o RickUIBuilder e adicione o diretório `src` ao **Search Path** do projeto Delphi:
@@ -79,6 +83,7 @@ Clone ou copie o RickUIBuilder e adicione o diretório `src` ao **Search Path** 
 
 Para o uso normal da biblioteca, não é necessário instalar package.
 
+<a name="primeiros-passos"></a>
 ## 🚀 Primeiros passos
 
 Para trabalhar com os `Fluent Builders`, o ponto de entrada mais direto é `Rick.UIBuilder`:
@@ -107,6 +112,7 @@ Nas próximas seções, cada forma de uso é apresentada com mais detalhes.
 
 ---
 
+<a name="factory"></a>
 ## 🏭 Factory
 
 **Unit de implementação:** `Rick.UIBuilder.Factory`
@@ -204,6 +210,7 @@ No caso de Button, o método direto da `Factory` cria o controle visual, mas nã
 
 ---
 
+<a name="label-builder"></a>
 ## 🔤 Label Builder
 
 **Unit de implementação:** `Rick.UIBuilder._Label`
@@ -250,6 +257,7 @@ end;
 
 ---
 
+<a name="button-builder"></a>
 ## 🔘 Button Builder
 
 **Unit de implementação:** `Rick.UIBuilder.Button`
@@ -303,6 +311,7 @@ Quando `Enabled(False)` é usado, o Builder aplica o valor configurado em `Disab
 
 ---
 
+<a name="badge-builder"></a>
 ## 🏷️ Badge Builder
 
 **Unit de implementação:** `Rick.UIBuilder.Badge`
@@ -347,6 +356,7 @@ Quando `Pill(True)` é usado, o formato pill definido pela `Factory` é preserva
 
 ---
 
+<a name="divider-builder"></a>
 ## ➖ Divider Builder
 
 **Unit de implementação:** `Rick.UIBuilder.Divider`
@@ -386,6 +396,7 @@ end;
 
 ---
 
+<a name="composition"></a>
 ## 🧩 Composition
 
 **Unit de implementação:** `Rick.UIBuilder.Composition`
@@ -451,6 +462,7 @@ Os records usados acima oferecem outros campos além dos alterados no exemplo. P
 
 ---
 
+<a name="uso-com-interfaces"></a>
 ## 🔌 Uso com Interfaces
 
 **Unit:** `Rick.UIBuilder.Interfaces`
@@ -492,6 +504,7 @@ Essa abordagem é útil quando o código deve depender explicitamente do contrat
 
 ---
 
+<a name="sample"></a>
 ## 🎨 Sample
 
 O projeto em `sample` é propositalmente simples e demonstra visualmente as três principais formas de uso:
@@ -508,6 +521,7 @@ sample\RickUIBuilder.Sample.dproj
 
 O sample funciona como uma apresentação básica. Os exemplos deste README mostram opções adicionais que já estão disponíveis na API pública.
 
+<a name="testes"></a>
 ## ✅ Testes
 
 O projeto possui uma suíte DUnitX funcional cobrindo as principais áreas do RickUIBuilder, incluindo:
@@ -523,6 +537,7 @@ O projeto possui uma suíte DUnitX funcional cobrindo as principais áreas do Ri
 
 O projeto de testes está disponível no diretório `tests`.
 
+<a name="licenca"></a>
 ## 📄 Licença
 
 Consulte [LICENSE-pt-BR](LICENSE-pt-BR).
