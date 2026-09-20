@@ -63,8 +63,8 @@ Usar explicitamente uma interface `IRickUIBuilder*` **não representa uma quarta
 - Records de configuração com valores `Default` reutilizáveis para criação direta pela `Factory`.
 - Configuração compartilhada de espaçamento com `TRickUIBuilderSpacing`.
 - Configuração de click e hover em Button.
-- Badge handles que expõem o container gerado e o `TLabel` interno.
-- Interfaces públicas para os `Fluent Builders` e para `Composition`.
+- Handles de Button e Badge que expõem o container gerado e o `TLabel` interno.
+- Interfaces públicas para os `Fluent Builders`, estado de hover do Button, Handles de controles gerados e `Composition`.
 
 <a name="requisitos"></a>
 ## 🧰 Requisitos
@@ -132,7 +132,7 @@ TRickUIBuilder.Factory
 | `CreateText` | `TLabel` |
 | `CreateDivider` | `TRectangle` |
 | `CreateBadge` | `TRectangle` do Badge e seu `TLabel` interno por meio de um parâmetro `out` |
-| `CreateButton` | `TRectangle` do Button com um Label interno para o caption |
+| `CreateButton` | `TRectangle` do Button; uma sobrecarga aditiva também retorna o `TLabel` interno do caption por parâmetro `out` |
 
 ### Records de configuração
 
@@ -206,7 +206,7 @@ end;
 
 `AOwner` controla o lifetime dos controles criados, enquanto `AParent` define onde eles serão inseridos na árvore visual do FMX.
 
-No caso de Button, o método direto da `Factory` cria o controle visual, mas não adiciona o comportamento de hover disponível no `Fluent Builder`. Quando você precisar de `HoverFillColor`, `OnHover` ou outras opções específicas do Builder, use o `Button Builder`.
+No caso de Button, o método direto da `Factory` cria o controle visual, mas não adiciona o comportamento de hover disponível no `Fluent Builder`. Quando você precisar de `HoverFillColor`, `OnHover` ou outras opções específicas do Builder, use o `Button Builder`. A sobrecarga original `CreateButton(...): TRectangle` continua disponível; use a sobrecarga com `out ATextLabel: TLabel` somente quando o código que utiliza diretamente a Factory também precisar da referência exata ao label de caption criado para aquele Button. Os dois controles continuam pertencendo ao `AOwner` informado à Factory.
 
 ---
 
@@ -308,6 +308,72 @@ end;
 ```
 
 Quando `Enabled(False)` é usado, o Builder aplica o valor configurado em `DisabledOpacity`. Quando está habilitado, utiliza o valor normal de `Opacity`.
+
+### Estado de hover do Button
+
+O Button Builder configura o hover pela própria API fluent pública (`HoverFillColor` e `OnHover`). O RickUIBuilder também expõe `IRickUIBuilderButtonHoverState` quando for necessário configurar explicitamente o próprio estado de hover.
+
+`TRickUIBuilderButtonHoverState.New` não recebe parâmetros. A configuração é feita por overloads fluent de entrada, enquanto os overloads correspondentes sem parâmetro retornam os valores atualmente configurados:
+
+| Configuração | Overload de entrada | Overload de saída |
+| --- | --- | --- |
+| Button | `Button(AValue: TRectangle)` | `Button: TRectangle` |
+| Fill normal | `FillColor(AValue: TAlphaColor)` | `FillColor: TAlphaColor` |
+| Fill de hover | `HoverFillColor(AValue: TAlphaColor)` | `HoverFillColor: TAlphaColor` |
+| Handler de MouseEnter | `OnEnter(AValue: TNotifyEvent)` | `OnEnter: TNotifyEvent` |
+| Handler de MouseLeave | `OnLeave(AValue: TNotifyEvent)` | `OnLeave: TNotifyEvent` |
+
+Cada overload de entrada retorna `IRickUIBuilderButtonHoverState`, preservando o encadeamento fluent. `Build(AOwner)` materializa o comportamento persistente de hover e retorna o mesmo contrato de interface.
+
+```pascal
+uses
+  System.UITypes,
+  FMX.Objects,
+  Rick.UIBuilder.Button.HoverState,
+  Rick.UIBuilder.Interfaces;
+
+procedure TMainForm.ConfigureButtonHover(const AButton: TRectangle);
+var
+  LHoverState: IRickUIBuilderButtonHoverState;
+begin
+  LHoverState := TRickUIBuilderButtonHoverState.New
+    .Button(AButton)
+    .FillColor(AButton.Fill.Color)
+    .HoverFillColor(TAlphaColors.Lightgray);
+
+  LHoverState.Build(Self);
+end;
+```
+
+A interface de configuração pode ser liberada depois de `Build`. O comportamento materializado dos eventos pertence ao `AOwner` informado a `Build` e permanece vivo enquanto esse Owner permanecer vivo. `Build` não altera o ownership do Button; portanto, o Owner informado deve permanecer vivo enquanto o Button puder disparar os eventos de hover configurados.
+
+### Acessando os controles gerados
+
+A API existente `Build(AParent): TRectangle` foi preservada e continua sendo a opção mais simples quando o consumidor precisa apenas do container do Button. Quando também for necessária a referência exata ao label interno do caption, use `BuildHandle`. O retorno é um `IRickUIBuilderButtonHandle` com `Container` e `TextLabel` apontando para os mesmos controles criados pelo Builder.
+
+```pascal
+uses
+  Rick.UIBuilder,
+  Rick.UIBuilder.Interfaces;
+
+procedure TMainForm.BuildButtonWithHandle;
+var
+  LHandle: IRickUIBuilderButtonHandle;
+begin
+  LHandle := TRickUIBuilder.Button
+    .Caption('Salvar')
+    .Size(160, 44)
+    .BuildHandle(Self);
+
+  LHandle.TextLabel.Text := 'Salvo';
+end;
+```
+
+O Handle é **non-owning**. Liberar a interface não libera nenhum dos controles e manter a interface referenciada não mantém esses controles vivos. O ownership e o lifetime continuam pertencendo ao `Owner` usado na criação (o Fluent Builder utiliza o `AParent` informado a `Build`/`BuildHandle` como Owner e Parent do container e como Owner do label de caption). Portanto, `Container` e `TextLabel` não devem ser acessados pelo Handle depois que o respectivo Owner tiver sido destruído.
+
+Use `Build` quando somente o `TRectangle` for necessário. Use `BuildHandle` quando o código precisar acessar explicitamente o `TLabel` criado, sem depender da organização interna de `Children` do Button.
+
+As chamadas em código-fonte para `Build(AParent): TRectangle` permanecem inalteradas. Como `IRickUIBuilderButton` passa a possuir um novo método, units/packages Delphi dependentes devem ser recompilados contra esta versão; não é afirmada compatibilidade binária com DCUs/DCPs/BPLs compilados contra o layout anterior da interface.
 
 ---
 
@@ -467,18 +533,22 @@ Os records usados acima oferecem outros campos além dos alterados no exemplo. P
 
 **Unit:** `Rick.UIBuilder.Interfaces`
 
-O RickUIBuilder expõe contratos públicos para os `Fluent Builders`, para o Badge handle e para o composer:
+O RickUIBuilder expõe contratos públicos para os `Fluent Builders`, para o estado de hover do Button, para os Handles de Button e Badge e para o composer:
 
 | Interface | Responsabilidade |
 | --- | --- |
 | `IRickUIBuilderLabel` | Contrato do Label Builder |
 | `IRickUIBuilderButton` | Contrato do Button Builder |
+| `IRickUIBuilderButtonHoverState` | Configuração fluent de hover com overloads de entrada/saída; `Build(AOwner)` materializa comportamento cujo lifetime segue o Owner informado |
+| `IRickUIBuilderButtonHandle` | Acesso non-owning ao container e ao label de caption gerados para o Button |
 | `IRickUIBuilderBadge` | Contrato do Badge Builder |
 | `IRickUIBuilderBadgeHandle` | Acesso ao container e ao text label gerados para o Badge |
 | `IRickUIBuilderDivider` | Contrato do Divider Builder |
 | `IRickUIBuilderComposer` | Contrato de Composition |
 
 Usar a interface explicitamente não cria outra implementação. Você continua trabalhando com o mesmo Builder retornado por `TRickUIBuilder`, apenas mantendo a referência pelo contrato público correspondente.
+
+`IRickUIBuilderButtonHoverState` é diferente quanto à finalidade, mas segue o mesmo estilo orientado a interface: representa a configuração explícita do hover, e não um Builder visual. Seu `New` não recebe parâmetros, os pares setter/getter utilizam overloads e `Build(AOwner)` materializa o comportamento de eventos controlado pelo Owner. A interface de configuração não precisa permanecer referenciada depois de `Build`.
 
 Exemplo simples:
 
@@ -524,7 +594,7 @@ O sample funciona como uma apresentação básica. Os exemplos deste README most
 <a name="testes"></a>
 ## ✅ Testes
 
-O projeto possui uma suíte DUnitX funcional cobrindo as principais áreas do RickUIBuilder, incluindo:
+O projeto possui uma suíte DUnitX cobrindo as principais áreas do RickUIBuilder, incluindo:
 
 - Types.
 - Factory.
@@ -536,6 +606,32 @@ O projeto possui uma suíte DUnitX funcional cobrindo as principais áreas do Ri
 - Facade.
 
 O projeto de testes está disponível no diretório `tests`.
+
+### Resultado DUnitX verificado
+
+Uma execução real de `RickUIBuilder.Test.exe` fornecida para esta versão apresentou:
+
+| Resultado DUnitX | Valor |
+| --- | ---: |
+| Tests Found | **151** |
+| Tests Passed | **151** |
+| Tests Ignored | **0** |
+| Tests Leaked | **0** |
+| Tests Failed | **0** |
+| Tests Errored | **0** |
+
+Esses valores documentam essa execução verificada específica; não constituem garantia para revisões futuras.
+
+### Method Toxicity Metrics
+
+O Method Toxicity Metrics do RAD Studio também foi executado para os projetos da biblioteca e de testes. Nos relatórios fornecidos, ordenados por `Toxicity`, os maiores valores exibidos foram:
+
+| Projeto | Maior `Toxicity` exibido | Threshold de qualidade do projeto |
+| --- | ---: | ---: |
+| `RickUIBuilder.dproj` | **0.487** | `< 1` |
+| `RickUIBuilder.Test.dproj` | **0.367** | `< 1` |
+
+Esses valores de `Toxicity` foram medidos pelo RAD Studio nos relatórios fornecidos; não são estimativas derivadas do código-fonte. A métrica é específica desta revisão e deve ser medida novamente após futuras alterações de código.
 
 <a name="licenca"></a>
 ## 📄 Licença

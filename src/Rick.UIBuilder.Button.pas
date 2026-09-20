@@ -1,4 +1,4 @@
-unit Rick.UIBuilder.Button;
+﻿unit Rick.UIBuilder.Button;
 (*
   ==============================================================================
   Unit: Rick.UIBuilder.Button
@@ -9,7 +9,7 @@ unit Rick.UIBuilder.Button;
   Implementa exclusivamente o builder fluente IRickUIBuilderButton
   (Opcao B do framework Rick.UIBuilder): TRickUIBuilderButtonBuilder
   acumula estado em memoria a cada chamada encadeada e so cria o botao
-  (TRectangle com TLabel interno) de fato ao chamar Build.
+  (TRectangle com TLabel interno) de fato ao chamar Build ou BuildHandle.
 
   A criacao real dos controles e delegada a TRickUIBuilderFactory.CreateButton
   (Opcao A) - esta unit NAO reimplementa a logica de instanciacao, apenas
@@ -18,8 +18,11 @@ unit Rick.UIBuilder.Button;
   DisabledOpacity, Enabled, Cursor, Opacity, Visible, OnClick, OnHover)
   e aplica esse estado extra apos o Build da Factory.
 
-  Esta unit NAO implementa o gerenciamento de estado de hover - essa
-  responsabilidade vive isoladamente em Rick.UIBuilder.Button.HoverState,
+  Esta unit NAO implementa IRickUIBuilderButtonHandle nem o gerenciamento
+  de estado de hover. O handle vive em Rick.UIBuilder.Button.Handle e o
+  estado de hover vive em Rick.UIBuilder.Button.HoverState.
+
+  O gerenciamento de hover permanece isolado em Rick.UIBuilder.Button.HoverState,
   em observancia ao Principio de Responsabilidade Unica (SRP): "montar
   o botao" (esta unit) e "gerenciar o estado de hover do botao"
   (Rick.UIBuilder.Button.HoverState) sao responsabilidades distintas.
@@ -39,13 +42,14 @@ uses
   Rick.UIBuilder.Types,
   Rick.UIBuilder.Interfaces,
   Rick.UIBuilder.Factory,
+  Rick.UIBuilder.Button.Handle,
   Rick.UIBuilder.Button.HoverState;
 
 type
   /// <summary>
   ///    Implementacao de IRickUIBuilderButton. Acumula estado em
   ///    campos privados a cada metodo encadeado; a criacao do botao
-  ///    so ocorre ao chamar Build.
+  ///    so ocorre ao chamar Build ou BuildHandle.
   /// </summary>
   TRickUIBuilderButtonBuilder = class(TInterfacedObject, IRickUIBuilderButton)
   private
@@ -76,6 +80,17 @@ type
     FOnClick           : TNotifyEvent;
     FOnEnter           : TNotifyEvent;
     FOnLeave           : TNotifyEvent;
+
+    function BuildConfig: TRickUIBuilderButtonConfig;
+    function BuildCore(AParent: TFmxObject; out ATextLabel: TLabel): TRectangle;
+    procedure ApplyContainerState(AButton: TRectangle);
+    procedure ApplyTextState(ATextLabel: TLabel);
+    procedure AttachBehavior(AParent: TFmxObject; AButton: TRectangle);
+
+    procedure InitLayoutDefaults(const ADefault: TRickUIBuilderButtonConfig);
+    procedure InitAppearanceDefaults(const ADefault: TRickUIBuilderButtonConfig);
+    procedure InitInteractionDefaults(const ADefault: TRickUIBuilderButtonConfig);
+    procedure InitEventDefaults;
   protected
     constructor Create;
 
@@ -104,6 +119,7 @@ type
     function OnHover(AEnter, ALeave: TNotifyEvent): IRickUIBuilderButton;
 
     function Build(AParent: TFmxObject): TRectangle;
+    function BuildHandle(AParent: TFmxObject): IRickUIBuilderButtonHandle;
   public
     /// <summary>
     ///    Cria uma nova instancia de IRickUIBuilderButton, ja com os
@@ -131,33 +147,10 @@ begin
 
   LDefault := TRickUIBuilderButtonConfig.Default;
 
-  FCaption           := '';
-  FLeft              := LDefault.Left;
-  FTop               := LDefault.Top;
-  FWidth             := LDefault.Width;
-  FHeight            := LDefault.Height;
-  FAnchors           := [];
-  FCornerRadius      := 16;
-  FMargin            := TRickUIBuilderSpacing.None;
-  FPadding           := TRickUIBuilderSpacing.None;
-  FFillColor         := LDefault.FillColor;
-  FBorderColor       := LDefault.BorderColor;
-  FBorderThickness   := 0;
-  FTextColor         := LDefault.TextColor;
-  FFontFamily        := '';
-  FFontSize          := LDefault.FontSize;
-  FBold              := False;
-  FHoverFillColor    := TAlphaColors.Null;
-  FHasHoverFillColor := False;
-  FDisabledOpacity   := 0.45;
-  FEnabled           := True;
-  FCursor            := crHandPoint;
-  FOpacity           := 1;
-  FVisible           := True;
-  FTag               := LDefault.Tag;
-  FOnClick           := nil;
-  FOnEnter           := nil;
-  FOnLeave           := nil;
+  InitLayoutDefaults(LDefault);
+  InitAppearanceDefaults(LDefault);
+  InitInteractionDefaults(LDefault);
+  InitEventDefaults;
 end;
 
 class function TRickUIBuilderButtonBuilder.New: IRickUIBuilderButton;
@@ -330,80 +323,144 @@ begin
   Result   := Self;
 end;
 
-function TRickUIBuilderButtonBuilder.Build(AParent: TFmxObject): TRectangle;
-var
-  LConfig     : TRickUIBuilderButtonConfig;
-  LHoverState : TRickUIBuilderButtonHoverState;
+function TRickUIBuilderButtonBuilder.BuildConfig: TRickUIBuilderButtonConfig;
 begin
-  LConfig             := TRickUIBuilderButtonConfig.Default;
-  // Margin e somado a posicao definida via Position, nao substitui -
-  // ver <remarks> de IRickUIBuilderButton.Margin.
-  LConfig.Left        := FLeft + FMargin.Left;
-  LConfig.Top         := FTop + FMargin.Top;
-  LConfig.Width       := FWidth;
-  LConfig.Height      := FHeight;
-  LConfig.FillColor   := FFillColor;
-  LConfig.BorderColor := FBorderColor;
-  LConfig.TextColor   := FTextColor;
-  LConfig.Tag         := FTag;
-  LConfig.FontSize    := FFontSize;
+  Result             := TRickUIBuilderButtonConfig.Default;
+  Result.Left        := FLeft + FMargin.Left;
+  Result.Top         := FTop + FMargin.Top;
+  Result.Width       := FWidth;
+  Result.Height      := FHeight;
+  Result.FillColor   := FFillColor;
+  Result.BorderColor := FBorderColor;
+  Result.TextColor   := FTextColor;
+  Result.Tag         := FTag;
+  Result.FontSize    := FFontSize;
+end;
 
-  // AParent e utilizado tambem como Owner: TFmxObject herda de
-  // TComponent, entao o ciclo de vida dos controles fica atrelado ao
-  // proprio Parent informado.
-  Result := TRickUIBuilderFactory.CreateButton(AParent, AParent, FCaption,
-    LConfig);
-
-  Result.Anchors := FAnchors;
-  Result.XRadius  := FCornerRadius;
-  Result.YRadius  := FCornerRadius;
+procedure TRickUIBuilderButtonBuilder.ApplyContainerState(AButton: TRectangle);
+begin
+  AButton.Anchors := FAnchors;
+  AButton.XRadius := FCornerRadius;
+  AButton.YRadius := FCornerRadius;
 
   if FBorderThickness > 0 then
-    Result.Stroke.Thickness := FBorderThickness;
+    AButton.Stroke.Thickness := FBorderThickness;
 
+  AButton.Enabled := FEnabled;
+  if FEnabled then
+    AButton.Opacity := FOpacity
+  else
+    AButton.Opacity := FDisabledOpacity;
+
+  AButton.Cursor := FCursor;
+  AButton.Visible := FVisible;
+end;
+
+procedure TRickUIBuilderButtonBuilder.ApplyTextState(ATextLabel: TLabel);
+begin
   if FFontFamily <> '' then
-  begin
-    if (Result.ChildrenCount > 0) and (Result.Children[0] is TLabel) then
-      TLabel(Result.Children[0]).TextSettings.Font.Family := FFontFamily;
-  end;
+    ATextLabel.TextSettings.Font.Family := FFontFamily;
 
   if FBold then
-  begin
-    if (Result.ChildrenCount > 0) and (Result.Children[0] is TLabel) then
-      TLabel(Result.Children[0]).TextSettings.Font.Style :=
-        TLabel(Result.Children[0]).TextSettings.Font.Style + [TFontStyle.fsBold];
-  end;
+    ATextLabel.TextSettings.Font.Style := ATextLabel.TextSettings.Font.Style
+      + [TFontStyle.fsBold];
 
-  if (Result.ChildrenCount > 0) and (Result.Children[0] is TLabel) then
-  begin
-    // Padding aplica-se ao espaco interno entre a borda do botao e o
-    // label de Caption - ver <remarks> de IRickUIBuilderButton.Padding.
-    TLabel(Result.Children[0]).Padding.Left   := FPadding.Left;
-    TLabel(Result.Children[0]).Padding.Top    := FPadding.Top;
-    TLabel(Result.Children[0]).Padding.Right  := FPadding.Right;
-    TLabel(Result.Children[0]).Padding.Bottom := FPadding.Bottom;
-  end;
+  ATextLabel.Padding.Left := FPadding.Left;
+  ATextLabel.Padding.Top := FPadding.Top;
+  ATextLabel.Padding.Right := FPadding.Right;
+  ATextLabel.Padding.Bottom := FPadding.Bottom;
+end;
 
-  // O estado de hover e delegado a Rick.UIBuilder.Button.HoverState -
-  // ver responsabilidade no cabecalho desta unit.
-  LHoverState := TRickUIBuilderButtonHoverState.New(AParent, Result,
-    FFillColor, FHoverFillColor, FHasHoverFillColor, FOnEnter, FOnLeave);
+procedure TRickUIBuilderButtonBuilder.AttachBehavior(AParent: TFmxObject;
+  AButton: TRectangle);
+var
+  LHoverState: IRickUIBuilderButtonHoverState;
+begin
+  LHoverState := TRickUIBuilderButtonHoverState.New
+    .Button(AButton).FillColor(FFillColor).OnEnter(FOnEnter).OnLeave(FOnLeave);
 
-  Result.OnMouseEnter := LHoverState.HandleMouseEnter;
-  Result.OnMouseLeave := LHoverState.HandleMouseLeave;
+  if FHasHoverFillColor then
+    LHoverState.HoverFillColor(FHoverFillColor);
 
+  LHoverState.Build(AParent);
   if Assigned(FOnClick) then
-    Result.OnClick := FOnClick;
+    AButton.OnClick := FOnClick;
+end;
 
-  Result.Enabled := FEnabled;
+function TRickUIBuilderButtonBuilder.BuildCore(AParent: TFmxObject;
+  out ATextLabel: TLabel): TRectangle;
+var
+  LConfig: TRickUIBuilderButtonConfig;
+begin
+  LConfig := BuildConfig;
+  Result := TRickUIBuilderFactory.CreateButton(AParent, AParent, FCaption,
+    LConfig, ATextLabel);
+  ApplyContainerState(Result);
+  ApplyTextState(ATextLabel);
+  AttachBehavior(AParent, Result);
+end;
 
-  if FEnabled then
-    Result.Opacity := FOpacity
-  else
-    Result.Opacity := FDisabledOpacity;
+function TRickUIBuilderButtonBuilder.Build(AParent: TFmxObject): TRectangle;
+var
+  LTextLabel: TLabel;
+begin
+  Result := BuildCore(AParent, LTextLabel);
+end;
 
-  Result.Cursor  := FCursor;
-  Result.Visible := FVisible;
+function TRickUIBuilderButtonBuilder.BuildHandle(
+  AParent: TFmxObject): IRickUIBuilderButtonHandle;
+var
+  LContainer: TRectangle;
+  LTextLabel: TLabel;
+begin
+  LContainer := BuildCore(AParent, LTextLabel);
+  Result := TRickUIBuilderButtonHandle.New(LContainer, LTextLabel);
+end;
+
+procedure TRickUIBuilderButtonBuilder.InitLayoutDefaults(
+  const ADefault: TRickUIBuilderButtonConfig);
+begin
+  FCaption      := '';
+  FLeft         := ADefault.Left;
+  FTop          := ADefault.Top;
+  FWidth        := ADefault.Width;
+  FHeight       := ADefault.Height;
+  FAnchors      := [];
+  FCornerRadius := 16;
+  FMargin       := TRickUIBuilderSpacing.None;
+  FPadding      := TRickUIBuilderSpacing.None;
+end;
+
+procedure TRickUIBuilderButtonBuilder.InitAppearanceDefaults(
+  const ADefault: TRickUIBuilderButtonConfig);
+begin
+  FFillColor         := ADefault.FillColor;
+  FBorderColor       := ADefault.BorderColor;
+  FBorderThickness   := 0;
+  FTextColor         := ADefault.TextColor;
+  FFontFamily        := '';
+  FFontSize          := ADefault.FontSize;
+  FBold              := False;
+  FHoverFillColor    := TAlphaColors.Null;
+  FHasHoverFillColor := False;
+  FDisabledOpacity   := 0.45;
+end;
+
+procedure TRickUIBuilderButtonBuilder.InitInteractionDefaults(
+  const ADefault: TRickUIBuilderButtonConfig);
+begin
+  FEnabled := True;
+  FCursor  := crHandPoint;
+  FOpacity := 1;
+  FVisible := True;
+  FTag     := ADefault.Tag;
+end;
+
+procedure TRickUIBuilderButtonBuilder.InitEventDefaults;
+begin
+  FOnClick := nil;
+  FOnEnter := nil;
+  FOnLeave := nil;
 end;
 
 end.

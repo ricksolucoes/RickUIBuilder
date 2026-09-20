@@ -176,7 +176,6 @@ end;
 procedure TRickUIBuilderComposerTests.SequenciaCompleta_DeveCriarTresControlesTodosFilhosDoMesmoParent;
 var
   LComposer: IRickUIBuilderComposer;
-  LHandle: IRickUIBuilderBadgeHandle;
 begin
   LComposer := TRickUIBuilderComposer.New(FHostForm);
   LComposer

@@ -1,4 +1,4 @@
-unit Rick.UIBuilder.Interfaces;
+﻿unit Rick.UIBuilder.Interfaces;
 (*
   ==============================================================================
   Unit: Rick.UIBuilder.Interfaces
@@ -7,7 +7,8 @@ unit Rick.UIBuilder.Interfaces;
   RESPONSABILIDADE
 
   Define os contratos (interfaces) dos builders fluentes do framework
-  Rick.UIBuilder (Opcao B): IRickUIBuilderLabel, IRickUIBuilderButton,
+  Rick.UIBuilder (Opcao B): IRickUIBuilderLabel, IRickUIBuilderButton
+  (com seu IRickUIBuilderButtonHandle), IRickUIBuilderButtonHoverState,
   IRickUIBuilderBadge (com seu IRickUIBuilderBadgeHandle) e
   IRickUIBuilderDivider.
 
@@ -293,10 +294,130 @@ type
   end;
 
   /// <summary>
+  ///    Configura fluentemente o estado de hover de um Button. O objeto
+  ///    de configuracao e reference-counted; Build materializa o
+  ///    comportamento persistente com lifetime controlado por AOwner.
+  /// </summary>
+  IRickUIBuilderButtonHoverState = interface
+    ['{1DDCEF34-0EBE-4734-98C5-F9DF13CAE728}']
+
+    /// <summary>
+    ///    Define o TRectangle que recebera os eventos de hover.
+    /// </summary>
+    /// <param name="AValue">Button que recebera os eventos.</param>
+    /// <returns>A propria interface para encadeamento fluente.</returns>
+    function Button(AValue: TRectangle): IRickUIBuilderButtonHoverState; overload;
+
+    /// <summary>
+    ///    Retorna o TRectangle atualmente configurado.
+    /// </summary>
+    /// <returns>O Button configurado ou nil quando ainda nao definido.</returns>
+    function Button: TRectangle; overload;
+
+    /// <summary>
+    ///    Define a cor normal restaurada ao sair do hover.
+    /// </summary>
+    /// <param name="AValue">Cor normal do Button.</param>
+    /// <returns>A propria interface para encadeamento fluente.</returns>
+    function FillColor(AValue: TAlphaColor): IRickUIBuilderButtonHoverState; overload;
+
+    /// <summary>
+    ///    Retorna a cor normal atualmente configurada.
+    /// </summary>
+    /// <returns>A cor normal configurada.</returns>
+    function FillColor: TAlphaColor; overload;
+
+    /// <summary>
+    ///    Define a cor aplicada durante o hover e marca essa configuracao
+    ///    como explicitamente informada.
+    /// </summary>
+    /// <param name="AValue">Cor aplicada durante o hover.</param>
+    /// <returns>A propria interface para encadeamento fluente.</returns>
+    function HoverFillColor(AValue: TAlphaColor):
+      IRickUIBuilderButtonHoverState; overload;
+
+    /// <summary>
+    ///    Retorna a cor de hover atualmente configurada.
+    /// </summary>
+    /// <returns>A cor de hover configurada.</returns>
+    function HoverFillColor: TAlphaColor; overload;
+
+    /// <summary>
+    ///    Define o manipulador adicional executado apos a entrada no hover.
+    /// </summary>
+    /// <param name="AValue">Manipulador executado no MouseEnter.</param>
+    /// <returns>A propria interface para encadeamento fluente.</returns>
+    function OnEnter(AValue: TNotifyEvent): IRickUIBuilderButtonHoverState; overload;
+
+    /// <summary>
+    ///    Retorna o manipulador de entrada atualmente configurado.
+    /// </summary>
+    /// <returns>O manipulador de entrada configurado.</returns>
+    function OnEnter: TNotifyEvent; overload;
+
+    /// <summary>
+    ///    Define o manipulador adicional executado apos a saida do hover.
+    /// </summary>
+    /// <param name="AValue">Manipulador executado no MouseLeave.</param>
+    /// <returns>A propria interface para encadeamento fluente.</returns>
+    function OnLeave(AValue: TNotifyEvent): IRickUIBuilderButtonHoverState; overload;
+
+    /// <summary>
+    ///    Retorna o manipulador de saida atualmente configurado.
+    /// </summary>
+    /// <returns>O manipulador de saida configurado.</returns>
+    function OnLeave: TNotifyEvent; overload;
+
+    /// <summary>
+    ///    Materializa o comportamento de hover e o atrela ao lifetime
+    ///    do componente informado como Owner.
+    /// </summary>
+    /// <param name="AOwner">Owner do comportamento materializado.</param>
+    /// <returns>A propria interface para encadeamento fluente.</returns>
+    /// <remarks>
+    ///    A interface de configuracao pode ser liberada apos Build. O
+    ///    comportamento continua vivo enquanto AOwner permanecer vivo.
+    ///    AOwner deve permanecer vivo enquanto Button puder disparar os
+    ///    eventos configurados; Build nao altera o ownership do Button.
+    /// </remarks>
+    function Build(AOwner: TComponent): IRickUIBuilderButtonHoverState;
+  end;
+
+  /// <summary>
+  ///    Representa os dois controles resultantes da criacao de um
+  ///    Button: o retangulo container e o label de Caption interno.
+  /// </summary>
+  /// <remarks>
+  ///    O handle nao e proprietario dos controles e nao altera o
+  ///    modelo de ownership utilizado na criacao. Container e TextLabel
+  ///    permanecem validos somente enquanto seus Owners mantiverem os
+  ///    controles vivos.
+  /// </remarks>
+  IRickUIBuilderButtonHandle = interface
+    ['{8B51C5CF-2849-41FC-8765-242C5169FEA6}']
+
+    /// <summary>
+    ///    Retorna o retangulo que forma o Button.
+    /// </summary>
+    /// <returns>
+    ///    O TRectangle criado como container do Button.
+    /// </returns>
+    function Container: TRectangle;
+
+    /// <summary>
+    ///    Retorna o label de Caption interno do Button.
+    /// </summary>
+    /// <returns>
+    ///    O TLabel criado como filho do Container.
+    /// </returns>
+    function TextLabel: TLabel;
+  end;
+
+  /// <summary>
   ///    Builder fluente para criacao de um botao customizado
   ///    (TRectangle com TLabel interno). Cada metodo retorna a propria
   ///    instancia, permitindo encadeamento. A criacao real do controle
-  ///    so ocorre ao chamar Build.
+  ///    so ocorre ao chamar Build ou BuildHandle.
   /// </summary>
   IRickUIBuilderButton = interface
     ['{3F8B2A1D-6C4E-4D9F-A2B3-5C6D7E8F9A0B}']
@@ -605,6 +726,25 @@ type
     ///    Caption criado como seu filho.
     /// </returns>
     function Build(AParent: TFmxObject): TRectangle;
+
+    /// <summary>
+    ///    Cria o mesmo Button de Build e devolve acesso explicito ao
+    ///    Container e ao TextLabel criados.
+    /// </summary>
+    /// <param name="AParent">
+    ///    Controle ou formulario que sera o Parent do Button criado.
+    /// </param>
+    /// <returns>
+    ///    Um IRickUIBuilderButtonHandle com as referencias exatas ao
+    ///    TRectangle e ao TLabel criados para este Button.
+    /// </returns>
+    /// <remarks>
+    ///    O handle nao assume ownership dos controles. A destruicao do
+    ///    handle nao libera Container nem TextLabel, e o handle nao deve
+    ///    ser usado depois que os Owners desses controles forem destruidos.
+    ///    Use Build quando somente o TRectangle for necessario.
+    /// </remarks>
+    function BuildHandle(AParent: TFmxObject): IRickUIBuilderButtonHandle;
   end;
 
   /// <summary>

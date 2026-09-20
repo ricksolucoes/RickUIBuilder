@@ -66,6 +66,14 @@ type
     FOpacity         : Single;
     FVisible         : Boolean;
     FTag             : NativeInt;
+
+    function BuildBadgeConfig: TRickUIBuilderBadgeConfig;
+    procedure ApplyBadgeShape(const AContainer: TRectangle);
+    procedure ApplyBadgeBorder(const AContainer: TRectangle);
+    procedure ApplyBadgeTextStyle(const ATextLabel: TLabel);
+    procedure ApplyBadgePadding(const ATextLabel: TLabel);
+    procedure ApplyBadgeFinalProperties(const AContainer: TRectangle);
+
   protected
     function Text(const AValue: string): IRickUIBuilderBadge;
     function Position(ALeft, ATop: Single): IRickUIBuilderBadge;
@@ -252,16 +260,7 @@ var
   LContainer : TRectangle;
   LTextLabel : TLabel;
 begin
-  LConfig                 := TRickUIBuilderBadgeConfig.Default;
-  // Margin e somado a posicao definida via Position, nao substitui -
-  // ver <remarks> de IRickUIBuilderBadge.Margin.
-  LConfig.Left            := FLeft + FMargin.Left;
-  LConfig.Top             := FTop + FMargin.Top;
-  LConfig.Width           := FWidth;
-  LConfig.Height          := FHeight;
-  LConfig.BackgroundColor := FBackgroundColor;
-  LConfig.TextColor       := FTextColor;
-  LConfig.FontSize        := FFontSize;
+  LConfig := BuildBadgeConfig;
 
   // AParent e utilizado tambem como Owner: TFmxObject herda de
   // TComponent, entao o ciclo de vida dos controles fica atrelado ao
@@ -269,37 +268,77 @@ begin
   LContainer := TRickUIBuilderFactory.CreateBadge(AParent, AParent, FText,
     LConfig, LTextLabel);
 
+  ApplyBadgeShape(LContainer);
+  ApplyBadgeBorder(LContainer);
+  ApplyBadgeTextStyle(LTextLabel);
+  ApplyBadgePadding(LTextLabel);
+  ApplyBadgeFinalProperties(LContainer);
+
+  Result := TRickUIBuilderBadgeHandle.New(LContainer, LTextLabel);
+end;
+
+function TRickUIBuilderBadgeBuilder.BuildBadgeConfig: TRickUIBuilderBadgeConfig;
+begin
+  Result                 := TRickUIBuilderBadgeConfig.Default;
+  // Margin e somado a posicao definida via Position, nao substitui -
+  // ver <remarks> de IRickUIBuilderBadge.Margin.
+  Result.Left            := FLeft + FMargin.Left;
+  Result.Top             := FTop + FMargin.Top;
+  Result.Width           := FWidth;
+  Result.Height          := FHeight;
+  Result.BackgroundColor := FBackgroundColor;
+  Result.TextColor       := FTextColor;
+  Result.FontSize        := FFontSize;
+end;
+
+procedure TRickUIBuilderBadgeBuilder.ApplyBadgeShape(
+  const AContainer: TRectangle);
+begin
   // A Factory ja aplica formato de pilula por padrao (XRadius/YRadius
   // = Height/2). Quando Pill e False, sobrescrevemos com CornerRadius
   // - ver <remarks> de IRickUIBuilderBadge.Pill.
   if not FPill then
   begin
-    LContainer.XRadius := FCornerRadius;
-    LContainer.YRadius := FCornerRadius;
+    AContainer.XRadius := FCornerRadius;
+    AContainer.YRadius := FCornerRadius;
   end;
+end;
 
+procedure TRickUIBuilderBadgeBuilder.ApplyBadgeBorder(
+  const AContainer: TRectangle);
+begin
   if not (FBorderColor = TAlphaColors.Null) then
   begin
-    LContainer.Stroke.Kind  := TBrushKind.Solid;
-    LContainer.Stroke.Color := FBorderColor;
+    AContainer.Stroke.Kind  := TBrushKind.Solid;
+    AContainer.Stroke.Color := FBorderColor;
   end;
+end;
 
+procedure TRickUIBuilderBadgeBuilder.ApplyBadgeTextStyle(
+  const ATextLabel: TLabel);
+begin
   if FBold then
-    LTextLabel.TextSettings.Font.Style := LTextLabel.TextSettings.Font.Style
+    ATextLabel.TextSettings.Font.Style := ATextLabel.TextSettings.Font.Style
       + [TFontStyle.fsBold];
+end;
 
+procedure TRickUIBuilderBadgeBuilder.ApplyBadgePadding(
+  const ATextLabel: TLabel);
+begin
   // Padding aplica-se ao espaco interno entre a borda do Container e
   // o TextLabel - ver <remarks> de IRickUIBuilderBadge.Padding.
-  LTextLabel.Padding.Left   := FPadding.Left;
-  LTextLabel.Padding.Top    := FPadding.Top;
-  LTextLabel.Padding.Right  := FPadding.Right;
-  LTextLabel.Padding.Bottom := FPadding.Bottom;
+  ATextLabel.Padding.Left   := FPadding.Left;
+  ATextLabel.Padding.Top    := FPadding.Top;
+  ATextLabel.Padding.Right  := FPadding.Right;
+  ATextLabel.Padding.Bottom := FPadding.Bottom;
+end;
 
-  LContainer.Opacity := FOpacity;
-  LContainer.Visible := FVisible;
-  LContainer.Tag     := FTag;
-
-  Result := TRickUIBuilderBadgeHandle.New(LContainer, LTextLabel);
+procedure TRickUIBuilderBadgeBuilder.ApplyBadgeFinalProperties(
+  const AContainer: TRectangle);
+begin
+  AContainer.Opacity := FOpacity;
+  AContainer.Visible := FVisible;
+  AContainer.Tag     := FTag;
 end;
 
 end.

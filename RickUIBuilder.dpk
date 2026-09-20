@@ -38,6 +38,7 @@ contains
   Rick.UIBuilder.Divider in 'src\Rick.UIBuilder.Divider.pas',
   Rick.UIBuilder.Badge.Handle in 'src\Rick.UIBuilder.Badge.Handle.pas',
   Rick.UIBuilder.Badge in 'src\Rick.UIBuilder.Badge.pas',
+  Rick.UIBuilder.Button.Handle in 'src\Rick.UIBuilder.Button.Handle.pas',
   Rick.UIBuilder.Button in 'src\Rick.UIBuilder.Button.pas',
   Rick.UIBuilder.Button.HoverState in 'src\Rick.UIBuilder.Button.HoverState.pas',
   Rick.UIBuilder.Composition in 'src\Rick.UIBuilder.Composition.pas',

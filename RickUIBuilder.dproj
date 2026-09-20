@@ -167,6 +167,7 @@
         <DCCReference Include="src\Rick.UIBuilder.Divider.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.Badge.Handle.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.Badge.pas"/>
+        <DCCReference Include="src\Rick.UIBuilder.Button.Handle.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.Button.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.Button.HoverState.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.Composition.pas"/>

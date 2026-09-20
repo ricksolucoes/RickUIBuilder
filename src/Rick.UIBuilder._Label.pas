@@ -62,6 +62,17 @@ type
     FVisible         : Boolean;
     FHitTest         : Boolean;
     FTag             : NativeInt;
+
+    function BuildLabelConfig: TRickUIBuilderTextConfig;
+    procedure ApplyLabelFontCustomization(const AResult: TLabel);
+    procedure ApplyLabelTextSettings(const AResult: TLabel);
+    procedure ApplyLabelPadding(const AResult: TLabel);
+    procedure ApplyLabelFinalProperties(const AResult: TLabel);
+
+    procedure InitLayoutDefaults(const ADefault: TRickUIBuilderTextConfig);
+    procedure InitFontDefaults(const ADefault: TRickUIBuilderTextConfig);
+    procedure InitTextBehaviorDefaults;
+    procedure InitVisualStateDefaults;
   protected
     function Text(const AValue: string): IRickUIBuilderLabel;
     function Position(ALeft, ATop: Single): IRickUIBuilderLabel;
@@ -112,27 +123,10 @@ begin
 
   LDefault := TRickUIBuilderTextConfig.Default;
 
-  FText            := '';
-  FLeft            := LDefault.Left;
-  FTop             := LDefault.Top;
-  FWidth           := LDefault.Width;
-  FHeight          := LDefault.Height;
-  FAnchors         := [];
-  FMargin          := TRickUIBuilderSpacing.None;
-  FPadding         := TRickUIBuilderSpacing.None;
-  FFontFamily      := '';
-  FFontSize        := LDefault.FontSize;
-  FFontColor       := LDefault.FontColor;
-  FBold            := LDefault.Bold;
-  FItalic          := False;
-  FHorizontalAlign := LDefault.HorizontalAlign;
-  FVerticalAlign   := TTextAlign.Leading;
-  FWordWrap        := False;
-  FTrimming        := TTextTrimming.None;
-  FOpacity         := 1;
-  FVisible         := True;
-  FHitTest         := False;
-  FTag             := 0;
+  InitLayoutDefaults(LDefault);
+  InitFontDefaults(LDefault);
+  InitTextBehaviorDefaults;
+  InitVisualStateDefaults;
 end;
 
 class function TRickUIBuilderLabelBuilder.New: IRickUIBuilderLabel;
@@ -279,17 +273,7 @@ function TRickUIBuilderLabelBuilder.Build(AParent: TFmxObject): TLabel;
 var
   LConfig: TRickUIBuilderTextConfig;
 begin
-  LConfig                 := TRickUIBuilderTextConfig.Default;
-  // Margin e somado a posicao definida via Position, nao substitui -
-  // ver <remarks> de IRickUIBuilderLabel.Margin.
-  LConfig.Left            := FLeft + FMargin.Left;
-  LConfig.Top             := FTop + FMargin.Top;
-  LConfig.Width           := FWidth;
-  LConfig.Height          := FHeight;
-  LConfig.FontSize        := FFontSize;
-  LConfig.FontColor       := FFontColor;
-  LConfig.HorizontalAlign := FHorizontalAlign;
-  LConfig.Bold            := FBold;
+  LConfig := BuildLabelConfig;
 
   // AParent e utilizado tambem como Owner: TFmxObject herda de
   // TComponent, entao o ciclo de vida do TLabel fica atrelado ao
@@ -298,29 +282,104 @@ begin
 
   Result.Anchors := FAnchors;
 
+  ApplyLabelFontCustomization(Result);
+  ApplyLabelTextSettings(Result);
+  ApplyLabelPadding(Result);
+  ApplyLabelFinalProperties(Result);
+end;
+
+function TRickUIBuilderLabelBuilder.BuildLabelConfig: TRickUIBuilderTextConfig;
+begin
+  Result                 := TRickUIBuilderTextConfig.Default;
+  // Margin e somado a posicao definida via Position, nao substitui -
+  // ver <remarks> de IRickUIBuilderLabel.Margin.
+  Result.Left            := FLeft + FMargin.Left;
+  Result.Top             := FTop + FMargin.Top;
+  Result.Width           := FWidth;
+  Result.Height          := FHeight;
+  Result.FontSize        := FFontSize;
+  Result.FontColor       := FFontColor;
+  Result.HorizontalAlign := FHorizontalAlign;
+  Result.Bold            := FBold;
+end;
+
+procedure TRickUIBuilderLabelBuilder.ApplyLabelFontCustomization(
+  const AResult: TLabel);
+begin
   if FFontFamily <> '' then
-    Result.TextSettings.Font.Family := FFontFamily;
+    AResult.TextSettings.Font.Family := FFontFamily;
 
   if FItalic then
-    Result.TextSettings.Font.Style := Result.TextSettings.Font.Style
+    AResult.TextSettings.Font.Style := AResult.TextSettings.Font.Style
       + [TFontStyle.fsItalic];
+end;
 
-  Result.TextSettings.VertAlign := FVerticalAlign;
-  Result.TextSettings.Trimming  := FTrimming;
-  Result.WordWrap                := FWordWrap;
+procedure TRickUIBuilderLabelBuilder.ApplyLabelTextSettings(
+  const AResult: TLabel);
+begin
+  AResult.TextSettings.VertAlign := FVerticalAlign;
+  AResult.TextSettings.Trimming  := FTrimming;
+  AResult.WordWrap                := FWordWrap;
+end;
 
+procedure TRickUIBuilderLabelBuilder.ApplyLabelPadding(
+  const AResult: TLabel);
+begin
   // Padding aplica-se ao espaco interno de renderizacao do texto,
   // sem alterar Width/Height do controle - ver <remarks> de
   // IRickUIBuilderLabel.Padding.
-  Result.Padding.Left   := FPadding.Left;
-  Result.Padding.Top    := FPadding.Top;
-  Result.Padding.Right  := FPadding.Right;
-  Result.Padding.Bottom := FPadding.Bottom;
+  AResult.Padding.Left   := FPadding.Left;
+  AResult.Padding.Top    := FPadding.Top;
+  AResult.Padding.Right  := FPadding.Right;
+  AResult.Padding.Bottom := FPadding.Bottom;
+end;
 
-  Result.Opacity  := FOpacity;
-  Result.Visible  := FVisible;
-  Result.HitTest  := FHitTest;
-  Result.Tag      := FTag;
+procedure TRickUIBuilderLabelBuilder.ApplyLabelFinalProperties(
+  const AResult: TLabel);
+begin
+  AResult.Opacity := FOpacity;
+  AResult.Visible := FVisible;
+  AResult.HitTest := FHitTest;
+  AResult.Tag     := FTag;
+end;
+
+procedure TRickUIBuilderLabelBuilder.InitLayoutDefaults(
+  const ADefault: TRickUIBuilderTextConfig);
+begin
+  FText    := '';
+  FLeft    := ADefault.Left;
+  FTop     := ADefault.Top;
+  FWidth   := ADefault.Width;
+  FHeight  := ADefault.Height;
+  FAnchors := [];
+  FMargin  := TRickUIBuilderSpacing.None;
+  FPadding := TRickUIBuilderSpacing.None;
+end;
+
+procedure TRickUIBuilderLabelBuilder.InitFontDefaults(
+  const ADefault: TRickUIBuilderTextConfig);
+begin
+  FFontFamily := '';
+  FFontSize   := ADefault.FontSize;
+  FFontColor  := ADefault.FontColor;
+  FBold       := ADefault.Bold;
+  FItalic     := False;
+end;
+
+procedure TRickUIBuilderLabelBuilder.InitTextBehaviorDefaults;
+begin
+  FHorizontalAlign := TRickUIBuilderTextConfig.Default.HorizontalAlign;
+  FVerticalAlign   := TTextAlign.Leading;
+  FWordWrap        := False;
+  FTrimming        := TTextTrimming.None;
+end;
+
+procedure TRickUIBuilderLabelBuilder.InitVisualStateDefaults;
+begin
+  FOpacity := 1;
+  FVisible := True;
+  FHitTest := False;
+  FTag     := 0;
 end;
 
 end.

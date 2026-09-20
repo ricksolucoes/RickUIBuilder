@@ -1,4 +1,4 @@
-unit Rick.UIBuilder.Tests.Button;
+﻿unit Rick.UIBuilder.Tests.Button;
 (*
   ==============================================================================
   Unit: Rick.UIBuilder.Tests.Button
@@ -6,16 +6,19 @@ unit Rick.UIBuilder.Tests.Button;
 
   RESPONSABILIDADE
 
-  Testes para TRickUIBuilderButtonBuilder (IRickUIBuilderButton),
-  divididos em duas categorias:
+  Testes de IRickUIBuilderButton e IRickUIBuilderButtonHoverState,
+  divididos em tres categorias:
 
   - TRickUIBuilderButtonChainingTests: unitario puro. Valida apenas
     que cada metodo encadeado retorna a mesma instancia do builder
     (sem depender de host FMX, sem chamar Build).
 
+  - TRickUIBuilderButtonHoverStateTests: integracao. Valida a interface
+    fluente de hover, seus overloads e o lifetime do behavior criado em Build.
+
   - TRickUIBuilderButtonBuildTests: integracao (Category('Integration')).
-    Exige um TForm host e valida o TRectangle efetivamente criado por
-    Build, incluindo o comportamento de hover (HoverFillColor e
+    Exige um TForm host e valida os controles efetivamente criados por
+    Build e BuildHandle, incluindo o comportamento de hover (HoverFillColor e
     OnHover coexistindo, conforme <remarks> de
     IRickUIBuilderButton.OnHover) simulado via disparo direto dos
     manipuladores OnMouseEnter/OnMouseLeave.
@@ -27,6 +30,7 @@ interface
 
 uses
   DUnitX.TestFramework,
+  System.Classes,
   System.UITypes,
   FMX.Forms, FMX.Types, FMX.Controls, FMX.Objects, FMX.StdCtrls,
   Rick.UIBuilder.Types,
@@ -50,6 +54,62 @@ type
     procedure OnClick_DeveRetornarAMesmaInstancia;
     [Test]
     procedure Build_DevePermitirEncadeamentoCompletoAntesDeChamarBuild;
+  end;
+
+  [TestFixture]
+  [Category('Integration')]
+  TRickUIBuilderButtonHoverStateTests = class
+  private
+    FHostForm: TForm;
+    FButton: TRectangle;
+    FEnterCount: Integer;
+    FLeaveCount: Integer;
+    procedure HandleEnter(Sender: TObject);
+    procedure HandleLeave(Sender: TObject);
+  public
+    [Setup]
+    procedure Setup;
+    [TearDown]
+    procedure TearDown;
+
+    [Test]
+    procedure New_DeveRetornarInterfaceNaoNula;
+    [Test]
+    procedure Button_Input_DeveRetornarMesmaInstancia;
+    [Test]
+    procedure Button_Output_DeveRetornarValorConfigurado;
+    [Test]
+    procedure FillColor_Input_DeveRetornarMesmaInstancia;
+    [Test]
+    procedure FillColor_Output_DeveRetornarValorConfigurado;
+    [Test]
+    procedure HoverFillColor_Input_DeveRetornarMesmaInstancia;
+    [Test]
+    procedure HoverFillColor_Output_DeveRetornarValorConfigurado;
+    [Test]
+    procedure OnEnter_Input_DeveRetornarMesmaInstancia;
+    [Test]
+    procedure OnEnter_Output_DeveRetornarHandlerConfigurado;
+    [Test]
+    procedure OnLeave_Input_DeveRetornarMesmaInstancia;
+    [Test]
+    procedure OnLeave_Output_DeveRetornarHandlerConfigurado;
+    [Test]
+    procedure Build_DeveManterHoverAtivoAposLiberarInterface;
+    [Test]
+    procedure Build_DeveAplicarHoverFillColor;
+    [Test]
+    procedure Build_DeveRestaurarFillColor;
+    [Test]
+    procedure Build_DeveExecutarOnEnter;
+    [Test]
+    procedure Build_DeveExecutarOnLeave;
+    [Test]
+    procedure Build_SemHoverFillColor_NaoDeveAlterarCor;
+    [Test]
+    procedure Build_DevePermitirHoverFillColorEOnHoverSimultaneamente;
+    [Test]
+    procedure Build_DeveAtrelarBehaviorAoOwnerInformado;
   end;
 
   [TestFixture]
@@ -95,9 +155,28 @@ type
     procedure Build_EnabledTrue_DeveAplicarOpacityInformada;
     [Test]
     procedure Build_DeveAplicarMarginDeslocandoPosicaoFinal;
+    [Test]
+    procedure BuildHandle_DeveRetornarHandleComControlesNaoNulos;
+    [Test]
+    procedure BuildHandle_DeveExporControlesDaArvoreVisual;
+    [Test]
+    procedure BuildHandle_DevePreservarParentEOwnership;
+    [Test]
+    procedure BuildHandle_DeveExporCaptionConfigurado;
+    [Test]
+    procedure BuildHandle_AlterarTextLabelDeveAfetarSomenteSeuButton;
+    [Test]
+    procedure BuildHandle_LiberadoNaoDeveLiberarControles;
+    [Test]
+    procedure BuildHandle_DevePreservarEstiloDoTextLabel;
+    [Test]
+    procedure BuildHandle_DevePreservarEstadoVisualDoContainer;
   end;
 
 implementation
+
+uses
+  FMX.Graphics;
 
 { TRickUIBuilderButtonChainingTests }
 
@@ -186,6 +265,245 @@ begin
     .OnHover(nil, nil);
 
   Assert.IsNotNull(LBuilder, 'O encadeamento completo nao deveria retornar nil.');
+end;
+
+{ TRickUIBuilderButtonHoverStateTests }
+
+procedure TRickUIBuilderButtonHoverStateTests.HandleEnter(Sender: TObject);
+begin
+  Inc(FEnterCount);
+end;
+
+procedure TRickUIBuilderButtonHoverStateTests.HandleLeave(Sender: TObject);
+begin
+  Inc(FLeaveCount);
+end;
+
+procedure TRickUIBuilderButtonHoverStateTests.Setup;
+begin
+  FHostForm := TForm.CreateNew(nil);
+  FButton := TRectangle.Create(FHostForm);
+  FButton.Parent := FHostForm;
+  FButton.Fill.Color := TAlphaColors.Dodgerblue;
+  FEnterCount := 0;
+  FLeaveCount := 0;
+end;
+
+procedure TRickUIBuilderButtonHoverStateTests.TearDown;
+begin
+  FHostForm.Free;
+end;
+
+procedure TRickUIBuilderButtonHoverStateTests.New_DeveRetornarInterfaceNaoNula;
+var
+  LState: IRickUIBuilderButtonHoverState;
+begin
+  LState := TRickUIBuilderButtonHoverState.New;
+
+  Assert.IsNotNull(LState, 'New nao deveria retornar nil.');
+end;
+
+procedure TRickUIBuilderButtonHoverStateTests.Button_Input_DeveRetornarMesmaInstancia;
+var
+  LState: IRickUIBuilderButtonHoverState;
+  LResult: IRickUIBuilderButtonHoverState;
+begin
+  LState := TRickUIBuilderButtonHoverState.New;
+  LResult := LState.Button(FButton);
+
+  Assert.AreEqual<IRickUIBuilderButtonHoverState>(LState, LResult,
+    'Button(AValue) deveria retornar a mesma instancia.');
+end;
+
+procedure TRickUIBuilderButtonHoverStateTests.Button_Output_DeveRetornarValorConfigurado;
+var
+  LState: IRickUIBuilderButtonHoverState;
+begin
+  LState := TRickUIBuilderButtonHoverState.New.Button(FButton);
+
+  Assert.AreEqual<TFmxObject>(FButton, LState.Button,
+    'Button deveria retornar o TRectangle configurado.');
+end;
+
+procedure TRickUIBuilderButtonHoverStateTests.FillColor_Input_DeveRetornarMesmaInstancia;
+var
+  LState: IRickUIBuilderButtonHoverState;
+  LResult: IRickUIBuilderButtonHoverState;
+begin
+  LState := TRickUIBuilderButtonHoverState.New;
+  LResult := LState.FillColor(TAlphaColors.Dodgerblue);
+
+  Assert.AreEqual<IRickUIBuilderButtonHoverState>(LState, LResult,
+    'FillColor(AValue) deveria retornar a mesma instancia.');
+end;
+
+procedure TRickUIBuilderButtonHoverStateTests.FillColor_Output_DeveRetornarValorConfigurado;
+var
+  LState: IRickUIBuilderButtonHoverState;
+begin
+  LState := TRickUIBuilderButtonHoverState.New.FillColor(TAlphaColors.Dodgerblue);
+
+  Assert.AreEqual<TAlphaColor>(TAlphaColors.Dodgerblue, LState.FillColor,
+    'FillColor deveria retornar a cor configurada.');
+end;
+
+procedure TRickUIBuilderButtonHoverStateTests.HoverFillColor_Input_DeveRetornarMesmaInstancia;
+var
+  LState: IRickUIBuilderButtonHoverState;
+  LResult: IRickUIBuilderButtonHoverState;
+begin
+  LState := TRickUIBuilderButtonHoverState.New;
+  LResult := LState.HoverFillColor(TAlphaColors.Royalblue);
+
+  Assert.AreEqual<IRickUIBuilderButtonHoverState>(LState, LResult,
+    'HoverFillColor(AValue) deveria retornar a mesma instancia.');
+end;
+
+procedure TRickUIBuilderButtonHoverStateTests.HoverFillColor_Output_DeveRetornarValorConfigurado;
+var
+  LState: IRickUIBuilderButtonHoverState;
+begin
+  LState := TRickUIBuilderButtonHoverState.New.HoverFillColor(TAlphaColors.Royalblue);
+
+  Assert.AreEqual<TAlphaColor>(TAlphaColors.Royalblue, LState.HoverFillColor,
+    'HoverFillColor deveria retornar a cor configurada.');
+end;
+
+procedure TRickUIBuilderButtonHoverStateTests.OnEnter_Input_DeveRetornarMesmaInstancia;
+var
+  LState: IRickUIBuilderButtonHoverState;
+  LResult: IRickUIBuilderButtonHoverState;
+begin
+  LState := TRickUIBuilderButtonHoverState.New;
+  LResult := LState.OnEnter(HandleEnter);
+
+  Assert.AreEqual<IRickUIBuilderButtonHoverState>(LState, LResult,
+    'OnEnter(AValue) deveria retornar a mesma instancia.');
+end;
+
+procedure TRickUIBuilderButtonHoverStateTests.OnEnter_Output_DeveRetornarHandlerConfigurado;
+var
+  LHandler: TNotifyEvent;
+  LState: IRickUIBuilderButtonHoverState;
+begin
+  LState := TRickUIBuilderButtonHoverState.New.OnEnter(HandleEnter);
+  LHandler := LState.OnEnter;
+  LHandler(FButton);
+
+  Assert.AreEqual(1, FEnterCount, 'OnEnter deveria retornar o handler configurado.');
+end;
+
+procedure TRickUIBuilderButtonHoverStateTests.OnLeave_Input_DeveRetornarMesmaInstancia;
+var
+  LState: IRickUIBuilderButtonHoverState;
+  LResult: IRickUIBuilderButtonHoverState;
+begin
+  LState := TRickUIBuilderButtonHoverState.New;
+  LResult := LState.OnLeave(HandleLeave);
+
+  Assert.AreEqual<IRickUIBuilderButtonHoverState>(LState, LResult,
+    'OnLeave(AValue) deveria retornar a mesma instancia.');
+end;
+
+procedure TRickUIBuilderButtonHoverStateTests.OnLeave_Output_DeveRetornarHandlerConfigurado;
+var
+  LHandler: TNotifyEvent;
+  LState: IRickUIBuilderButtonHoverState;
+begin
+  LState := TRickUIBuilderButtonHoverState.New.OnLeave(HandleLeave);
+  LHandler := LState.OnLeave;
+  LHandler(FButton);
+
+  Assert.AreEqual(1, FLeaveCount, 'OnLeave deveria retornar o handler configurado.');
+end;
+
+procedure TRickUIBuilderButtonHoverStateTests.Build_DeveManterHoverAtivoAposLiberarInterface;
+var
+  LState: IRickUIBuilderButtonHoverState;
+begin
+  LState := TRickUIBuilderButtonHoverState.New.Button(FButton)
+    .FillColor(TAlphaColors.Dodgerblue).HoverFillColor(TAlphaColors.Royalblue);
+  LState.Build(FHostForm);
+  LState := nil;
+  FButton.OnMouseEnter(FButton);
+
+  Assert.AreEqual<TAlphaColor>(TAlphaColors.Royalblue, FButton.Fill.Color,
+    'Hover deveria permanecer ativo apos liberar a interface de configuracao.');
+end;
+
+procedure TRickUIBuilderButtonHoverStateTests.Build_DeveAplicarHoverFillColor;
+begin
+  TRickUIBuilderButtonHoverState.New.Button(FButton)
+    .FillColor(TAlphaColors.Dodgerblue).HoverFillColor(TAlphaColors.Royalblue)
+    .Build(FHostForm);
+  FButton.OnMouseEnter(FButton);
+
+  Assert.AreEqual<TAlphaColor>(TAlphaColors.Royalblue, FButton.Fill.Color,
+    'Build deveria aplicar HoverFillColor no MouseEnter.');
+end;
+
+procedure TRickUIBuilderButtonHoverStateTests.Build_DeveRestaurarFillColor;
+begin
+  TRickUIBuilderButtonHoverState.New.Button(FButton)
+    .FillColor(TAlphaColors.Dodgerblue).HoverFillColor(TAlphaColors.Royalblue)
+    .Build(FHostForm);
+  FButton.OnMouseEnter(FButton);
+  FButton.OnMouseLeave(FButton);
+
+  Assert.AreEqual<TAlphaColor>(TAlphaColors.Dodgerblue, FButton.Fill.Color,
+    'Build deveria restaurar FillColor no MouseLeave.');
+end;
+
+procedure TRickUIBuilderButtonHoverStateTests.Build_DeveExecutarOnEnter;
+begin
+  TRickUIBuilderButtonHoverState.New.Button(FButton).OnEnter(HandleEnter)
+    .Build(FHostForm);
+  FButton.OnMouseEnter(FButton);
+
+  Assert.AreEqual(1, FEnterCount, 'OnEnter configurado nao foi executado.');
+end;
+
+procedure TRickUIBuilderButtonHoverStateTests.Build_DeveExecutarOnLeave;
+begin
+  TRickUIBuilderButtonHoverState.New.Button(FButton).OnLeave(HandleLeave)
+    .Build(FHostForm);
+  FButton.OnMouseLeave(FButton);
+
+  Assert.AreEqual(1, FLeaveCount, 'OnLeave configurado nao foi executado.');
+end;
+
+procedure TRickUIBuilderButtonHoverStateTests.Build_SemHoverFillColor_NaoDeveAlterarCor;
+begin
+  TRickUIBuilderButtonHoverState.New.Button(FButton)
+    .FillColor(TAlphaColors.Dodgerblue).Build(FHostForm);
+  FButton.OnMouseEnter(FButton);
+
+  Assert.AreEqual<TAlphaColor>(TAlphaColors.Dodgerblue, FButton.Fill.Color,
+    'Sem HoverFillColor a cor do Button nao deveria ser alterada.');
+end;
+
+procedure TRickUIBuilderButtonHoverStateTests.Build_DevePermitirHoverFillColorEOnHoverSimultaneamente;
+begin
+  TRickUIBuilderButtonHoverState.New.Button(FButton)
+    .FillColor(TAlphaColors.Dodgerblue).HoverFillColor(TAlphaColors.Royalblue)
+    .OnEnter(HandleEnter).OnLeave(HandleLeave).Build(FHostForm);
+  FButton.OnMouseEnter(FButton);
+  FButton.OnMouseLeave(FButton);
+
+  Assert.AreEqual<TAlphaColor>(TAlphaColors.Dodgerblue, FButton.Fill.Color);
+  Assert.AreEqual(1, FEnterCount, 'OnEnter deveria coexistir com HoverFillColor.');
+  Assert.AreEqual(1, FLeaveCount, 'OnLeave deveria coexistir com HoverFillColor.');
+end;
+
+procedure TRickUIBuilderButtonHoverStateTests.Build_DeveAtrelarBehaviorAoOwnerInformado;
+var
+  LComponentCount: Integer;
+begin
+  LComponentCount := FHostForm.ComponentCount;
+  TRickUIBuilderButtonHoverState.New.Button(FButton).Build(FHostForm);
+
+  Assert.AreEqual(LComponentCount + 1, FHostForm.ComponentCount,
+    'Build deveria criar um behavior owned pelo componente informado.');
 end;
 
 { TRickUIBuilderButtonBuildTests }
@@ -429,8 +747,129 @@ begin
     'Margin.Top nao foi somado a Position.Y.');
 end;
 
+procedure TRickUIBuilderButtonBuildTests.BuildHandle_DeveRetornarHandleComControlesNaoNulos;
+var
+  LHandle: IRickUIBuilderButtonHandle;
+begin
+  LHandle := TRickUIBuilderButtonBuilder.New.Caption('Instalar')
+    .BuildHandle(FHostForm);
+
+  Assert.IsNotNull(LHandle, 'BuildHandle nao deveria retornar nil.');
+  Assert.IsNotNull(LHandle.Container, 'Container nao deveria ser nil.');
+  Assert.IsNotNull(LHandle.TextLabel, 'TextLabel nao deveria ser nil.');
+end;
+
+procedure TRickUIBuilderButtonBuildTests.BuildHandle_DeveExporControlesDaArvoreVisual;
+var
+  LHandle: IRickUIBuilderButtonHandle;
+begin
+  LHandle := TRickUIBuilderButtonBuilder.New.Caption('Instalar')
+    .BuildHandle(FHostForm);
+
+  Assert.AreEqual<TFmxObject>(LHandle.Container, FHostForm.Children[0],
+    'Container deveria ser o TRectangle inserido no Parent.');
+  Assert.AreEqual<TFmxObject>(LHandle.TextLabel, LHandle.Container.Children[0],
+    'TextLabel deveria ser o TLabel visual criado para o Button.');
+end;
+
+procedure TRickUIBuilderButtonBuildTests.BuildHandle_DevePreservarParentEOwnership;
+var
+  LHandle: IRickUIBuilderButtonHandle;
+begin
+  LHandle := TRickUIBuilderButtonBuilder.New.Caption('Instalar')
+    .BuildHandle(FHostForm);
+
+  Assert.AreEqual<TFmxObject>(FHostForm, LHandle.Container.Parent,
+    'Parent do Container incorreto.');
+  Assert.AreEqual<TFmxObject>(LHandle.Container, LHandle.TextLabel.Parent,
+    'Parent do TextLabel deveria ser o Container.');
+  Assert.AreEqual<TComponent>(FHostForm, LHandle.Container.Owner,
+    'Owner do Container deveria permanecer o Parent informado.');
+  Assert.AreEqual<TComponent>(FHostForm, LHandle.TextLabel.Owner,
+    'Owner do TextLabel deveria permanecer o Parent informado.');
+end;
+
+procedure TRickUIBuilderButtonBuildTests.BuildHandle_DeveExporCaptionConfigurado;
+var
+  LHandle: IRickUIBuilderButtonHandle;
+begin
+  LHandle := TRickUIBuilderButtonBuilder.New.Caption('Salvar')
+    .BuildHandle(FHostForm);
+
+  Assert.AreEqual('Salvar', LHandle.TextLabel.Text,
+    'TextLabel deveria conter o Caption configurado.');
+end;
+
+procedure TRickUIBuilderButtonBuildTests.BuildHandle_AlterarTextLabelDeveAfetarSomenteSeuButton;
+var
+  LFirst: IRickUIBuilderButtonHandle;
+  LSecond: IRickUIBuilderButtonHandle;
+begin
+  LFirst := TRickUIBuilderButtonBuilder.New.Caption('Primeiro').BuildHandle(FHostForm);
+  LSecond := TRickUIBuilderButtonBuilder.New.Caption('Segundo').BuildHandle(FHostForm);
+  LFirst.TextLabel.Text := 'Alterado';
+
+  Assert.AreNotEqual<TFmxObject>(LFirst.Container, LSecond.Container,
+    'Dois Buttons deveriam possuir Containers independentes.');
+  Assert.AreNotEqual<TFmxObject>(LFirst.TextLabel, LSecond.TextLabel,
+    'Dois Buttons deveriam possuir TextLabels independentes.');
+  Assert.AreEqual('Alterado', LFirst.TextLabel.Text, 'Primeiro TextLabel incorreto.');
+  Assert.AreEqual('Segundo', LSecond.TextLabel.Text, 'Segundo TextLabel foi alterado.');
+end;
+
+procedure TRickUIBuilderButtonBuildTests.BuildHandle_LiberadoNaoDeveLiberarControles;
+var
+  LContainer: TRectangle;
+  LTextLabel: TLabel;
+  LHandle: IRickUIBuilderButtonHandle;
+begin
+  LHandle := TRickUIBuilderButtonBuilder.New.Caption('Instalar').BuildHandle(FHostForm);
+  LContainer := LHandle.Container;
+  LTextLabel := LHandle.TextLabel;
+  LHandle := nil;
+  LTextLabel.Text := 'Ainda vivo';
+
+  Assert.AreEqual<TFmxObject>(FHostForm, LContainer.Parent,
+    'Liberar o Handle nao deveria liberar o Container.');
+  Assert.AreEqual('Ainda vivo', LTextLabel.Text,
+    'Liberar o Handle nao deveria liberar o TextLabel.');
+end;
+
+procedure TRickUIBuilderButtonBuildTests.BuildHandle_DevePreservarEstiloDoTextLabel;
+var
+  LHandle: IRickUIBuilderButtonHandle;
+begin
+  LHandle := TRickUIBuilderButtonBuilder.New.Caption('Instalar')
+    .FontFamily('Arial').Bold.Padding(TRickUIBuilderSpacing.Uniform(4))
+    .BuildHandle(FHostForm);
+
+  Assert.AreEqual('Arial', LHandle.TextLabel.TextSettings.Font.Family,
+    'FontFamily nao foi aplicada ao TextLabel retornado.');
+  Assert.IsTrue(TFontStyle.fsBold in LHandle.TextLabel.TextSettings.Font.Style,
+    'Bold nao foi aplicado ao TextLabel retornado.');
+  Assert.AreEqual<Single>(4, LHandle.TextLabel.Padding.Left,
+    'Padding nao foi aplicado ao TextLabel retornado.');
+end;
+
+procedure TRickUIBuilderButtonBuildTests.BuildHandle_DevePreservarEstadoVisualDoContainer;
+var
+  LHandle: IRickUIBuilderButtonHandle;
+begin
+  LHandle := TRickUIBuilderButtonBuilder.New.Caption('Instalar')
+    .CornerRadius(9).BorderColor(TAlphaColors.Red).BorderThickness(3)
+    .Cursor(crDefault).Visible(False).BuildHandle(FHostForm);
+
+  Assert.AreEqual<Single>(9, LHandle.Container.XRadius, 'XRadius incorreto.');
+  Assert.AreEqual<Single>(9, LHandle.Container.YRadius, 'YRadius incorreto.');
+  Assert.AreEqual<Single>(3, LHandle.Container.Stroke.Thickness,
+    'BorderThickness incorreto.');
+  Assert.AreEqual<TCursor>(crDefault, LHandle.Container.Cursor, 'Cursor incorreto.');
+  Assert.IsFalse(LHandle.Container.Visible, 'Visible(False) nao foi aplicado.');
+end;
+
 initialization
   TDUnitX.RegisterTestFixture(TRickUIBuilderButtonChainingTests);
+  TDUnitX.RegisterTestFixture(TRickUIBuilderButtonHoverStateTests);
   TDUnitX.RegisterTestFixture(TRickUIBuilderButtonBuildTests);
 
 end.

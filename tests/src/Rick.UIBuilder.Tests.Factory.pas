@@ -113,6 +113,8 @@ type
     [Test]
     procedure DeveCriarLabelDeCaptionComoFilho;
     [Test]
+    procedure DeveRetornarTextLabelCriadoNaSobrecargaComOut;
+    [Test]
     procedure NaoDeveAplicarBordaQuandoBorderColorForNull;
     [Test]
     procedure DeveAplicarBordaQuandoBorderColorForInformada;
@@ -385,6 +387,21 @@ begin
     end;
 
   Assert.IsTrue(LFound, 'O botao deveria conter um TLabel filho com o Caption informado.');
+end;
+
+procedure TRickUIBuilderFactoryCreateButtonTests.DeveRetornarTextLabelCriadoNaSobrecargaComOut;
+var
+  LButton: TRectangle;
+  LTextLabel: TLabel;
+begin
+  LButton := TRickUIBuilderFactory.CreateButton(FHostForm, FHostForm, 'Instalar',
+    TRickUIBuilderButtonConfig.Default, LTextLabel);
+
+  Assert.IsNotNull(LTextLabel, 'O TextLabel de saida nao deveria ser nil.');
+  Assert.AreEqual<TFmxObject>(LButton, LTextLabel.Parent,
+    'O TextLabel retornado deveria pertencer ao Button criado.');
+  Assert.AreEqual('Instalar', LTextLabel.Text,
+    'O TextLabel retornado deveria conter o Caption informado.');
 end;
 
 procedure TRickUIBuilderFactoryCreateButtonTests.NaoDeveAplicarBordaQuandoBorderColorForNull;

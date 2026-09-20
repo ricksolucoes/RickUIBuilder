@@ -46,6 +46,11 @@ type
   ///    framework Rick.UIBuilder.
   /// </summary>
   TRickUIBuilderFactory = class sealed
+  private
+    class procedure ApplyButtonConfig(AButton: TRectangle;
+      const AConfig: TRickUIBuilderButtonConfig); static;
+    class function ButtonTextConfig(
+      const AConfig: TRickUIBuilderButtonConfig): TRickUIBuilderTextConfig; static;
   public
     /// <summary>
     ///    Cria um TLabel a partir de um TRickUIBuilderTextConfig.
@@ -88,6 +93,46 @@ type
     /// </returns>
     class function CreateDivider(AOwner: TComponent; AParent: TFmxObject;
       const AConfig: TRickUIBuilderDividerConfig): TRectangle; static;
+
+    /// <summary>
+    ///    Cria o TRectangle (container visual) de um Badge, posicionado
+    ///    e configurado a partir de um TRickUIBuilderBadgeConfig, no
+    ///    formato de pilula (cantos totalmente arredondados).
+    /// </summary>
+    /// <param name="AOwner">
+    ///    Componente responsavel pelo ciclo de vida do TRectangle
+    ///    criado.
+    /// </param>
+    /// <param name="AParent">
+    ///    Controle ou formulario que sera o Parent do Container
+    ///    criado.
+    /// </param>
+    /// <param name="AConfig">
+    ///    Configuracao de geometria e cor de fundo a ser aplicada.
+    /// </param>
+    /// <returns>
+    ///    O TRectangle criado e ja anexado a AParent, sem HitTest e
+    ///    sem Stroke.
+    /// </returns>
+    class function CreateBadgeContainer(AOwner: TComponent; AParent: TFmxObject;
+      const AConfig: TRickUIBuilderBadgeConfig): TRectangle;
+
+    /// <summary>
+    ///    Monta a configuracao de texto (TRickUIBuilderTextConfig) usada
+    ///    para criar o TLabel interno de um Badge, a partir de um
+    ///    TRickUIBuilderBadgeConfig.
+    /// </summary>
+    /// <param name="AConfig">
+    ///    Configuracao do Badge da qual sao derivados tamanho, fonte e
+    ///    cor do texto.
+    /// </param>
+    /// <returns>
+    ///    Um TRickUIBuilderTextConfig com Left/Top zerados (o texto e
+    ///    posicionado em relacao ao Container, nao ao Parent do Badge) e
+    ///    alinhamento horizontal centralizado.
+    /// </returns>
+    class function BuildBadgeTextConfig(
+      const AConfig: TRickUIBuilderBadgeConfig): TRickUIBuilderTextConfig;
 
     /// <summary>
     ///    Cria um Badge (TRectangle com TLabel interno) a partir de
@@ -151,7 +196,22 @@ type
     ///    conta propria, se necessario.
     /// </remarks>
     class function CreateButton(AOwner: TComponent; AParent: TFmxObject;
-      const ACaption: string; const AConfig: TRickUIBuilderButtonConfig): TRectangle; static;
+      const ACaption: string; const AConfig: TRickUIBuilderButtonConfig): TRectangle; overload; static;
+
+    /// <summary>
+    ///    Cria o mesmo Button da sobrecarga tradicional e devolve, em
+    ///    ATextLabel, a referencia exata ao TLabel de Caption criado.
+    /// </summary>
+    /// <param name="ATextLabel">
+    ///    Parametro de saida com o TLabel interno criado. A referencia
+    ///    nao transfere ownership ao chamador.
+    /// </param>
+    /// <returns>
+    ///    O mesmo TRectangle retornado pela sobrecarga tradicional.
+    /// </returns>
+    class function CreateButton(AOwner: TComponent; AParent: TFmxObject;
+      const ACaption: string; const AConfig: TRickUIBuilderButtonConfig;
+      out ATextLabel: TLabel): TRectangle; overload; static;
   end;
 
 implementation
@@ -204,75 +264,101 @@ begin
   Result.Stroke.Kind  := TBrushKind.None;
 end;
 
+class function TRickUIBuilderFactory.CreateBadgeContainer(AOwner: TComponent;
+  AParent: TFmxObject; const AConfig: TRickUIBuilderBadgeConfig): TRectangle;
+begin
+  Result             := TRectangle.Create(AOwner);
+  Result.Parent      := AParent;
+  Result.Position.X  := AConfig.Left;
+  Result.Position.Y  := AConfig.Top;
+  Result.Width       := AConfig.Width;
+  Result.Height      := AConfig.Height;
+  Result.XRadius     := AConfig.Height / 2;
+  Result.YRadius     := AConfig.Height / 2;
+  Result.HitTest     := False;
+  Result.Fill.Kind   := TBrushKind.Solid;
+  Result.Fill.Color  := AConfig.BackgroundColor;
+  Result.Stroke.Kind := TBrushKind.None;
+end;
+
+class function TRickUIBuilderFactory.BuildBadgeTextConfig(
+  const AConfig: TRickUIBuilderBadgeConfig): TRickUIBuilderTextConfig;
+begin
+  Result                 := TRickUIBuilderTextConfig.Default;
+  Result.Left            := 0;
+  Result.Top             := 0;
+  Result.Width           := AConfig.Width;
+  Result.Height          := AConfig.Height;
+  Result.FontSize        := AConfig.FontSize;
+  Result.FontColor       := AConfig.TextColor;
+  Result.HorizontalAlign := TTextAlign.Center;
+end;
+
 class function TRickUIBuilderFactory.CreateBadge(AOwner: TComponent;
   AParent: TFmxObject; const AText: string;
   const AConfig: TRickUIBuilderBadgeConfig; out ATextLabel: TLabel): TRectangle;
 var
   LTextConfig: TRickUIBuilderTextConfig;
 begin
-  Result                  := TRectangle.Create(AOwner);
-  Result.Parent           := AParent;
-  Result.Position.X       := AConfig.Left;
-  Result.Position.Y       := AConfig.Top;
-  Result.Width            := AConfig.Width;
-  Result.Height           := AConfig.Height;
-  Result.XRadius          := AConfig.Height / 2;
-  Result.YRadius          := AConfig.Height / 2;
-  Result.HitTest          := False;
-  Result.Fill.Kind        := TBrushKind.Solid;
-  Result.Fill.Color       := AConfig.BackgroundColor;
-  Result.Stroke.Kind      := TBrushKind.None;
+  Result      := CreateBadgeContainer(AOwner, AParent, AConfig);
+  LTextConfig := BuildBadgeTextConfig(AConfig);
+  ATextLabel  := CreateText(AOwner, Result, AText, LTextConfig);
+end;
 
-  LTextConfig                 := TRickUIBuilderTextConfig.Default;
-  LTextConfig.Left            := 0;
-  LTextConfig.Top             := 0;
-  LTextConfig.Width           := AConfig.Width;
-  LTextConfig.Height          := AConfig.Height;
-  LTextConfig.FontSize        := AConfig.FontSize;
-  LTextConfig.FontColor       := AConfig.TextColor;
-  LTextConfig.HorizontalAlign := TTextAlign.Center;
+class procedure TRickUIBuilderFactory.ApplyButtonConfig(AButton: TRectangle;
+  const AConfig: TRickUIBuilderButtonConfig);
+begin
+  AButton.Position.X         := AConfig.Left;
+  AButton.Position.Y         := AConfig.Top;
+  AButton.Width              := AConfig.Width;
+  AButton.Height             := AConfig.Height;
+  AButton.Cursor             := crHandPoint;
+  AButton.XRadius            := 16;
+  AButton.YRadius            := 16;
+  AButton.Tag                := AConfig.Tag;
+  AButton.HitTest            := True;
+  AButton.Fill.Kind          := TBrushKind.Solid;
+  AButton.Fill.Color         := AConfig.FillColor;
+  AButton.Stroke.Kind        := TBrushKind.None;
 
-  ATextLabel := CreateText(AOwner, Result, AText, LTextConfig);
+  if not (AConfig.BorderColor = TAlphaColors.Null) then
+  begin
+    AButton.Stroke.Kind      := TBrushKind.Solid;
+    AButton.Stroke.Color     := AConfig.BorderColor;
+    AButton.Stroke.Thickness := 2;
+  end;
+end;
+
+class function TRickUIBuilderFactory.ButtonTextConfig(
+  const AConfig: TRickUIBuilderButtonConfig): TRickUIBuilderTextConfig;
+begin
+  Result                 := TRickUIBuilderTextConfig.Default;
+  Result.Left            := 0;
+  Result.Top             := 0;
+  Result.Width           := AConfig.Width;
+  Result.Height          := AConfig.Height;
+  Result.FontSize        := AConfig.FontSize;
+  Result.FontColor       := AConfig.TextColor;
+  Result.HorizontalAlign := TTextAlign.Center;
 end;
 
 class function TRickUIBuilderFactory.CreateButton(AOwner: TComponent;
   AParent: TFmxObject; const ACaption: string;
   const AConfig: TRickUIBuilderButtonConfig): TRectangle;
 var
-  LTextConfig: TRickUIBuilderTextConfig;
+  LTextLabel: TLabel;
 begin
-  Result                      := TRectangle.Create(AOwner);
-  Result.Parent               := AParent;
-  Result.Position.X           := AConfig.Left;
-  Result.Position.Y           := AConfig.Top;
-  Result.Width                := AConfig.Width;
-  Result.Height               := AConfig.Height;
-  Result.Cursor                := crHandPoint;
-  Result.XRadius               := 16;
-  Result.YRadius               := 16;
-  Result.Tag                   := AConfig.Tag;
-  Result.HitTest               := True;
-  Result.Fill.Kind             := TBrushKind.Solid;
-  Result.Fill.Color            := AConfig.FillColor;
-  Result.Stroke.Kind           := TBrushKind.None;
+  Result := CreateButton(AOwner, AParent, ACaption, AConfig, LTextLabel);
+end;
 
-  if not (AConfig.BorderColor = TAlphaColors.Null) then
-  begin
-    Result.Stroke.Kind        := TBrushKind.Solid;
-    Result.Stroke.Color       := AConfig.BorderColor;
-    Result.Stroke.Thickness   := 2;
-  end;
-
-  LTextConfig                 := TRickUIBuilderTextConfig.Default;
-  LTextConfig.Left            := 0;
-  LTextConfig.Top             := 0;
-  LTextConfig.Width           := AConfig.Width;
-  LTextConfig.Height          := AConfig.Height;
-  LTextConfig.FontSize        := AConfig.FontSize;
-  LTextConfig.FontColor       := AConfig.TextColor;
-  LTextConfig.HorizontalAlign := TTextAlign.Center;
-
-  CreateText(AOwner, Result, ACaption, LTextConfig);
+class function TRickUIBuilderFactory.CreateButton(AOwner: TComponent;
+  AParent: TFmxObject; const ACaption: string;
+  const AConfig: TRickUIBuilderButtonConfig; out ATextLabel: TLabel): TRectangle;
+begin
+  Result := TRectangle.Create(AOwner);
+  Result.Parent := AParent;
+  ApplyButtonConfig(Result, AConfig);
+  ATextLabel := CreateText(AOwner, Result, ACaption, ButtonTextConfig(AConfig));
 end;
 
 end.

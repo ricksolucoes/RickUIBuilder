@@ -63,8 +63,8 @@ Using an `IRickUIBuilder*` interface explicitly is **not a fourth creation style
 - Configuration records with reusable defaults for direct Factory creation.
 - Shared spacing support through `TRickUIBuilderSpacing`.
 - Button click and hover configuration.
-- Badge handles that expose both the generated container and its internal text label.
-- Explicit public interfaces for fluent builders and composition.
+- Button and Badge handles that expose both the generated container and its internal text label.
+- Explicit public interfaces for fluent builders, button hover state, generated-control handles, and composition.
 
 <a name="requirements"></a>
 ## 🧰 Requirements
@@ -132,7 +132,7 @@ TRickUIBuilder.Factory
 | `CreateText` | `TLabel` |
 | `CreateDivider` | `TRectangle` |
 | `CreateBadge` | Badge `TRectangle` plus its internal `TLabel` through an `out` parameter |
-| `CreateButton` | Button `TRectangle` with an internal caption label |
+| `CreateButton` | Button `TRectangle`; an additive overload also returns the internal caption `TLabel` through an `out` parameter |
 
 ### Configuration records
 
@@ -206,7 +206,7 @@ end;
 
 `AOwner` controls the lifetime of the created controls, while `AParent` defines where they are placed in the FMX visual tree.
 
-For buttons, the direct Factory method creates the visual control but does not attach the fluent builder's hover behavior. Use the Button Builder when you need `HoverFillColor`, `OnHover`, or the other builder-only options.
+For buttons, the direct Factory method creates the visual control but does not attach the fluent builder's hover behavior. Use the Button Builder when you need `HoverFillColor`, `OnHover`, or the other builder-only options. The original `CreateButton(...): TRectangle` overload remains available; use the overload with `out ATextLabel: TLabel` only when direct Factory code also needs the exact caption label created for that button. Both controls remain owned by the `AOwner` passed to the Factory.
 
 ---
 
@@ -308,6 +308,72 @@ end;
 ```
 
 When `Enabled(False)` is used, the builder applies the configured `DisabledOpacity`. When enabled, the normal `Opacity` value is used.
+
+### Button hover state
+
+The Button Builder configures hover through its public fluent API (`HoverFillColor` and `OnHover`). RickUIBuilder also exposes `IRickUIBuilderButtonHoverState` when the hover state itself needs to be configured explicitly.
+
+`TRickUIBuilderButtonHoverState.New` takes no parameters. Configuration is performed through fluent input overloads, while the corresponding parameterless overloads return the currently configured values:
+
+| Setting | Input overload | Output overload |
+| --- | --- | --- |
+| Button | `Button(AValue: TRectangle)` | `Button: TRectangle` |
+| Normal fill | `FillColor(AValue: TAlphaColor)` | `FillColor: TAlphaColor` |
+| Hover fill | `HoverFillColor(AValue: TAlphaColor)` | `HoverFillColor: TAlphaColor` |
+| Mouse enter handler | `OnEnter(AValue: TNotifyEvent)` | `OnEnter: TNotifyEvent` |
+| Mouse leave handler | `OnLeave(AValue: TNotifyEvent)` | `OnLeave: TNotifyEvent` |
+
+Each input overload returns `IRickUIBuilderButtonHoverState`, so configuration remains chainable. `Build(AOwner)` materializes the persistent hover behavior and returns the same interface contract.
+
+```pascal
+uses
+  System.UITypes,
+  FMX.Objects,
+  Rick.UIBuilder.Button.HoverState,
+  Rick.UIBuilder.Interfaces;
+
+procedure TMainForm.ConfigureButtonHover(const AButton: TRectangle);
+var
+  LHoverState: IRickUIBuilderButtonHoverState;
+begin
+  LHoverState := TRickUIBuilderButtonHoverState.New
+    .Button(AButton)
+    .FillColor(AButton.Fill.Color)
+    .HoverFillColor(TAlphaColors.Lightgray);
+
+  LHoverState.Build(Self);
+end;
+```
+
+The configuration interface may be released after `Build`. The materialized event behavior is owned by the `AOwner` passed to `Build` and remains alive while that Owner remains alive. `Build` does not change the Button's ownership; the supplied Owner must therefore remain alive for as long as the Button can fire the configured hover events.
+
+### Accessing the generated controls
+
+The existing `Build(AParent): TRectangle` API is preserved and remains the simplest choice when the caller only needs the button container. When code also needs the exact internal caption label, call `BuildHandle` instead. It returns an `IRickUIBuilderButtonHandle` with `Container` and `TextLabel` references to the same controls created by the builder.
+
+```pascal
+uses
+  Rick.UIBuilder,
+  Rick.UIBuilder.Interfaces;
+
+procedure TMainForm.BuildButtonWithHandle;
+var
+  LHandle: IRickUIBuilderButtonHandle;
+begin
+  LHandle := TRickUIBuilder.Button
+    .Caption('Save')
+    .Size(160, 44)
+    .BuildHandle(Self);
+
+  LHandle.TextLabel.Text := 'Saved';
+end;
+```
+
+The handle is **non-owning**. Releasing the interface does not free either control, and holding the interface does not keep those controls alive. Ownership and lifetime stay with the `Owner` used during creation (the fluent builder uses the `AParent` passed to `Build`/`BuildHandle` as Owner and Parent for the container, and as Owner for the caption label). Therefore, do not access `Container` or `TextLabel` through a handle after their Owner has been destroyed.
+
+Use `Build` when only the `TRectangle` is required. Use `BuildHandle` when code must access the generated `TLabel` explicitly without depending on the button's `Children` layout.
+
+Existing source calls to `Build(AParent): TRectangle` remain unchanged. Because `IRickUIBuilderButton` gains a new method, dependent Delphi units/packages should be rebuilt against this version; binary compatibility with DCUs/DCPs/BPLs compiled against an older interface layout is not asserted.
 
 ---
 
@@ -467,18 +533,22 @@ The records above contain additional fields beyond those changed in the example.
 
 **Unit:** `Rick.UIBuilder.Interfaces`
 
-RickUIBuilder exposes public contracts for the fluent builders, the badge handle, and the composer:
+RickUIBuilder exposes public contracts for the fluent builders, button hover state, the button and badge handles, and the composer:
 
 | Interface | Role |
 | --- | --- |
 | `IRickUIBuilderLabel` | Label fluent builder contract |
 | `IRickUIBuilderButton` | Button fluent builder contract |
+| `IRickUIBuilderButtonHoverState` | Fluent hover configuration with input/output overloads; `Build(AOwner)` materializes behavior whose lifetime follows the supplied Owner |
+| `IRickUIBuilderButtonHandle` | Non-owning access to the generated button container and caption label |
 | `IRickUIBuilderBadge` | Badge fluent builder contract |
 | `IRickUIBuilderBadgeHandle` | Access to the generated badge container and text label |
 | `IRickUIBuilderDivider` | Divider fluent builder contract |
 | `IRickUIBuilderComposer` | Composition contract |
 
 Using an interface explicitly does not create a different implementation. It simply stores the same builder returned by `TRickUIBuilder` behind its public contract.
+
+`IRickUIBuilderButtonHoverState` is the exception in purpose, not in interface style: it represents the explicit hover configuration rather than a visual component builder. Its `New` factory is parameterless, its setter/getter pairs use overloads, and its `Build(AOwner)` materializes the Owner-managed event behavior. The configuration interface itself does not need to remain referenced after `Build`.
 
 A minimal example:
 
@@ -524,7 +594,7 @@ The sample is designed as a basic showcase. The examples in this README cover ad
 <a name="tests"></a>
 ## ✅ Tests
 
-The project includes a working DUnitX test suite covering the main RickUIBuilder areas, including:
+The project includes a DUnitX test suite covering the main RickUIBuilder areas, including:
 
 - Types.
 - Factory.
@@ -536,6 +606,32 @@ The project includes a working DUnitX test suite covering the main RickUIBuilder
 - Facade.
 
 The test project is available under `tests`.
+
+### Verified DUnitX result
+
+A real execution of `RickUIBuilder.Test.exe` supplied for this version reported:
+
+| DUnitX result | Value |
+| --- | ---: |
+| Tests Found | **151** |
+| Tests Passed | **151** |
+| Tests Ignored | **0** |
+| Tests Leaked | **0** |
+| Tests Failed | **0** |
+| Tests Errored | **0** |
+
+These values document that specific verified execution; they are not a guarantee about future revisions.
+
+### Method Toxicity Metrics
+
+RAD Studio Method Toxicity Metrics was also executed for the library and test projects. In the supplied reports, ordered by `Toxicity`, the highest values shown were:
+
+| Project | Highest `Toxicity` shown | Project quality threshold |
+| --- | ---: | ---: |
+| `RickUIBuilder.dproj` | **0.487** | `< 1` |
+| `RickUIBuilder.Test.dproj` | **0.367** | `< 1` |
+
+These are measured RAD Studio `Toxicity` values from the supplied reports, not values estimated from source code. The metric is revision-specific and should be measured again after future code changes.
 
 <a name="license"></a>
 ## 📄 License
