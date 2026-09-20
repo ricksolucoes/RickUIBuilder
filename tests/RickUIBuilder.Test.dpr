@@ -2,9 +2,12 @@ program RickUIBuilder.Test;
 
 {$IFNDEF TESTINSIGHT}
 {$APPTYPE CONSOLE}
-{$ENDIF}{$STRONGLINKTYPES ON}
+{$ENDIF}
+{$STRONGLINKTYPES ON}
+
 uses
   System.SysUtils,
+  System.IOUtils,
   {$IFDEF TESTINSIGHT}
   TestInsight.DUnitX,
   {$ENDIF }
@@ -21,38 +24,63 @@ uses
   Rick.UIBuilder.Tests.Facade in 'src\Rick.UIBuilder.Tests.Facade.pas';
 
 var
-  runner : ITestRunner;
-  results : IRunResults;
-  logger : ITestLogger;
+  runner      : ITestRunner;
+  results     : IRunResults;
+  logger      : ITestLogger;
   nunitLogger : ITestLogger;
+  xmlOutputPath : string;
+
 begin
 {$IFDEF TESTINSIGHT}
+  // Se este define estiver ativo, o fluxo abaixo (incluindo o XML) NUNCA roda.
+  // Garanta que TESTINSIGHT esteja OFF no build usado para gerar o relatório.
   TestInsight.DUnitX.RunRegisteredTests;
   exit;
 {$ENDIF}
   try
-    //Check command line options, will exit if invalid
+    // Verifica/valida argumentos de linha de comando (ex: --xml=..., --format=...)
     TDUnitX.CheckCommandLine;
-    //Create the test runner
+
+    // Cria o runner
     runner := TDUnitX.CreateRunner;
-    //Tell the runner to use RTTI to find Fixtures
     runner.UseRTTI := True;
-    //tell the runner how we will log things
-    //Log to the console window
+    runner.FailsOnNoAsserts := False;
+
+    // Logger de console
     logger := TDUnitXConsoleLogger.Create(true);
     runner.AddLogger(logger);
-    //Generate an NUnit compatible XML File
-    nunitLogger := TDUnitXXMLNUnitFileLogger.Create(TDUnitX.Options.XMLOutputFile);
-    runner.AddLogger(nunitLogger);
-    runner.FailsOnNoAsserts := False; //When true, Assertions must be made during tests;
 
-    //Run tests
+    // --- Define explicitamente o caminho do XML ---
+    // Se o usuário não passou --xml=... na linha de comando, força um caminho
+    // absoluto e previsível, ao lado do executável.
+    xmlOutputPath := TDUnitX.Options.XMLOutputFile;
+    if xmlOutputPath.Trim.IsEmpty then
+      xmlOutputPath := 'dunitx-results.xml';
+
+    if not TPath.IsPathRooted(xmlOutputPath) then
+      xmlOutputPath := TPath.Combine(TPath.GetDirectoryName(ParamStr(0)), xmlOutputPath);
+
+    nunitLogger := TDUnitXXMLNUnitFileLogger.Create(xmlOutputPath);
+    runner.AddLogger(nunitLogger);
+
+    // --- Executa os testes ---
     results := runner.Execute;
+
+    Writeln;
+
+    // Confirma se o arquivo foi realmente criado
+    if TFile.Exists(xmlOutputPath) then
+      Writeln('XML gerado com sucesso: ', xmlOutputPath)
+    else
+      Writeln('ATENCAO: XML NAO foi encontrado apos a execucao em: ', xmlOutputPath);
+
+
+    Writeln;
+
     if not results.AllPassed then
       System.ExitCode := EXIT_ERRORS;
 
     {$IFNDEF CI}
-    //We don't want this happening when running under CI.
     if TDUnitX.Options.ExitBehavior = TDUnitXExitBehavior.Pause then
     begin
       System.Write('Done.. press <Enter> key to quit.');
@@ -61,6 +89,9 @@ begin
     {$ENDIF}
   except
     on E: Exception do
-      System.Writeln(E.ClassName, ': ', E.Message);
+    begin
+      Writeln('ERRO FATAL: ', E.ClassName, ': ', E.Message);
+      System.ExitCode := EXIT_ERRORS;
+    end;
   end;
 end.

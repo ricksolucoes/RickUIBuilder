@@ -9,9 +9,10 @@
   Implementa IRickUIBuilderButtonHoverState como configuracao fluente e
   materializa, em Build, o comportamento persistente de hover de um Button.
 
-  A configuracao usa TInterfacedObject e pode ser liberada depois de Build.
-  O manipulador efetivo dos eventos permanece em um TComponent interno cujo
-  Owner e informado em Build, preservando o lifetime necessario para
+  A configuracao usa TInterfacedObject e permanece como a fonte viva dos
+  valores usados depois de Build. O manipulador efetivo dos eventos permanece
+  em um TComponent interno cujo Owner e informado em Build e mantem uma
+  referencia ao estado, preservando o lifetime necessario para
   OnMouseEnter/OnMouseLeave sem expor TComponent como contrato publico.
 
   ==============================================================================
@@ -47,6 +48,7 @@ type
     function FillColor: TAlphaColor; overload;
     function HoverFillColor(AValue: TAlphaColor): IRickUIBuilderButtonHoverState; overload;
     function HoverFillColor: TAlphaColor; overload;
+    function HasHoverFillColor: Boolean;
     function OnEnter(AValue: TNotifyEvent): IRickUIBuilderButtonHoverState; overload;
     function OnEnter: TNotifyEvent; overload;
     function OnLeave(AValue: TNotifyEvent): IRickUIBuilderButtonHoverState; overload;
@@ -65,15 +67,12 @@ implementation
 type
   TRickUIBuilderButtonHoverBehavior = class(TComponent)
   strict private
-    FButton            : TRectangle;
-    FFillColor         : TAlphaColor;
-    FHoverFillColor    : TAlphaColor;
-    FHasHoverFillColor : Boolean;
-    FOnEnter           : TNotifyEvent;
-    FOnLeave           : TNotifyEvent;
+    FButton: TRectangle;
+    FState: TRickUIBuilderButtonHoverState;
+    FStateLifetime: IRickUIBuilderButtonHoverState;
   public
-    procedure Configure(AButton: TRectangle; AFillColor, AHoverFillColor: TAlphaColor;
-      AHasHoverFillColor: Boolean; AOnEnter, AOnLeave: TNotifyEvent);
+    procedure Configure(AButton: TRectangle;
+      AState: TRickUIBuilderButtonHoverState);
     procedure HandleMouseEnter(Sender: TObject);
     procedure HandleMouseLeave(Sender: TObject);
   end;
@@ -128,6 +127,11 @@ begin
   Result := FHoverFillColor;
 end;
 
+function TRickUIBuilderButtonHoverState.HasHoverFillColor: Boolean;
+begin
+  Result := FHasHoverFillColor;
+end;
+
 function TRickUIBuilderButtonHoverState.OnEnter(
   AValue: TNotifyEvent): IRickUIBuilderButtonHoverState;
 begin
@@ -158,8 +162,7 @@ var
   LBehavior: TRickUIBuilderButtonHoverBehavior;
 begin
   LBehavior := TRickUIBuilderButtonHoverBehavior.Create(AOwner);
-  LBehavior.Configure(FButton, FFillColor, FHoverFillColor,
-    FHasHoverFillColor, FOnEnter, FOnLeave);
+  LBehavior.Configure(FButton, Self);
   FButton.OnMouseEnter := LBehavior.HandleMouseEnter;
   FButton.OnMouseLeave := LBehavior.HandleMouseLeave;
   Result := Self;
@@ -168,33 +171,35 @@ end;
 { TRickUIBuilderButtonHoverBehavior }
 
 procedure TRickUIBuilderButtonHoverBehavior.Configure(AButton: TRectangle;
-  AFillColor, AHoverFillColor: TAlphaColor; AHasHoverFillColor: Boolean;
-  AOnEnter, AOnLeave: TNotifyEvent);
+  AState: TRickUIBuilderButtonHoverState);
 begin
   FButton := AButton;
-  FFillColor := AFillColor;
-  FHoverFillColor := AHoverFillColor;
-  FHasHoverFillColor := AHasHoverFillColor;
-  FOnEnter := AOnEnter;
-  FOnLeave := AOnLeave;
+  FState := AState;
+  FStateLifetime := AState;
 end;
 
 procedure TRickUIBuilderButtonHoverBehavior.HandleMouseEnter(Sender: TObject);
+var
+  LHandler: TNotifyEvent;
 begin
-  if FHasHoverFillColor then
-    FButton.Fill.Color := FHoverFillColor;
+  if FState.HasHoverFillColor then
+    FButton.Fill.Color := FState.HoverFillColor;
 
-  if Assigned(FOnEnter) then
-    FOnEnter(Sender);
+  LHandler := FState.OnEnter();
+  if Assigned(LHandler) then
+    LHandler(Sender);
 end;
 
 procedure TRickUIBuilderButtonHoverBehavior.HandleMouseLeave(Sender: TObject);
+var
+  LHandler: TNotifyEvent;
 begin
-  if FHasHoverFillColor then
-    FButton.Fill.Color := FFillColor;
+  if FState.HasHoverFillColor then
+    FButton.Fill.Color := FState.FillColor;
 
-  if Assigned(FOnLeave) then
-    FOnLeave(Sender);
+  LHandler := FState.OnLeave();
+  if Assigned(LHandler) then
+    LHandler(Sender);
 end;
 
 end.

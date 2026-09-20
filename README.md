@@ -63,7 +63,7 @@ Using an `IRickUIBuilder*` interface explicitly is **not a fourth creation style
 - Configuration records with reusable defaults for direct Factory creation.
 - Shared spacing support through `TRickUIBuilderSpacing`.
 - Button click and hover configuration.
-- Button and Badge handles that expose both the generated container and its internal text label.
+- Button and Badge handles that expose the generated container and internal text label; the Button handle also exposes its mutable hover state.
 - Explicit public interfaces for fluent builders, button hover state, generated-control handles, and composition.
 
 <a name="requirements"></a>
@@ -323,7 +323,9 @@ The Button Builder configures hover through its public fluent API (`HoverFillCol
 | Mouse enter handler | `OnEnter(AValue: TNotifyEvent)` | `OnEnter: TNotifyEvent` |
 | Mouse leave handler | `OnLeave(AValue: TNotifyEvent)` | `OnLeave: TNotifyEvent` |
 
-Each input overload returns `IRickUIBuilderButtonHoverState`, so configuration remains chainable. `Build(AOwner)` materializes the persistent hover behavior and returns the same interface contract.
+Each input overload returns `IRickUIBuilderButtonHoverState`, so configuration remains chainable. `Build(AOwner)` materializes the persistent hover behavior and returns the same interface contract. The behavior keeps that same state alive and reads the current `FillColor`, `HoverFillColor`, `OnEnter`, and `OnLeave` values when the corresponding mouse event is fired. Updating these values after `Build` therefore affects subsequent hover events without rebuilding the button.
+
+The setters do not repaint the button immediately. A new `HoverFillColor` is used by the next `MouseEnter`, and a new `FillColor` is used by the next `MouseLeave`. Changing `Button(AValue)` after `Build` also does not retarget a behavior that has already been materialized; that behavior remains attached to the button used by its own `Build`.
 
 ```pascal
 uses
@@ -342,14 +344,20 @@ begin
     .HoverFillColor(TAlphaColors.Lightgray);
 
   LHoverState.Build(Self);
+
+  // Later: the already-built behavior will use these values
+  // on the next corresponding mouse events.
+  LHoverState
+    .FillColor(TAlphaColors.Teal)
+    .HoverFillColor(TAlphaColors.Aqua);
 end;
 ```
 
-The configuration interface may be released after `Build`. The materialized event behavior is owned by the `AOwner` passed to `Build` and remains alive while that Owner remains alive. `Build` does not change the Button's ownership; the supplied Owner must therefore remain alive for as long as the Button can fire the configured hover events.
+The caller's configuration reference may be released after `Build`. The materialized event behavior is owned by the `AOwner` passed to `Build`, keeps the hover state alive, and remains active while that Owner remains alive. `Build` does not change the Button's ownership; the supplied Owner must therefore remain alive for as long as the Button can fire the configured hover events.
 
 ### Accessing the generated controls
 
-The existing `Build(AParent): TRectangle` API is preserved and remains the simplest choice when the caller only needs the button container. When code also needs the exact internal caption label, call `BuildHandle` instead. It returns an `IRickUIBuilderButtonHandle` with `Container` and `TextLabel` references to the same controls created by the builder.
+The existing `Build(AParent): TRectangle` API is preserved and remains the simplest choice when the caller only needs the button container. When code also needs post-build access, call `BuildHandle` instead. It returns an `IRickUIBuilderButtonHandle` with `Container`, `TextLabel`, and the same mutable `HoverState` used by the button's materialized behavior.
 
 ```pascal
 uses
@@ -366,14 +374,20 @@ begin
     .BuildHandle(Self);
 
   LHandle.TextLabel.Text := 'Saved';
+
+  LHandle.HoverState
+    .FillColor(TAlphaColors.Teal)
+    .HoverFillColor(TAlphaColors.Aqua);
 end;
 ```
 
-The handle is **non-owning**. Releasing the interface does not free either control, and holding the interface does not keep those controls alive. Ownership and lifetime stay with the `Owner` used during creation (the fluent builder uses the `AParent` passed to `Build`/`BuildHandle` as Owner and Parent for the container, and as Owner for the caption label). Therefore, do not access `Container` or `TextLabel` through a handle after their Owner has been destroyed.
+`BuildHandle` supplies a non-nil `HoverState` associated with the same button. The compatibility overload `TRickUIBuilderButtonHandle.New(Container, TextLabel)` is preserved for direct callers and has no hover state to expose, so its `HoverState` result is `nil`.
+
+The handle is **non-owning** with respect to the FMX controls. Releasing the interface does not free either control, and holding the interface does not keep those controls alive. The handle may keep the logical hover-state interface referenced, but that state does not own the button. Ownership and lifetime stay with the `Owner` used during creation (the fluent builder uses the `AParent` passed to `Build`/`BuildHandle` as Owner and Parent for the container, and as Owner for the caption label). Therefore, do not access `Container`, `TextLabel`, or their hover state after the control Owner has been destroyed.
 
 Use `Build` when only the `TRectangle` is required. Use `BuildHandle` when code must access the generated `TLabel` explicitly without depending on the button's `Children` layout.
 
-Existing source calls to `Build(AParent): TRectangle` remain unchanged. Because `IRickUIBuilderButton` gains a new method, dependent Delphi units/packages should be rebuilt against this version; binary compatibility with DCUs/DCPs/BPLs compiled against an older interface layout is not asserted.
+Existing source calls to `Build(AParent): TRectangle` remain unchanged. Public interface layouts have evolved (`IRickUIBuilderButton` includes `BuildHandle`, and `IRickUIBuilderButtonHandle` now includes `HoverState`), so dependent Delphi units/packages should be rebuilt against this version; binary compatibility with DCUs/DCPs/BPLs compiled against an older interface layout is not asserted.
 
 ---
 
@@ -539,8 +553,8 @@ RickUIBuilder exposes public contracts for the fluent builders, button hover sta
 | --- | --- |
 | `IRickUIBuilderLabel` | Label fluent builder contract |
 | `IRickUIBuilderButton` | Button fluent builder contract |
-| `IRickUIBuilderButtonHoverState` | Fluent hover configuration with input/output overloads; `Build(AOwner)` materializes behavior whose lifetime follows the supplied Owner |
-| `IRickUIBuilderButtonHandle` | Non-owning access to the generated button container and caption label |
+| `IRickUIBuilderButtonHoverState` | Mutable hover state with input/output overloads; `Build(AOwner)` materializes behavior that reads the current values on subsequent mouse events |
+| `IRickUIBuilderButtonHandle` | Non-owning access to the generated button container and caption label, plus the associated mutable hover state |
 | `IRickUIBuilderBadge` | Badge fluent builder contract |
 | `IRickUIBuilderBadgeHandle` | Access to the generated badge container and text label |
 | `IRickUIBuilderDivider` | Divider fluent builder contract |
@@ -548,7 +562,7 @@ RickUIBuilder exposes public contracts for the fluent builders, button hover sta
 
 Using an interface explicitly does not create a different implementation. It simply stores the same builder returned by `TRickUIBuilder` behind its public contract.
 
-`IRickUIBuilderButtonHoverState` is the exception in purpose, not in interface style: it represents the explicit hover configuration rather than a visual component builder. Its `New` factory is parameterless, its setter/getter pairs use overloads, and its `Build(AOwner)` materializes the Owner-managed event behavior. The configuration interface itself does not need to remain referenced after `Build`.
+`IRickUIBuilderButtonHoverState` is the exception in purpose, not in interface style: it represents the explicit hover state rather than a visual component builder. Its `New` factory is parameterless, its setter/getter pairs use overloads, and its `Build(AOwner)` materializes the Owner-managed event behavior. The behavior keeps the state alive, so the caller does not need to retain a reference merely for lifetime; when the caller does keep the state (directly or through `IRickUIBuilderButtonHandle.HoverState`), changes to fill colors and enter/leave handlers are consumed by subsequent mouse events.
 
 A minimal example:
 
@@ -605,33 +619,48 @@ The project includes a DUnitX test suite covering the main RickUIBuilder areas, 
 - Composition.
 - Facade.
 
-The test project is available under `tests`.
+The test project is available under `tests`. The current source declares **161** `[Test]` methods.
 
-### Verified DUnitX result
+### Latest verified DUnitX result
 
-A real execution of `RickUIBuilder.Test.exe` supplied for this version reported:
+The supplied NUnit XML identifies `RickUIBuilder.Test.exe` and records a real execution at **2026-09-20 07:06:01** with assembly result `Success` / `success="True"`:
 
 | DUnitX result | Value |
 | --- | ---: |
-| Tests Found | **151** |
-| Tests Passed | **151** |
+| Tests Found | **161** |
+| Tests Passed | **161** |
 | Tests Ignored | **0** |
-| Tests Leaked | **0** |
 | Tests Failed | **0** |
 | Tests Errored | **0** |
+| Inconclusive | **0** |
+| Not run | **0** |
+| Skipped | **0** |
+| Invalid | **0** |
 
-These values document that specific verified execution; they are not a guarantee about future revisions.
+The supplied console output for the same run additionally reports **Tests Leaked = 0**. The NUnit execution includes the mutable-hover contracts added in this revision, including `HoverFillColor_AposBuild_DeveSerUsadaNoProximoMouseEnter`, `FillColor_AposBuild_DeveSerUsadaNoProximoMouseLeave`, `OnEnter_AposBuild_DeveUsarHandlerAtual`, `OnLeave_AposBuild_DeveUsarHandlerAtual`, `Button_AlteradoAposBuild_NaoDeveRetargetBehaviorJaCriado`, and the `BuildHandle` tests that expose and mutate the same HoverState used by the built Button.
 
 ### Method Toxicity Metrics
 
-RAD Studio Method Toxicity Metrics was also executed for the library and test projects. In the supplied reports, ordered by `Toxicity`, the highest values shown were:
+RAD Studio Method Toxicity Metrics was re-run after the mutable HoverState implementation for both the library and test projects. The supplied CSV reports contain **157 measured library methods** and **188 measured test methods**. Their measured maxima are:
 
-| Project | Highest `Toxicity` shown | Project quality threshold |
-| --- | ---: | ---: |
-| `RickUIBuilder.dproj` | **0.487** | `< 1` |
-| `RickUIBuilder.Test.dproj` | **0.367** | `< 1` |
+| Project | Methods | Max `Length` | Max `Parameters` | Max `If Depth` | Max `Cyclomatic Complexity` | Max `Toxicity` | Hard-gate violations |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `RickUIBuilder.dproj` | **157** | **20** | **5** | **1** | **3** | **0.487** | **0** |
+| `RickUIBuilder.Test.dproj` | **188** | **12** | **1** | **1** | **4** | **0.367** | **0** |
 
-These are measured RAD Studio `Toxicity` values from the supplied reports, not values estimated from source code. The metric is revision-specific and should be measured again after future code changes.
+The project hard gates remain `Length <= 20`, `Parameters <= 6`, `If Depth <= 5`, `Cyclomatic Complexity <= 6`, and `Toxicity < 1`. No row in either supplied post-change CSV exceeds those limits.
+
+The methods central to the mutable HoverState implementation were measured as follows:
+
+| Method | Length | Params | If Depth | Cyclomatic | Toxicity |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `TRickUIBuilderButtonBuilder.AttachBehavior` | 6 | 2 | 1 | 3 | 0.333 |
+| `TRickUIBuilderButtonBuilder.BuildCore` | 5 | 3 | 0 | 1 | 0.229 |
+| `TRickUIBuilderButtonHoverBehavior.Configure` | 3 | 2 | 0 | 1 | 0.163 |
+| `TRickUIBuilderButtonHoverBehavior.HandleMouseEnter` | 5 | 1 | 1 | 3 | 0.279 |
+| `TRickUIBuilderButtonHoverBehavior.HandleMouseLeave` | 5 | 1 | 1 | 3 | 0.279 |
+
+These are measured RAD Studio values from the supplied post-change reports, not values estimated from source code. They are revision-specific and must be measured again after future code changes.
 
 <a name="license"></a>
 ## 📄 License

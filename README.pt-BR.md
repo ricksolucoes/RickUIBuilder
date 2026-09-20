@@ -63,7 +63,7 @@ Usar explicitamente uma interface `IRickUIBuilder*` **não representa uma quarta
 - Records de configuração com valores `Default` reutilizáveis para criação direta pela `Factory`.
 - Configuração compartilhada de espaçamento com `TRickUIBuilderSpacing`.
 - Configuração de click e hover em Button.
-- Handles de Button e Badge que expõem o container gerado e o `TLabel` interno.
+- Handles de Button e Badge que expõem o container gerado e o `TLabel` interno; o Handle de Button também expõe seu HoverState mutável.
 - Interfaces públicas para os `Fluent Builders`, estado de hover do Button, Handles de controles gerados e `Composition`.
 
 <a name="requisitos"></a>
@@ -323,7 +323,9 @@ O Button Builder configura o hover pela própria API fluent pública (`HoverFill
 | Handler de MouseEnter | `OnEnter(AValue: TNotifyEvent)` | `OnEnter: TNotifyEvent` |
 | Handler de MouseLeave | `OnLeave(AValue: TNotifyEvent)` | `OnLeave: TNotifyEvent` |
 
-Cada overload de entrada retorna `IRickUIBuilderButtonHoverState`, preservando o encadeamento fluent. `Build(AOwner)` materializa o comportamento persistente de hover e retorna o mesmo contrato de interface.
+Cada overload de entrada retorna `IRickUIBuilderButtonHoverState`, preservando o encadeamento fluent. `Build(AOwner)` materializa o comportamento persistente de hover e retorna o mesmo contrato de interface. O behavior mantém esse mesmo estado vivo e consulta os valores atuais de `FillColor`, `HoverFillColor`, `OnEnter` e `OnLeave` quando o evento de mouse correspondente é disparado. Portanto, alterar esses valores depois de `Build` afeta os eventos de hover seguintes sem reconstruir o Button.
+
+Os setters não repintam o Button imediatamente. Um novo `HoverFillColor` é usado no próximo `MouseEnter`, e um novo `FillColor` é usado no próximo `MouseLeave`. Alterar `Button(AValue)` depois de `Build` também não retargeta um behavior já materializado; aquele behavior permanece associado ao Button usado no seu próprio `Build`.
 
 ```pascal
 uses
@@ -342,14 +344,20 @@ begin
     .HoverFillColor(TAlphaColors.Lightgray);
 
   LHoverState.Build(Self);
+
+  // Depois: o behavior já construído usará estes valores
+  // nos próximos eventos de mouse correspondentes.
+  LHoverState
+    .FillColor(TAlphaColors.Teal)
+    .HoverFillColor(TAlphaColors.Aqua);
 end;
 ```
 
-A interface de configuração pode ser liberada depois de `Build`. O comportamento materializado dos eventos pertence ao `AOwner` informado a `Build` e permanece vivo enquanto esse Owner permanecer vivo. `Build` não altera o ownership do Button; portanto, o Owner informado deve permanecer vivo enquanto o Button puder disparar os eventos de hover configurados.
+A referência de configuração mantida pelo chamador pode ser liberada depois de `Build`. O comportamento materializado dos eventos pertence ao `AOwner` informado a `Build`, mantém o estado de hover vivo e permanece ativo enquanto esse Owner permanecer vivo. `Build` não altera o ownership do Button; portanto, o Owner informado deve permanecer vivo enquanto o Button puder disparar os eventos de hover configurados.
 
 ### Acessando os controles gerados
 
-A API existente `Build(AParent): TRectangle` foi preservada e continua sendo a opção mais simples quando o consumidor precisa apenas do container do Button. Quando também for necessária a referência exata ao label interno do caption, use `BuildHandle`. O retorno é um `IRickUIBuilderButtonHandle` com `Container` e `TextLabel` apontando para os mesmos controles criados pelo Builder.
+A API existente `Build(AParent): TRectangle` foi preservada e continua sendo a opção mais simples quando o consumidor precisa apenas do container do Button. Quando for necessário acesso pós-Build, use `BuildHandle`. O retorno é um `IRickUIBuilderButtonHandle` com `Container`, `TextLabel` e o mesmo `HoverState` mutável utilizado pelo behavior materializado do Button.
 
 ```pascal
 uses
@@ -366,14 +374,20 @@ begin
     .BuildHandle(Self);
 
   LHandle.TextLabel.Text := 'Salvo';
+
+  LHandle.HoverState
+    .FillColor(TAlphaColors.Teal)
+    .HoverFillColor(TAlphaColors.Aqua);
 end;
 ```
 
-O Handle é **non-owning**. Liberar a interface não libera nenhum dos controles e manter a interface referenciada não mantém esses controles vivos. O ownership e o lifetime continuam pertencendo ao `Owner` usado na criação (o Fluent Builder utiliza o `AParent` informado a `Build`/`BuildHandle` como Owner e Parent do container e como Owner do label de caption). Portanto, `Container` e `TextLabel` não devem ser acessados pelo Handle depois que o respectivo Owner tiver sido destruído.
+`BuildHandle` fornece um `HoverState` não nulo associado ao mesmo Button. A sobrecarga de compatibilidade `TRickUIBuilderButtonHandle.New(Container, TextLabel)` foi preservada para consumidores diretos e não recebe estado de hover; portanto, nesse caso `HoverState` retorna `nil`.
+
+O Handle é **non-owning** em relação aos controles FMX. Liberar a interface não libera nenhum dos controles e manter a interface referenciada não mantém esses controles vivos. O Handle pode manter a interface lógica de HoverState referenciada, mas esse estado não é proprietário do Button. O ownership e o lifetime continuam pertencendo ao `Owner` usado na criação (o Fluent Builder utiliza o `AParent` informado a `Build`/`BuildHandle` como Owner e Parent do container e como Owner do label de caption). Portanto, `Container`, `TextLabel` e o estado de hover não devem ser usados depois que o respectivo Owner dos controles tiver sido destruído.
 
 Use `Build` quando somente o `TRectangle` for necessário. Use `BuildHandle` quando o código precisar acessar explicitamente o `TLabel` criado, sem depender da organização interna de `Children` do Button.
 
-As chamadas em código-fonte para `Build(AParent): TRectangle` permanecem inalteradas. Como `IRickUIBuilderButton` passa a possuir um novo método, units/packages Delphi dependentes devem ser recompilados contra esta versão; não é afirmada compatibilidade binária com DCUs/DCPs/BPLs compilados contra o layout anterior da interface.
+As chamadas em código-fonte para `Build(AParent): TRectangle` permanecem inalteradas. Os layouts das interfaces públicas evoluíram (`IRickUIBuilderButton` inclui `BuildHandle` e `IRickUIBuilderButtonHandle` agora inclui `HoverState`), portanto units/packages Delphi dependentes devem ser recompilados contra esta versão; não é afirmada compatibilidade binária com DCUs/DCPs/BPLs compilados contra layouts anteriores.
 
 ---
 
@@ -539,8 +553,8 @@ O RickUIBuilder expõe contratos públicos para os `Fluent Builders`, para o est
 | --- | --- |
 | `IRickUIBuilderLabel` | Contrato do Label Builder |
 | `IRickUIBuilderButton` | Contrato do Button Builder |
-| `IRickUIBuilderButtonHoverState` | Configuração fluent de hover com overloads de entrada/saída; `Build(AOwner)` materializa comportamento cujo lifetime segue o Owner informado |
-| `IRickUIBuilderButtonHandle` | Acesso non-owning ao container e ao label de caption gerados para o Button |
+| `IRickUIBuilderButtonHoverState` | Estado de hover mutável com overloads de entrada/saída; `Build(AOwner)` materializa behavior que consulta os valores atuais nos eventos de mouse seguintes |
+| `IRickUIBuilderButtonHandle` | Acesso non-owning ao container e ao label de caption gerados para o Button, além do HoverState mutável associado |
 | `IRickUIBuilderBadge` | Contrato do Badge Builder |
 | `IRickUIBuilderBadgeHandle` | Acesso ao container e ao text label gerados para o Badge |
 | `IRickUIBuilderDivider` | Contrato do Divider Builder |
@@ -548,7 +562,7 @@ O RickUIBuilder expõe contratos públicos para os `Fluent Builders`, para o est
 
 Usar a interface explicitamente não cria outra implementação. Você continua trabalhando com o mesmo Builder retornado por `TRickUIBuilder`, apenas mantendo a referência pelo contrato público correspondente.
 
-`IRickUIBuilderButtonHoverState` é diferente quanto à finalidade, mas segue o mesmo estilo orientado a interface: representa a configuração explícita do hover, e não um Builder visual. Seu `New` não recebe parâmetros, os pares setter/getter utilizam overloads e `Build(AOwner)` materializa o comportamento de eventos controlado pelo Owner. A interface de configuração não precisa permanecer referenciada depois de `Build`.
+`IRickUIBuilderButtonHoverState` é diferente quanto à finalidade, mas segue o mesmo estilo orientado a interface: representa o estado explícito do hover, e não um Builder visual. Seu `New` não recebe parâmetros, os pares setter/getter utilizam overloads e `Build(AOwner)` materializa o comportamento de eventos controlado pelo Owner. O behavior mantém o estado vivo, portanto o chamador não precisa manter uma referência apenas por lifetime; quando mantém o estado diretamente ou por `IRickUIBuilderButtonHandle.HoverState`, alterações de cores e handlers de enter/leave são consumidas pelos eventos de mouse seguintes.
 
 Exemplo simples:
 
@@ -605,33 +619,48 @@ O projeto possui uma suíte DUnitX cobrindo as principais áreas do RickUIBuilde
 - Composition.
 - Facade.
 
-O projeto de testes está disponível no diretório `tests`.
+O projeto de testes está disponível no diretório `tests`. O código-fonte atual declara **161** métodos `[Test]`.
 
-### Resultado DUnitX verificado
+### Último resultado DUnitX verificado
 
-Uma execução real de `RickUIBuilder.Test.exe` fornecida para esta versão apresentou:
+O XML NUnit fornecido identifica `RickUIBuilder.Test.exe` e registra uma execução real em **2026-09-20 07:06:01**, com resultado do assembly `Success` / `success="True"`:
 
 | Resultado DUnitX | Valor |
 | --- | ---: |
-| Tests Found | **151** |
-| Tests Passed | **151** |
+| Tests Found | **161** |
+| Tests Passed | **161** |
 | Tests Ignored | **0** |
-| Tests Leaked | **0** |
 | Tests Failed | **0** |
 | Tests Errored | **0** |
+| Inconclusive | **0** |
+| Not run | **0** |
+| Skipped | **0** |
+| Invalid | **0** |
 
-Esses valores documentam essa execução verificada específica; não constituem garantia para revisões futuras.
+A saída de console fornecida para a mesma execução também registra **Tests Leaked = 0**. A execução NUnit inclui os contratos de hover mutável adicionados nesta revisão, entre eles `HoverFillColor_AposBuild_DeveSerUsadaNoProximoMouseEnter`, `FillColor_AposBuild_DeveSerUsadaNoProximoMouseLeave`, `OnEnter_AposBuild_DeveUsarHandlerAtual`, `OnLeave_AposBuild_DeveUsarHandlerAtual`, `Button_AlteradoAposBuild_NaoDeveRetargetBehaviorJaCriado` e os testes de `BuildHandle` que expõem e alteram o mesmo HoverState utilizado pelo Button construído.
 
 ### Method Toxicity Metrics
 
-O Method Toxicity Metrics do RAD Studio também foi executado para os projetos da biblioteca e de testes. Nos relatórios fornecidos, ordenados por `Toxicity`, os maiores valores exibidos foram:
+O Method Toxicity Metrics do RAD Studio foi executado novamente após a implementação do HoverState mutável, tanto para a biblioteca quanto para o projeto de testes. Os CSVs fornecidos contêm **157 métodos medidos da biblioteca** e **188 métodos medidos do projeto de testes**. Os máximos medidos são:
 
-| Projeto | Maior `Toxicity` exibido | Threshold de qualidade do projeto |
-| --- | ---: | ---: |
-| `RickUIBuilder.dproj` | **0.487** | `< 1` |
-| `RickUIBuilder.Test.dproj` | **0.367** | `< 1` |
+| Projeto | Métodos | Máx. `Length` | Máx. `Parameters` | Máx. `If Depth` | Máx. `Cyclomatic Complexity` | Máx. `Toxicity` | Violações dos hard gates |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `RickUIBuilder.dproj` | **157** | **20** | **5** | **1** | **3** | **0,487** | **0** |
+| `RickUIBuilder.Test.dproj` | **188** | **12** | **1** | **1** | **4** | **0,367** | **0** |
 
-Esses valores de `Toxicity` foram medidos pelo RAD Studio nos relatórios fornecidos; não são estimativas derivadas do código-fonte. A métrica é específica desta revisão e deve ser medida novamente após futuras alterações de código.
+Os hard gates do projeto permanecem `Length <= 20`, `Parameters <= 6`, `If Depth <= 5`, `Cyclomatic Complexity <= 6` e `Toxicity < 1`. Nenhuma linha dos dois CSVs pós-alteração fornecidos ultrapassa esses limites.
+
+Os métodos centrais da implementação do HoverState mutável foram medidos da seguinte forma:
+
+| Método | Length | Params | If Depth | Cyclomatic | Toxicity |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `TRickUIBuilderButtonBuilder.AttachBehavior` | 6 | 2 | 1 | 3 | 0,333 |
+| `TRickUIBuilderButtonBuilder.BuildCore` | 5 | 3 | 0 | 1 | 0,229 |
+| `TRickUIBuilderButtonHoverBehavior.Configure` | 3 | 2 | 0 | 1 | 0,163 |
+| `TRickUIBuilderButtonHoverBehavior.HandleMouseEnter` | 5 | 1 | 1 | 3 | 0,279 |
+| `TRickUIBuilderButtonHoverBehavior.HandleMouseLeave` | 5 | 1 | 1 | 3 | 0,279 |
+
+Esses são valores reais medidos pelo RAD Studio nos relatórios pós-alteração fornecidos, não estimativas derivadas do código-fonte. Eles são específicos desta revisão e devem ser medidos novamente após futuras alterações de código.
 
 <a name="licenca"></a>
 ## 📄 Licença

@@ -82,10 +82,12 @@ type
     FOnLeave           : TNotifyEvent;
 
     function BuildConfig: TRickUIBuilderButtonConfig;
-    function BuildCore(AParent: TFmxObject; out ATextLabel: TLabel): TRectangle;
+    function BuildCore(AParent: TFmxObject; out ATextLabel: TLabel;
+      out AHoverState: IRickUIBuilderButtonHoverState): TRectangle;
     procedure ApplyContainerState(AButton: TRectangle);
     procedure ApplyTextState(ATextLabel: TLabel);
-    procedure AttachBehavior(AParent: TFmxObject; AButton: TRectangle);
+    function AttachBehavior(AParent: TFmxObject; AButton: TRectangle):
+      IRickUIBuilderButtonHoverState;
 
     procedure InitLayoutDefaults(const ADefault: TRickUIBuilderButtonConfig);
     procedure InitAppearanceDefaults(const ADefault: TRickUIBuilderButtonConfig);
@@ -371,24 +373,23 @@ begin
   ATextLabel.Padding.Bottom := FPadding.Bottom;
 end;
 
-procedure TRickUIBuilderButtonBuilder.AttachBehavior(AParent: TFmxObject;
-  AButton: TRectangle);
-var
-  LHoverState: IRickUIBuilderButtonHoverState;
+function TRickUIBuilderButtonBuilder.AttachBehavior(AParent: TFmxObject;
+  AButton: TRectangle): IRickUIBuilderButtonHoverState;
 begin
-  LHoverState := TRickUIBuilderButtonHoverState.New
+  Result := TRickUIBuilderButtonHoverState.New
     .Button(AButton).FillColor(FFillColor).OnEnter(FOnEnter).OnLeave(FOnLeave);
 
   if FHasHoverFillColor then
-    LHoverState.HoverFillColor(FHoverFillColor);
+    Result.HoverFillColor(FHoverFillColor);
 
-  LHoverState.Build(AParent);
+  Result.Build(AParent);
   if Assigned(FOnClick) then
     AButton.OnClick := FOnClick;
 end;
 
 function TRickUIBuilderButtonBuilder.BuildCore(AParent: TFmxObject;
-  out ATextLabel: TLabel): TRectangle;
+  out ATextLabel: TLabel;
+  out AHoverState: IRickUIBuilderButtonHoverState): TRectangle;
 var
   LConfig: TRickUIBuilderButtonConfig;
 begin
@@ -397,24 +398,26 @@ begin
     LConfig, ATextLabel);
   ApplyContainerState(Result);
   ApplyTextState(ATextLabel);
-  AttachBehavior(AParent, Result);
+  AHoverState := AttachBehavior(AParent, Result);
 end;
 
 function TRickUIBuilderButtonBuilder.Build(AParent: TFmxObject): TRectangle;
 var
+  LHoverState: IRickUIBuilderButtonHoverState;
   LTextLabel: TLabel;
 begin
-  Result := BuildCore(AParent, LTextLabel);
+  Result := BuildCore(AParent, LTextLabel, LHoverState);
 end;
 
 function TRickUIBuilderButtonBuilder.BuildHandle(
   AParent: TFmxObject): IRickUIBuilderButtonHandle;
 var
   LContainer: TRectangle;
+  LHoverState: IRickUIBuilderButtonHoverState;
   LTextLabel: TLabel;
 begin
-  LContainer := BuildCore(AParent, LTextLabel);
-  Result := TRickUIBuilderButtonHandle.New(LContainer, LTextLabel);
+  LContainer := BuildCore(AParent, LTextLabel, LHoverState);
+  Result := TRickUIBuilderButtonHandle.New(LContainer, LTextLabel, LHoverState);
 end;
 
 procedure TRickUIBuilderButtonBuilder.InitLayoutDefaults(

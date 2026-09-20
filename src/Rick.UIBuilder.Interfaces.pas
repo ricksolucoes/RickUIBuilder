@@ -298,14 +298,24 @@ type
   ///    de configuracao e reference-counted; Build materializa o
   ///    comportamento persistente com lifetime controlado por AOwner.
   /// </summary>
+  /// <remarks>
+  ///    Depois de Build, FillColor, HoverFillColor, OnEnter e OnLeave
+  ///    permanecem mutaveis. O behavior materializado consulta os valores
+  ///    atuais quando os eventos de mouse sao disparados.
+  /// </remarks>
   IRickUIBuilderButtonHoverState = interface
     ['{1DDCEF34-0EBE-4734-98C5-F9DF13CAE728}']
 
     /// <summary>
-    ///    Define o TRectangle que recebera os eventos de hover.
+    ///    Define o TRectangle usado em uma futura materializacao do hover.
     /// </summary>
-    /// <param name="AValue">Button que recebera os eventos.</param>
+    /// <param name="AValue">Button usado por um proximo Build.</param>
     /// <returns>A propria interface para encadeamento fluente.</returns>
+    /// <remarks>
+    ///    Alterar Button depois de Build nao retargeta behaviors ja
+    ///    materializados; cada behavior permanece ligado ao Button usado
+    ///    no respectivo Build.
+    /// </remarks>
     function Button(AValue: TRectangle): IRickUIBuilderButtonHoverState; overload;
 
     /// <summary>
@@ -319,6 +329,9 @@ type
     /// </summary>
     /// <param name="AValue">Cor normal do Button.</param>
     /// <returns>A propria interface para encadeamento fluente.</returns>
+    /// <remarks>
+    ///    Depois de Build, o novo valor e usado no proximo MouseLeave.
+    /// </remarks>
     function FillColor(AValue: TAlphaColor): IRickUIBuilderButtonHoverState; overload;
 
     /// <summary>
@@ -333,6 +346,9 @@ type
     /// </summary>
     /// <param name="AValue">Cor aplicada durante o hover.</param>
     /// <returns>A propria interface para encadeamento fluente.</returns>
+    /// <remarks>
+    ///    Depois de Build, o novo valor e usado no proximo MouseEnter.
+    /// </remarks>
     function HoverFillColor(AValue: TAlphaColor):
       IRickUIBuilderButtonHoverState; overload;
 
@@ -347,6 +363,9 @@ type
     /// </summary>
     /// <param name="AValue">Manipulador executado no MouseEnter.</param>
     /// <returns>A propria interface para encadeamento fluente.</returns>
+    /// <remarks>
+    ///    Depois de Build, o novo handler e usado no proximo MouseEnter.
+    /// </remarks>
     function OnEnter(AValue: TNotifyEvent): IRickUIBuilderButtonHoverState; overload;
 
     /// <summary>
@@ -360,6 +379,9 @@ type
     /// </summary>
     /// <param name="AValue">Manipulador executado no MouseLeave.</param>
     /// <returns>A propria interface para encadeamento fluente.</returns>
+    /// <remarks>
+    ///    Depois de Build, o novo handler e usado no proximo MouseLeave.
+    /// </remarks>
     function OnLeave(AValue: TNotifyEvent): IRickUIBuilderButtonHoverState; overload;
 
     /// <summary>
@@ -375,23 +397,25 @@ type
     /// <param name="AOwner">Owner do comportamento materializado.</param>
     /// <returns>A propria interface para encadeamento fluente.</returns>
     /// <remarks>
-    ///    A interface de configuracao pode ser liberada apos Build. O
-    ///    comportamento continua vivo enquanto AOwner permanecer vivo.
-    ///    AOwner deve permanecer vivo enquanto Button puder disparar os
-    ///    eventos configurados; Build nao altera o ownership do Button.
+    ///    O behavior mantem o estado vivo enquanto AOwner permanecer vivo
+    ///    e consulta os valores atuais de cor e handlers a cada evento.
+    ///    A interface do chamador pode ser liberada apos Build. AOwner deve
+    ///    permanecer vivo enquanto Button puder disparar os eventos;
+    ///    Build nao altera o ownership do Button.
     /// </remarks>
     function Build(AOwner: TComponent): IRickUIBuilderButtonHoverState;
   end;
 
   /// <summary>
-  ///    Representa os dois controles resultantes da criacao de um
-  ///    Button: o retangulo container e o label de Caption interno.
+  ///    Representa o acesso pos-Build a um Button: o retangulo container,
+  ///    o label de Caption interno e o estado de hover associado.
   /// </summary>
   /// <remarks>
   ///    O handle nao e proprietario dos controles e nao altera o
   ///    modelo de ownership utilizado na criacao. Container e TextLabel
   ///    permanecem validos somente enquanto seus Owners mantiverem os
-  ///    controles vivos.
+  ///    controles vivos. HoverState mantem apenas o estado logico vivo;
+  ///    ele nao assume ownership do Button.
   /// </remarks>
   IRickUIBuilderButtonHandle = interface
     ['{8B51C5CF-2849-41FC-8765-242C5169FEA6}']
@@ -411,6 +435,16 @@ type
     ///    O TLabel criado como filho do Container.
     /// </returns>
     function TextLabel: TLabel;
+
+    /// <summary>
+    ///    Retorna o estado de hover associado ao Button.
+    /// </summary>
+    /// <returns>
+    ///    O IRickUIBuilderButtonHoverState utilizado pelo behavior do Button.
+    ///    Pode ser nil em handles criados diretamente pela sobrecarga de
+    ///    compatibilidade de TRickUIBuilderButtonHandle.New sem HoverState.
+    /// </returns>
+    function HoverState: IRickUIBuilderButtonHoverState;
   end;
 
   /// <summary>
