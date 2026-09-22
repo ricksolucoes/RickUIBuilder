@@ -691,6 +691,6 @@ Titular e mantenedora do **RickUIBuilder**.
 
 **Framework especializado no desenvolvimento de componentes visuais modernos, utilizando padrões de builders reutilizáveis, interfaces e auxiliares de composição.**
 
-[⬆ Voltar ao topo](#-rickuiuilder)
+[⬆ Voltar ao topo](#rickuiuilder)
 
 </div>
