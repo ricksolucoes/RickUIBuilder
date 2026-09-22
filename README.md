@@ -1,4 +1,4 @@
-# RickUIBuilder
+# 📱RickUIBuilder
 
 [![Delphi](https://img.shields.io/badge/Delphi-FireMonkey-E62431?style=flat-square)](#requirements)
 [![FMX](https://img.shields.io/badge/UI-FMX-0E7490?style=flat-square)](#overview)
@@ -662,7 +662,35 @@ The methods central to the mutable HoverState implementation were measured as fo
 
 These are measured RAD Studio values from the supplied post-change reports, not values estimated from source code. They are revision-specific and must be measured again after future code changes.
 
-<a name="license"></a>
-## 📄 License
+## 🔐 Licença
 
-See [LICENSE](LICENSE).
+Copyright © 2026 **RickSoluções**. Todos os direitos reservados.
+
+O RickUIBuilder é um **software proprietário** disponibilizado sob uma **Licença de Uso Limitado Revogável**. A licença concede autorização limitada, não exclusiva, não transferível e revogável para utilizar, estudar, testar e modificar o Software enquanto essa autorização permanecer válida.
+
+A licença **não** autoriza automaticamente redistribuição, sublicenciamento, publicação, hospedagem, comercialização, uso como SaaS ou incorporação em produtos ou serviços comerciais. Direitos comerciais, empresariais, OEM, SaaS, redistribuição, hospedagem e outras modalidades poderão ser concedidos separadamente e por escrito pela RickSoluções.
+
+- 📄 **Licença oficial (inglês):** [`LICENSE`](LICENSE)
+- 🇧🇷 **Tradução em português:** [`LICENSE-pt-BR`](LICENSE-pt-BR)
+
+> [!IMPORTANT]
+> O fato de o código-fonte estar publicamente acessível não torna o RickUIBuilder open source e não concede direitos além daqueles expressamente previstos na licença aplicável.
+
+---
+
+## 👤 Mantenedor
+
+**RickSoluções**  
+Titular e mantenedora do **RickUIBuilder**.
+
+---
+
+<div align="center">
+
+### 📱 RickUIBuilder
+
+**Framework especializado no desenvolvimento de componentes visuais modernos, utilizando padrões de builders reutilizáveis, interfaces e auxiliares de composição.**
+
+[⬆ Voltar ao topo](#-rickuibuilder)
+
+</div>
