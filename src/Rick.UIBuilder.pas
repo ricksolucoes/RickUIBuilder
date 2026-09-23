@@ -11,13 +11,14 @@ unit Rick.UIBuilder;
   discutidas e implementadas nas fases anteriores:
 
   - Factory (Opcao A)       -> TRickUIBuilder.Factory
-  - Builders fluentes (Opcao B) -> TRickUIBuilder.Label_/Button/Badge/Divider
+  - Builders fluentes (Opcao B) -> TRickUIBuilder.Label_/Button/Badge/Divider/ComboBox
   - Composicao (meio-termo) -> TRickUIBuilder.On(AParent)
 
   Esta unit NAO implementa nenhuma logica de criacao de controle -
   apenas encaminha para as units especificas de cada abordagem
   (Rick.UIBuilder.Factory, Rick.UIBuilder._Label, Rick.UIBuilder.Button,
-  Rick.UIBuilder.Badge, Rick.UIBuilder.Divider, Rick.UIBuilder.Composition),
+  Rick.UIBuilder.Badge, Rick.UIBuilder.Divider, Rick.UIBuilder.ComboBox e
+  Rick.UIBuilder.Composition),
   escondendo do consumidor de qual unit interna cada abordagem vem.
 
   Ver docs/usage-guide.md para a tabela de decisao de quando utilizar
@@ -36,6 +37,7 @@ uses
   Rick.UIBuilder.Button,
   Rick.UIBuilder.Badge,
   Rick.UIBuilder.Divider,
+  Rick.UIBuilder.ComboBox,
   Rick.UIBuilder.Composition;
 
 type
@@ -98,6 +100,11 @@ type
     class function Divider: IRickUIBuilderDivider; static;
 
     /// <summary>
+    ///    Cria uma nova instancia independente do builder fluente do ComboBox.
+    /// </summary>
+    class function ComboBox: IRickUIBuilderComboBox; static;
+
+    /// <summary>
     ///    Da acesso direto a TRickUIBuilderFactory (criacao direta,
     ///    Opcao A), para os cenarios em que um controle unico com
     ///    poucas variacoes nao justifica um builder fluente.
@@ -147,6 +154,11 @@ end;
 class function TRickUIBuilder.Divider: IRickUIBuilderDivider;
 begin
   Result := TRickUIBuilderDividerBuilder.New;
+end;
+
+class function TRickUIBuilder.ComboBox: IRickUIBuilderComboBox;
+begin
+  Result := TRickUIBuilderComboBoxBuilder.New;
 end;
 
 class function TRickUIBuilder.Factory: TRickUIBuilderFactoryClass;

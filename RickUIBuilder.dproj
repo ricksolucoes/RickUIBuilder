@@ -171,6 +171,13 @@
         <DCCReference Include="src\Rick.UIBuilder.Button.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.Button.HoverState.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.Composition.pas"/>
+        <DCCReference Include="src\Rick.UIBuilder.ComboBox.Data.pas"/>
+        <DCCReference Include="src\Rick.UIBuilder.ComboBox.State.pas"/>
+        <DCCReference Include="src\Rick.UIBuilder.ComboBox.Style.pas"/>
+        <DCCReference Include="src\Rick.UIBuilder.ComboBox.Presentation.pas"/>
+        <DCCReference Include="src\Rick.UIBuilder.ComboBox.Virtualization.pas"/>
+        <DCCReference Include="src\Rick.UIBuilder.ComboBox.Handle.pas"/>
+        <DCCReference Include="src\Rick.UIBuilder.ComboBox.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

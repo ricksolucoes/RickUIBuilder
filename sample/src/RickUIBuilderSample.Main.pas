@@ -8,11 +8,12 @@ unit RickUIBuilderSample.Main;
 
   Formulario de demonstracao (Showcase) do framework Rick.UIBuilder.
   Constroi, inteiramente em runtime (sem arquivo .fmx associado), uma
-  tela dividida em 3 secoes - uma para cada abordagem do framework:
+  tela dividida em secoes para as abordagens do framework e o ComboBox:
 
   1. Factory (Opcao A)        - TRickUIBuilder.Factory.Create*
   2. Builders fluentes (Opcao B) - TRickUIBuilder.Label_/Button/Badge/Divider
-  3. Composicao (meio-termo)  - TRickUIBuilder.On(AParent)
+  3. ComboBox - matriz visual  - TRickUIBuilder.ComboBox
+  4. Composicao (meio-termo)  - TRickUIBuilder.On(AParent)
 
   Este formulario NAO e um exemplo de tela de producao - e uma
   vitrine deliberadamente simples, cujo unico objetivo e permitir a
@@ -54,6 +55,7 @@ type
     FClickCount      : Integer;
 
     FHoverStateBadgeHandle : IRickUIBuilderBadgeHandle;
+    FComboBoxHandle        : IRickUIBuilderComboBoxHandle;
 
     function AddSectionHeader(const ATitle: string; ATop: Single): Single;
     function AddSubHeader(const AText: string; ATop: Single): Single;
@@ -63,6 +65,23 @@ type
     procedure BuildFluentDividerDemo(var ATop: Single);
     procedure BuildFluentBadgeDemo(var ATop: Single);
     procedure BuildFluentButtonDemo(var ATop: Single);
+    function DesktopComboBoxConfig: TRickUIBuilderComboBoxConfig;
+    function MobileComboBoxConfig: TRickUIBuilderComboBoxConfig;
+    function AdaptiveComboBoxConfig: TRickUIBuilderComboBoxConfig;
+    function CustomComboBoxConfig: TRickUIBuilderComboBoxConfig;
+    procedure BuildDesktopComboBoxDemo(var ATop: Single);
+    procedure BuildMobileComboBoxDemo(var ATop: Single);
+    procedure BuildAdaptiveComboBoxDemo(var ATop: Single);
+    procedure BuildCustomComboBoxDemo(var ATop: Single);
+    procedure ConfigureComboStatusBadge(ABadge: TRectangle;
+      AColor: TAlphaColor);
+    procedure ConfigureComboStatusLabel(ALabel: TLabel; const AText: string);
+    procedure AddComboStatusBadge(AContainer: TControl; const AText: string;
+      AColor: TAlphaColor);
+    procedure CustomizeComboBoxItem(Sender: TObject; AIndex: Integer;
+      const AItem: TRickUIBuilderComboBoxItem; AContainer: TControl);
+    procedure ConfigureComboBoxRuntime;
+    procedure BuildComboBoxDemo(var ATop: Single);
     procedure BuildCompositionSection(var ATop: Single);
 
     procedure DemoButtonClick(Sender: TObject);
@@ -95,6 +114,15 @@ const
   _SUCCESS_TEXT     = $FF166534;
   _DANGER_BG        = $FFFEE2E2;
   _DANGER_TEXT      = $FF991B1B;
+
+  _COMBO_BLUE_BG    = $FFEFF6FF;
+  _COMBO_BLUE       = $FF2563EB;
+  _COMBO_GREEN_BG   = $FFF0FDF4;
+  _COMBO_GREEN      = $FF15803D;
+  _COMBO_PURPLE_BG  = $FFFAF5FF;
+  _COMBO_PURPLE     = $FF7E22CE;
+  _COMBO_ORANGE_BG  = $FFFFF7ED;
+  _COMBO_ORANGE     = $FFC2410C;
 
   _CONTENT_LEFT     = 24;
   _CONTENT_WIDTH    = 552;
@@ -135,6 +163,7 @@ begin
   BuildFluentDividerDemo(LTop);
   BuildFluentBadgeDemo(LTop);
   BuildFluentButtonDemo(LTop);
+  BuildComboBoxDemo(LTop);
   BuildCompositionSection(LTop);
 end;
 
@@ -333,7 +362,233 @@ begin
 end;
 
 { ============================================================
-  3) COMPOSICAO (MEIO-TERMO)
+  3) COMBOBOX - ESTILOS, APRESENTACOES E TIPOS DE LISTA
+  ============================================================ }
+
+function TPageSampleMain.DesktopComboBoxConfig: TRickUIBuilderComboBoxConfig;
+begin
+  Result := TRickUIBuilderComboBoxConfig.Default;
+  Result.Width := _CONTENT_WIDTH;
+  Result.BackgroundColor := _COMBO_BLUE_BG;
+  Result.BorderColor := _COMBO_BLUE;
+  Result.PopupColor := TAlphaColors.White;
+  Result.HoverColor := $FFDBEAFE;
+  Result.SelectedColor := $FFBFDBFE;
+  Result.ArrowColor := _COMBO_BLUE;
+end;
+
+function TPageSampleMain.MobileComboBoxConfig: TRickUIBuilderComboBoxConfig;
+begin
+  Result := TRickUIBuilderComboBoxConfig.Default;
+  Result.Width := _CONTENT_WIDTH;
+  Result.Height := 48;
+  Result.ItemHeight := 48;
+  Result.BackgroundColor := _COMBO_GREEN_BG;
+  Result.BorderColor := _COMBO_GREEN;
+  Result.PopupColor := $FFF7FFF9;
+  Result.HoverColor := $FFDCFCE7;
+  Result.SelectedColor := $FFBBF7D0;
+  Result.ArrowColor := _COMBO_GREEN;
+end;
+
+function TPageSampleMain.AdaptiveComboBoxConfig: TRickUIBuilderComboBoxConfig;
+begin
+  Result := TRickUIBuilderComboBoxConfig.Default;
+  Result.Width := _CONTENT_WIDTH;
+{$IF Defined(ANDROID) or Defined(IOS)}
+  Result.Height := 48;
+  Result.ItemHeight := 48;
+{$ENDIF}
+  Result.BackgroundColor := _COMBO_PURPLE_BG;
+  Result.BorderColor := _COMBO_PURPLE;
+  Result.PopupColor := $FFFEFBFF;
+  Result.HoverColor := $FFF3E8FF;
+  Result.SelectedColor := $FFE9D5FF;
+  Result.ArrowColor := _COMBO_PURPLE;
+end;
+
+function TPageSampleMain.CustomComboBoxConfig: TRickUIBuilderComboBoxConfig;
+begin
+  Result := TRickUIBuilderComboBoxConfig.Default;
+  Result.Width := _CONTENT_WIDTH;
+  Result.Height := 44;
+  Result.ItemHeight := 40;
+  Result.BackgroundColor := _COMBO_ORANGE_BG;
+  Result.BorderColor := _COMBO_ORANGE;
+  Result.PopupColor := $FFFFFCF8;
+  Result.HoverColor := $FFFFEDD5;
+  Result.SelectedColor := $FFFED7AA;
+  Result.ArrowColor := _COMBO_ORANGE;
+end;
+
+procedure TPageSampleMain.BuildDesktopComboBoxDemo(var ATop: Single);
+begin
+  ATop := AddSubHeader('Desktop + Anchored - lista textual simples', ATop);
+  TRickUIBuilder.ComboBox
+    .CustomConfig(DesktopComboBoxConfig)
+    .StyleType(TRickUIBuilderComboBoxStyleType.Desktop)
+    .PresentationMode(TRickUIBuilderComboBoxPresentationMode.Anchored)
+    .Position(_CONTENT_LEFT, ATop)
+    .Size(_CONTENT_WIDTH, 42)
+    .Items(['Pequeno', 'Medio', 'Grande', 'Extra grande'])
+    .ItemIndex(1)
+    .ArrowPosition(TRickUIBuilderComboBoxArrowPosition.Right)
+    .ArrowMargins(8, 4, 16, 4)
+    .ArrowSize(14)
+    .Build(FScroll);
+  ATop := ATop + 58;
+end;
+
+procedure TPageSampleMain.BuildMobileComboBoxDemo(var ATop: Single);
+begin
+  ATop := AddSubHeader('Mobile + Overlay - DisplayText e Value independentes', ATop);
+  TRickUIBuilder.ComboBox
+    .CustomConfig(MobileComboBoxConfig)
+    .StyleType(TRickUIBuilderComboBoxStyleType.Mobile)
+    .PresentationMode(TRickUIBuilderComboBoxPresentationMode.Overlay)
+    .Position(_CONTENT_LEFT, ATop)
+    .AddItem('Pagamento por Pix', 'PIX')
+    .AddItem('Cartao de credito', 'CREDIT')
+    .AddItem('Boleto bancario', 'BOLETO')
+    .ItemIndex(0)
+    .ArrowPosition(TRickUIBuilderComboBoxArrowPosition.Right)
+    .ArrowMargins(10, 6, 18, 6)
+    .ArrowSize(16)
+    .Build(FScroll);
+  ATop := ATop + 64;
+end;
+
+procedure TPageSampleMain.BuildAdaptiveComboBoxDemo(var ATop: Single);
+var
+  LCodeColumn: TRickUIBuilderComboBoxColumn;
+  LDescriptionColumn: TRickUIBuilderComboBoxColumn;
+begin
+  ATop := AddSubHeader('Adaptive + Auto - lista estruturada em duas colunas', ATop);
+  LCodeColumn := TRickUIBuilderComboBoxColumn.Create(
+    TRickUIBuilderComboBoxColumnSizeMode.Fixed, 90);
+  LDescriptionColumn := TRickUIBuilderComboBoxColumn.Create(
+    TRickUIBuilderComboBoxColumnSizeMode.Proportional, 1);
+  FComboBoxHandle := TRickUIBuilder.ComboBox
+    .CustomConfig(AdaptiveComboBoxConfig)
+    .StyleType(TRickUIBuilderComboBoxStyleType.Adaptive)
+    .PresentationMode(TRickUIBuilderComboBoxPresentationMode.Auto)
+    .Position(_CONTENT_LEFT, ATop)
+    .Column(LCodeColumn)
+    .Column(LDescriptionColumn)
+    .AddStructuredItem('Notebook Core i7', '001', ['001', 'Notebook Core i7'])
+    .AddStructuredItem('Monitor 27', '002', ['002', 'Monitor 27'])
+    .AddStructuredItem('Teclado mecanico', '003', ['003', 'Teclado mecanico'])
+    .SelectedText('Monitor 27')
+    .ArrowPosition(TRickUIBuilderComboBoxArrowPosition.Right)
+    .ArrowMargins(8, 4, 14, 4)
+    .ArrowSize(14)
+    .BuildHandle(FScroll);
+  ATop := ATop + 58;
+end;
+
+procedure TPageSampleMain.ConfigureComboStatusBadge(ABadge: TRectangle;
+  AColor: TAlphaColor);
+begin
+  ABadge.Align := TAlignLayout.Right;
+  ABadge.Width := 72;
+  ABadge.Margins.Left := 4;
+  ABadge.Margins.Top := 7;
+  ABadge.Margins.Right := 8;
+  ABadge.Margins.Bottom := 7;
+  ABadge.Fill.Color := AColor;
+  ABadge.Stroke.Kind := TBrushKind.None;
+  ABadge.XRadius := 8;
+  ABadge.YRadius := 8;
+  ABadge.HitTest := False;
+end;
+
+procedure TPageSampleMain.ConfigureComboStatusLabel(ALabel: TLabel;
+  const AText: string);
+begin
+  ALabel.Align := TAlignLayout.Client;
+  ALabel.Text := AText;
+  ALabel.TextSettings.HorzAlign := TTextAlign.Center;
+  ALabel.TextSettings.VertAlign := TTextAlign.Center;
+  ALabel.TextSettings.FontColor := TAlphaColors.White;
+  ALabel.StyledSettings := ALabel.StyledSettings - [TStyledSetting.FontColor];
+  ALabel.HitTest := False;
+end;
+
+procedure TPageSampleMain.AddComboStatusBadge(AContainer: TControl;
+  const AText: string; AColor: TAlphaColor);
+var
+  LBadge: TRectangle;
+  LLabel: TLabel;
+begin
+  LBadge := TRectangle.Create(AContainer);
+  LBadge.Parent := AContainer;
+  ConfigureComboStatusBadge(LBadge, AColor);
+  LLabel := TLabel.Create(LBadge);
+  LLabel.Parent := LBadge;
+  ConfigureComboStatusLabel(LLabel, AText);
+end;
+
+procedure TPageSampleMain.CustomizeComboBoxItem(Sender: TObject; AIndex: Integer;
+  const AItem: TRickUIBuilderComboBoxItem; AContainer: TControl);
+begin
+  if Odd(AIndex) then
+    AddComboStatusBadge(AContainer, 'Novo', _COMBO_ORANGE)
+  else
+    AddComboStatusBadge(AContainer, 'Ativo', _SUCCESS_TEXT);
+end;
+
+procedure TPageSampleMain.BuildCustomComboBoxDemo(var ATop: Single);
+var
+  LCodeColumn: TRickUIBuilderComboBoxColumn;
+  LDescriptionColumn: TRickUIBuilderComboBoxColumn;
+  LStatusColumn: TRickUIBuilderComboBoxColumn;
+begin
+  ATop := AddSubHeader(
+    'Custom + Anchored - tres colunas, owner-draw e seta a esquerda', ATop);
+  LCodeColumn := TRickUIBuilderComboBoxColumn.Create(
+    TRickUIBuilderComboBoxColumnSizeMode.Fixed, 78);
+  LDescriptionColumn := TRickUIBuilderComboBoxColumn.Create(
+    TRickUIBuilderComboBoxColumnSizeMode.Proportional, 1);
+  LStatusColumn := TRickUIBuilderComboBoxColumn.Create(
+    TRickUIBuilderComboBoxColumnSizeMode.Fixed, 92);
+  TRickUIBuilder.ComboBox.CustomConfig(CustomComboBoxConfig)
+    .StyleType(TRickUIBuilderComboBoxStyleType.Custom)
+    .PresentationMode(TRickUIBuilderComboBoxPresentationMode.Anchored)
+    .Position(_CONTENT_LEFT, ATop).Column(LCodeColumn)
+    .Column(LDescriptionColumn).Column(LStatusColumn)
+    .AddStructuredItem('Financeiro', 'FIN', ['FIN', 'Financeiro', ''])
+    .AddStructuredItem('Comercial', 'COM', ['COM', 'Comercial', ''])
+    .AddStructuredItem('Tecnologia', 'TEC', ['TEC', 'Tecnologia', ''])
+    .AddStructuredItem('Operacoes', 'OPE', ['OPE', 'Operacoes', ''])
+    .ItemIndex(2).ArrowPosition(TRickUIBuilderComboBoxArrowPosition.Left)
+    .ArrowMargins(14, 5, 10, 5).ArrowSize(14)
+    .OnCustomizeItem(CustomizeComboBoxItem).Build(FScroll);
+  ATop := ATop + 60;
+end;
+
+procedure TPageSampleMain.ConfigureComboBoxRuntime;
+begin
+  FComboBoxHandle.SetArrowColor(_COMBO_PURPLE);
+  FComboBoxHandle.Add('Mouse sem fio', '004');
+  FComboBoxHandle.AddRange(['Headset', 'Webcam']);
+end;
+
+procedure TPageSampleMain.BuildComboBoxDemo(var ATop: Single);
+begin
+  ATop := AddSectionHeader('3. ComboBox - matriz visual', ATop);
+  ATop := AddSubHeader(
+    'Desktop, Mobile, Adaptive e Custom; listas simples, Value, colunas e owner-draw',
+    ATop);
+  BuildDesktopComboBoxDemo(ATop);
+  BuildMobileComboBoxDemo(ATop);
+  BuildAdaptiveComboBoxDemo(ATop);
+  ConfigureComboBoxRuntime;
+  BuildCustomComboBoxDemo(ATop);
+  ATop := ATop + 8;
+end;
+
+{ ============================================================
+  4) COMPOSICAO (MEIO-TERMO)
   ============================================================ }
 
 procedure TPageSampleMain.BuildCompositionSection(var ATop: Single);
@@ -344,7 +599,7 @@ var
   LBadgeConfig  : TRickUIBuilderBadgeConfig;
   LBadgeHandle  : IRickUIBuilderBadgeHandle;
 begin
-  ATop := AddSectionHeader('3. Composicao (meio-termo)', ATop);
+  ATop := AddSectionHeader('4. Composicao (meio-termo)', ATop);
   ATop := AddSubHeader('TRickUIBuilder.On(AParent).AddText/AddDivider/AddBadge/AddButton',
     ATop);
 

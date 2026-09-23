@@ -42,6 +42,13 @@ contains
   Rick.UIBuilder.Button in 'src\Rick.UIBuilder.Button.pas',
   Rick.UIBuilder.Button.HoverState in 'src\Rick.UIBuilder.Button.HoverState.pas',
   Rick.UIBuilder.Composition in 'src\Rick.UIBuilder.Composition.pas',
+  Rick.UIBuilder.ComboBox.Data in 'src\Rick.UIBuilder.ComboBox.Data.pas',
+  Rick.UIBuilder.ComboBox.State in 'src\Rick.UIBuilder.ComboBox.State.pas',
+  Rick.UIBuilder.ComboBox.Style in 'src\Rick.UIBuilder.ComboBox.Style.pas',
+  Rick.UIBuilder.ComboBox.Presentation in 'src\Rick.UIBuilder.ComboBox.Presentation.pas',
+  Rick.UIBuilder.ComboBox.Virtualization in 'src\Rick.UIBuilder.ComboBox.Virtualization.pas',
+  Rick.UIBuilder.ComboBox.Handle in 'src\Rick.UIBuilder.ComboBox.Handle.pas',
+  Rick.UIBuilder.ComboBox in 'src\Rick.UIBuilder.ComboBox.pas',
   Rick.UIBuilder in 'src\Rick.UIBuilder.pas';
 
 end.

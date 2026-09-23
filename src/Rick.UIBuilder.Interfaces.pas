@@ -9,8 +9,8 @@
   Define os contratos (interfaces) dos builders fluentes do framework
   Rick.UIBuilder (Opcao B): IRickUIBuilderLabel, IRickUIBuilderButton
   (com seu IRickUIBuilderButtonHandle), IRickUIBuilderButtonHoverState,
-  IRickUIBuilderBadge (com seu IRickUIBuilderBadgeHandle) e
-  IRickUIBuilderDivider.
+  IRickUIBuilderBadge (com seu IRickUIBuilderBadgeHandle),
+  IRickUIBuilderDivider e IRickUIBuilderComboBox com seu handle runtime.
 
   Cada interface e autocontida (sem heranca entre interfaces): em Object
   Pascal, encadeamento fluente com heranca de interface obrigaria a
@@ -18,9 +18,9 @@
   economiza nada aqui - so adicionaria complexidade.
 
   Esta unit NAO contem implementacao. As implementacoes concretas vivem
-  em Rick.UIBuilder.Label, Rick.UIBuilder.Button, Rick.UIBuilder.Badge e
-  Rick.UIBuilder.Divider, e delegam a criacao real dos controles para
-  Rick.UIBuilder.Factory (evita duplicar a logica de criacao).
+  em Rick.UIBuilder.Label, Rick.UIBuilder.Button, Rick.UIBuilder.Badge,
+  Rick.UIBuilder.Divider e Rick.UIBuilder.ComboBox, delegando a criacao
+  fundamental dos controles para Rick.UIBuilder.Factory.
 
   ==============================================================================
 *)
@@ -1151,6 +1151,123 @@ type
     ///    O TRectangle criado, ja anexado a AParent.
     /// </returns>
     function Build(AParent: TFmxObject): TRectangle;
+  end;
+
+  /// <summary>
+  ///    Callback opcional executado depois que o item visual padrao foi
+  ///    reconstruido para um indice logico. O container recebido pertence ao
+  ///    ComboBox e e reciclado; controles customizados devem ser criados com
+  ///    esse container como Owner/Parent e nao devem ser reutilizados fora do
+  ///    ciclo visual do item.
+  /// </summary>
+  TRickUIBuilderComboBoxCustomizeItemEvent = procedure(Sender: TObject;
+    AIndex: Integer; const AItem: TRickUIBuilderComboBoxItem;
+    AContainer: TControl) of object;
+
+  /// <summary>
+  ///    Contrato runtime do ComboBox materializado. O handle mantem o modelo
+  ///    de dados e reconhece quando a arvore visual ja foi destruida.
+  /// </summary>
+  IRickUIBuilderComboBoxHandle = interface
+    ['{17C3B8D3-7BDF-47DA-A2B7-FF785B77AC7D}']
+
+    /// <summary>Indica se a arvore visual do ComboBox ainda esta anexada.</summary>
+    function IsAttached: Boolean;
+    /// <summary>Retorna o indice selecionado ou -1 quando nao ha selecao.</summary>
+    function ItemIndex: Integer;
+    /// <summary>Retorna o DisplayText selecionado ou string vazia.</summary>
+    function SelectedText: string;
+    /// <summary>Retorna o Value selecionado ou string vazia.</summary>
+    function SelectedValue: string;
+    /// <summary>Retorna a quantidade atual de itens logicos.</summary>
+    function Count: Integer;
+    /// <summary>Seleciona um indice valido ou -1; retorna False se invalido.</summary>
+    function SelectIndex(AIndex: Integer): Boolean;
+    /// <summary>
+    ///    Seleciona a primeira ocorrencia case-insensitive de AText e preserva
+    ///    a selecao atual quando nenhuma correspondencia e encontrada.
+    /// </summary>
+    function SelectText(const AText: string): Boolean;
+    /// <summary>Adiciona um item textual usando o proprio texto como Value.</summary>
+    procedure Add(const AText: string); overload;
+    /// <summary>Adiciona um item com DisplayText e Value independentes.</summary>
+    procedure Add(const ADisplayText, AValue: string); overload;
+    /// <summary>Adiciona varios itens textuais sem reconstruir o controle.</summary>
+    procedure AddRange(const AItems: array of string);
+    /// <summary>Abre a superficie de selecao quando a view esta anexada.</summary>
+    procedure Open;
+    /// <summary>Fecha a superficie de selecao mantendo a selecao confirmada.</summary>
+    procedure Close;
+    /// <summary>Altera a cor da seta sem novo Build.</summary>
+    procedure SetArrowColor(AValue: TAlphaColor);
+    /// <summary>Altera o tamanho visual da seta sem novo Build.</summary>
+    procedure SetArrowSize(AWidth, AHeight: Single);
+    /// <summary>Substitui o path usado quando o ComboBox esta fechado.</summary>
+    procedure SetClosedArrowPath(const AValue: string);
+    /// <summary>Substitui o path usado quando o ComboBox esta aberto.</summary>
+    procedure SetOpenedArrowPath(const AValue: string);
+  end;
+
+  /// <summary>
+  ///    Builder fluente do ComboBox runtime-only do RickUIBuilder. Acumula
+  ///    configuracao e dados e somente materializa controles FMX em Build ou
+  ///    BuildHandle.
+  /// </summary>
+  IRickUIBuilderComboBox = interface
+    ['{331D5FB3-C602-4276-9031-39D4F3B28F6D}']
+    function Position(ALeft, ATop: Single): IRickUIBuilderComboBox;
+    function Size(AWidth, AHeight: Single): IRickUIBuilderComboBox;
+    function Placeholder(const AValue: string): IRickUIBuilderComboBox;
+    function Items(const AItems: array of string): IRickUIBuilderComboBox;
+    function AddItem(const ADisplayText: string): IRickUIBuilderComboBox; overload;
+    function AddItem(const ADisplayText,
+      AValue: string): IRickUIBuilderComboBox; overload;
+    function AddStructuredItem(const ADisplayText, AValue: string;
+      const AColumns: array of string): IRickUIBuilderComboBox;
+    function Column(
+      const AValue: TRickUIBuilderComboBoxColumn): IRickUIBuilderComboBox;
+    function ItemIndex(AValue: Integer): IRickUIBuilderComboBox;
+    function SelectedText(const AValue: string): IRickUIBuilderComboBox;
+    function StyleType(
+      AValue: TRickUIBuilderComboBoxStyleType): IRickUIBuilderComboBox;
+    function CustomConfig(
+      const AValue: TRickUIBuilderComboBoxConfig): IRickUIBuilderComboBox;
+    function PresentationMode(
+      AValue: TRickUIBuilderComboBoxPresentationMode): IRickUIBuilderComboBox;
+    function ItemHeight(AValue: Single): IRickUIBuilderComboBox;
+    function PopupMaxHeight(AValue: Single): IRickUIBuilderComboBox;
+    function PopupWidthOffset(AValue: Single): IRickUIBuilderComboBox;
+    function ArrowColor(AValue: TAlphaColor): IRickUIBuilderComboBox;
+    function ArrowSize(AValue: Single): IRickUIBuilderComboBox;
+    /// <summary>Define a lateral usada para ancorar a seta no controle.</summary>
+    function ArrowPosition(
+      AValue: TRickUIBuilderComboBoxArrowPosition): IRickUIBuilderComboBox;
+    /// <summary>
+    ///    Define as margens exclusivas da seta, independentes do padding do texto.
+    /// </summary>
+    function ArrowMargins(ALeft, ATop, ARight,
+      ABottom: Single): IRickUIBuilderComboBox;
+    function Enabled(AValue: Boolean = True): IRickUIBuilderComboBox;
+    function ClosedArrowPath(const AValue: string): IRickUIBuilderComboBox;
+    function OpenedArrowPath(const AValue: string): IRickUIBuilderComboBox;
+    function OnChange(AValue: TNotifyEvent): IRickUIBuilderComboBox;
+    function OnOpen(AValue: TNotifyEvent): IRickUIBuilderComboBox;
+    function OnClose(AValue: TNotifyEvent): IRickUIBuilderComboBox;
+    function OnCustomizeItem(
+      AValue: TRickUIBuilderComboBoxCustomizeItemEvent): IRickUIBuilderComboBox;
+
+    /// <summary>
+    ///    Materializa o ComboBox e devolve seu container principal. O runtime
+    ///    continua vivo enquanto o container existir.
+    /// </summary>
+    function Build(AParent: TFmxObject): TRectangle;
+
+    /// <summary>
+    ///    Materializa o ComboBox e devolve o contrato runtime. O handle nao
+    ///    assume ownership da arvore visual e passa a IsAttached=False quando
+    ///    ela e destruida.
+    /// </summary>
+    function BuildHandle(AParent: TFmxObject): IRickUIBuilderComboBoxHandle;
   end;
 
   /// <summary>

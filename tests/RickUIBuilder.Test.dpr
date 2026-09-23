@@ -21,7 +21,8 @@ uses
   Rick.UIBuilder.Tests.Badge in 'src\Rick.UIBuilder.Tests.Badge.pas',
   Rick.UIBuilder.Tests.Button in 'src\Rick.UIBuilder.Tests.Button.pas',
   Rick.UIBuilder.Tests.Composition in 'src\Rick.UIBuilder.Tests.Composition.pas',
-  Rick.UIBuilder.Tests.Facade in 'src\Rick.UIBuilder.Tests.Facade.pas';
+  Rick.UIBuilder.Tests.Facade in 'src\Rick.UIBuilder.Tests.Facade.pas',
+  Rick.UIBuilder.Tests.ComboBox in 'src\Rick.UIBuilder.Tests.ComboBox.pas';
 
 var
   runner      : ITestRunner;

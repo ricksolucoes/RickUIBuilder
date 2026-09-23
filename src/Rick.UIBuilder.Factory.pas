@@ -20,8 +20,8 @@ unit Rick.UIBuilder.Factory;
   Esta unit NAO conhece paleta de cores de nenhum projeto consumidor -
   toda cor chega via TAlphaColor nos records de configuracao.
 
-  Os builders fluentes (Rick.UIBuilder.Label, .Button, .Badge,
-  .Divider) delegam sua criacao real para esta Factory, evitando
+  Os builders fluentes (Rick.UIBuilder.Label, .Button, .Badge, .Divider
+  e .ComboBox) delegam sua criacao fundamental para esta Factory, evitando
   duplicar a logica de instanciacao de controles.
 
   ==============================================================================
@@ -51,6 +51,16 @@ type
       const AConfig: TRickUIBuilderButtonConfig); static;
     class function ButtonTextConfig(
       const AConfig: TRickUIBuilderButtonConfig): TRickUIBuilderTextConfig; static;
+    class procedure ApplyComboBoxConfig(AContainer: TRectangle;
+      const AConfig: TRickUIBuilderComboBoxConfig); static;
+    class function ComboBoxArrowLeft(
+      const AConfig: TRickUIBuilderComboBoxConfig): Single; static;
+    class function ComboBoxArrowTop(
+      const AConfig: TRickUIBuilderComboBoxConfig): Single; static;
+    class procedure ConfigureComboBoxText(ATextLabel: TLabel;
+      const AConfig: TRickUIBuilderComboBoxConfig); static;
+    class procedure ConfigureComboBoxArrow(AArrow: TPath;
+      const AConfig: TRickUIBuilderComboBoxConfig); static;
   public
     /// <summary>
     ///    Cria um TLabel a partir de um TRickUIBuilderTextConfig.
@@ -72,6 +82,21 @@ type
     /// </returns>
     class function CreateText(AOwner: TComponent; AParent: TFmxObject;
       const AText: string; const AConfig: TRickUIBuilderTextConfig): TLabel; static;
+
+    /// <summary>
+    ///    Cria o controle principal fechado do ComboBox usando somente
+    ///    TRectangle, TLabel e TPath. A lista/popup e criada posteriormente
+    ///    pelo runtime quando realmente utilizada.
+    /// </summary>
+    /// <param name="AOwner">Owner dos controles materializados.</param>
+    /// <param name="AParent">Parent visual do container principal.</param>
+    /// <param name="AConfig">Configuracao efetiva do ComboBox.</param>
+    /// <param name="ATextLabel">TLabel interno non-owning devolvido ao runtime.</param>
+    /// <param name="AArrow">TPath interno non-owning devolvido ao runtime.</param>
+    /// <returns>TRectangle principal ja anexado ao Parent.</returns>
+    class function CreateComboBox(AOwner: TComponent; AParent: TFmxObject;
+      const AConfig: TRickUIBuilderComboBoxConfig; out ATextLabel: TLabel;
+      out AArrow: TPath): TRectangle; static;
 
     /// <summary>
     ///    Cria um divisor (TRectangle de 1px de altura) a partir de
@@ -217,9 +242,116 @@ type
 implementation
 
 uses
+  System.Math,
   FMX.Graphics;
 
 { TRickUIBuilderFactory }
+
+class procedure TRickUIBuilderFactory.ApplyComboBoxConfig(
+  AContainer: TRectangle; const AConfig: TRickUIBuilderComboBoxConfig);
+begin
+  AContainer.Position.X := AConfig.Left;
+  AContainer.Position.Y := AConfig.Top;
+  AContainer.Width := AConfig.Width;
+  AContainer.Height := AConfig.Height;
+  AContainer.Cursor := crHandPoint;
+  AContainer.HitTest := True;
+  AContainer.CanFocus := AConfig.Enabled;
+  AContainer.Enabled := AConfig.Enabled;
+  AContainer.Fill.Kind := TBrushKind.Solid;
+  AContainer.Fill.Color := AConfig.BackgroundColor;
+  AContainer.Stroke.Kind := TBrushKind.Solid;
+  AContainer.Stroke.Color := AConfig.BorderColor;
+  AContainer.XRadius := AConfig.CornerRadius;
+  AContainer.YRadius := AConfig.CornerRadius;
+  if not AConfig.Enabled then
+    AContainer.Opacity := AConfig.DisabledOpacity;
+end;
+
+class function TRickUIBuilderFactory.ComboBoxArrowLeft(
+  const AConfig: TRickUIBuilderComboBoxConfig): Single;
+begin
+  if AConfig.ArrowPosition = TRickUIBuilderComboBoxArrowPosition.Right then
+    Result := AConfig.Width - Max(0, AConfig.ArrowMarginRight) - AConfig.ArrowSize
+  else
+    Result := Max(0, AConfig.ArrowMarginLeft);
+  Result := Max(0, Min(Result, Max(0, AConfig.Width - AConfig.ArrowSize)));
+end;
+
+class function TRickUIBuilderFactory.ComboBoxArrowTop(
+  const AConfig: TRickUIBuilderComboBoxConfig): Single;
+var
+  LAvailable: Single;
+begin
+  LAvailable := Max(0, AConfig.Height - Max(0, AConfig.ArrowMarginTop) -
+    Max(0, AConfig.ArrowMarginBottom));
+  Result := Max(0, AConfig.ArrowMarginTop) + Max(0,
+    (LAvailable - AConfig.ArrowSize) / 2);
+  Result := Max(0, Min(Result, Max(0, AConfig.Height - AConfig.ArrowSize)));
+end;
+
+class procedure TRickUIBuilderFactory.ConfigureComboBoxText(
+  ATextLabel: TLabel; const AConfig: TRickUIBuilderComboBoxConfig);
+var
+  LArrowLeft: Single;
+  LTextLeft: Single;
+  LTextRight: Single;
+begin
+  LArrowLeft := ComboBoxArrowLeft(AConfig);
+  LTextLeft := AConfig.HorizontalPadding;
+  LTextRight := AConfig.Width - AConfig.HorizontalPadding;
+  if AConfig.ArrowPosition = TRickUIBuilderComboBoxArrowPosition.Right then
+    LTextRight := LArrowLeft - Max(0, AConfig.ArrowMarginLeft)
+  else
+    LTextLeft := LArrowLeft + AConfig.ArrowSize +
+      Max(0, AConfig.ArrowMarginRight);
+  ATextLabel.SetBounds(LTextLeft, 0, Max(1, LTextRight - LTextLeft),
+    AConfig.Height);
+  ATextLabel.TextSettings.Font.Size := AConfig.FontSize;
+  ATextLabel.TextSettings.Font.Style := AConfig.FontStyle;
+  ATextLabel.TextSettings.FontColor := AConfig.TextColor;
+  ATextLabel.TextSettings.HorzAlign := AConfig.TextAlign;
+  ATextLabel.TextSettings.VertAlign := TTextAlign.Center;
+  ATextLabel.TextSettings.Trimming := AConfig.Trimming;
+  ATextLabel.StyledSettings := ATextLabel.StyledSettings -
+    [TStyledSetting.Size, TStyledSetting.Style, TStyledSetting.FontColor];
+  if AConfig.FontFamily <> '' then
+  begin
+    ATextLabel.TextSettings.Font.Family := AConfig.FontFamily;
+    ATextLabel.StyledSettings := ATextLabel.StyledSettings -
+      [TStyledSetting.Family];
+  end;
+  ATextLabel.HitTest := False;
+end;
+
+class procedure TRickUIBuilderFactory.ConfigureComboBoxArrow(AArrow: TPath;
+  const AConfig: TRickUIBuilderComboBoxConfig);
+begin
+  AArrow.SetBounds(ComboBoxArrowLeft(AConfig), ComboBoxArrowTop(AConfig),
+    AConfig.ArrowSize, AConfig.ArrowSize);
+  AArrow.Data.Data := AConfig.ClosedArrowPath;
+  AArrow.Fill.Kind := TBrushKind.Solid;
+  AArrow.Fill.Color := AConfig.ArrowColor;
+  AArrow.Stroke.Kind := TBrushKind.None;
+  AArrow.HitTest := False;
+end;
+
+class function TRickUIBuilderFactory.CreateComboBox(AOwner: TComponent;
+  AParent: TFmxObject; const AConfig: TRickUIBuilderComboBoxConfig;
+  out ATextLabel: TLabel; out AArrow: TPath): TRectangle;
+begin
+  Result := TRectangle.Create(AOwner);
+  Result.Parent := AParent;
+  ApplyComboBoxConfig(Result, AConfig);
+
+  ATextLabel := TLabel.Create(AOwner);
+  ATextLabel.Parent := Result;
+  ConfigureComboBoxText(ATextLabel, AConfig);
+
+  AArrow := TPath.Create(AOwner);
+  AArrow.Parent := Result;
+  ConfigureComboBoxArrow(AArrow, AConfig);
+end;
 
 class function TRickUIBuilderFactory.CreateText(AOwner: TComponent;
   AParent: TFmxObject; const AText: string;

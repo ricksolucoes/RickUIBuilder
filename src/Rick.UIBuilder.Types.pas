@@ -1,4 +1,5 @@
 unit Rick.UIBuilder.Types;
+{$SCOPEDENUMS ON}
 (*
   ==============================================================================
   Unit: Rick.UIBuilder.Types
@@ -6,10 +7,10 @@ unit Rick.UIBuilder.Types;
 
   RESPONSABILIDADE
 
-  Define os records de configuracao utilizados pela abordagem de criacao
-  direta (Factory / Opcao A) do framework Rick.UIBuilder, alem do record
-  de espacamento (TRickUIBuilderSpacing) compartilhado por todas as
-  abordagens (Factory, Builders fluentes e Composition).
+  Define os tipos publicos de configuracao utilizados pelo framework
+  Rick.UIBuilder, incluindo os records da Factory, os contratos de dados e
+  estilo do ComboBox e o espacamento (TRickUIBuilderSpacing) compartilhado
+  pelas abordagens Factory, Builders fluentes e Composition.
 
   Esta unit NAO depende de FMX.Forms, FMX.Controls ou qualquer unit de
   UI concreta - apenas dos tipos base necessarios para descrever geometria,
@@ -139,6 +140,146 @@ type
   end;
 
   /// <summary>
+  ///    Perfis de experiencia visual e de interacao disponiveis para o
+  ///    ComboBox. O valor Adaptive e resolvido em runtime para Desktop ou
+  ///    Mobile sem criar implementacoes independentes do componente.
+  /// </summary>
+  TRickUIBuilderComboBoxStyleType = (
+    Desktop,
+    Mobile,
+    Adaptive,
+    Custom
+  );
+
+  /// <summary>
+  ///    Define como a superficie de selecao do ComboBox sera apresentada.
+  ///    Auto permite ao StyleType escolher o default; Anchored mantem a lista
+  ///    junto ao controle e Overlay utiliza a area disponivel do Parent.
+  /// </summary>
+  TRickUIBuilderComboBoxPresentationMode = (
+    Auto,
+    Anchored,
+    Overlay
+  );
+
+  /// <summary>
+  ///    Define em qual lateral do controle principal a seta do ComboBox sera
+  ///    ancorada. As margens da seta continuam independentes da lateral.
+  /// </summary>
+  TRickUIBuilderComboBoxArrowPosition = (
+    Left,
+    Right
+  );
+
+  /// <summary>
+  ///    Estrategia de dimensionamento de uma coluna visual do ComboBox.
+  /// </summary>
+  TRickUIBuilderComboBoxColumnSizeMode = (
+    Auto,
+    Fixed,
+    Proportional
+  );
+
+  /// <summary>
+  ///    Configuracao publica de uma coluna adicional exibida nos itens do
+  ///    ComboBox. Nao representa cabecalho nem identidade do item.
+  /// </summary>
+  TRickUIBuilderComboBoxColumn = record
+    SizeMode: TRickUIBuilderComboBoxColumnSizeMode;
+    SizeValue: Single;
+    Alignment: TTextAlign;
+    Visible: Boolean;
+
+    /// <summary>
+    ///    Cria uma coluna com o modo de dimensionamento informado.
+    /// </summary>
+    class function Create(ASizeMode: TRickUIBuilderComboBoxColumnSizeMode;
+      ASizeValue: Single = 0): TRickUIBuilderComboBoxColumn; static;
+  end;
+
+  /// <summary>
+  ///    Item logico do ComboBox. DisplayText e o texto principal apresentado
+  ///    ao usuario, Value e um valor semantico sem requisito de unicidade e
+  ///    Columns armazena dados visuais adicionais para apresentacao rica.
+  /// </summary>
+  TRickUIBuilderComboBoxItem = record
+    DisplayText: string;
+    Value: string;
+    Columns: TArray<string>;
+
+    /// <summary>
+    ///    Cria um item textual simples usando o proprio texto tambem como
+    ///    Value.
+    /// </summary>
+    class function Create(
+      const ADisplayText: string): TRickUIBuilderComboBoxItem; overload; static;
+
+    /// <summary>
+    ///    Cria um item com DisplayText e Value independentes.
+    /// </summary>
+    class function Create(const ADisplayText,
+      AValue: string): TRickUIBuilderComboBoxItem; overload; static;
+
+    /// <summary>
+    ///    Cria um item estruturado com dados adicionais para colunas.
+    /// </summary>
+    class function Structured(const ADisplayText, AValue: string;
+      const AColumns: array of string): TRickUIBuilderComboBoxItem; static;
+  end;
+
+  /// <summary>
+  ///    Configuracao materializada do ComboBox. O record concentra apenas
+  ///    tokens publicos de geometria, tipografia, cores, estilo, apresentacao
+  ///    e paths; estado de selecao, popup e virtualizacao permanecem internos.
+  /// </summary>
+  TRickUIBuilderComboBoxConfig = record
+    Left: Single;
+    Top: Single;
+    Width: Single;
+    Height: Single;
+    ItemHeight: Single;
+    PopupWidth: Single;
+    PopupWidthOffset: Single;
+    PopupMaxHeight: Single;
+    CornerRadius: Single;
+    HorizontalPadding: Single;
+    ArrowSize: Single;
+    ArrowMarginLeft: Single;
+    ArrowMarginTop: Single;
+    ArrowMarginRight: Single;
+    ArrowMarginBottom: Single;
+    ArrowPosition: TRickUIBuilderComboBoxArrowPosition;
+    FontSize: Single;
+    FontFamily: string;
+    FontStyle: TFontStyles;
+    TextAlign: TTextAlign;
+    Trimming: TTextTrimming;
+    BackgroundColor: TAlphaColor;
+    BorderColor: TAlphaColor;
+    TextColor: TAlphaColor;
+    PlaceholderColor: TAlphaColor;
+    ArrowColor: TAlphaColor;
+    PopupColor: TAlphaColor;
+    HoverColor: TAlphaColor;
+    SelectedColor: TAlphaColor;
+    FocusColor: TAlphaColor;
+    DisabledOpacity: Single;
+    SearchTimeout: Cardinal;
+    Enabled: Boolean;
+    RequestedStyleType: TRickUIBuilderComboBoxStyleType;
+    EffectiveStyleType: TRickUIBuilderComboBoxStyleType;
+    PresentationMode: TRickUIBuilderComboBoxPresentationMode;
+    ClosedArrowPath: string;
+    OpenedArrowPath: string;
+
+    /// <summary>
+    ///    Retorna os defaults neutros do ComboBox. Overrides explicitos do
+    ///    Builder podem substituir esses valores antes do Build.
+    /// </summary>
+    class function Default: TRickUIBuilderComboBoxConfig; static;
+  end;
+
+  /// <summary>
   ///    Representa um espacamento com valores independentes para cada
   ///    lado (esquerda, topo, direita, base). Utilizado pelos metodos
   ///    Margin e Padding em todos os builders fluentes do framework.
@@ -195,6 +336,14 @@ type
     class function None: TRickUIBuilderSpacing; static;
   end;
 
+const
+  /// <summary>Path vetorial padrao da seta para baixo, normalizado do SVG fornecido.</summary>
+  RICK_COMBOBOX_ARROW_DOWN_PATH =
+    'M 12,15.4 L 6,9.4 L 7.075,8.325 L 12,13.25 L 16.925,8.325 L 18,9.4 L 12,15.4 Z';
+  /// <summary>Path vetorial padrao da seta para cima, normalizado do SVG fornecido.</summary>
+  RICK_COMBOBOX_ARROW_UP_PATH =
+    'M 12,10.15 L 7.075,15.075 L 6,14 L 12,8 L 18,14 L 16.925,15.075 L 12,10.15 Z';
+
 implementation
 
 { TRickUIBuilderTextConfig }
@@ -247,6 +396,110 @@ begin
   Result.Top    := 0;
   Result.Width  := 100;
   Result.Color  := TAlphaColors.Lightgray;
+end;
+
+{ TRickUIBuilderComboBoxColumn }
+
+class function TRickUIBuilderComboBoxColumn.Create(
+  ASizeMode: TRickUIBuilderComboBoxColumnSizeMode;
+  ASizeValue: Single): TRickUIBuilderComboBoxColumn;
+begin
+  Result.SizeMode := ASizeMode;
+  Result.SizeValue := ASizeValue;
+  Result.Alignment := TTextAlign.Leading;
+  Result.Visible := True;
+end;
+
+{ TRickUIBuilderComboBoxItem }
+
+class function TRickUIBuilderComboBoxItem.Create(
+  const ADisplayText: string): TRickUIBuilderComboBoxItem;
+begin
+  Result := Create(ADisplayText, ADisplayText);
+end;
+
+class function TRickUIBuilderComboBoxItem.Create(const ADisplayText,
+  AValue: string): TRickUIBuilderComboBoxItem;
+begin
+  Result.DisplayText := ADisplayText;
+  Result.Value := AValue;
+  SetLength(Result.Columns, 0);
+end;
+
+class function TRickUIBuilderComboBoxItem.Structured(const ADisplayText,
+  AValue: string; const AColumns: array of string): TRickUIBuilderComboBoxItem;
+var
+  LIndex: Integer;
+begin
+  Result := Create(ADisplayText, AValue);
+  SetLength(Result.Columns, Length(AColumns));
+  for LIndex := 0 to High(AColumns) do
+    Result.Columns[LIndex] := AColumns[LIndex];
+end;
+
+{ TRickUIBuilderComboBoxConfig }
+
+procedure InitComboBoxGeometry(var AConfig: TRickUIBuilderComboBoxConfig);
+begin
+  AConfig.Left := 0;
+  AConfig.Top := 0;
+  AConfig.Width := 220;
+  AConfig.Height := 40;
+  AConfig.ItemHeight := 36;
+  AConfig.PopupWidth := 0;
+  AConfig.PopupWidthOffset := 0;
+  AConfig.PopupMaxHeight := 240;
+  AConfig.CornerRadius := 6;
+  AConfig.HorizontalPadding := 12;
+  AConfig.ArrowSize := 20;
+  AConfig.ArrowMarginLeft := 8;
+  AConfig.ArrowMarginTop := 0;
+  AConfig.ArrowMarginRight := 12;
+  AConfig.ArrowMarginBottom := 0;
+  AConfig.ArrowPosition := TRickUIBuilderComboBoxArrowPosition.Right;
+  AConfig.FontSize := 14;
+end;
+
+procedure InitComboBoxTypography(var AConfig: TRickUIBuilderComboBoxConfig);
+begin
+  AConfig.FontFamily := '';
+  AConfig.FontStyle := [];
+  AConfig.TextAlign := TTextAlign.Leading;
+  AConfig.Trimming := TTextTrimming.None;
+end;
+
+procedure InitComboBoxColors(var AConfig: TRickUIBuilderComboBoxConfig);
+begin
+  AConfig.BackgroundColor := TAlphaColors.White;
+  AConfig.BorderColor := $FFD0D5DD;
+  AConfig.TextColor := $FF1D2939;
+  AConfig.PlaceholderColor := $FF667085;
+  AConfig.ArrowColor := $FF667085;
+  AConfig.PopupColor := TAlphaColors.White;
+  AConfig.HoverColor := $FFF2F4F7;
+  AConfig.SelectedColor := $FFEFF8FF;
+  AConfig.FocusColor := $FF2E90FA;
+  AConfig.DisabledOpacity := 0.5;
+end;
+
+procedure InitComboBoxBehavior(var AConfig: TRickUIBuilderComboBoxConfig);
+begin
+  AConfig.SearchTimeout := 900;
+  AConfig.Enabled := True;
+  AConfig.RequestedStyleType := TRickUIBuilderComboBoxStyleType.Adaptive;
+  AConfig.EffectiveStyleType := TRickUIBuilderComboBoxStyleType.Desktop;
+  AConfig.PresentationMode := TRickUIBuilderComboBoxPresentationMode.Auto;
+  AConfig.ClosedArrowPath := RICK_COMBOBOX_ARROW_DOWN_PATH;
+  AConfig.OpenedArrowPath := RICK_COMBOBOX_ARROW_UP_PATH;
+end;
+
+class function TRickUIBuilderComboBoxConfig.Default:
+  TRickUIBuilderComboBoxConfig;
+begin
+  InitComboBoxGeometry(Result);
+  InitComboBoxTypography(Result);
+  InitComboBoxColors(Result);
+  InitComboBoxBehavior(Result);
 end;
 
 { TRickUIBuilderSpacing }

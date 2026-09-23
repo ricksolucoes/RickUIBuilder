@@ -178,6 +178,7 @@
         <DCCReference Include="src\Rick.UIBuilder.Tests.Button.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.Tests.Composition.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.Tests.Facade.pas"/>
+        <DCCReference Include="src\Rick.UIBuilder.Tests.ComboBox.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
