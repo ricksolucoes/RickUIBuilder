@@ -1,4 +1,4 @@
-unit Rick.UIBuilder.ComboBox.Virtualization;
+﻿unit Rick.UIBuilder.ComboBox.Virtualization;
 (*
   ============================================================================
   Unit: Rick.UIBuilder.ComboBox.Virtualization
@@ -48,6 +48,8 @@ type
     procedure RowMouseLeave(Sender: TObject);
     procedure ResetRow(ARow: TRectangle);
     procedure BindRow(ARow: TRectangle; AIndex: Integer);
+    procedure CreateCustomSlot(ARow: TRectangle; ASourceIndex: Integer;
+      const AItem: TRickUIBuilderComboBoxItem);
     procedure BuildTextCells(ARow: TRectangle;
       const AItem: TRickUIBuilderComboBoxItem);
     procedure BuildSimpleText(ARow: TRectangle; const AText: string);
@@ -168,7 +170,7 @@ end;
 function TRickUIBuilderComboBoxVirtualizer.RequiredPoolSize: Integer;
 begin
   Result := Ceil(FScrollBox.Height / Max(FConfig.ItemHeight, 1)) + 2;
-  Result := Min(Result, FData.Count);
+  Result := Min(Result, FData.ViewCount);
 end;
 
 procedure TRickUIBuilderComboBoxVirtualizer.EnsurePool;
@@ -382,41 +384,50 @@ procedure TRickUIBuilderComboBoxVirtualizer.BindRow(ARow: TRectangle;
   AIndex: Integer);
 var
   LItem: TRickUIBuilderComboBoxItem;
-  LCustomSlot: TLayout;
+  LSourceIndex: Integer;
 begin
   ResetRow(ARow);
-  if (AIndex < 0) or (AIndex >= FData.Count) then
+  LSourceIndex := FData.SourceIndexFromView(AIndex);
+  if LSourceIndex < 0 then
     Exit;
 
-  LItem := FData.Item(AIndex);
-  ARow.Tag := AIndex;
+  LItem := FData.Item(LSourceIndex);
+  ARow.Tag := LSourceIndex;
   ARow.Position.Y := AIndex * FConfig.ItemHeight;
   ARow.Width := FScrollBox.Width;
   ARow.Height := FConfig.ItemHeight;
   BuildTextCells(ARow, LItem);
 
   if Assigned(FOnCustomizeItem) then
-  begin
-    LCustomSlot := TLayout.Create(ARow);
-    LCustomSlot.Parent := ARow;
-    LCustomSlot.Align := TAlignLayout.Client;
-    LCustomSlot.HitTest := False;
-    FOnCustomizeItem(Self, AIndex, LItem, LCustomSlot);
-  end;
+    CreateCustomSlot(ARow, LSourceIndex, LItem);
   ARow.Visible := True;
+end;
+
+procedure TRickUIBuilderComboBoxVirtualizer.CreateCustomSlot(
+  ARow: TRectangle; ASourceIndex: Integer;
+  const AItem: TRickUIBuilderComboBoxItem);
+var
+  LCustomSlot: TLayout;
+begin
+  LCustomSlot := TLayout.Create(ARow);
+  LCustomSlot.Parent := ARow;
+  LCustomSlot.Align := TAlignLayout.Client;
+  LCustomSlot.HitTest := False;
+  FOnCustomizeItem(Self, ASourceIndex, AItem, LCustomSlot);
 end;
 
 function TRickUIBuilderComboBoxVirtualizer.FirstVisibleIndex: Integer;
 begin
   Result := Floor(FScrollBox.ViewportPosition.Y / Max(FConfig.ItemHeight, 1));
   Result := Max(0, Result - 1);
+  Result := Min(Result, Max(0, FData.ViewCount - RequiredPoolSize));
 end;
 
 procedure TRickUIBuilderComboBoxVirtualizer.UpdateContentHeight;
 begin
   if not Assigned(FSpacer) then
     Exit;
-  FSpacer.Position.Y := Max(0, FData.Count * FConfig.ItemHeight - 1);
+  FSpacer.Position.Y := Max(0, FData.ViewCount * FConfig.ItemHeight - 1);
 end;
 
 procedure TRickUIBuilderComboBoxVirtualizer.Refresh(ASelectedIndex,
@@ -440,7 +451,7 @@ begin
     begin
       BindRow(FRows[LPoolIndex], LLogicalIndex + LPoolIndex);
       if FRows[LPoolIndex].Visible then
-        ApplyRowState(FRows[LPoolIndex], LLogicalIndex + LPoolIndex,
+        ApplyRowState(FRows[LPoolIndex], FRows[LPoolIndex].Tag,
           ASelectedIndex, ATargetIndex);
     end;
   finally
@@ -456,21 +467,21 @@ var
   LViewportTop: Single;
   LViewportBottom: Single;
   LPosition: TPointF;
+  LViewIndex: Integer;
 begin
-  if (AIndex < 0) or (AIndex >= FData.Count) then
+  LViewIndex := FData.ViewIndexFromSource(AIndex);
+  if LViewIndex < 0 then
     Exit;
 
-  LTop := AIndex * FConfig.ItemHeight;
+  LTop := LViewIndex * FConfig.ItemHeight;
   LBottom := LTop + FConfig.ItemHeight;
   LViewportTop := FScrollBox.ViewportPosition.Y;
   LViewportBottom := LViewportTop + FScrollBox.Height;
   LPosition := FScrollBox.ViewportPosition;
-
   if LTop < LViewportTop then
     LPosition.Y := LTop
   else if LBottom > LViewportBottom then
     LPosition.Y := LBottom - FScrollBox.Height;
-
   FScrollBox.ViewportPosition := LPosition;
 end;
 

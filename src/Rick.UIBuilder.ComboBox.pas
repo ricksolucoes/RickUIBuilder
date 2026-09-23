@@ -1,4 +1,4 @@
-unit Rick.UIBuilder.ComboBox;
+﻿unit Rick.UIBuilder.ComboBox;
 (*
   ============================================================================
   Unit: Rick.UIBuilder.ComboBox
@@ -78,6 +78,11 @@ type
     function Enabled(AValue: Boolean = True): IRickUIBuilderComboBox;
     function ClosedArrowPath(const AValue: string): IRickUIBuilderComboBox;
     function OpenedArrowPath(const AValue: string): IRickUIBuilderComboBox;
+    function SearchPlaceholder(const AValue: string): IRickUIBuilderComboBox;
+    function NoResultsText(const AValue: string): IRickUIBuilderComboBox;
+    function BackPath(const AValue: string): IRickUIBuilderComboBox;
+    function ClearPath(const AValue: string): IRickUIBuilderComboBox;
+    function NoResultsPath(const AValue: string): IRickUIBuilderComboBox;
     function OnChange(AValue: TNotifyEvent): IRickUIBuilderComboBox;
     function OnOpen(AValue: TNotifyEvent): IRickUIBuilderComboBox;
     function OnClose(AValue: TNotifyEvent): IRickUIBuilderComboBox;
@@ -300,6 +305,41 @@ function TRickUIBuilderComboBoxBuilder.OpenedArrowPath(
   const AValue: string): IRickUIBuilderComboBox;
 begin
   FConfig.OpenedArrowPath := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderComboBoxBuilder.SearchPlaceholder(
+  const AValue: string): IRickUIBuilderComboBox;
+begin
+  FConfig.SearchPlaceholder := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderComboBoxBuilder.NoResultsText(
+  const AValue: string): IRickUIBuilderComboBox;
+begin
+  FConfig.NoResultsText := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderComboBoxBuilder.BackPath(
+  const AValue: string): IRickUIBuilderComboBox;
+begin
+  FConfig.BackPath := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderComboBoxBuilder.ClearPath(
+  const AValue: string): IRickUIBuilderComboBox;
+begin
+  FConfig.ClearPath := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderComboBoxBuilder.NoResultsPath(
+  const AValue: string): IRickUIBuilderComboBox;
+begin
+  FConfig.NoResultsPath := AValue;
   Result := Self;
 end;
 

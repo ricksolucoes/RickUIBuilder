@@ -1,4 +1,4 @@
-unit Rick.UIBuilder.Types;
+﻿unit Rick.UIBuilder.Types;
 {$SCOPEDENUMS ON}
 (*
   ==============================================================================
@@ -154,12 +154,14 @@ type
   /// <summary>
   ///    Define como a superficie de selecao do ComboBox sera apresentada.
   ///    Auto permite ao StyleType escolher o default; Anchored mantem a lista
-  ///    junto ao controle e Overlay utiliza a area disponivel do Parent.
+  ///    junto ao controle, Overlay utiliza a area disponivel do Parent e
+  ///    FullWindow ocupa o host visual raiz da aplicacao.
   /// </summary>
   TRickUIBuilderComboBoxPresentationMode = (
     Auto,
     Anchored,
-    Overlay
+    Overlay,
+    FullWindow
   );
 
   /// <summary>
@@ -265,6 +267,25 @@ type
     FocusColor: TAlphaColor;
     DisabledOpacity: Single;
     SearchTimeout: Cardinal;
+    FullWindowCornerRadius: Single;
+    FullWindowPadding: Single;
+    SearchHeaderHeight: Single;
+    SearchFieldHeight: Single;
+    SearchFieldCornerRadius: Single;
+    SearchIconSize: Single;
+    NoResultsIconSize: Single;
+    FullWindowBackgroundColor: TAlphaColor;
+    SearchFieldBackgroundColor: TAlphaColor;
+    SearchFieldBorderColor: TAlphaColor;
+    SearchTextColor: TAlphaColor;
+    SearchIconColor: TAlphaColor;
+    NoResultsTextColor: TAlphaColor;
+    NoResultsIconColor: TAlphaColor;
+    SearchPlaceholder: string;
+    NoResultsText: string;
+    BackPath: string;
+    ClearPath: string;
+    NoResultsPath: string;
     Enabled: Boolean;
     RequestedStyleType: TRickUIBuilderComboBoxStyleType;
     EffectiveStyleType: TRickUIBuilderComboBoxStyleType;
@@ -343,6 +364,15 @@ const
   /// <summary>Path vetorial padrao da seta para cima, normalizado do SVG fornecido.</summary>
   RICK_COMBOBOX_ARROW_UP_PATH =
     'M 12,10.15 L 7.075,15.075 L 6,14 L 12,8 L 18,14 L 16.925,15.075 L 12,10.15 Z';
+  /// <summary>Path vetorial padrao do comando de voltar do FullWindow.</summary>
+  RICK_COMBOBOX_BACK_PATH =
+    'M400-240 160-480l241-241 43 42-169 169h526v60H275l168 168-43 42Z';
+  /// <summary>Path vetorial padrao do comando de limpar a pesquisa.</summary>
+  RICK_COMBOBOX_CLEAR_PATH =
+    'm330-288 150-150 150 150 42-42-150-150 150-150-42-42-150 150-150-150-42 42 150 150-150 150 42 42ZM480-80q-82 0-155-31.5t-127.5-86Q143-252 111.5-325T80-480q0-83 31.5-156t86-127Q252-817 325-848.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 82-31.5 155T763-197.5q-54 54.5-127 86T480-80Zm0-60q142 0 241-99.5T820-480q0-142-99-241t-241-99q-141 0-240.5 99T140-480q0 141 99.5 240.5T480-140Zm0-340Z';
+  /// <summary>Path vetorial padrao do estado sem resultados.</summary>
+  RICK_COMBOBOX_NO_RESULTS_PATH =
+    'M244.5-414.5Q233-426 233-443t11.5-28.5Q256-483 273-483t28.5 11.5Q313-460 313-443t-11.5 28.5Q290-403 273-403t-28.5-11.5ZM819-240l-60-60h61v-520H238l-60-60h642q23 0 41.5 18.5T880-820v520q0 23-17.5 41.5T819-240ZM525-533l-60-60h261v60H525ZM860-28 648-240H240L80-80v-729l-24-23 41-44L903-70l-43 42ZM364-525Zm135-35Zm-254.5 25.5Q233-546 233-563t11.5-28.5Q256-603 273-603t28.5 11.5Q313-580 313-563t-11.5 28.5Q290-523 273-523t-28.5-11.5ZM405-653l-24-24v-36h345v60H405Zm-265-96v529l74-80h374L140-749Z';
 
 implementation
 
@@ -482,6 +512,40 @@ begin
   AConfig.DisabledOpacity := 0.5;
 end;
 
+procedure InitComboBoxFullWindowGeometry(
+  var AConfig: TRickUIBuilderComboBoxConfig);
+begin
+  AConfig.FullWindowCornerRadius := 28;
+  AConfig.FullWindowPadding := 16;
+  AConfig.SearchHeaderHeight := 88;
+  AConfig.SearchFieldHeight := 56;
+  AConfig.SearchFieldCornerRadius := 16;
+  AConfig.SearchIconSize := 24;
+  AConfig.NoResultsIconSize := 64;
+end;
+
+procedure InitComboBoxFullWindowColors(
+  var AConfig: TRickUIBuilderComboBoxConfig);
+begin
+  AConfig.FullWindowBackgroundColor := TAlphaColors.White;
+  AConfig.SearchFieldBackgroundColor := TAlphaColors.White;
+  AConfig.SearchFieldBorderColor := $FF98A2B3;
+  AConfig.SearchTextColor := $FF1D2939;
+  AConfig.SearchIconColor := $FF1D2939;
+  AConfig.NoResultsTextColor := $FF667085;
+  AConfig.NoResultsIconColor := $FF98A2B3;
+end;
+
+procedure InitComboBoxFullWindowContent(
+  var AConfig: TRickUIBuilderComboBoxConfig);
+begin
+  AConfig.SearchPlaceholder := 'Pesquisar...';
+  AConfig.NoResultsText := 'Nenhum registro encontrado';
+  AConfig.BackPath := RICK_COMBOBOX_BACK_PATH;
+  AConfig.ClearPath := RICK_COMBOBOX_CLEAR_PATH;
+  AConfig.NoResultsPath := RICK_COMBOBOX_NO_RESULTS_PATH;
+end;
+
 procedure InitComboBoxBehavior(var AConfig: TRickUIBuilderComboBoxConfig);
 begin
   AConfig.SearchTimeout := 900;
@@ -499,6 +563,9 @@ begin
   InitComboBoxGeometry(Result);
   InitComboBoxTypography(Result);
   InitComboBoxColors(Result);
+  InitComboBoxFullWindowGeometry(Result);
+  InitComboBoxFullWindowColors(Result);
+  InitComboBoxFullWindowContent(Result);
   InitComboBoxBehavior(Result);
 end;
 

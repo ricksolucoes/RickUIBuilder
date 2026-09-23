@@ -1,4 +1,4 @@
-unit Rick.UIBuilder.ComboBox.Data;
+﻿unit Rick.UIBuilder.ComboBox.Data;
 (*
   ============================================================================
   Unit: Rick.UIBuilder.ComboBox.Data
@@ -6,11 +6,13 @@ unit Rick.UIBuilder.ComboBox.Data;
 
   RESPONSABILIDADE
 
-  Mantem exclusivamente o modelo logico de itens e selecao do ComboBox.
-  Nao conhece controles FMX, popup, virtualizacao ou lifecycle visual.
+  Mantem exclusivamente o modelo logico de itens, selecao e a view filtrada
+  do ComboBox. Nao conhece controles FMX, presentation ou lifecycle visual.
 
   DisplayText e a representacao visual primaria, Value e um valor semantico
-  sem requisito de unicidade e ItemIndex representa a posicao selecionada.
+  sem requisito de unicidade e ItemIndex representa a posicao selecionada na
+  colecao original. A pesquisa cria apenas um mapeamento ViewIndex ->
+  SourceIndex; a colecao original nunca e removida ou reordenada pelo filtro.
   ============================================================================
 *)
 
@@ -18,6 +20,7 @@ interface
 
 uses
   System.SysUtils,
+  System.StrUtils,
   System.Generics.Collections,
   Rick.UIBuilder.Types;
 
@@ -25,8 +28,12 @@ type
   TRickUIBuilderComboBoxData = class
   strict private
     FItems: TList<TRickUIBuilderComboBoxItem>;
+    FFilteredIndexes: TList<Integer>;
     FItemIndex: Integer;
+    FFilterText: string;
     function IsValidIndex(AIndex: Integer): Boolean;
+    function HasFilter: Boolean;
+    procedure RebuildFilter;
   public
     constructor Create;
     destructor Destroy; override;
@@ -43,6 +50,13 @@ type
     function SelectIndex(AIndex: Integer): Boolean;
     function TrySelectText(const AText: string): Boolean;
     function FindPrefix(const APrefix: string): Integer;
+    procedure SetFilterText(const AText: string);
+    procedure ClearFilter;
+    function FilterText: string;
+    function ViewCount: Integer;
+    function ViewItem(AViewIndex: Integer): TRickUIBuilderComboBoxItem;
+    function SourceIndexFromView(AViewIndex: Integer): Integer;
+    function ViewIndexFromSource(ASourceIndex: Integer): Integer;
   end;
 
 implementation
@@ -51,19 +65,41 @@ constructor TRickUIBuilderComboBoxData.Create;
 begin
   inherited Create;
   FItems := TList<TRickUIBuilderComboBoxItem>.Create;
+  FFilteredIndexes := TList<Integer>.Create;
   FItemIndex := -1;
 end;
 
 destructor TRickUIBuilderComboBoxData.Destroy;
 begin
+  FFilteredIndexes.Free;
   FItems.Free;
   inherited;
+end;
+
+function TRickUIBuilderComboBoxData.HasFilter: Boolean;
+begin
+  Result := FFilterText <> '';
+end;
+
+procedure TRickUIBuilderComboBoxData.RebuildFilter;
+var
+  LIndex: Integer;
+begin
+  FFilteredIndexes.Clear;
+  if not HasFilter then
+    Exit;
+
+  for LIndex := 0 to FItems.Count - 1 do
+    if ContainsText(FItems[LIndex].DisplayText, FFilterText) then
+      FFilteredIndexes.Add(LIndex);
 end;
 
 procedure TRickUIBuilderComboBoxData.Add(
   const AItem: TRickUIBuilderComboBoxItem);
 begin
   FItems.Add(AItem);
+  if HasFilter then
+    RebuildFilter;
 end;
 
 procedure TRickUIBuilderComboBoxData.AddText(const AText: string);
@@ -76,7 +112,9 @@ var
   LItem: string;
 begin
   for LItem in AItems do
-    AddText(LItem);
+    FItems.Add(TRickUIBuilderComboBoxItem.Create(LItem));
+  if HasFilter then
+    RebuildFilter;
 end;
 
 procedure TRickUIBuilderComboBoxData.AddRange(
@@ -85,7 +123,9 @@ var
   LItem: TRickUIBuilderComboBoxItem;
 begin
   for LItem in AItems do
-    Add(LItem);
+    FItems.Add(LItem);
+  if HasFilter then
+    RebuildFilter;
 end;
 
 function TRickUIBuilderComboBoxData.Count: Integer;
@@ -158,6 +198,65 @@ begin
   for LIndex := 0 to FItems.Count - 1 do
     if SameText(Copy(FItems[LIndex].DisplayText, 1, Length(APrefix)), APrefix) then
       Exit(LIndex);
+end;
+
+procedure TRickUIBuilderComboBoxData.SetFilterText(const AText: string);
+begin
+  FFilterText := AText;
+  RebuildFilter;
+end;
+
+procedure TRickUIBuilderComboBoxData.ClearFilter;
+begin
+  if FFilterText = '' then
+    Exit;
+  FFilterText := '';
+  FFilteredIndexes.Clear;
+end;
+
+function TRickUIBuilderComboBoxData.FilterText: string;
+begin
+  Result := FFilterText;
+end;
+
+function TRickUIBuilderComboBoxData.ViewCount: Integer;
+begin
+  if HasFilter then
+    Result := FFilteredIndexes.Count
+  else
+    Result := FItems.Count;
+end;
+
+function TRickUIBuilderComboBoxData.SourceIndexFromView(
+  AViewIndex: Integer): Integer;
+begin
+  Result := -1;
+  if (AViewIndex < 0) or (AViewIndex >= ViewCount) then
+    Exit;
+  if HasFilter then
+    Result := FFilteredIndexes[AViewIndex]
+  else
+    Result := AViewIndex;
+end;
+
+function TRickUIBuilderComboBoxData.ViewIndexFromSource(
+  ASourceIndex: Integer): Integer;
+begin
+  Result := -1;
+  if not IsValidIndex(ASourceIndex) then
+    Exit;
+  if not HasFilter then
+    Exit(ASourceIndex);
+  Result := FFilteredIndexes.IndexOf(ASourceIndex);
+end;
+
+function TRickUIBuilderComboBoxData.ViewItem(
+  AViewIndex: Integer): TRickUIBuilderComboBoxItem;
+var
+  LSourceIndex: Integer;
+begin
+  LSourceIndex := SourceIndexFromView(AViewIndex);
+  Result := Item(LSourceIndex);
 end;
 
 end.

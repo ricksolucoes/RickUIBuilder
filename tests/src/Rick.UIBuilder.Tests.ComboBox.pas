@@ -23,6 +23,8 @@ uses
   FMX.Layouts,
   FMX.Objects,
   FMX.StdCtrls,
+  FMX.Edit,
+  FMX.Graphics,
   Rick.UIBuilder,
   Rick.UIBuilder.Types,
   Rick.UIBuilder.Interfaces,
@@ -50,6 +52,12 @@ type
     procedure IndiceInvalido_NaoDeveAlterarSelecao;
     [Test]
     procedure AddRange_DevePreservarSelecaoExistente;
+    [Test]
+    procedure Filtro_DeveMapearViewParaSourceIndex;
+    [Test]
+    procedure ClearFilter_DeveRestaurarViewCompleta;
+    [Test]
+    procedure AddRangeComFiltro_DeveAtualizarView;
   end;
 
   [TestFixture]
@@ -58,7 +66,7 @@ type
     [Test]
     procedure Desktop_DeveResolverAnchoredQuandoPresentationForAuto;
     [Test]
-    procedure Mobile_DeveResolverOverlayQuandoPresentationForAuto;
+    procedure Mobile_DeveResolverFullWindowQuandoPresentationForAuto;
     [Test]
     procedure OverridePresentation_DevePrevalecerSobreDefaultDoStyle;
   end;
@@ -69,8 +77,31 @@ type
   private
     FHostForm: TForm;
     FScroll: TVertScrollBox;
+    FChangeCount: Integer;
     function CountVisiblePopupRectangles(AContainer: TRectangle): Integer;
     function FindArrow(AContainer: TRectangle): TPath;
+    function FindFullWindowPopup: TRectangle;
+    function FindEdit(AParent: TFmxObject): TEdit;
+    function NormalizePathData(const AData: string): string;
+    function FindPath(AParent: TFmxObject; const AData: string): TPath;
+    function FindLabel(AParent: TFmxObject; const AText: string): TLabel;
+    function FindScrollBox(AParent: TFmxObject): TVertScrollBox;
+    function RequireFullWindowPopup: TRectangle;
+    function RequireEdit(AParent: TFmxObject): TEdit;
+    function RequirePath(AParent: TFmxObject; const AData: string): TPath;
+    function RequireScrollBox(AParent: TFmxObject): TVertScrollBox;
+    function RequirePathHitArea(APath: TPath): TControl;
+    procedure SetSearchText(AEdit: TEdit; const AText: string);
+    procedure ClickPath(APath: TPath);
+    procedure ClickVisibleRow(AScrollBox: TVertScrollBox; ATag: Integer);
+    procedure AssertSearchFieldVisuals(AEdit: TEdit);
+    procedure AssertHitAreas(ABack, AClear: TPath);
+    procedure AssertClearHidden(AClear: TPath);
+    procedure AssertClearVisible(AClear: TPath);
+    function CountVisibleRows(AScrollBox: TVertScrollBox): Integer;
+    function FindVisibleRowByTag(AScrollBox: TVertScrollBox;
+      ATag: Integer): TRectangle;
+    procedure ComboChange(Sender: TObject);
     procedure AssertClosedVisualTree(AContainer: TRectangle);
   public
     [Setup]
@@ -103,6 +134,30 @@ type
     procedure SetaEsquerda_DeveReservarAreaDoTexto;
     [Test]
     procedure PathsDefault_DeveUsarSetasIndependentes;
+    [Test]
+    procedure FullWindow_DeveUsarFormComoHostVisual;
+    [Test]
+    procedure FullWindow_DeveCriarEstruturaDeBuscaCompleta;
+    [Test]
+    procedure Clear_InicialmenteEComEditVazioDeveEstarOculto;
+    [Test]
+    procedure Clear_ComUmOuMaisCaracteresDeveFicarVisivel;
+    [Test]
+    procedure Clear_AoClicarDeveRestaurarFiltroSemAlterarSelecao;
+    [Test]
+    procedure Clear_AposEmptyStateDeveRestaurarLista;
+    [Test]
+    procedure ResultadoFiltrado_DeveSelecionarSourceIndexEValueOriginal;
+    [Test]
+    procedure EmptyState_DeveAceitarMensagemEPathCustomizados;
+    [Test]
+    procedure Back_DeveFecharFullWindowSemAlterarSelecao;
+    [Test]
+    procedure ParentDestruidoComFullWindowAberto_DeveDesanexarHandle;
+    [Test]
+    procedure CustomFullWindow_DeveUsarMesmaPresentationFullWindow;
+    [Test]
+    procedure FullWindowPathsDefault_DeveUsarAssetsFornecidos;
   end;
 
 implementation
@@ -166,6 +221,38 @@ begin
   Assert.AreEqual('B', FData.SelectedText);
 end;
 
+procedure TRickUIBuilderComboBoxDataTests.Filtro_DeveMapearViewParaSourceIndex;
+begin
+  FData.AddRange(['Rio de Janeiro', 'Sao Paulo', 'Riviera', 'Salvador']);
+  FData.SetFilterText('ri');
+
+  Assert.AreEqual(2, FData.ViewCount);
+  Assert.AreEqual(0, FData.SourceIndexFromView(0));
+  Assert.AreEqual(2, FData.SourceIndexFromView(1));
+  Assert.AreEqual('Riviera', FData.ViewItem(1).DisplayText);
+end;
+
+procedure TRickUIBuilderComboBoxDataTests.ClearFilter_DeveRestaurarViewCompleta;
+begin
+  FData.AddRange(['Rio', 'Sao Paulo', 'Ribeirao']);
+  FData.SetFilterText('ri');
+  Assert.AreEqual(2, FData.ViewCount);
+
+  FData.ClearFilter;
+  Assert.AreEqual('', FData.FilterText);
+  Assert.AreEqual(3, FData.ViewCount);
+end;
+
+procedure TRickUIBuilderComboBoxDataTests.AddRangeComFiltro_DeveAtualizarView;
+begin
+  FData.AddRange(['Rio', 'Sao Paulo']);
+  FData.SetFilterText('ri');
+  FData.AddRange(['Riviera', 'Salvador']);
+
+  Assert.AreEqual(2, FData.ViewCount);
+  Assert.AreEqual(2, FData.SourceIndexFromView(1));
+end;
+
 { TRickUIBuilderComboBoxStyleTests }
 
 procedure TRickUIBuilderComboBoxStyleTests.Desktop_DeveResolverAnchoredQuandoPresentationForAuto;
@@ -183,7 +270,7 @@ begin
     Integer(LConfig.PresentationMode));
 end;
 
-procedure TRickUIBuilderComboBoxStyleTests.Mobile_DeveResolverOverlayQuandoPresentationForAuto;
+procedure TRickUIBuilderComboBoxStyleTests.Mobile_DeveResolverFullWindowQuandoPresentationForAuto;
 var
   LConfig: TRickUIBuilderComboBoxConfig;
 begin
@@ -194,7 +281,7 @@ begin
 
   Assert.AreEqual(Integer(TRickUIBuilderComboBoxStyleType.Mobile),
     Integer(LConfig.EffectiveStyleType));
-  Assert.AreEqual(Integer(TRickUIBuilderComboBoxPresentationMode.Overlay),
+  Assert.AreEqual(Integer(TRickUIBuilderComboBoxPresentationMode.FullWindow),
     Integer(LConfig.PresentationMode));
 end;
 
@@ -221,6 +308,7 @@ begin
   FScroll := TVertScrollBox.Create(FHostForm);
   FScroll.Parent := FHostForm;
   FScroll.Align := TAlignLayout.Client;
+  FChangeCount := 0;
 end;
 
 procedure TRickUIBuilderComboBoxIntegrationTests.TearDown;
@@ -240,8 +328,9 @@ begin
   for LIndex := 0 to FScroll.Content.ChildrenCount - 1 do
   begin
     LChild := FScroll.Content.Children[LIndex];
-    if (LChild is TRectangle) and (LChild <> AContainer) and
-      TRectangle(LChild).Visible then
+    if not (LChild is TRectangle) then
+      Continue;
+    if (LChild <> AContainer) and TRectangle(LChild).Visible then
       Inc(Result);
   end;
 end;
@@ -255,6 +344,272 @@ begin
   for LIndex := 0 to AContainer.ChildrenCount - 1 do
     if AContainer.Children[LIndex] is TPath then
       Exit(TPath(AContainer.Children[LIndex]));
+end;
+
+function TRickUIBuilderComboBoxIntegrationTests.FindFullWindowPopup: TRectangle;
+var
+  LIndex: Integer;
+  LChild: TFmxObject;
+begin
+  Result := nil;
+  for LIndex := 0 to FHostForm.ChildrenCount - 1 do
+  begin
+    LChild := FHostForm.Children[LIndex];
+    if not (LChild is TRectangle) then
+      Continue;
+    if TRectangle(LChild).Visible then
+      Exit(TRectangle(LChild));
+  end;
+end;
+
+function TRickUIBuilderComboBoxIntegrationTests.FindEdit(
+  AParent: TFmxObject): TEdit;
+var
+  LIndex: Integer;
+begin
+  Result := nil;
+  if not Assigned(AParent) then
+    Exit;
+  if AParent is TEdit then
+    Exit(TEdit(AParent));
+  for LIndex := 0 to AParent.ChildrenCount - 1 do
+  begin
+    Result := FindEdit(AParent.Children[LIndex]);
+    if Assigned(Result) then
+      Exit;
+  end;
+end;
+
+function TRickUIBuilderComboBoxIntegrationTests.NormalizePathData(
+  const AData: string): string;
+var
+  LPathData: TPathData;
+begin
+  // TPathData reserializa o SVG; o teste compara a forma canonica, nao o texto de entrada.
+  LPathData := TPathData.Create;
+  try
+    LPathData.Data := AData;
+    Result := LPathData.Data;
+  finally
+    LPathData.Free;
+  end;
+end;
+
+function TRickUIBuilderComboBoxIntegrationTests.FindPath(AParent: TFmxObject;
+  const AData: string): TPath;
+var
+  LIndex: Integer;
+begin
+  Result := nil;
+  if not Assigned(AParent) then
+    Exit;
+  if AParent is TPath then
+    if TPath(AParent).Data.Data = NormalizePathData(AData) then
+      Exit(TPath(AParent));
+  for LIndex := 0 to AParent.ChildrenCount - 1 do
+  begin
+    Result := FindPath(AParent.Children[LIndex], AData);
+    if Assigned(Result) then
+      Exit;
+  end;
+end;
+
+function TRickUIBuilderComboBoxIntegrationTests.FindLabel(AParent: TFmxObject;
+  const AText: string): TLabel;
+var
+  LIndex: Integer;
+begin
+  Result := nil;
+  if not Assigned(AParent) then
+    Exit;
+  if AParent is TLabel then
+    if TLabel(AParent).Text = AText then
+      Exit(TLabel(AParent));
+  for LIndex := 0 to AParent.ChildrenCount - 1 do
+  begin
+    Result := FindLabel(AParent.Children[LIndex], AText);
+    if Assigned(Result) then
+      Exit;
+  end;
+end;
+
+function TRickUIBuilderComboBoxIntegrationTests.FindScrollBox(
+  AParent: TFmxObject): TVertScrollBox;
+var
+  LIndex: Integer;
+begin
+  Result := nil;
+  if not Assigned(AParent) then
+    Exit;
+  if AParent is TVertScrollBox then
+    Exit(TVertScrollBox(AParent));
+  for LIndex := 0 to AParent.ChildrenCount - 1 do
+  begin
+    Result := FindScrollBox(AParent.Children[LIndex]);
+    if Assigned(Result) then
+      Exit;
+  end;
+end;
+
+function TRickUIBuilderComboBoxIntegrationTests.RequireFullWindowPopup:
+  TRectangle;
+begin
+  Result := FindFullWindowPopup;
+  Assert.IsNotNull(Result, 'FullWindow deveria estar materializado.');
+end;
+
+function TRickUIBuilderComboBoxIntegrationTests.RequireEdit(
+  AParent: TFmxObject): TEdit;
+begin
+  Result := FindEdit(AParent);
+  Assert.IsNotNull(Result, 'FullWindow deveria conter SearchEdit.');
+end;
+
+function TRickUIBuilderComboBoxIntegrationTests.RequirePath(
+  AParent: TFmxObject; const AData: string): TPath;
+begin
+  Result := FindPath(AParent, AData);
+  Assert.IsNotNull(Result, 'FullWindow deveria conter o TPath solicitado.');
+end;
+
+function TRickUIBuilderComboBoxIntegrationTests.RequireScrollBox(
+  AParent: TFmxObject): TVertScrollBox;
+begin
+  Result := FindScrollBox(AParent);
+  Assert.IsNotNull(Result, 'FullWindow deveria conter a lista virtualizada.');
+end;
+
+function TRickUIBuilderComboBoxIntegrationTests.RequirePathHitArea(
+  APath: TPath): TControl;
+begin
+  Result := nil;
+  Assert.IsNotNull(APath, 'O TPath da hit area não pode ser nil.');
+  if not Assigned(APath) then
+    Exit;
+  if APath.Parent is TControl then
+    Result := TControl(APath.Parent);
+  Assert.IsNotNull(Result, 'O TPath deveria possuir hit area.');
+end;
+
+procedure TRickUIBuilderComboBoxIntegrationTests.SetSearchText(
+  AEdit: TEdit; const AText: string);
+begin
+  Assert.IsTrue(Assigned(AEdit.OnChangeTracking));
+  AEdit.Text := AText;
+  AEdit.OnChangeTracking(AEdit);
+end;
+
+procedure TRickUIBuilderComboBoxIntegrationTests.ClickPath(APath: TPath);
+var
+  LHitArea: TControl;
+begin
+  LHitArea := RequirePathHitArea(APath);
+  Assert.IsTrue(Assigned(LHitArea.OnClick));
+  LHitArea.OnClick(LHitArea);
+end;
+
+procedure TRickUIBuilderComboBoxIntegrationTests.ClickVisibleRow(
+  AScrollBox: TVertScrollBox; ATag: Integer);
+var
+  LRow: TRectangle;
+begin
+  LRow := FindVisibleRowByTag(AScrollBox, ATag);
+  Assert.IsNotNull(LRow, 'A view filtrada deveria conter o SourceIndex esperado.');
+  Assert.IsTrue(Assigned(LRow.OnClick));
+  LRow.OnClick(LRow);
+end;
+
+procedure TRickUIBuilderComboBoxIntegrationTests.AssertSearchFieldVisuals(
+  AEdit: TEdit);
+begin
+  Assert.IsTrue(AEdit.Parent is TRectangle);
+  Assert.AreEqual(Integer(TAlignLayout.Client), Integer(AEdit.Align));
+  Assert.IsTrue(TRectangle(AEdit.Parent).ClipChildren);
+  Assert.AreEqual('transparentedit', AEdit.StyleLookup);
+end;
+
+procedure TRickUIBuilderComboBoxIntegrationTests.AssertHitAreas(ABack,
+  AClear: TPath);
+var
+  LBackArea: TControl;
+  LClearArea: TControl;
+begin
+  LBackArea := RequirePathHitArea(ABack);
+  LClearArea := RequirePathHitArea(AClear);
+  Assert.IsTrue(ABack.Parent is TLayout);
+  Assert.IsTrue(AClear.Parent is TLayout);
+  Assert.IsFalse(ABack.HitTest);
+  Assert.IsTrue(LBackArea.HitTest);
+  Assert.IsTrue(LBackArea.Width > ABack.Width);
+  Assert.IsTrue(Assigned(LBackArea.OnClick));
+  Assert.IsFalse(AClear.HitTest);
+  Assert.IsTrue(LClearArea.Width > AClear.Width);
+  Assert.IsFalse(LClearArea.Visible);
+  Assert.IsFalse(LClearArea.HitTest);
+end;
+
+procedure TRickUIBuilderComboBoxIntegrationTests.AssertClearHidden(
+  AClear: TPath);
+var
+  LClearArea: TControl;
+begin
+  LClearArea := RequirePathHitArea(AClear);
+  Assert.IsFalse(AClear.Visible);
+  Assert.IsFalse(AClear.HitTest);
+  Assert.IsFalse(LClearArea.Visible);
+  Assert.IsFalse(LClearArea.HitTest);
+end;
+
+procedure TRickUIBuilderComboBoxIntegrationTests.AssertClearVisible(
+  AClear: TPath);
+var
+  LClearArea: TControl;
+begin
+  LClearArea := RequirePathHitArea(AClear);
+  Assert.IsTrue(AClear.Visible);
+  Assert.IsFalse(AClear.HitTest);
+  Assert.IsTrue(LClearArea.Visible);
+  Assert.IsTrue(LClearArea.HitTest);
+  Assert.IsTrue(Assigned(LClearArea.OnClick));
+end;
+
+function TRickUIBuilderComboBoxIntegrationTests.CountVisibleRows(
+  AScrollBox: TVertScrollBox): Integer;
+var
+  LIndex: Integer;
+  LChild: TFmxObject;
+begin
+  Result := 0;
+  for LIndex := 0 to AScrollBox.Content.ChildrenCount - 1 do
+  begin
+    LChild := AScrollBox.Content.Children[LIndex];
+    if not (LChild is TRectangle) then
+      Continue;
+    if TRectangle(LChild).Visible and (TRectangle(LChild).Opacity > 0) then
+      Inc(Result);
+  end;
+end;
+
+function TRickUIBuilderComboBoxIntegrationTests.FindVisibleRowByTag(
+  AScrollBox: TVertScrollBox; ATag: Integer): TRectangle;
+var
+  LIndex: Integer;
+  LChild: TFmxObject;
+begin
+  Result := nil;
+  for LIndex := 0 to AScrollBox.Content.ChildrenCount - 1 do
+  begin
+    LChild := AScrollBox.Content.Children[LIndex];
+    if not (LChild is TRectangle) then
+      Continue;
+    if TRectangle(LChild).Visible and (TRectangle(LChild).Tag = ATag) then
+      Exit(TRectangle(LChild));
+  end;
+end;
+
+procedure TRickUIBuilderComboBoxIntegrationTests.ComboChange(Sender: TObject);
+begin
+  Inc(FChangeCount);
 end;
 
 procedure TRickUIBuilderComboBoxIntegrationTests.AssertClosedVisualTree(
@@ -482,6 +837,261 @@ begin
 
   Assert.AreEqual<Single>(14, LArrow.Position.X);
   Assert.AreEqual<Single>(38, LLabel.Position.X);
+end;
+
+procedure TRickUIBuilderComboBoxIntegrationTests.FullWindow_DeveUsarFormComoHostVisual;
+var
+  LHandle: IRickUIBuilderComboBoxHandle;
+  LPopup: TRectangle;
+begin
+  LHandle := TRickUIBuilder.ComboBox.Items(['A', 'B'])
+    .StyleType(TRickUIBuilderComboBoxStyleType.Mobile)
+    .BuildHandle(FScroll);
+  LHandle.Open;
+  LPopup := FindFullWindowPopup;
+
+  Assert.IsNotNull(LPopup);
+  Assert.AreEqual<TFmxObject>(FHostForm, LPopup.Parent);
+  Assert.AreEqual(Integer(TAlignLayout.Client), Integer(LPopup.Align));
+  Assert.IsTrue(TCorner.TopLeft in LPopup.Corners);
+  Assert.IsFalse(TCorner.BottomLeft in LPopup.Corners);
+end;
+
+procedure TRickUIBuilderComboBoxIntegrationTests.FullWindow_DeveCriarEstruturaDeBuscaCompleta;
+var
+  LHandle: IRickUIBuilderComboBoxHandle;
+  LPopup: TRectangle;
+  LEdit: TEdit;
+  LBack: TPath;
+  LClear: TPath;
+  LList: TVertScrollBox;
+begin
+  LHandle := TRickUIBuilder.ComboBox.Items(['Rio', 'Sao Paulo'])
+    .StyleType(TRickUIBuilderComboBoxStyleType.Mobile).BuildHandle(FScroll);
+  LHandle.Open;
+  LPopup := RequireFullWindowPopup;
+  LEdit := RequireEdit(LPopup);
+  LBack := RequirePath(LPopup, RICK_COMBOBOX_BACK_PATH);
+  LClear := RequirePath(LPopup, RICK_COMBOBOX_CLEAR_PATH);
+  LList := RequireScrollBox(LPopup);
+  Assert.IsNotNull(LList);
+  AssertSearchFieldVisuals(LEdit);
+  AssertHitAreas(LBack, LClear);
+end;
+
+
+procedure TRickUIBuilderComboBoxIntegrationTests.Clear_InicialmenteEComEditVazioDeveEstarOculto;
+var
+  LHandle: IRickUIBuilderComboBoxHandle;
+  LPopup: TRectangle;
+  LEdit: TEdit;
+  LClear: TPath;
+begin
+  LHandle := TRickUIBuilder.ComboBox.Items(['Rio', 'Sao Paulo'])
+    .StyleType(TRickUIBuilderComboBoxStyleType.Mobile).BuildHandle(FScroll);
+  LHandle.Open;
+  LPopup := RequireFullWindowPopup;
+  LEdit := RequireEdit(LPopup);
+  LClear := RequirePath(LPopup, RICK_COMBOBOX_CLEAR_PATH);
+  AssertClearHidden(LClear);
+  SetSearchText(LEdit, '');
+  AssertClearHidden(LClear);
+end;
+
+
+
+
+procedure TRickUIBuilderComboBoxIntegrationTests.Clear_ComUmOuMaisCaracteresDeveFicarVisivel;
+var
+  LHandle: IRickUIBuilderComboBoxHandle;
+  LPopup: TRectangle;
+  LEdit: TEdit;
+  LClear: TPath;
+begin
+  LHandle := TRickUIBuilder.ComboBox.Items(['Rio', 'Ribeirao'])
+    .StyleType(TRickUIBuilderComboBoxStyleType.Mobile).BuildHandle(FScroll);
+  LHandle.Open;
+  LPopup := RequireFullWindowPopup;
+  LEdit := RequireEdit(LPopup);
+  LClear := RequirePath(LPopup, RICK_COMBOBOX_CLEAR_PATH);
+  SetSearchText(LEdit, ' ');
+  AssertClearVisible(LClear);
+  SetSearchText(LEdit, 'Ri');
+  AssertClearVisible(LClear);
+  SetSearchText(LEdit, '');
+  AssertClearHidden(LClear);
+end;
+
+
+
+
+procedure TRickUIBuilderComboBoxIntegrationTests.Clear_AoClicarDeveRestaurarFiltroSemAlterarSelecao;
+var
+  LHandle: IRickUIBuilderComboBoxHandle;
+  LPopup: TRectangle;
+  LEdit: TEdit;
+  LClear: TPath;
+  LList: TVertScrollBox;
+begin
+  LHandle := TRickUIBuilder.ComboBox.Items(['Rio', 'Sao Paulo', 'Ribeirao'])
+    .ItemIndex(1).StyleType(TRickUIBuilderComboBoxStyleType.Mobile)
+    .OnChange(ComboChange).BuildHandle(FScroll);
+  LHandle.Open;
+  LPopup := RequireFullWindowPopup;
+  LEdit := RequireEdit(LPopup);
+  LClear := RequirePath(LPopup, RICK_COMBOBOX_CLEAR_PATH);
+  LList := RequireScrollBox(LPopup);
+  SetSearchText(LEdit, 'ri');
+  Assert.AreEqual(2, CountVisibleRows(LList));
+  ClickPath(LClear);
+  Assert.AreEqual('', LEdit.Text);
+  Assert.AreEqual(3, CountVisibleRows(LList));
+  Assert.AreEqual(1, LHandle.ItemIndex);
+  Assert.AreEqual(0, FChangeCount);
+  Assert.IsTrue(LPopup.Visible);
+end;
+
+
+
+
+procedure TRickUIBuilderComboBoxIntegrationTests.Clear_AposEmptyStateDeveRestaurarLista;
+var
+  LHandle: IRickUIBuilderComboBoxHandle;
+  LPopup: TRectangle;
+  LEdit: TEdit;
+  LClear: TPath;
+  LList: TVertScrollBox;
+begin
+  LHandle := TRickUIBuilder.ComboBox.Items(['Rio', 'Curitiba'])
+    .StyleType(TRickUIBuilderComboBoxStyleType.Mobile).BuildHandle(FScroll);
+  LHandle.Open;
+  LPopup := RequireFullWindowPopup;
+  LEdit := RequireEdit(LPopup);
+  LClear := RequirePath(LPopup, RICK_COMBOBOX_CLEAR_PATH);
+  LList := RequireScrollBox(LPopup);
+  SetSearchText(LEdit, 'xyz');
+  Assert.IsFalse(LList.Visible);
+  ClickPath(LClear);
+  Assert.IsTrue(LList.Visible);
+  Assert.AreEqual(2, CountVisibleRows(LList));
+  Assert.IsFalse(RequirePathHitArea(LClear).Visible);
+end;
+
+
+
+procedure TRickUIBuilderComboBoxIntegrationTests.ResultadoFiltrado_DeveSelecionarSourceIndexEValueOriginal;
+var
+  LHandle: IRickUIBuilderComboBoxHandle;
+  LPopup: TRectangle;
+  LEdit: TEdit;
+  LList: TVertScrollBox;
+begin
+  LHandle := TRickUIBuilder.ComboBox.AddItem('Sao Paulo', 'SP')
+    .AddItem('Rio de Janeiro', 'RJ').AddItem('Ribeirao Preto', 'RP')
+    .StyleType(TRickUIBuilderComboBoxStyleType.Mobile).BuildHandle(FScroll);
+  LHandle.Open;
+  LPopup := RequireFullWindowPopup;
+  LEdit := RequireEdit(LPopup);
+  LList := RequireScrollBox(LPopup);
+  SetSearchText(LEdit, 'ri');
+  ClickVisibleRow(LList, 2);
+  Assert.AreEqual(2, LHandle.ItemIndex);
+  Assert.AreEqual('RP', LHandle.SelectedValue);
+  Assert.IsFalse(LPopup.Visible);
+end;
+
+
+
+
+procedure TRickUIBuilderComboBoxIntegrationTests.EmptyState_DeveAceitarMensagemEPathCustomizados;
+var
+  LHandle: IRickUIBuilderComboBoxHandle;
+  LPopup: TRectangle;
+  LEdit: TEdit;
+  LLabel: TLabel;
+  LPath: TPath;
+begin
+  LHandle := TRickUIBuilder.ComboBox.Items(['Rio'])
+    .StyleType(TRickUIBuilderComboBoxStyleType.Mobile)
+    .NoResultsText('Sem cidades').NoResultsPath(RICK_COMBOBOX_ARROW_UP_PATH)
+    .BuildHandle(FScroll);
+  LHandle.Open;
+  LPopup := RequireFullWindowPopup;
+  LEdit := RequireEdit(LPopup);
+  SetSearchText(LEdit, 'xyz');
+  LLabel := FindLabel(LPopup, 'Sem cidades');
+  Assert.IsNotNull(LLabel, 'Empty State deveria conter a mensagem customizada.');
+  Assert.IsTrue(LLabel.Parent is TControl);
+  Assert.IsTrue(TControl(LLabel.Parent).Visible);
+  LPath := RequirePath(LPopup, RICK_COMBOBOX_ARROW_UP_PATH);
+  Assert.IsNotNull(LPath);
+end;
+
+
+
+procedure TRickUIBuilderComboBoxIntegrationTests.Back_DeveFecharFullWindowSemAlterarSelecao;
+var
+  LHandle: IRickUIBuilderComboBoxHandle;
+  LPopup: TRectangle;
+  LBack: TPath;
+  LBackArea: TControl;
+begin
+  LHandle := TRickUIBuilder.ComboBox.Items(['A', 'B'])
+    .ItemIndex(1).StyleType(TRickUIBuilderComboBoxStyleType.Mobile)
+    .BuildHandle(FScroll);
+  LHandle.Open;
+  LPopup := RequireFullWindowPopup;
+  LBack := RequirePath(LPopup, RICK_COMBOBOX_BACK_PATH);
+  LBackArea := RequirePathHitArea(LBack);
+  Assert.IsFalse(LBack.HitTest);
+  Assert.IsTrue(LBackArea.HitTest);
+  ClickPath(LBack);
+  Assert.IsFalse(LPopup.Visible);
+  Assert.AreEqual(1, LHandle.ItemIndex);
+  Assert.AreEqual('B', LHandle.SelectedText);
+end;
+
+
+
+procedure TRickUIBuilderComboBoxIntegrationTests.ParentDestruidoComFullWindowAberto_DeveDesanexarHandle;
+var
+  LHandle: IRickUIBuilderComboBoxHandle;
+begin
+  LHandle := TRickUIBuilder.ComboBox.Items(['A', 'B'])
+    .StyleType(TRickUIBuilderComboBoxStyleType.Mobile)
+    .BuildHandle(FScroll);
+  LHandle.Open;
+
+  FScroll.Free;
+  FScroll := nil;
+  Assert.IsFalse(LHandle.IsAttached);
+  Assert.AreEqual(2, LHandle.Count);
+end;
+
+procedure TRickUIBuilderComboBoxIntegrationTests.CustomFullWindow_DeveUsarMesmaPresentationFullWindow;
+var
+  LConfig: TRickUIBuilderComboBoxConfig;
+  LHandle: IRickUIBuilderComboBoxHandle;
+  LPopup: TRectangle;
+begin
+  LConfig := TRickUIBuilderComboBoxConfig.Default;
+  LHandle := TRickUIBuilder.ComboBox.CustomConfig(LConfig)
+    .PresentationMode(TRickUIBuilderComboBoxPresentationMode.FullWindow)
+    .Items(['A', 'B']).BuildHandle(FScroll);
+  LHandle.Open;
+  LPopup := FindFullWindowPopup;
+  Assert.IsNotNull(LPopup);
+  Assert.AreEqual<TFmxObject>(FHostForm, LPopup.Parent);
+end;
+
+procedure TRickUIBuilderComboBoxIntegrationTests.FullWindowPathsDefault_DeveUsarAssetsFornecidos;
+var
+  LConfig: TRickUIBuilderComboBoxConfig;
+begin
+  LConfig := TRickUIBuilderComboBoxConfig.Default;
+  Assert.AreEqual(RICK_COMBOBOX_BACK_PATH, LConfig.BackPath);
+  Assert.AreEqual(RICK_COMBOBOX_CLEAR_PATH, LConfig.ClearPath);
+  Assert.AreEqual(RICK_COMBOBOX_NO_RESULTS_PATH, LConfig.NoResultsPath);
 end;
 
 procedure TRickUIBuilderComboBoxIntegrationTests.PathsDefault_DeveUsarSetasIndependentes;

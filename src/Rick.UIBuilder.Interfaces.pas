@@ -1250,6 +1250,16 @@ type
     function Enabled(AValue: Boolean = True): IRickUIBuilderComboBox;
     function ClosedArrowPath(const AValue: string): IRickUIBuilderComboBox;
     function OpenedArrowPath(const AValue: string): IRickUIBuilderComboBox;
+    /// <summary>Define o placeholder exibido no TEdit do modo FullWindow.</summary>
+    function SearchPlaceholder(const AValue: string): IRickUIBuilderComboBox;
+    /// <summary>Define a mensagem apresentada quando o filtro nao retorna itens.</summary>
+    function NoResultsText(const AValue: string): IRickUIBuilderComboBox;
+    /// <summary>Substitui o path do comando de voltar do modo FullWindow.</summary>
+    function BackPath(const AValue: string): IRickUIBuilderComboBox;
+    /// <summary>Substitui o path do comando de limpar a pesquisa.</summary>
+    function ClearPath(const AValue: string): IRickUIBuilderComboBox;
+    /// <summary>Substitui o path exibido quando nao existem resultados.</summary>
+    function NoResultsPath(const AValue: string): IRickUIBuilderComboBox;
     function OnChange(AValue: TNotifyEvent): IRickUIBuilderComboBox;
     function OnOpen(AValue: TNotifyEvent): IRickUIBuilderComboBox;
     function OnClose(AValue: TNotifyEvent): IRickUIBuilderComboBox;

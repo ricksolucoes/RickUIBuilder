@@ -1,4 +1,4 @@
-unit Rick.UIBuilder.ComboBox.Handle;
+﻿unit Rick.UIBuilder.ComboBox.Handle;
 (*
   ============================================================================
   Unit: Rick.UIBuilder.ComboBox.Handle
@@ -65,6 +65,11 @@ type
     procedure MainEnter(Sender: TObject);
     procedure MainExit(Sender: TObject);
     procedure DismissClick(Sender: TObject);
+    procedure SearchChanged(Sender: TObject);
+    procedure ClearSearchClick(Sender: TObject);
+    procedure SearchEditKeyDown(Sender: TObject; var Key: Word;
+      var KeyChar: WideChar; Shift: TShiftState);
+    function PageSize: Integer;
     procedure RowClick(Sender: TObject);
     procedure MainKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar;
       Shift: TShiftState);
@@ -77,8 +82,13 @@ type
     function ArrowTop(AHeight: Single): Single;
     procedure UpdateTextBounds(AArrowLeft, AArrowWidth: Single);
     procedure UpdateArrowBounds(AWidth, AHeight: Single);
+    function IsFullWindow: Boolean;
+    function ViewCount: Integer;
     procedure RefreshPopup;
     procedure EnsurePresentation;
+    procedure ResetFullWindowFilter;
+    procedure UpdateTargetFromView;
+    procedure SetTargetView(AViewIndex: Integer);
     procedure MoveTarget(ADelta: Integer);
     procedure SetTarget(AIndex: Integer);
     procedure ConfirmTarget;
@@ -224,6 +234,9 @@ begin
   FPresentation := TRickUIBuilderComboBoxPresentation.Create(AOwner,
     FParent, FContainer, FConfig);
   FPresentation.SetOnDismiss(DismissClick);
+  FPresentation.SetOnSearchChange(SearchChanged);
+  FPresentation.SetOnClear(ClearSearchClick);
+  FPresentation.SetOnSearchKeyDown(SearchEditKeyDown);
 end;
 
 procedure TRickUIBuilderComboBoxHandle.AttachVisual(AParent: TFmxObject;
@@ -342,7 +355,7 @@ procedure TRickUIBuilderComboBoxHandle.Add(const AText: string);
 begin
   FData.AddText(AText);
   if FState.IsOpen and Assigned(FPresentation) then
-    FPresentation.Open(Count);
+    FPresentation.Open(ViewCount);
   RefreshPopup;
 end;
 
@@ -351,7 +364,7 @@ procedure TRickUIBuilderComboBoxHandle.Add(const ADisplayText,
 begin
   FData.Add(TRickUIBuilderComboBoxItem.Create(ADisplayText, AValue));
   if FState.IsOpen and Assigned(FPresentation) then
-    FPresentation.Open(Count);
+    FPresentation.Open(ViewCount);
   RefreshPopup;
 end;
 
@@ -360,7 +373,7 @@ procedure TRickUIBuilderComboBoxHandle.AddRange(
 begin
   FData.AddRange(AItems);
   if FState.IsOpen and Assigned(FPresentation) then
-    FPresentation.Open(Count);
+    FPresentation.Open(ViewCount);
   RefreshPopup;
 end;
 
@@ -442,12 +455,56 @@ begin
   UpdateTextBounds(LLeft, AWidth);
 end;
 
+function TRickUIBuilderComboBoxHandle.IsFullWindow: Boolean;
+begin
+  Result := FConfig.PresentationMode =
+    TRickUIBuilderComboBoxPresentationMode.FullWindow;
+end;
+
+function TRickUIBuilderComboBoxHandle.ViewCount: Integer;
+begin
+  Result := FData.ViewCount;
+end;
+
+procedure TRickUIBuilderComboBoxHandle.ResetFullWindowFilter;
+begin
+  if not IsFullWindow then
+    Exit;
+  FData.ClearFilter;
+  if Assigned(FPresentation) then
+    FPresentation.ResetSearch;
+end;
+
+procedure TRickUIBuilderComboBoxHandle.UpdateTargetFromView;
+var
+  LSelectedView: Integer;
+begin
+  LSelectedView := FData.ViewIndexFromSource(ItemIndex);
+  if LSelectedView >= 0 then
+    FState.SetTargetIndex(ItemIndex)
+  else if ViewCount > 0 then
+    FState.SetTargetIndex(FData.SourceIndexFromView(0))
+  else
+    FState.SetTargetIndex(-1);
+  if Assigned(FVirtualizer) and (FState.TargetIndex >= 0) then
+    FVirtualizer.EnsureIndexVisible(FState.TargetIndex);
+end;
+
+procedure TRickUIBuilderComboBoxHandle.SetTargetView(AViewIndex: Integer);
+var
+  LSourceIndex: Integer;
+begin
+  LSourceIndex := FData.SourceIndexFromView(AViewIndex);
+  if LSourceIndex >= 0 then
+    SetTarget(LSourceIndex);
+end;
+
 procedure TRickUIBuilderComboBoxHandle.EnsurePresentation;
 begin
   if not IsAttached or not Assigned(FPresentation) then
     Exit;
 
-  FPresentation.Open(Count);
+  FPresentation.Open(ViewCount);
   if Assigned(FVirtualizer) then
     Exit;
 
@@ -460,9 +517,12 @@ end;
 
 procedure TRickUIBuilderComboBoxHandle.RefreshPopup;
 begin
-  if not FState.IsOpen or not Assigned(FVirtualizer) then
+  if not FState.IsOpen then
     Exit;
-  FVirtualizer.Refresh(ItemIndex, FState.TargetIndex);
+  if Assigned(FPresentation) then
+    FPresentation.UpdateResultState(ViewCount);
+  if Assigned(FVirtualizer) then
+    FVirtualizer.Refresh(ItemIndex, FState.TargetIndex);
 end;
 
 procedure TRickUIBuilderComboBoxHandle.Open;
@@ -471,7 +531,9 @@ begin
     Exit;
 
   FState.BeginOpen(ItemIndex);
+  ResetFullWindowFilter;
   EnsurePresentation;
+  UpdateTargetFromView;
   FState.FinishOpen;
   UpdateArrow;
   RefreshPopup;
@@ -518,6 +580,58 @@ begin
   Close;
 end;
 
+procedure TRickUIBuilderComboBoxHandle.SearchChanged(Sender: TObject);
+begin
+  if not IsFullWindow or not Assigned(FPresentation) then
+    Exit;
+  FPresentation.SyncSearchVisualState;
+  FData.SetFilterText(FPresentation.SearchText);
+  UpdateTargetFromView;
+  RefreshPopup;
+end;
+
+procedure TRickUIBuilderComboBoxHandle.ClearSearchClick(Sender: TObject);
+begin
+  if not IsFullWindow or not Assigned(FPresentation) then
+    Exit;
+  FPresentation.ResetSearch;
+  FData.ClearFilter;
+  UpdateTargetFromView;
+  RefreshPopup;
+end;
+
+procedure TRickUIBuilderComboBoxHandle.SearchEditKeyDown(Sender: TObject;
+  var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
+begin
+  if not FState.IsOpen then
+    Exit;
+  case Key of
+    vkDown: MoveTarget(1);
+    vkUp: MoveTarget(-1);
+    vkPrior: MoveTarget(-PageSize);
+    vkNext: MoveTarget(PageSize);
+    vkReturn: ConfirmTarget;
+    vkEscape, vkTab: Close;
+  else
+    Exit;
+  end;
+  Key := 0;
+end;
+
+function TRickUIBuilderComboBoxHandle.PageSize: Integer;
+var
+  LHeight: Single;
+  LScrollBox: TControl;
+begin
+  LHeight := FConfig.PopupMaxHeight;
+  LScrollBox := nil;
+  if Assigned(FPresentation) then
+    LScrollBox := FPresentation.ScrollBox();
+  if Assigned(LScrollBox) then
+    LHeight := LScrollBox.Height;
+  Result := Max(1, Round(LHeight / Max(FConfig.ItemHeight, 1)));
+end;
+
 procedure TRickUIBuilderComboBoxHandle.RowClick(Sender: TObject);
 begin
   if not (Sender is TControl) then
@@ -538,17 +652,16 @@ end;
 
 procedure TRickUIBuilderComboBoxHandle.MoveTarget(ADelta: Integer);
 var
-  LTarget: Integer;
+  LViewIndex: Integer;
 begin
-  if Count = 0 then
+  if ViewCount = 0 then
     Exit;
-
-  LTarget := FState.TargetIndex;
-  if LTarget < 0 then
-    LTarget := 0
+  LViewIndex := FData.ViewIndexFromSource(FState.TargetIndex);
+  if LViewIndex < 0 then
+    LViewIndex := 0
   else
-    LTarget := EnsureRange(LTarget + ADelta, 0, Count - 1);
-  SetTarget(LTarget);
+    LViewIndex := EnsureRange(LViewIndex + ADelta, 0, ViewCount - 1);
+  SetTargetView(LViewIndex);
 end;
 
 procedure TRickUIBuilderComboBoxHandle.ConfirmTarget;
@@ -602,18 +715,14 @@ begin
 end;
 
 procedure TRickUIBuilderComboBoxHandle.OpenedKeyDown(Key: Word);
-var
-  LPageSize: Integer;
 begin
-  LPageSize := Max(1, Round(FConfig.PopupMaxHeight /
-    Max(FConfig.ItemHeight, 1)));
   case Key of
     vkDown: MoveTarget(1);
     vkUp: MoveTarget(-1);
-    vkHome: SetTarget(0);
-    vkEnd: SetTarget(Count - 1);
-    vkPrior: MoveTarget(-LPageSize);
-    vkNext: MoveTarget(LPageSize);
+    vkHome: SetTargetView(0);
+    vkEnd: SetTargetView(ViewCount - 1);
+    vkPrior: MoveTarget(-PageSize);
+    vkNext: MoveTarget(PageSize);
     vkReturn, vkSpace: ConfirmTarget;
     vkEscape, vkTab: Close;
   end;

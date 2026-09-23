@@ -1,4 +1,4 @@
-unit RickUIBuilderSample.Main;
+﻿unit RickUIBuilderSample.Main;
 (*
   ==============================================================================
   Unit: RickUIBuilderShowcase.Main
@@ -69,10 +69,12 @@ type
     function MobileComboBoxConfig: TRickUIBuilderComboBoxConfig;
     function AdaptiveComboBoxConfig: TRickUIBuilderComboBoxConfig;
     function CustomComboBoxConfig: TRickUIBuilderComboBoxConfig;
+    function CustomFullWindowComboBoxConfig: TRickUIBuilderComboBoxConfig;
     procedure BuildDesktopComboBoxDemo(var ATop: Single);
     procedure BuildMobileComboBoxDemo(var ATop: Single);
     procedure BuildAdaptiveComboBoxDemo(var ATop: Single);
     procedure BuildCustomComboBoxDemo(var ATop: Single);
+    procedure BuildCustomFullWindowComboBoxDemo(var ATop: Single);
     procedure ConfigureComboStatusBadge(ABadge: TRectangle;
       AColor: TAlphaColor);
     procedure ConfigureComboStatusLabel(ALabel: TLabel; const AText: string);
@@ -123,6 +125,8 @@ const
   _COMBO_PURPLE     = $FF7E22CE;
   _COMBO_ORANGE_BG  = $FFFFF7ED;
   _COMBO_ORANGE     = $FFC2410C;
+  _COMBO_TEAL_BG     = $FFF0FDFA;
+  _COMBO_TEAL        = $FF0F766E;
 
   _CONTENT_LEFT     = 24;
   _CONTENT_WIDTH    = 552;
@@ -389,6 +393,10 @@ begin
   Result.HoverColor := $FFDCFCE7;
   Result.SelectedColor := $FFBBF7D0;
   Result.ArrowColor := _COMBO_GREEN;
+  Result.FullWindowBackgroundColor := TAlphaColors.White;
+  Result.SearchFieldBorderColor := $FF98A2B3;
+  Result.SearchIconColor := _COMBO_GREEN;
+  Result.NoResultsIconColor := _COMBO_GREEN;
 end;
 
 function TPageSampleMain.AdaptiveComboBoxConfig: TRickUIBuilderComboBoxConfig;
@@ -421,6 +429,21 @@ begin
   Result.ArrowColor := _COMBO_ORANGE;
 end;
 
+function TPageSampleMain.CustomFullWindowComboBoxConfig:
+  TRickUIBuilderComboBoxConfig;
+begin
+  Result := TRickUIBuilderComboBoxConfig.Default;
+  Result.Width := _CONTENT_WIDTH;
+  Result.BackgroundColor := _COMBO_TEAL_BG;
+  Result.BorderColor := _COMBO_TEAL;
+  Result.PopupColor := TAlphaColors.White;
+  Result.HoverColor := $FFCCFBF1;
+  Result.SelectedColor := $FF99F6E4;
+  Result.ArrowColor := _COMBO_TEAL;
+  Result.SearchIconColor := _COMBO_TEAL;
+  Result.NoResultsIconColor := _COMBO_TEAL;
+end;
+
 procedure TPageSampleMain.BuildDesktopComboBoxDemo(var ATop: Single);
 begin
   ATop := AddSubHeader('Desktop + Anchored - lista textual simples', ATop);
@@ -441,16 +464,20 @@ end;
 
 procedure TPageSampleMain.BuildMobileComboBoxDemo(var ATop: Single);
 begin
-  ATop := AddSubHeader('Mobile + Overlay - DisplayText e Value independentes', ATop);
+  ATop := AddSubHeader('Mobile + Auto - FullWindow com pesquisa em tempo real', ATop);
   TRickUIBuilder.ComboBox
     .CustomConfig(MobileComboBoxConfig)
     .StyleType(TRickUIBuilderComboBoxStyleType.Mobile)
-    .PresentationMode(TRickUIBuilderComboBoxPresentationMode.Overlay)
+    .PresentationMode(TRickUIBuilderComboBoxPresentationMode.Auto)
     .Position(_CONTENT_LEFT, ATop)
-    .AddItem('Pagamento por Pix', 'PIX')
-    .AddItem('Cartao de credito', 'CREDIT')
-    .AddItem('Boleto bancario', 'BOLETO')
+    .AddItem('Rio de Janeiro', 'RJ')
+    .AddItem('Riviera de São Lourenço, SP', 'RIVIERA')
+    .AddItem('Ribeirão Preto, SP', 'RAO')
+    .AddItem('Copacabana, Rio de Janeiro, RJ', 'COPA')
+    .AddItem('Rio das Ostras, RJ', 'RIO_OSTRAS')
     .ItemIndex(0)
+    .SearchPlaceholder('Pesquisar cidade...')
+    .NoResultsText('Nenhuma cidade encontrada')
     .ArrowPosition(TRickUIBuilderComboBoxArrowPosition.Right)
     .ArrowMargins(10, 6, 18, 6)
     .ArrowSize(16)
@@ -566,6 +593,30 @@ begin
   ATop := ATop + 60;
 end;
 
+procedure TPageSampleMain.BuildCustomFullWindowComboBoxDemo(
+  var ATop: Single);
+begin
+  ATop := AddSubHeader(
+    'Custom + FullWindow - mesmas colunas em apresentacao de tela cheia', ATop);
+  TRickUIBuilder.ComboBox.CustomConfig(CustomFullWindowComboBoxConfig)
+    .StyleType(TRickUIBuilderComboBoxStyleType.Custom)
+    .PresentationMode(TRickUIBuilderComboBoxPresentationMode.FullWindow)
+    .Position(_CONTENT_LEFT, ATop)
+    .Column(TRickUIBuilderComboBoxColumn.Create(
+      TRickUIBuilderComboBoxColumnSizeMode.Fixed, 86))
+    .Column(TRickUIBuilderComboBoxColumn.Create(
+      TRickUIBuilderComboBoxColumnSizeMode.Proportional, 1))
+    .AddStructuredItem('Cliente ativo', 'ATV', ['ATV', 'Cliente ativo'])
+    .AddStructuredItem('Cliente bloqueado', 'BLQ', ['BLQ', 'Cliente bloqueado'])
+    .AddStructuredItem('Cliente pendente', 'PEN', ['PEN', 'Cliente pendente'])
+    .ItemIndex(0).SearchPlaceholder('Pesquisar status...')
+    .NoResultsText('Nenhum status encontrado')
+    .OnCustomizeItem(CustomizeComboBoxItem)
+    .ArrowPosition(TRickUIBuilderComboBoxArrowPosition.Right)
+    .ArrowMargins(8, 5, 14, 5).ArrowSize(14).Build(FScroll);
+  ATop := ATop + 62;
+end;
+
 procedure TPageSampleMain.ConfigureComboBoxRuntime;
 begin
   FComboBoxHandle.SetArrowColor(_COMBO_PURPLE);
@@ -577,13 +628,14 @@ procedure TPageSampleMain.BuildComboBoxDemo(var ATop: Single);
 begin
   ATop := AddSectionHeader('3. ComboBox - matriz visual', ATop);
   ATop := AddSubHeader(
-    'Desktop, Mobile, Adaptive e Custom; listas simples, Value, colunas e owner-draw',
+    'Anchored e FullWindow; pesquisa, Value, colunas e owner-draw',
     ATop);
   BuildDesktopComboBoxDemo(ATop);
   BuildMobileComboBoxDemo(ATop);
   BuildAdaptiveComboBoxDemo(ATop);
   ConfigureComboBoxRuntime;
   BuildCustomComboBoxDemo(ATop);
+  BuildCustomFullWindowComboBoxDemo(ATop);
   ATop := ATop + 8;
 end;
 

@@ -1,4 +1,4 @@
-unit Rick.UIBuilder.ComboBox.Style;
+﻿unit Rick.UIBuilder.ComboBox.Style;
 (*
   ============================================================================
   Unit: Rick.UIBuilder.ComboBox.Style
@@ -68,7 +68,7 @@ begin
     Exit;
 
   if AConfig.EffectiveStyleType = TRickUIBuilderComboBoxStyleType.Mobile then
-    AConfig.PresentationMode := TRickUIBuilderComboBoxPresentationMode.Overlay
+    AConfig.PresentationMode := TRickUIBuilderComboBoxPresentationMode.FullWindow
   else
     AConfig.PresentationMode := TRickUIBuilderComboBoxPresentationMode.Anchored;
 end;
