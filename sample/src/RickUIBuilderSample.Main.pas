@@ -57,6 +57,16 @@ type
     FHoverStateBadgeHandle : IRickUIBuilderBadgeHandle;
     FComboBoxHandle        : IRickUIBuilderComboBoxHandle;
 
+    function CreateFactoryTextConfig(ATop: Single): TRickUIBuilderTextConfig;
+    function CreateFactoryDividerConfig(ATop: Single): TRickUIBuilderDividerConfig;
+    function CreateFactoryBadgeConfig(ATop: Single): TRickUIBuilderBadgeConfig;
+    function CreateFactoryButtonConfig(ATop: Single): TRickUIBuilderButtonConfig;
+
+    function CreateCompositionTextConfig(ATop: Single): TRickUIBuilderTextConfig;
+    function CreateCompositionDividerConfig(ATop: Single): TRickUIBuilderDividerConfig;
+    function CreateCompositionBadgeConfig(ATop: Single): TRickUIBuilderBadgeConfig;
+    function CreateCompositionButtonConfig(ATop: Single): TRickUIBuilderButtonConfig;
+
     function AddSectionHeader(const ATitle: string; ATop: Single): Single;
     function AddSubHeader(const AText: string; ATop: Single): Single;
 
@@ -211,6 +221,51 @@ end;
   1) FACTORY (OPCAO A)
   ============================================================ }
 
+function TPageSampleMain.CreateFactoryTextConfig(
+  ATop: Single): TRickUIBuilderTextConfig;
+begin
+  Result           := TRickUIBuilderTextConfig.Default;
+  Result.Left      := _CONTENT_LEFT;
+  Result.Top       := ATop;
+  Result.Width     := _CONTENT_WIDTH;
+  Result.Height    := 22;
+  Result.FontColor := _TEXT_PRIMARY;
+end;
+
+function TPageSampleMain.CreateFactoryDividerConfig(
+  ATop: Single): TRickUIBuilderDividerConfig;
+begin
+  Result       := TRickUIBuilderDividerConfig.Default;
+  Result.Left  := _CONTENT_LEFT;
+  Result.Top   := ATop;
+  Result.Width := _CONTENT_WIDTH;
+  Result.Color := _DIVIDER;
+end;
+
+function TPageSampleMain.CreateFactoryBadgeConfig(
+  ATop: Single): TRickUIBuilderBadgeConfig;
+begin
+  Result                 := TRickUIBuilderBadgeConfig.Default;
+  Result.Left            := _CONTENT_LEFT;
+  Result.Top             := ATop;
+  Result.Width           := 110;
+  Result.Height          := 27;
+  Result.BackgroundColor := _SUCCESS_BG;
+  Result.TextColor       := _SUCCESS_TEXT;
+end;
+
+function TPageSampleMain.CreateFactoryButtonConfig(
+  ATop: Single): TRickUIBuilderButtonConfig;
+begin
+  Result           := TRickUIBuilderButtonConfig.Default;
+  Result.Left      := _CONTENT_LEFT;
+  Result.Top       := ATop;
+  Result.Width     := 180;
+  Result.Height    := 40;
+  Result.FillColor := _PRIMARY;
+  Result.TextColor := TAlphaColors.White;
+end;
+
 procedure TPageSampleMain.BuildFactorySection(var ATop: Single);
 var
   LTextConfig   : TRickUIBuilderTextConfig;
@@ -224,46 +279,25 @@ begin
     ATop);
 
   // CreateText
-  LTextConfig           := TRickUIBuilderTextConfig.Default;
-  LTextConfig.Left      := _CONTENT_LEFT;
-  LTextConfig.Top       := ATop;
-  LTextConfig.Width     := _CONTENT_WIDTH;
-  LTextConfig.Height    := 22;
-  LTextConfig.FontColor := _TEXT_PRIMARY;
+  LTextConfig := CreateFactoryTextConfig(ATop);
   TRickUIBuilder.Factory.CreateText(FScroll, FScroll,
     'CreateText: este texto foi criado por TRickUIBuilderFactory.CreateText.',
     LTextConfig);
   ATop := ATop + 30;
 
   // CreateDivider
-  LDividerConf       := TRickUIBuilderDividerConfig.Default;
-  LDividerConf.Left  := _CONTENT_LEFT;
-  LDividerConf.Top   := ATop;
-  LDividerConf.Width := _CONTENT_WIDTH;
-  LDividerConf.Color := _DIVIDER;
+  LDividerConf := CreateFactoryDividerConfig(ATop);
   TRickUIBuilder.Factory.CreateDivider(FScroll, FScroll, LDividerConf);
   ATop := ATop + 16;
 
   // CreateBadge
-  LBadgeConfig                 := TRickUIBuilderBadgeConfig.Default;
-  LBadgeConfig.Left            := _CONTENT_LEFT;
-  LBadgeConfig.Top             := ATop;
-  LBadgeConfig.Width           := 110;
-  LBadgeConfig.Height          := 27;
-  LBadgeConfig.BackgroundColor := _SUCCESS_BG;
-  LBadgeConfig.TextColor       := _SUCCESS_TEXT;
+  LBadgeConfig := CreateFactoryBadgeConfig(ATop);
   TRickUIBuilder.Factory.CreateBadge(FScroll, FScroll, 'CreateBadge',
     LBadgeConfig, LBadgeText);
   ATop := ATop + 40;
 
   // CreateButton
-  LButtonConfig             := TRickUIBuilderButtonConfig.Default;
-  LButtonConfig.Left        := _CONTENT_LEFT;
-  LButtonConfig.Top         := ATop;
-  LButtonConfig.Width       := 180;
-  LButtonConfig.Height      := 40;
-  LButtonConfig.FillColor   := _PRIMARY;
-  LButtonConfig.TextColor   := TAlphaColors.White;
+  LButtonConfig := CreateFactoryButtonConfig(ATop);
   TRickUIBuilder.Factory.CreateButton(FScroll, FScroll, 'CreateButton',
     LButtonConfig);
   ATop := ATop + 56;
@@ -642,6 +676,50 @@ end;
 { ============================================================
   4) COMPOSICAO (MEIO-TERMO)
   ============================================================ }
+function TPageSampleMain.CreateCompositionTextConfig(
+  ATop: Single): TRickUIBuilderTextConfig;
+begin
+  Result           := TRickUIBuilderTextConfig.Default;
+  Result.Left      := _CONTENT_LEFT;
+  Result.Top       := ATop;
+  Result.Width     := _CONTENT_WIDTH;
+  Result.Height    := 22;
+  Result.FontColor := _TEXT_PRIMARY;
+end;
+
+function TPageSampleMain.CreateCompositionDividerConfig(
+  ATop: Single): TRickUIBuilderDividerConfig;
+begin
+  Result       := TRickUIBuilderDividerConfig.Default;
+  Result.Left  := _CONTENT_LEFT;
+  Result.Top   := ATop + 30;
+  Result.Width := _CONTENT_WIDTH;
+  Result.Color := _DIVIDER;
+end;
+
+function TPageSampleMain.CreateCompositionBadgeConfig(
+  ATop: Single): TRickUIBuilderBadgeConfig;
+begin
+  Result                 := TRickUIBuilderBadgeConfig.Default;
+  Result.Left            := _CONTENT_LEFT;
+  Result.Top             := ATop + 46;
+  Result.Width           := 130;
+  Result.Height          := 27;
+  Result.BackgroundColor := _SUCCESS_BG;
+  Result.TextColor       := _SUCCESS_TEXT;
+end;
+
+function TPageSampleMain.CreateCompositionButtonConfig(
+  ATop: Single): TRickUIBuilderButtonConfig;
+begin
+  Result           := TRickUIBuilderButtonConfig.Default;
+  Result.Left      := _CONTENT_LEFT;
+  Result.Top       := ATop + 84;
+  Result.Width     := 180;
+  Result.Height    := 40;
+  Result.FillColor := _PRIMARY;
+  Result.TextColor := TAlphaColors.White;
+end;
 
 procedure TPageSampleMain.BuildCompositionSection(var ATop: Single);
 var
@@ -655,34 +733,10 @@ begin
   ATop := AddSubHeader('TRickUIBuilder.On(AParent).AddText/AddDivider/AddBadge/AddButton',
     ATop);
 
-  LTextConfig           := TRickUIBuilderTextConfig.Default;
-  LTextConfig.Left      := _CONTENT_LEFT;
-  LTextConfig.Top       := ATop;
-  LTextConfig.Width     := _CONTENT_WIDTH;
-  LTextConfig.Height    := 22;
-  LTextConfig.FontColor := _TEXT_PRIMARY;
-
-  LDividerConf       := TRickUIBuilderDividerConfig.Default;
-  LDividerConf.Left  := _CONTENT_LEFT;
-  LDividerConf.Top   := ATop + 30;
-  LDividerConf.Width := _CONTENT_WIDTH;
-  LDividerConf.Color := _DIVIDER;
-
-  LBadgeConfig                 := TRickUIBuilderBadgeConfig.Default;
-  LBadgeConfig.Left            := _CONTENT_LEFT;
-  LBadgeConfig.Top             := ATop + 46;
-  LBadgeConfig.Width           := 130;
-  LBadgeConfig.Height          := 27;
-  LBadgeConfig.BackgroundColor := _SUCCESS_BG;
-  LBadgeConfig.TextColor       := _SUCCESS_TEXT;
-
-  LButtonConfig             := TRickUIBuilderButtonConfig.Default;
-  LButtonConfig.Left        := _CONTENT_LEFT;
-  LButtonConfig.Top         := ATop + 84;
-  LButtonConfig.Width       := 180;
-  LButtonConfig.Height      := 40;
-  LButtonConfig.FillColor   := _PRIMARY;
-  LButtonConfig.TextColor   := TAlphaColors.White;
+  LTextConfig   := CreateCompositionTextConfig(ATop);
+  LDividerConf  := CreateCompositionDividerConfig(ATop);
+  LBadgeConfig  := CreateCompositionBadgeConfig(ATop);
+  LButtonConfig := CreateCompositionButtonConfig(ATop);
 
   TRickUIBuilder.On(FScroll)
     .AddText('Sequencia inteira criada em uma unica cadeia fluente.', LTextConfig)

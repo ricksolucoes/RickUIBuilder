@@ -37,6 +37,8 @@ uses
   Rick.UIBuilder.ComboBox.Virtualization;
 
 type
+  TComboKeyActions = array[Byte] of TProc;
+
   TRickUIBuilderComboBoxHandle = class(TInterfacedObject,
     IRickUIBuilderComboBoxHandle)
   private
@@ -57,6 +59,12 @@ type
     FArrow: TPath;
     FSearchTimer: TTimer;
     FSearchBuffer: string;
+    FKeyActions: TComboKeyActions;
+    FSearchKeyActions: TComboKeyActions;
+
+    procedure InitKeyActions;
+    procedure InitSearchKeyActions;
+
     procedure BindVisualReferences(AParent: TFmxObject; AContainer: TRectangle;
       ATextLabel: TLabel; AArrow: TPath);
     procedure ConfigureVisualEvents;
@@ -164,6 +172,8 @@ begin
   FConfig := AConfig;
   FData := AData;
   FState := TRickUIBuilderComboBoxState.Create;
+  InitKeyActions;
+  InitSearchKeyActions;
 end;
 
 destructor TRickUIBuilderComboBoxHandle.Destroy;
@@ -600,21 +610,27 @@ begin
   RefreshPopup;
 end;
 
+procedure TRickUIBuilderComboBoxHandle.InitSearchKeyActions;
+begin
+  FSearchKeyActions[vkDown]   := procedure begin MoveTarget(1); end;
+  FSearchKeyActions[vkUp]     := procedure begin MoveTarget(-1); end;
+  FSearchKeyActions[vkPrior]  := procedure begin MoveTarget(-PageSize); end;
+  FSearchKeyActions[vkNext]   := procedure begin MoveTarget(PageSize); end;
+  FSearchKeyActions[vkReturn] := procedure begin ConfirmTarget; end;
+  FSearchKeyActions[vkEscape] := procedure begin Close; end;
+  FSearchKeyActions[vkTab]    := procedure begin Close; end;
+end;
+
 procedure TRickUIBuilderComboBoxHandle.SearchEditKeyDown(Sender: TObject;
   var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
 begin
   if not FState.IsOpen then
     Exit;
-  case Key of
-    vkDown: MoveTarget(1);
-    vkUp: MoveTarget(-1);
-    vkPrior: MoveTarget(-PageSize);
-    vkNext: MoveTarget(PageSize);
-    vkReturn: ConfirmTarget;
-    vkEscape, vkTab: Close;
-  else
+
+  if (Key > High(Byte)) or not Assigned(FSearchKeyActions[Key]) then
     Exit;
-  end;
+
+  FSearchKeyActions[Key]();
   Key := 0;
 end;
 
@@ -714,18 +730,24 @@ begin
     SelectIndex(Max(0, ItemIndex - 1));
 end;
 
+procedure TRickUIBuilderComboBoxHandle.InitKeyActions;
+begin
+  FKeyActions[vkDown]   := procedure begin MoveTarget(1); end;
+  FKeyActions[vkUp]     := procedure begin MoveTarget(-1); end;
+  FKeyActions[vkHome]   := procedure begin SetTargetView(0); end;
+  FKeyActions[vkEnd]    := procedure begin SetTargetView(ViewCount - 1); end;
+  FKeyActions[vkPrior]  := procedure begin MoveTarget(-PageSize); end;
+  FKeyActions[vkNext]   := procedure begin MoveTarget(PageSize); end;
+  FKeyActions[vkReturn] := procedure begin ConfirmTarget; end;
+  FKeyActions[vkSpace]  := procedure begin ConfirmTarget; end;
+  FKeyActions[vkEscape] := procedure begin Close; end;
+  FKeyActions[vkTab]    := procedure begin Close; end;
+end;
+
 procedure TRickUIBuilderComboBoxHandle.OpenedKeyDown(Key: Word);
 begin
-  case Key of
-    vkDown: MoveTarget(1);
-    vkUp: MoveTarget(-1);
-    vkHome: SetTargetView(0);
-    vkEnd: SetTargetView(ViewCount - 1);
-    vkPrior: MoveTarget(-PageSize);
-    vkNext: MoveTarget(PageSize);
-    vkReturn, vkSpace: ConfirmTarget;
-    vkEscape, vkTab: Close;
-  end;
+  if (Key <= High(Byte)) and Assigned(FKeyActions[Key]) then
+    FKeyActions[Key]();
 end;
 
 procedure TRickUIBuilderComboBoxHandle.MainKeyDown(Sender: TObject;
