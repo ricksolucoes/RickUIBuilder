@@ -27,10 +27,12 @@ The library is distributed as source code. To use it, add the `src` directory to
 - [Button Builder](#button-builder)
 - [Badge Builder](#badge-builder)
 - [Divider Builder](#divider-builder)
+- [ComboBox Builder](#combobox-builder)
 - [Composition](#composition)
 - [Working with Interfaces](#working-with-interfaces)
 - [Sample Application](#sample-application)
 - [Tests](#tests)
+- [AI-assisted Maintenance](#ai-assisted-maintenance)
 - [License](#license)
 
 <a name="overview"></a>
@@ -45,6 +47,7 @@ TRickUIBuilder
 ├── Button    -> fluent Button builder
 ├── Badge     -> fluent Badge builder
 ├── Divider   -> fluent Divider builder
+├── ComboBox  -> fluent, stateful ComboBox builder
 └── On(...)   -> UI composition
 ```
 
@@ -53,7 +56,7 @@ The three creation styles are intended for different levels of configuration:
 | Style | Entry point | Typical use |
 | --- | --- | --- |
 | Factory | `TRickUIBuilder.Factory` or `TRickUIBuilderFactory` | Create a control directly from a configuration record |
-| Fluent Builders | `Label_`, `Button`, `Badge`, `Divider` | Configure a component through a readable fluent chain before calling `Build` |
+| Fluent Builders | `Label_`, `Button`, `Badge`, `Divider`, `ComboBox` | Configure a component through a readable fluent chain before calling `Build` |
 | Composition | `TRickUIBuilder.On(AParent)` | Create a short sequence of controls on the same parent |
 
 Using an `IRickUIBuilder*` interface explicitly is **not a fourth creation style**. It is an alternative way to hold and use the same fluent builders through their public contracts.
@@ -62,13 +65,17 @@ Using an `IRickUIBuilder*` interface explicitly is **not a fourth creation style
 ## ✨ Features
 
 - Direct creation of FMX text, buttons, badges, and dividers through `TRickUIBuilderFactory`.
-- Fluent Label, Button, Badge, and Divider builders.
+- Fluent Label, Button, Badge, Divider, and ComboBox builders.
 - UI composition through `TRickUIBuilder.On(AParent)`.
 - Configuration records with reusable defaults for direct Factory creation.
 - Shared spacing support through `TRickUIBuilderSpacing`.
-- Button click and hover configuration.
-- Button and Badge handles that expose the generated container and internal text label; the Button handle also exposes its mutable hover state.
-- Explicit public interfaces for fluent builders, button hover state, generated-control handles, and composition.
+- Button click and mutable hover configuration, including runtime access through `IRickUIBuilderButtonHandle`.
+- ComboBox support for independent `DisplayText` and `Value`, simple or structured items, columns, selection, and runtime mutation through `IRickUIBuilderComboBoxHandle`.
+- ComboBox presentation modes `Auto`, `Anchored`, `Overlay`, and `FullWindow`, with Desktop, Mobile, Adaptive, and Custom style profiles.
+- FullWindow search with clear/back hit areas, filtered-view mapping, empty state, and custom SVG paths.
+- Virtualized ComboBox item rendering with optional `OnCustomizeItem` content.
+- Explicit public interfaces for fluent builders, generated-control handles, mutable hover state, ComboBox runtime control, and composition.
+- Detailed ComboBox architecture and maintenance documentation under [`docs/combobox`](docs/combobox/README.md).
 
 <a name="requirements"></a>
 ## 🧰 Requirements
@@ -480,6 +487,56 @@ end;
 
 ---
 
+<a name="combobox-builder"></a>
+## 🔽 ComboBox Builder
+
+**Implementation units:** `Rick.UIBuilder.ComboBox` and the specialized `Rick.UIBuilder.ComboBox.*` units.
+
+`TRickUIBuilder.ComboBox` creates a runtime-only FMX ComboBox with a fluent configuration API. The closed control is materialized by `Build` or `BuildHandle`; the selection surface is created lazily when opened. The same logical data model and virtualizer are reused across `Anchored`, `Overlay`, and `FullWindow` presentations.
+
+### Core capabilities
+
+- Simple textual items through `Items` and `AddItem`.
+- Independent `DisplayText` and `Value`.
+- Structured items with additional visual columns.
+- Initial selection by `ItemIndex` or `SelectedText`.
+- Desktop, Mobile, Adaptive, and Custom style profiles.
+- `Auto`, `Anchored`, `Overlay`, and `FullWindow` presentation modes.
+- FullWindow search, clear action, back action, and empty state.
+- Virtualized row rendering and optional `OnCustomizeItem` content.
+- Arrow position, margins, size, color, and open/closed paths.
+- Runtime selection, mutation, open/close, and arrow updates through `IRickUIBuilderComboBoxHandle`.
+
+```pascal
+uses
+  Rick.UIBuilder,
+  Rick.UIBuilder.Interfaces,
+  Rick.UIBuilder.Types;
+
+procedure TMainForm.BuildCityComboBox;
+begin
+  FComboBoxHandle := TRickUIBuilder.ComboBox
+    .StyleType(TRickUIBuilderComboBoxStyleType.Mobile)
+    .PresentationMode(TRickUIBuilderComboBoxPresentationMode.Auto)
+    .Position(24, 24)
+    .AddItem('Rio de Janeiro', 'RJ')
+    .AddItem('Riviera de São Lourenço, SP', 'RIVIERA')
+    .AddItem('Ribeirão Preto, SP', 'RAO')
+    .ItemIndex(0)
+    .SearchPlaceholder('Search city...')
+    .NoResultsText('No city found')
+    .BuildHandle(Self);
+end;
+```
+
+`Build` returns the generated closed-control `TRectangle` and keeps the runtime behavior alive while that visual tree exists. `BuildHandle` returns `IRickUIBuilderComboBoxHandle`, which does not own the visual tree and reports `IsAttached = False` after the associated visual structure is destroyed.
+
+For structured lists, use `TRickUIBuilderComboBoxColumn` and `AddStructuredItem`. The source collection remains stable while filtering: the filtered view maps `ViewIndex` back to the original `SourceIndex` before committing selection.
+
+For the complete public API, internal dependency map, FullWindow behavior, filtering rules, virtualization, ownership, tests, and maintenance invariants, read the [ComboBox technical documentation](docs/combobox/README.md).
+
+---
+
 <a name="composition"></a>
 ## 🧩 Composition
 
@@ -551,7 +608,7 @@ The records above contain additional fields beyond those changed in the example.
 
 **Unit:** `Rick.UIBuilder.Interfaces`
 
-RickUIBuilder exposes public contracts for the fluent builders, button hover state, the button and badge handles, and the composer:
+RickUIBuilder exposes public contracts for the fluent builders, mutable button hover state, generated-control handles, ComboBox runtime control, and the composer:
 
 | Interface | Role |
 | --- | --- |
@@ -562,6 +619,8 @@ RickUIBuilder exposes public contracts for the fluent builders, button hover sta
 | `IRickUIBuilderBadge` | Badge fluent builder contract |
 | `IRickUIBuilderBadgeHandle` | Access to the generated badge container and text label |
 | `IRickUIBuilderDivider` | Divider fluent builder contract |
+| `IRickUIBuilderComboBox` | ComboBox fluent builder contract |
+| `IRickUIBuilderComboBoxHandle` | Non-owning runtime contract for selection, data mutation, open/close, and arrow updates |
 | `IRickUIBuilderComposer` | Composition contract |
 
 Using an interface explicitly does not create a different implementation. It simply stores the same builder returned by `TRickUIBuilder` behind its public contract.
@@ -595,11 +654,17 @@ This style is useful when code should explicitly depend on the interface contrac
 <a name="sample-application"></a>
 ## 🎨 Sample Application
 
-The `sample` project is intentionally small and demonstrates the three main usage styles visually:
+The `sample` project demonstrates the framework usage styles and the current ComboBox matrix:
 
 - Factory.
 - Fluent Builders.
 - Composition.
+- Desktop ComboBox with `Anchored` presentation.
+- Mobile ComboBox with `Auto` resolving to FullWindow and real-time search.
+- Adaptive ComboBox with structured columns and a retained runtime handle.
+- Custom ComboBox with multiple columns, `OnCustomizeItem`, and left-positioned arrow.
+- Custom FullWindow ComboBox using the same data and rendering pipeline.
+- Runtime ComboBox updates through `IRickUIBuilderComboBoxHandle`.
 
 Open:
 
@@ -607,32 +672,21 @@ Open:
 sample\RickUIBuilder.Sample.dproj
 ```
 
-The sample is designed as a basic showcase. The examples in this README cover additional options that are available in the public API.
+The detailed ComboBox design is documented separately under [`docs/combobox`](docs/combobox/README.md).
 
 <a name="tests"></a>
 ## ✅ Tests
 
-The project includes a DUnitX test suite covering the main RickUIBuilder areas, including:
-
-- Types.
-- Factory.
-- Label.
-- Button.
-- Badge.
-- Divider.
-- Composition.
-- Facade.
-
-The test project is available under `tests`. The current source declares **161** `[Test]` methods.
+The project includes a DUnitX suite covering the main RickUIBuilder areas, including Types, Factory, Label, Button, Badge, Divider, Composition, Facade, and ComboBox data/integration/style behavior. The current source declares **197** `[Test]` methods.
 
 ### Latest verified DUnitX result
 
-The supplied NUnit XML identifies `RickUIBuilder.Test.exe` and records a real execution at **2026-09-20 07:06:01** with assembly result `Success` / `success="True"`:
+The supplied NUnit XML identifies `RickUIBuilder.Test.exe` and records a real execution at **2026-09-22 23:46:29** with assembly result `Success` / `success="True"`:
 
 | DUnitX result | Value |
 | --- | ---: |
-| Tests Found | **161** |
-| Tests Passed | **161** |
+| Tests Found | **197** |
+| Tests Passed | **197** |
 | Tests Ignored | **0** |
 | Tests Failed | **0** |
 | Tests Errored | **0** |
@@ -640,52 +694,63 @@ The supplied NUnit XML identifies `RickUIBuilder.Test.exe` and records a real ex
 | Not run | **0** |
 | Skipped | **0** |
 | Invalid | **0** |
+| Tests Leaked | **0** |
 
-The supplied console output for the same run additionally reports **Tests Leaked = 0**. The NUnit execution includes the mutable-hover contracts added in this revision, including `HoverFillColor_AposBuild_DeveSerUsadaNoProximoMouseEnter`, `FillColor_AposBuild_DeveSerUsadaNoProximoMouseLeave`, `OnEnter_AposBuild_DeveUsarHandlerAtual`, `OnLeave_AposBuild_DeveUsarHandlerAtual`, `Button_AlteradoAposBuild_NaoDeveRetargetBehaviorJaCriado`, and the `BuildHandle` tests that expose and mutate the same HoverState used by the built Button.
+The ComboBox coverage includes data selection/filter mapping, runtime handle behavior, Parent/Popup lifecycle, arrow behavior, FullWindow host resolution, FullWindow search structure, clear/back actions, filtered selection, empty state, custom FullWindow, path defaults, and style/presentation resolution.
 
 ### Method Toxicity Metrics
 
-RAD Studio Method Toxicity Metrics was re-run after the mutable HoverState implementation for both the library and test projects. The supplied CSV reports contain **157 measured library methods** and **188 measured test methods**. Their measured maxima are:
+RAD Studio Method Toxicity Metrics was run for the three current projects. The supplied reports contain **404 measured library methods**, **252 measured test methods**, and **35 measured sample methods**.
 
-| Project | Methods | Max `Length` | Max `Parameters` | Max `If Depth` | Max `Cyclomatic Complexity` | Max `Toxicity` | Hard-gate violations |
+| Project | Methods | Max `Length` | Max `Parameters` | Max `If Depth` | Max `Cyclomatic Complexity` | Max `Toxicity` | Gate violations |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `RickUIBuilder.dproj` | **157** | **20** | **5** | **1** | **3** | **0.487** | **0** |
-| `RickUIBuilder.Test.dproj` | **188** | **12** | **1** | **1** | **4** | **0.367** | **0** |
+| `RickUIBuilder.dproj` / library package | **404** | **20** | **5** | **3** | **4** | **0.554** | **0** |
+| `RickUIBuilder.Test.dproj` | **252** | **14** | **2** | **2** | **6** | **0.571** | **0** |
+| `RickUIBuilder.Sample.dproj` | **35** | **14** | **4** | **1** | **2** | **0.338** | **0** |
 
-The project hard gates remain `Length <= 20`, `Parameters <= 6`, `If Depth <= 5`, `Cyclomatic Complexity <= 6`, and `Toxicity < 1`. No row in either supplied post-change CSV exceeds those limits.
+The project quality gates are `Length <= 20`, `Parameters <= 6`, `If Depth <= 5`, `Cyclomatic Complexity <= 6`, and `Toxicity < 1`. No row in the three supplied reports exceeds those limits.
 
-The methods central to the mutable HoverState implementation were measured as follows:
+The highest measured toxicity in each project is:
 
-| Method | Length | Params | If Depth | Cyclomatic | Toxicity |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| `TRickUIBuilderButtonBuilder.AttachBehavior` | 6 | 2 | 1 | 3 | 0.333 |
-| `TRickUIBuilderButtonBuilder.BuildCore` | 5 | 3 | 0 | 1 | 0.229 |
-| `TRickUIBuilderButtonHoverBehavior.Configure` | 3 | 2 | 0 | 1 | 0.163 |
-| `TRickUIBuilderButtonHoverBehavior.HandleMouseEnter` | 5 | 1 | 1 | 3 | 0.279 |
-| `TRickUIBuilderButtonHoverBehavior.HandleMouseLeave` | 5 | 1 | 1 | 3 | 0.279 |
+| Project | Method | Toxicity |
+| --- | --- | ---: |
+| Library | `TRickUIBuilderComboBoxVirtualizer.CreateColumnLabel` | **0.554** |
+| Tests | `TRickUIBuilderComboBoxIntegrationTests.FindPath` and `FindLabel` | **0.571** |
+| Sample | `TPageSampleMain.CustomizeComboBoxItem` | **0.338** |
 
-These are measured RAD Studio values from the supplied post-change reports, not values estimated from source code. They are revision-specific and must be measured again after future code changes.
+These are real RAD Studio values from the supplied CSV reports, not source-code estimates. They are revision-specific and must be measured again after future Delphi code changes.
 
-## 🔐 Licença
+<a name="ai-assisted-maintenance"></a>
+## 🤖 AI-assisted Maintenance
 
-Copyright © 2026 **RickSoluções**. Todos os direitos reservados.
+Repository-level AI guidance starts at [`AGENTS.md`](AGENTS.md). It routes maintenance work to the organized material under [`.ai/`](.ai/README.md):
 
-O RickUIBuilder é um **software proprietário** disponibilizado sob uma **Licença de Uso Limitado Revogável**. A licença concede autorização limitada, não exclusiva, não transferível e revogável para utilizar, estudar, testar e modificar o Software enquanto essa autorização permanecer válida.
+- `agents/` defines the orchestrator, Delphi engineer, technical writer, and quality auditor roles.
+- `skills/` defines repeatable procedures for repository analysis, Delphi-safe changes, ComboBox maintenance, documentation consistency, and test validation.
+- `templates/` provides reusable structures for plans, technical documentation, audits, and delivery reports.
+- `checklists/` provides pre-change, documentation, and final quality gates.
 
-A licença **não** autoriza automaticamente redistribuição, sublicenciamento, publicação, hospedagem, comercialização, uso como SaaS ou incorporação em produtos ou serviços comerciais. Direitos comerciais, empresariais, OEM, SaaS, redistribuição, hospedagem e outras modalidades poderão ser concedidos separadamente e por escrito pela RickSoluções.
+For ComboBox work, `AGENTS.md` explicitly routes the reader to [`docs/combobox`](docs/combobox/README.md) before editing the implementation.
 
-- 📄 **Licença oficial (inglês):** [`LICENSE`](LICENSE)
-- 🇧🇷 **Tradução em português:** [`LICENSE-pt-BR`](LICENSE-pt-BR)
+<a name="license"></a>
+## 🔐 License
+
+Copyright © 2026 **RickSoluções**. All rights reserved.
+
+RickUIBuilder is **proprietary software** distributed under a **Revocable Limited Use License**. The license grants limited, non-exclusive, non-transferable, and revocable permission to use, study, test, and modify the Software while that authorization remains valid.
+
+The license does **not** automatically grant redistribution, sublicensing, publication, hosting, commercialization, SaaS use, or incorporation into commercial products or services. Commercial, enterprise, OEM, SaaS, redistribution, hosting, and other rights may be granted separately in writing by RickSoluções.
+
+- 📄 **Official license (English):** [`LICENSE`](LICENSE)
+- 🇧🇷 **Portuguese translation:** [`LICENSE-pt-BR`](LICENSE-pt-BR)
 
 > [!IMPORTANT]
-> O fato de o código-fonte estar publicamente acessível não torna o RickUIBuilder open source e não concede direitos além daqueles expressamente previstos na licença aplicável.
+> Public access to the source code does not make RickUIBuilder open source and does not grant rights beyond those expressly provided by the applicable license.
 
----
-
-## 👤 Mantenedor
+## 👤 Maintainer
 
 **RickSoluções**  
-Titular e mantenedora do **RickUIBuilder**.
+Owner and maintainer of **RickUIBuilder**.
 
 ---
 
@@ -693,8 +758,8 @@ Titular e mantenedora do **RickUIBuilder**.
 
 ### 📱 RickUIBuilder
 
-**Framework especializado no desenvolvimento de componentes visuais modernos, utilizando padrões de builders reutilizáveis, interfaces e auxiliares de composição.**
+**Framework for building modern FMX visual components with reusable builders, interfaces, runtime handles, and composition helpers.**
 
-[⬆ Voltar ao topo](#rickuibuilder)
+[⬆ Back to top](#rickuibuilder)
 
 </div>

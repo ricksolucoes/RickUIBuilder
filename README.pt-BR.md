@@ -27,10 +27,12 @@ A distribuição é feita em código-fonte. Para usar o RickUIBuilder, basta adi
 - [Button Builder](#button-builder)
 - [Badge Builder](#badge-builder)
 - [Divider Builder](#divider-builder)
+- [ComboBox Builder](#combobox-builder)
 - [Composition](#composition)
 - [Uso com Interfaces](#uso-com-interfaces)
 - [Sample](#sample)
 - [Testes](#testes)
+- [Manutenção assistida por IA](#manutencao-assistida-por-ia)
 - [Licença](#licenca)
 
 <a name="visao-geral"></a>
@@ -45,6 +47,7 @@ TRickUIBuilder
 ├── Button    -> Fluent Builder de Button
 ├── Badge     -> Fluent Builder de Badge
 ├── Divider   -> Fluent Builder de Divider
+├── ComboBox  -> ComboBox Builder fluente e stateful
 └── On(...)   -> Composition de UI
 ```
 
@@ -53,7 +56,7 @@ As três formas de criação atendem a níveis diferentes de configuração:
 | Forma de uso | Ponto de entrada | Quando usar |
 | --- | --- | --- |
 | Factory | `TRickUIBuilder.Factory` ou `TRickUIBuilderFactory` | Quando você quer criar o controle diretamente a partir de um record de configuração |
-| Fluent Builders | `Label_`, `Button`, `Badge`, `Divider` | Quando precisa configurar o componente de forma encadeada e legível antes de chamar `Build` |
+| Fluent Builders | `Label_`, `Button`, `Badge`, `Divider`, `ComboBox` | Quando precisa configurar o componente de forma encadeada e legível antes de chamar `Build` |
 | Composition | `TRickUIBuilder.On(AParent)` | Quando precisa criar uma sequência curta de controles no mesmo `Parent` |
 
 Usar explicitamente uma interface `IRickUIBuilder*` **não representa uma quarta forma de criação**. É apenas outra maneira de manter e utilizar os mesmos `Fluent Builders` por meio de seus contratos públicos.
@@ -61,14 +64,18 @@ Usar explicitamente uma interface `IRickUIBuilder*` **não representa uma quarta
 <a name="recursos"></a>
 ## ✨ Recursos
 
-- Criação direta de textos, buttons, badges e dividers FMX por meio de `TRickUIBuilderFactory`.
-- `Fluent Builders` para Label, Button, Badge e Divider.
-- `Composition` de UI com `TRickUIBuilder.On(AParent)`.
-- Records de configuração com valores `Default` reutilizáveis para criação direta pela `Factory`.
-- Configuração compartilhada de espaçamento com `TRickUIBuilderSpacing`.
-- Configuração de click e hover em Button.
-- Handles de Button e Badge que expõem o container gerado e o `TLabel` interno; o Handle de Button também expõe seu HoverState mutável.
-- Interfaces públicas para os `Fluent Builders`, estado de hover do Button, Handles de controles gerados e `Composition`.
+- Criação direta de textos, buttons, badges e dividers FMX por `TRickUIBuilderFactory`.
+- Label, Button, Badge, Divider e ComboBox Builders fluentes.
+- Composition por `TRickUIBuilder.On(AParent)`.
+- Records de configuração com defaults reutilizáveis para criação direta via Factory.
+- Spacing compartilhado por `TRickUIBuilderSpacing`.
+- Configuração de click e hover mutável do Button, incluindo acesso runtime por `IRickUIBuilderButtonHandle`.
+- ComboBox com `DisplayText` e `Value` independentes, itens simples ou estruturados, colunas, seleção e mutação runtime por `IRickUIBuilderComboBoxHandle`.
+- Presentation Modes `Auto`, `Anchored`, `Overlay` e `FullWindow`, com perfis Desktop, Mobile, Adaptive e Custom.
+- Pesquisa FullWindow com áreas de hit para clear/back, mapeamento da view filtrada, empty state e paths SVG customizáveis.
+- Renderização virtualizada dos itens do ComboBox com conteúdo opcional via `OnCustomizeItem`.
+- Interfaces públicas explícitas para builders, handles dos controles gerados, estado de hover mutável, controle runtime do ComboBox e Composition.
+- Documentação detalhada de arquitetura e manutenção do ComboBox em [`docs/combobox`](docs/combobox/README.pt-BR.md).
 
 <a name="requisitos"></a>
 ## 🧰 Requisitos
@@ -480,6 +487,56 @@ end;
 
 ---
 
+<a name="combobox-builder"></a>
+## 🔽 ComboBox Builder
+
+**Units de implementação:** `Rick.UIBuilder.ComboBox` e as units especializadas `Rick.UIBuilder.ComboBox.*`.
+
+`TRickUIBuilder.ComboBox` cria um ComboBox FMX runtime-only com API de configuração fluente. O controle fechado é materializado por `Build` ou `BuildHandle`; a superfície de seleção é criada de forma lazy quando aberta. O mesmo modelo lógico de dados e o mesmo virtualizer são reutilizados nas apresentações `Anchored`, `Overlay` e `FullWindow`.
+
+### Principais recursos
+
+- Itens textuais simples por `Items` e `AddItem`.
+- `DisplayText` e `Value` independentes.
+- Itens estruturados com colunas visuais adicionais.
+- Seleção inicial por `ItemIndex` ou `SelectedText`.
+- Perfis Desktop, Mobile, Adaptive e Custom.
+- Presentation Modes `Auto`, `Anchored`, `Overlay` e `FullWindow`.
+- Pesquisa FullWindow, ação de clear, ação de back e empty state.
+- Renderização virtualizada de rows e conteúdo opcional via `OnCustomizeItem`.
+- Posição, margens, tamanho, cor e paths aberto/fechado da seta.
+- Seleção, mutação, open/close e atualização da seta em runtime por `IRickUIBuilderComboBoxHandle`.
+
+```pascal
+uses
+  Rick.UIBuilder,
+  Rick.UIBuilder.Interfaces,
+  Rick.UIBuilder.Types;
+
+procedure TMainForm.BuildCityComboBox;
+begin
+  FComboBoxHandle := TRickUIBuilder.ComboBox
+    .StyleType(TRickUIBuilderComboBoxStyleType.Mobile)
+    .PresentationMode(TRickUIBuilderComboBoxPresentationMode.Auto)
+    .Position(24, 24)
+    .AddItem('Rio de Janeiro', 'RJ')
+    .AddItem('Riviera de São Lourenço, SP', 'RIVIERA')
+    .AddItem('Ribeirão Preto, SP', 'RAO')
+    .ItemIndex(0)
+    .SearchPlaceholder('Pesquisar cidade...')
+    .NoResultsText('Nenhuma cidade encontrada')
+    .BuildHandle(Self);
+end;
+```
+
+`Build` retorna o `TRectangle` do controle fechado e mantém o runtime ativo enquanto essa árvore visual existir. `BuildHandle` retorna `IRickUIBuilderComboBoxHandle`, que não assume ownership da árvore visual e passa a informar `IsAttached = False` quando a estrutura visual associada é destruída.
+
+Para listas estruturadas, use `TRickUIBuilderComboBoxColumn` e `AddStructuredItem`. A coleção de origem permanece estável durante o filtro: a view filtrada mapeia `ViewIndex` de volta para o `SourceIndex` original antes de confirmar a seleção.
+
+Para a API pública completa, mapa interno de dependências, comportamento FullWindow, regras de filtro, virtualização, ownership, testes e invariantes de manutenção, consulte a [documentação técnica do ComboBox](docs/combobox/README.pt-BR.md).
+
+---
+
 <a name="composition"></a>
 ## 🧩 Composition
 
@@ -551,7 +608,7 @@ Os records usados acima oferecem outros campos além dos alterados no exemplo. P
 
 **Unit:** `Rick.UIBuilder.Interfaces`
 
-O RickUIBuilder expõe contratos públicos para os `Fluent Builders`, para o estado de hover do Button, para os Handles de Button e Badge e para o composer:
+O RickUIBuilder expõe contratos públicos para os `Fluent Builders`, estado de hover mutável do Button, Handles dos controles gerados, controle runtime do ComboBox e composer:
 
 | Interface | Responsabilidade |
 | --- | --- |
@@ -562,6 +619,8 @@ O RickUIBuilder expõe contratos públicos para os `Fluent Builders`, para o est
 | `IRickUIBuilderBadge` | Contrato do Badge Builder |
 | `IRickUIBuilderBadgeHandle` | Acesso ao container e ao text label gerados para o Badge |
 | `IRickUIBuilderDivider` | Contrato do Divider Builder |
+| `IRickUIBuilderComboBox` | Contrato do ComboBox Builder |
+| `IRickUIBuilderComboBoxHandle` | Contrato runtime non-owning para seleção, mutação de dados, open/close e atualização da seta |
 | `IRickUIBuilderComposer` | Contrato de Composition |
 
 Usar a interface explicitamente não cria outra implementação. Você continua trabalhando com o mesmo Builder retornado por `TRickUIBuilder`, apenas mantendo a referência pelo contrato público correspondente.
@@ -595,11 +654,17 @@ Essa abordagem é útil quando o código deve depender explicitamente do contrat
 <a name="sample"></a>
 ## 🎨 Sample
 
-O projeto em `sample` é propositalmente simples e demonstra visualmente as três principais formas de uso:
+O projeto em `sample` demonstra as formas de uso do framework e a matriz atual do ComboBox:
 
 - Factory.
 - Fluent Builders.
 - Composition.
+- ComboBox Desktop com apresentação `Anchored`.
+- ComboBox Mobile com `Auto` resolvendo para FullWindow e pesquisa em tempo real.
+- ComboBox Adaptive com colunas estruturadas e handle runtime preservado.
+- ComboBox Custom com múltiplas colunas, `OnCustomizeItem` e seta à esquerda.
+- ComboBox Custom FullWindow utilizando o mesmo pipeline de dados e renderização.
+- Atualizações runtime do ComboBox por `IRickUIBuilderComboBoxHandle`.
 
 Abra:
 
@@ -607,32 +672,21 @@ Abra:
 sample\RickUIBuilder.Sample.dproj
 ```
 
-O sample funciona como uma apresentação básica. Os exemplos deste README mostram opções adicionais que já estão disponíveis na API pública.
+O projeto detalhado do ComboBox está documentado separadamente em [`docs/combobox`](docs/combobox/README.pt-BR.md).
 
 <a name="testes"></a>
 ## ✅ Testes
 
-O projeto possui uma suíte DUnitX cobrindo as principais áreas do RickUIBuilder, incluindo:
-
-- Types.
-- Factory.
-- Label.
-- Button.
-- Badge.
-- Divider.
-- Composition.
-- Facade.
-
-O projeto de testes está disponível no diretório `tests`. O código-fonte atual declara **161** métodos `[Test]`.
+O projeto possui uma suíte DUnitX cobrindo as principais áreas do RickUIBuilder, incluindo Types, Factory, Label, Button, Badge, Divider, Composition, Facade e comportamentos de Data/Integration/Style do ComboBox. O código-fonte atual declara **197** métodos `[Test]`.
 
 ### Último resultado DUnitX verificado
 
-O XML NUnit fornecido identifica `RickUIBuilder.Test.exe` e registra uma execução real em **2026-09-20 07:06:01**, com resultado do assembly `Success` / `success="True"`:
+O XML NUnit fornecido identifica `RickUIBuilder.Test.exe` e registra uma execução real em **2026-09-22 23:46:29**, com resultado do assembly `Success` / `success="True"`:
 
 | Resultado DUnitX | Valor |
 | --- | ---: |
-| Tests Found | **161** |
-| Tests Passed | **161** |
+| Tests Found | **197** |
+| Tests Passed | **197** |
 | Tests Ignored | **0** |
 | Tests Failed | **0** |
 | Tests Errored | **0** |
@@ -640,32 +694,45 @@ O XML NUnit fornecido identifica `RickUIBuilder.Test.exe` e registra uma execuç
 | Not run | **0** |
 | Skipped | **0** |
 | Invalid | **0** |
+| Tests Leaked | **0** |
 
-A saída de console fornecida para a mesma execução também registra **Tests Leaked = 0**. A execução NUnit inclui os contratos de hover mutável adicionados nesta revisão, entre eles `HoverFillColor_AposBuild_DeveSerUsadaNoProximoMouseEnter`, `FillColor_AposBuild_DeveSerUsadaNoProximoMouseLeave`, `OnEnter_AposBuild_DeveUsarHandlerAtual`, `OnLeave_AposBuild_DeveUsarHandlerAtual`, `Button_AlteradoAposBuild_NaoDeveRetargetBehaviorJaCriado` e os testes de `BuildHandle` que expõem e alteram o mesmo HoverState utilizado pelo Button construído.
+A cobertura do ComboBox inclui seleção e mapeamento do filtro em Data, comportamento do handle runtime, lifecycle de Parent/Popup, seta, resolução do host FullWindow, estrutura de pesquisa FullWindow, ações clear/back, seleção filtrada, empty state, Custom FullWindow, paths default e resolução de Style/Presentation.
 
 ### Method Toxicity Metrics
 
-O Method Toxicity Metrics do RAD Studio foi executado novamente após a implementação do HoverState mutável, tanto para a biblioteca quanto para o projeto de testes. Os CSVs fornecidos contêm **157 métodos medidos da biblioteca** e **188 métodos medidos do projeto de testes**. Os máximos medidos são:
+O Method Toxicity Metrics do RAD Studio foi executado para os três projetos atuais. Os relatórios fornecidos contêm **404 métodos medidos da biblioteca**, **252 métodos medidos dos testes** e **35 métodos medidos do Sample**.
 
-| Projeto | Métodos | Máx. `Length` | Máx. `Parameters` | Máx. `If Depth` | Máx. `Cyclomatic Complexity` | Máx. `Toxicity` | Violações dos hard gates |
+| Projeto | Métodos | Máx. `Length` | Máx. `Parameters` | Máx. `If Depth` | Máx. `Cyclomatic Complexity` | Máx. `Toxicity` | Violações dos gates |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `RickUIBuilder.dproj` | **157** | **20** | **5** | **1** | **3** | **0,487** | **0** |
-| `RickUIBuilder.Test.dproj` | **188** | **12** | **1** | **1** | **4** | **0,367** | **0** |
+| `RickUIBuilder.dproj` / package da biblioteca | **404** | **20** | **5** | **3** | **4** | **0,554** | **0** |
+| `RickUIBuilder.Test.dproj` | **252** | **14** | **2** | **2** | **6** | **0,571** | **0** |
+| `RickUIBuilder.Sample.dproj` | **35** | **14** | **4** | **1** | **2** | **0,338** | **0** |
 
-Os hard gates do projeto permanecem `Length <= 20`, `Parameters <= 6`, `If Depth <= 5`, `Cyclomatic Complexity <= 6` e `Toxicity < 1`. Nenhuma linha dos dois CSVs pós-alteração fornecidos ultrapassa esses limites.
+Os gates de qualidade do projeto são `Length <= 20`, `Parameters <= 6`, `If Depth <= 5`, `Cyclomatic Complexity <= 6` e `Toxicity < 1`. Nenhuma linha dos três relatórios fornecidos ultrapassa esses limites.
 
-Os métodos centrais da implementação do HoverState mutável foram medidos da seguinte forma:
+A maior Toxicity medida em cada projeto é:
 
-| Método | Length | Params | If Depth | Cyclomatic | Toxicity |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| `TRickUIBuilderButtonBuilder.AttachBehavior` | 6 | 2 | 1 | 3 | 0,333 |
-| `TRickUIBuilderButtonBuilder.BuildCore` | 5 | 3 | 0 | 1 | 0,229 |
-| `TRickUIBuilderButtonHoverBehavior.Configure` | 3 | 2 | 0 | 1 | 0,163 |
-| `TRickUIBuilderButtonHoverBehavior.HandleMouseEnter` | 5 | 1 | 1 | 3 | 0,279 |
-| `TRickUIBuilderButtonHoverBehavior.HandleMouseLeave` | 5 | 1 | 1 | 3 | 0,279 |
+| Projeto | Método | Toxicity |
+| --- | --- | ---: |
+| Biblioteca | `TRickUIBuilderComboBoxVirtualizer.CreateColumnLabel` | **0,554** |
+| Testes | `TRickUIBuilderComboBoxIntegrationTests.FindPath` e `FindLabel` | **0,571** |
+| Sample | `TPageSampleMain.CustomizeComboBoxItem` | **0,338** |
 
-Esses são valores reais medidos pelo RAD Studio nos relatórios pós-alteração fornecidos, não estimativas derivadas do código-fonte. Eles são específicos desta revisão e devem ser medidos novamente após futuras alterações de código.
+Esses são valores reais medidos pelo RAD Studio nos CSVs fornecidos, não estimativas derivadas do código-fonte. Eles são específicos desta revisão e devem ser medidos novamente após futuras alterações Delphi.
 
+<a name="manutencao-assistida-por-ia"></a>
+## 🤖 Manutenção assistida por IA
+
+A orientação de IA no nível do repositório começa em [`AGENTS.md`](AGENTS.md). Esse arquivo direciona as tarefas para o material organizado em [`.ai/`](.ai/README.md):
+
+- `agents/` define os papéis de orquestrador, engenheiro Delphi, redator técnico e auditor de qualidade.
+- `skills/` define procedimentos reutilizáveis para análise do repositório, alterações Delphi seguras, manutenção do ComboBox, consistência documental e validação de testes.
+- `templates/` fornece estruturas reutilizáveis para planos, documentação técnica, auditorias e relatórios de entrega.
+- `checklists/` fornece gates pré-alteração, documental e final.
+
+Para qualquer alteração do ComboBox, `AGENTS.md` direciona explicitamente a leitura de [`docs/combobox`](docs/combobox/README.pt-BR.md) antes da edição da implementação.
+
+<a name="licenca"></a>
 ## 🔐 Licença
 
 Copyright © 2026 **RickSoluções**. Todos os direitos reservados.
@@ -695,6 +762,6 @@ Titular e mantenedora do **RickUIBuilder**.
 
 **Framework especializado no desenvolvimento de componentes visuais modernos, utilizando padrões de builders reutilizáveis, interfaces e auxiliares de composição.**
 
-[⬆ Voltar ao topo](#rickuiuilder)
+[⬆ Voltar ao topo](#rickuibuilder)
 
 </div>
