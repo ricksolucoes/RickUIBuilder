@@ -723,14 +723,20 @@ Esses são valores reais medidos pelo RAD Studio nos CSVs fornecidos, não estim
 <a name="manutencao-assistida-por-ia"></a>
 ## 🤖 Manutenção assistida por IA
 
-A orientação de IA no nível do repositório começa em [`AGENTS.md`](AGENTS.md). Esse arquivo direciona as tarefas para o material organizado em [`.ai/`](.ai/README.md):
+A orientação de IA no nível do repositório começa em [`AGENTS.md`](AGENTS.md). O sistema de engenharia válido para todo o projeto fica em [`.agents/`](.agents/README.md) e usa [`ricksolucoes/agent-skills`](https://github.com/ricksolucoes/agent-skills) como **benchmark de comportamento e profundidade**, e não apenas como referência de nomes ou estrutura de pastas.
 
-- `agents/` define os papéis de orquestrador, engenheiro Delphi, redator técnico e auditor de qualidade.
-- `skills/` define procedimentos reutilizáveis para análise do repositório, alterações Delphi seguras, manutenção do ComboBox, consistência documental e validação de testes.
-- `templates/` fornece estruturas reutilizáveis para planos, documentação técnica, auditorias e relatórios de entrega.
-- `checklists/` fornece gates pré-alteração, documental e final.
+A adaptação local preserva o mesmo modelo de engenharia — skills como workflows executáveis, personas especializadas, anti-rationalization, red flags, verificação baseada em evidência, progressive disclosure, estratégia brownfield e uma Definition of Done reutilizável — substituindo mecanismos específicos de Web/TypeScript por práticas realmente aplicáveis ao RickUIBuilder: Delphi/Object Pascal, FireMonkey, DUnitX, RAD Studio, ownership/lifetime e Method Toxicity.
 
-Para qualquer alteração do ComboBox, `AGENTS.md` direciona explicitamente a leitura de [`docs/combobox`](docs/combobox/README.pt-BR.md) antes da edição da implementação.
+- `skills/<nome>/SKILL.md` contém workflows detalhados acionados por intenção, com condições de entrada, pontos de decisão, técnicas específicas do projeto, rationalizations comuns, red flags e critérios de saída verificáveis.
+- `agents/` contém personas especializadas como engenheiro Delphi, code reviewer, test engineer, redator técnico e auditor de qualidade. Personas fornecem perspectiva e contrato de saída; não roteiam outras personas.
+- `references/` centraliza Definition of Done, restrições do projeto, mapa de componentes, regras de qualidade Delphi/FMX, políticas de testes/documentação, baseline de Method Toxicity, padrões de orquestração e o contrato explícito de adaptação do `agent-skills`.
+- `templates/` contém artefatos reutilizáveis para especificações, planos de alteração, Attempt Logs de debugging iterativo, ADRs, auditorias e relatórios de entrega.
+
+A governança se aplica a **todos os elementos do RickUIBuilder** — Factory, Label, Button, Badge, Divider, ComboBox, Composition, contratos compartilhados, Sample/testes e componentes futuros. O workflow genérico `component-maintenance` descobre os contratos e a complexidade reais de cada elemento em vez de impor a arquitetura do ComboBox a controles mais simples.
+
+O ComboBox continua sendo o primeiro componente com documentação técnica aprofundada em [`docs/combobox`](docs/combobox/README.pt-BR.md). Esses documentos são conhecimento de domínio carregado somente quando uma tarefa de ComboBox precisa deles; eles não constituem o modelo de engenharia do framework inteiro.
+
+A política de adaptação e as diferenças mantidas intencionalmente em relação ao projeto upstream estão documentadas em [`.agents/references/agent-skills-adaptation.md`](.agents/references/agent-skills-adaptation.md).
 
 <a name="licenca"></a>
 ## 🔐 Licença
