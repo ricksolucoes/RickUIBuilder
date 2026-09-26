@@ -367,6 +367,15 @@ type
   /// </returns>
   TRickUIBuilderBooleanCallback = function: Boolean of object;
 
+  /// <summary>
+  ///    Representa um callback associado a uma instancia que recebe um valor
+  ///    Boolean. A semantica do valor e definida pelo ponto de uso.
+  /// </summary>
+  /// <param name="AValue">
+  ///    Valor Boolean fornecido ao callback.
+  /// </param>
+  TRickUIBuilderBooleanProcedure = procedure(AValue: Boolean) of object;
+
 
 
 const

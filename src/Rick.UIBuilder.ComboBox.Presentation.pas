@@ -103,7 +103,7 @@ type
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
     constructor Create(AOwner: TComponent; AParent: TFmxObject;
-      AAnchor: TRectangle; const AConfig: TRickUIBuilderComboBoxConfig);
+      AAnchor: TRectangle; const AConfig: TRickUIBuilderComboBoxConfig); reintroduce;
     destructor Destroy; override;
     procedure SetOnDismiss(AValue: TNotifyEvent);
     procedure SetOnSearchChange(AValue: TNotifyEvent);

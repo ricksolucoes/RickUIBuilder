@@ -180,6 +180,7 @@
         <DCCReference Include="src\Rick.UIBuilder.ComboBox.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.Button.HoverBehavior.pas"/>
+        <DCCReference Include="src\Rick.UIBuilder.ComboBox.Behavior.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -224,6 +225,12 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="APP\Debug\RickUIBuilder.bpl" Configuration="Debug" Class="ProjectOutput"/>
+                <DeployFile LocalName="APP\Debug\RickUIBuilder.bpl" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>RickUIBuilder.bpl</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployClass Name="AdditionalDebugSymbols">
                     <Platform Name="OSX32">
                         <Operation>1</Operation>

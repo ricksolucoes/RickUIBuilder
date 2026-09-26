@@ -74,7 +74,7 @@ type
   public
     constructor Create(AScrollBox: TVertScrollBox;
       AData: TRickUIBuilderComboBoxData;
-      const AConfig: TRickUIBuilderComboBoxConfig);
+      const AConfig: TRickUIBuilderComboBoxConfig); reintroduce;
     destructor Destroy; override;
     procedure SetColumns(const AColumns: TArray<TRickUIBuilderComboBoxColumn>);
     procedure SetOnRowClick(AValue: TNotifyEvent);

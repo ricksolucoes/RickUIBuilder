@@ -50,6 +50,7 @@ contains
   Rick.UIBuilder.ComboBox.Handle in 'src\Rick.UIBuilder.ComboBox.Handle.pas',
   Rick.UIBuilder.ComboBox in 'src\Rick.UIBuilder.ComboBox.pas',
   Rick.UIBuilder in 'src\Rick.UIBuilder.pas',
-  Rick.UIBuilder.Button.HoverBehavior in 'src\Rick.UIBuilder.Button.HoverBehavior.pas';
+  Rick.UIBuilder.Button.HoverBehavior in 'src\Rick.UIBuilder.Button.HoverBehavior.pas',
+  Rick.UIBuilder.ComboBox.Behavior in 'src\Rick.UIBuilder.ComboBox.Behavior.pas';
 
 end.

@@ -11,10 +11,11 @@
   referencia ao handle; as referencias FMX sao non-owning e sao explicitamente
   desconectadas quando o container visual deixa de existir.
 
-  Um TComponent interno, owned pelo mesmo Parent usado pelo Builder, mantem uma
-  referencia forte ao handle e observa somente o container do ComboBox. Assim,
-  Build sem handle externo continua funcional e a destruicao de outros
-  componentes do mesmo Parent nao provoca detach indevido.
+  O lifetime do runtime materializado e delegado a
+  Rick.UIBuilder.ComboBox.Behavior, que mantem uma referencia forte ao handle e
+  observa somente o container do ComboBox. Assim, Build sem handle externo
+  continua funcional e a destruicao de outros componentes do mesmo Parent nao
+  provoca detach indevido.
   ============================================================================
 *)
 
@@ -34,7 +35,8 @@ uses
   Rick.UIBuilder.ComboBox.Data,
   Rick.UIBuilder.ComboBox.State,
   Rick.UIBuilder.ComboBox.Presentation,
-  Rick.UIBuilder.ComboBox.Virtualization;
+  Rick.UIBuilder.ComboBox.Virtualization,
+  Rick.UIBuilder.ComboBox.Behavior;
 
 type
   TComboKeyActions = array[Byte] of TProc;
@@ -146,22 +148,6 @@ implementation
 uses
   System.Math;
 
-type
-  TRickUIBuilderComboBoxBehavior = class(TComponent)
-  private
-    FContainer: TComponent;
-    FHandle: TRickUIBuilderComboBoxHandle;
-    FLifetime: IRickUIBuilderComboBoxHandle;
-  protected
-    procedure Notification(AComponent: TComponent;
-      Operation: TOperation); override;
-  public
-    destructor Destroy; override;
-    procedure Configure(AContainer: TComponent;
-      AHandle: TRickUIBuilderComboBoxHandle;
-      const ALifetime: IRickUIBuilderComboBoxHandle);
-  end;
-
 { TRickUIBuilderComboBoxHandle }
 
 constructor TRickUIBuilderComboBoxHandle.Create(
@@ -257,7 +243,7 @@ var
 begin
   BindVisualReferences(AParent, AContainer, ATextLabel, AArrow);
   LBehavior := TRickUIBuilderComboBoxBehavior.Create(AParent);
-  LBehavior.Configure(AContainer, Self, ALifetime);
+  LBehavior.Configure(AContainer, ALifetime, DetachVisual);
   ConfigureVisualEvents;
   CreateRuntimeServices(LBehavior);
   UpdateDisplay;
@@ -791,43 +777,6 @@ procedure TRickUIBuilderComboBoxHandle.SetOpenedArrowPath(
 begin
   FConfig.OpenedArrowPath := AValue;
   UpdateArrow;
-end;
-
-{ TRickUIBuilderComboBoxBehavior }
-
-procedure TRickUIBuilderComboBoxBehavior.Configure(AContainer: TComponent;
-  AHandle: TRickUIBuilderComboBoxHandle;
-  const ALifetime: IRickUIBuilderComboBoxHandle);
-begin
-  FContainer := AContainer;
-  FHandle := AHandle;
-  FLifetime := ALifetime;
-  if Assigned(FContainer) then
-    FContainer.FreeNotification(Self);
-end;
-
-destructor TRickUIBuilderComboBoxBehavior.Destroy;
-begin
-  if Assigned(FContainer) then
-    FContainer.RemoveFreeNotification(Self);
-  if Assigned(FHandle) then
-    FHandle.DetachVisual;
-  FContainer := nil;
-  FHandle := nil;
-  FLifetime := nil;
-  inherited;
-end;
-
-procedure TRickUIBuilderComboBoxBehavior.Notification(AComponent: TComponent;
-  Operation: TOperation);
-begin
-  inherited;
-  if (Operation <> opRemove) or (AComponent <> FContainer) then
-    Exit;
-
-  if Assigned(FHandle) then
-    FHandle.DetachVisual(False);
-  FContainer := nil;
 end;
 
 end.
