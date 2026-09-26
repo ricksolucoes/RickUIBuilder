@@ -1,4 +1,4 @@
-<div align="center">
+﻿<div align="center">
 
 # 📱RickUIBuilder
 
@@ -538,6 +538,16 @@ For the complete public API, internal dependency map, FullWindow behavior, filte
 ---
 
 <a name="composition"></a>
+## 📚 Detailed component documentation
+
+Complete references for the builders are organized by component:
+
+- [Label](docs/label/README.md) — API, defaults, layout, margin/padding, and ownership.
+- [Button](docs/button/README.md) — API, hover, Behavior, Handle, lifecycle, and examples.
+- [Badge](docs/badge/README.md) — API, Pill/CornerRadius, Handle, ownership, and examples.
+- [Divider](docs/divider/README.md) — API, orientation, geometry, Factory, and examples.
+- [ComboBox](docs/combobox/README.md) — complete ComboBox technical documentation.
+
 ## 🧩 Composition
 
 **Implementation unit:** `Rick.UIBuilder.Composition`
