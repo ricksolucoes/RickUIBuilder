@@ -1,4 +1,4 @@
-# Customization and Examples
+﻿# Customization and Examples
 
 > [English](customizacao-e-exemplos.md) | [Português do Brasil](customizacao-e-exemplos.pt-BR.md)
 
@@ -164,3 +164,80 @@ Path strings are parsed by FireMonkey `TPathData`; see the maintenance document 
 ## CustomConfig
 
 Use `TRickUIBuilderComboBoxConfig.Default` as the starting point, change only required tokens, then pass the record to `.CustomConfig(Config)`. This preserves all currently defined defaults and avoids leaving newly introduced fields uninitialized in future versions.
+
+### Advanced typography and colors
+
+```pascal
+LConfig := TRickUIBuilderComboBoxConfig.Default;
+LConfig.FontFamily := 'Segoe UI';
+LConfig.FontStyle := [TFontStyle.fsBold];
+LConfig.TextAlign := TTextAlign.Center;
+LConfig.Trimming := TTextTrimming.Character;
+LConfig.PlaceholderColor := $FF98A2B3;
+LConfig.FocusColor := $FF7E22CE;
+
+TRickUIBuilder.ComboBox
+  .CustomConfig(LConfig)
+  .Items(['Small', 'Medium', 'Large'])
+  .Build(AParent);
+```
+
+`CustomConfig` copies the entire record. Prefer starting from `Default` instead of declaring a partially initialized record.
+
+### Advanced FullWindow configuration
+
+```pascal
+LConfig := TRickUIBuilderComboBoxConfig.Default;
+LConfig.PresentationMode :=
+  TRickUIBuilderComboBoxPresentationMode.FullWindow;
+LConfig.FullWindowCornerRadius := 20;
+LConfig.FullWindowPadding := 20;
+LConfig.SearchFieldHeight := 52;
+LConfig.SearchFieldCornerRadius := 12;
+LConfig.FullWindowBackgroundColor := $FFF8FAFC;
+LConfig.SearchFieldBackgroundColor := TAlphaColors.White;
+LConfig.SearchFieldBorderColor := $FFCBD5E1;
+LConfig.SearchTextColor := $FF0F172A;
+LConfig.SearchIconColor := $FF475569;
+LConfig.NoResultsTextColor := $FF64748B;
+LConfig.NoResultsIconColor := $FF94A3B8;
+
+TRickUIBuilder.ComboBox
+  .CustomConfig(LConfig)
+  .SearchPlaceholder('Search product...')
+  .NoResultsText('No product found')
+  .Build(AParent);
+```
+
+The geometry and color fields above belong to the same `TRickUIBuilderComboBoxConfig`; there is no separate FullWindow configuration record.
+
+### Popup width
+
+With `PopupWidth <= 0`, the popup uses the anchor width plus `PopupWidthOffset`:
+
+```pascal
+LConfig := TRickUIBuilderComboBoxConfig.Default;
+LConfig.PopupWidth := 0;
+LConfig.PopupWidthOffset := 80;
+
+TRickUIBuilder.ComboBox
+  .CustomConfig(LConfig)
+  .Size(240, 40)
+  .Items(['Small', 'Medium', 'Large'])
+  .Build(AParent);
+```
+
+In this example, the runtime rule calculates width from the anchor width (`240`) plus the offset (`80`). If `PopupWidth` is greater than zero, `PopupWidthOffset` no longer participates in the calculation.
+
+### Left-side arrow
+
+```pascal
+TRickUIBuilder.ComboBox
+  .ArrowPosition(TRickUIBuilderComboBoxArrowPosition.Left)
+  .ArrowMargins(12, 4, 8, 4)
+  .ArrowSize(16)
+  .Items(['Small', 'Medium', 'Large'])
+  .Build(AParent);
+```
+
+When the arrow is on the left, runtime reserves text space after the arrow using `ArrowMarginRight`. When it is on the right, the text area ends before the arrow using `ArrowMarginLeft`. `ArrowMarginTop` and `ArrowMarginBottom` participate in the arrow's vertical placement.

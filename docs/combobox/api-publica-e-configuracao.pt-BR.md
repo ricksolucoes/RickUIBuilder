@@ -1,4 +1,4 @@
-# API Pública e Configuração
+﻿# API Pública e Configuração
 
 > [English](api-publica-e-configuracao.md) | [Português do Brasil](api-publica-e-configuracao.pt-BR.md)
 
@@ -81,6 +81,19 @@ A sintaxe de scoped enums é utilizada: referencie membros como `Type.Member`.
 | Margens L/T/R/B da seta | `8 / 0 / 12 / 0` |
 | `ArrowPosition` | `Right` |
 | `FontSize` | `14` |
+| `FontFamily` | `''` |
+| `FontStyle` | `[]` |
+| `TextAlign` | `TTextAlign.Leading` |
+| `Trimming` | `TTextTrimming.None` |
+| `BackgroundColor` | `TAlphaColors.White` |
+| `BorderColor` | `$FFD0D5DD` |
+| `TextColor` | `$FF1D2939` |
+| `PlaceholderColor` | `$FF667085` |
+| `ArrowColor` | `$FF667085` |
+| `PopupColor` | `TAlphaColors.White` |
+| `HoverColor` | `$FFF2F4F7` |
+| `SelectedColor` | `$FFEFF8FF` |
+| `FocusColor` | `$FF2E90FA` |
 | `DisabledOpacity` | `0.5` |
 | `SearchTimeout` | `900` ms |
 | `FullWindowCornerRadius` | `28` |
@@ -90,12 +103,72 @@ A sintaxe de scoped enums é utilizada: referencie membros como `Type.Member`.
 | `SearchFieldCornerRadius` | `16` |
 | `SearchIconSize` | `24` |
 | `NoResultsIconSize` | `64` |
+| `FullWindowBackgroundColor` | `TAlphaColors.White` |
+| `SearchFieldBackgroundColor` | `TAlphaColors.White` |
+| `SearchFieldBorderColor` | `$FF98A2B3` |
+| `SearchTextColor` | `$FF1D2939` |
+| `SearchIconColor` | `$FF1D2939` |
+| `NoResultsTextColor` | `$FF667085` |
+| `NoResultsIconColor` | `$FF98A2B3` |
 | `SearchPlaceholder` | `Pesquisar...` |
 | `NoResultsText` | `Nenhum registro encontrado` |
 | `Enabled` | `True` |
 | `RequestedStyleType` | `Adaptive` |
 | `EffectiveStyleType` | `Desktop` antes da resolução de style |
 | `PresentationMode` | `Auto` |
+
+## Configurações avançadas do record
+
+Nem todos os campos de `TRickUIBuilderComboBoxConfig` possuem um método fluente dedicado. Para esses casos, use `TRickUIBuilderComboBoxConfig.Default` como base e aplique o record com `CustomConfig`.
+
+Os principais campos avançados são:
+
+| Grupo | Campos | Semântica |
+|---|---|---|
+| Tipografia | `FontFamily`, `FontStyle`, `TextAlign`, `Trimming` | Configuram família, estilos, alinhamento horizontal e trimming do texto exibido pelo ComboBox. |
+| Placeholder | `PlaceholderColor` | Define a cor usada quando não existe seleção confirmada e o placeholder é exibido. |
+| Popup | `PopupWidth`, `PopupWidthOffset`, `PopupColor` | Controlam largura e cor da superfície de seleção não FullWindow. |
+| Estados visuais | `HoverColor`, `SelectedColor`, `FocusColor` | Definem as cores usadas para hover, seleção e foco. |
+| FullWindow — geometria | `FullWindowCornerRadius`, `FullWindowPadding`, `SearchHeaderHeight`, `SearchFieldHeight`, `SearchFieldCornerRadius`, `SearchIconSize`, `NoResultsIconSize` | Dimensionam a apresentação FullWindow e seus elementos de pesquisa/empty state. |
+| FullWindow — cores | `FullWindowBackgroundColor`, `SearchFieldBackgroundColor`, `SearchFieldBorderColor`, `SearchTextColor`, `SearchIconColor`, `NoResultsTextColor`, `NoResultsIconColor` | Definem as cores da superfície FullWindow, campo de pesquisa e estado sem resultados. |
+
+`PopupWidth` e `PopupWidthOffset` têm semântica conjunta: quando `PopupWidth > 0`, esse valor é usado diretamente. Quando `PopupWidth <= 0`, a largura é calculada como `Anchor.Width + PopupWidthOffset`. O resultado final é limitado a no mínimo `1`.
+
+### Eventos
+
+- `OnChange` é disparado quando a seleção confirmada realmente muda.
+- `OnOpen` é disparado ao final de uma abertura efetiva, depois que estado, apresentação, seta e popup foram atualizados. Chamadas a `Open` sem attachment, com `Enabled = False` ou quando o ComboBox já está aberto não disparam o evento.
+- `OnClose` é disparado ao final de um fechamento efetivo, depois que a presentation foi fechada, o estado foi finalizado e a seta foi atualizada. Chamar `Close` quando o ComboBox já está fechado não dispara o evento.
+
+### Navegação por teclado
+
+No controle principal fechado:
+
+| Entrada | Ação |
+|---|---|
+| `F4`, `Enter`, `Space`, `Alt+Down` | Abre o ComboBox. |
+| `Down`, `Right` | Seleciona o próximo item, respeitando os limites. |
+| `Up`, `Left` | Seleciona o item anterior, respeitando os limites. |
+| Caractere imprimível | Executa busca incremental por prefixo e confirma a correspondência encontrada. |
+
+No controle principal aberto:
+
+| Entrada | Ação |
+|---|---|
+| `Down`, `Up` | Move o target visual. |
+| `Home`, `End` | Move o target para o primeiro ou último item da view. |
+| `PageUp`, `PageDown` | Move o target por uma página calculada a partir da altura disponível e de `ItemHeight`. |
+| `Enter`, `Space` | Confirma o target e fecha. |
+| `Escape`, `Tab` | Fecha. |
+| Caractere imprimível | Executa busca incremental por prefixo e move o target para a correspondência. |
+
+No campo de pesquisa FullWindow, `Down`, `Up`, `PageUp`, `PageDown`, `Enter`, `Escape` e `Tab` são tratados pelo runtime do ComboBox. `Home`, `End` e `Space` não fazem parte desse mapa específico.
+
+A busca incremental usa `SearchTimeout` para limpar o buffer acumulado; o default atual é `900` ms. Ela é distinta do filtro textual exibido na apresentação FullWindow.
+
+### Alterações runtime da seta
+
+`SetArrowSize(AWidth, AHeight)` aceita largura e altura independentes. Se qualquer uma delas for `<= 0`, a chamada é ignorada. `SetClosedArrowPath` e `SetOpenedArrowPath` atualizam o path armazenado e reaplicam imediatamente a aparência correspondente ao estado aberto/fechado atual.
 
 ## CustomConfig e defaults de style
 
