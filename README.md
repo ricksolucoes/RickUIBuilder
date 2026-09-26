@@ -691,7 +691,7 @@ The project includes a DUnitX suite covering the main RickUIBuilder areas, inclu
 
 ### Latest verified DUnitX result
 
-The supplied NUnit XML identifies `RickUIBuilder.Test.exe` and records a real execution at **2026-09-22 23:46:29** with assembly result `Success` / `success="True"`:
+The supplied NUnit XML identifies `RickUIBuilder.Test.exe` and records a real execution at **2026-09-25 23:08:08** with assembly result `Success` / `success="True"`:
 
 | DUnitX result | Value |
 | --- | ---: |
@@ -704,13 +704,12 @@ The supplied NUnit XML identifies `RickUIBuilder.Test.exe` and records a real ex
 | Not run | **0** |
 | Skipped | **0** |
 | Invalid | **0** |
-| Tests Leaked | **0** |
 
 The ComboBox coverage includes data selection/filter mapping, runtime handle behavior, Parent/Popup lifecycle, arrow behavior, FullWindow host resolution, FullWindow search structure, clear/back actions, filtered selection, empty state, custom FullWindow, path defaults, and style/presentation resolution.
 
 ### Method Toxicity Metrics
 
-RAD Studio Method Toxicity Metrics was run for the three current projects. The supplied reports contain **404 measured library methods**, **252 measured test methods**, and **35 measured sample methods**.
+The currently supplied `RickUIBuilder.csv` is a real RAD Studio Method Toxicity Metrics export for the library and contains **404 measured methods**. The Tests and Sample values below are the **last real baseline recorded by the project** from previously supplied RAD Studio CSV reports; they are not measurements from the currently supplied library CSV.
 
 | Project | Methods | Max `Length` | Max `Parameters` | Max `If Depth` | Max `Cyclomatic Complexity` | Max `Toxicity` | Gate violations |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -718,9 +717,9 @@ RAD Studio Method Toxicity Metrics was run for the three current projects. The s
 | `RickUIBuilder.Test.dproj` | **252** | **14** | **2** | **2** | **6** | **0.571** | **0** |
 | `RickUIBuilder.Sample.dproj` | **35** | **14** | **4** | **1** | **2** | **0.338** | **0** |
 
-The project quality gates are `Length <= 20`, `Parameters <= 6`, `If Depth <= 5`, `Cyclomatic Complexity <= 6`, and `Toxicity < 1`. No row in the three supplied reports exceeds those limits.
+The project quality gates are `Length <= 20`, `Parameters <= 6`, `If Depth <= 5`, `Cyclomatic Complexity <= 6`, and `Toxicity < 1`. The current library CSV is within those limits. The recorded Tests and Sample baseline was also within those limits when measured.
 
-The highest measured toxicity in each project is:
+The current library measurement and the last recorded Tests/Sample baseline report these maximum Toxicity values:
 
 | Project | Method | Toxicity |
 | --- | --- | ---: |
@@ -728,7 +727,7 @@ The highest measured toxicity in each project is:
 | Tests | `TRickUIBuilderComboBoxIntegrationTests.FindPath` and `FindLabel` | **0.571** |
 | Sample | `TPageSampleMain.CustomizeComboBoxItem` | **0.338** |
 
-These are real RAD Studio values from the supplied CSV reports, not source-code estimates. They are revision-specific and must be measured again after future Delphi code changes.
+These are real RAD Studio values, not source-code estimates. The Library row is confirmed by the currently supplied `RickUIBuilder.csv`; the Tests and Sample rows are historical real measurements retained as the project's last recorded baseline. They must not be presented as measurements of a later revision without new corresponding CSV exports.
 
 <a name="ai-assisted-maintenance"></a>
 ## 🤖 AI-assisted Maintenance

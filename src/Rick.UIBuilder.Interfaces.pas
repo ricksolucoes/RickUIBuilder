@@ -397,10 +397,11 @@ type
     /// <param name="AOwner">Owner do comportamento materializado.</param>
     /// <returns>A propria interface para encadeamento fluente.</returns>
     /// <remarks>
-    ///    O behavior mantem o estado vivo enquanto AOwner permanecer vivo
-    ///    e consulta os valores atuais de cor e handlers a cada evento.
-    ///    A interface do chamador pode ser liberada apos Build. AOwner deve
-    ///    permanecer vivo enquanto Button puder disparar os eventos;
+    ///    Button(AValue) deve ter sido configurado com um TRectangle valido
+    ///    antes da chamada a Build. O behavior mantem o estado vivo enquanto
+    ///    AOwner permanecer vivo e consulta os valores atuais de cor e handlers
+    ///    a cada evento. A interface do chamador pode ser liberada apos Build.
+    ///    AOwner deve permanecer vivo enquanto Button puder disparar os eventos;
     ///    Build nao altera o ownership do Button.
     /// </remarks>
     function Build(AOwner: TComponent): IRickUIBuilderButtonHoverState;
