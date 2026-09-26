@@ -49,6 +49,7 @@ contains
   Rick.UIBuilder.ComboBox.Virtualization in 'src\Rick.UIBuilder.ComboBox.Virtualization.pas',
   Rick.UIBuilder.ComboBox.Handle in 'src\Rick.UIBuilder.ComboBox.Handle.pas',
   Rick.UIBuilder.ComboBox in 'src\Rick.UIBuilder.ComboBox.pas',
-  Rick.UIBuilder in 'src\Rick.UIBuilder.pas';
+  Rick.UIBuilder in 'src\Rick.UIBuilder.pas',
+  Rick.UIBuilder.Button.HoverBehavior in 'src\Rick.UIBuilder.Button.HoverBehavior.pas';
 
 end.

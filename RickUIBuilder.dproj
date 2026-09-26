@@ -3,7 +3,7 @@
         <ProjectGuid>{7F77334B-6594-447E-819C-E20CD5CACF7F}</ProjectGuid>
         <MainSource>RickUIBuilder.dpk</MainSource>
         <ProjectVersion>20.3</ProjectVersion>
-        <FrameworkType>None</FrameworkType>
+        <FrameworkType>FMX</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
@@ -179,6 +179,7 @@
         <DCCReference Include="src\Rick.UIBuilder.ComboBox.Handle.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.ComboBox.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.pas"/>
+        <DCCReference Include="src\Rick.UIBuilder.Button.HoverBehavior.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

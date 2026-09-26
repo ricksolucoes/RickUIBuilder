@@ -6,14 +6,12 @@
 
   RESPONSABILIDADE
 
-  Implementa IRickUIBuilderButtonHoverState como configuracao fluente e
-  materializa, em Build, o comportamento persistente de hover de um Button.
+  Implementa IRickUIBuilderButtonHoverState como configuracao fluente e fonte
+  viva dos valores usados pelo comportamento de hover depois de Build.
 
-  A configuracao usa TInterfacedObject e permanece como a fonte viva dos
-  valores usados depois de Build. O manipulador efetivo dos eventos permanece
-  em um TComponent interno cujo Owner e informado em Build e mantem uma
-  referencia ao estado, preservando o lifetime necessario para
-  OnMouseEnter/OnMouseLeave sem expor TComponent como contrato publico.
+  Build delega a materializacao do comportamento persistente para
+  Rick.UIBuilder.Button.HoverBehavior, mantendo nesta unit somente o estado e
+  sua configuracao.
 
   ==============================================================================
 *)
@@ -64,18 +62,8 @@ type
 
 implementation
 
-type
-  TRickUIBuilderButtonHoverBehavior = class(TComponent)
-  strict private
-    FButton: TRectangle;
-    FState: TRickUIBuilderButtonHoverState;
-    FStateLifetime: IRickUIBuilderButtonHoverState;
-  public
-    procedure Configure(AButton: TRectangle;
-      AState: TRickUIBuilderButtonHoverState);
-    procedure HandleMouseEnter(Sender: TObject);
-    procedure HandleMouseLeave(Sender: TObject);
-  end;
+uses
+  Rick.UIBuilder.Button.HoverBehavior;
 
 { TRickUIBuilderButtonHoverState }
 
@@ -162,44 +150,10 @@ var
   LBehavior: TRickUIBuilderButtonHoverBehavior;
 begin
   LBehavior := TRickUIBuilderButtonHoverBehavior.Create(AOwner);
-  LBehavior.Configure(FButton, Self);
+  LBehavior.Configure(FButton, Self, HasHoverFillColor);
   FButton.OnMouseEnter := LBehavior.HandleMouseEnter;
   FButton.OnMouseLeave := LBehavior.HandleMouseLeave;
   Result := Self;
-end;
-
-{ TRickUIBuilderButtonHoverBehavior }
-
-procedure TRickUIBuilderButtonHoverBehavior.Configure(AButton: TRectangle;
-  AState: TRickUIBuilderButtonHoverState);
-begin
-  FButton := AButton;
-  FState := AState;
-  FStateLifetime := AState;
-end;
-
-procedure TRickUIBuilderButtonHoverBehavior.HandleMouseEnter(Sender: TObject);
-var
-  LHandler: TNotifyEvent;
-begin
-  if FState.HasHoverFillColor then
-    FButton.Fill.Color := FState.HoverFillColor;
-
-  LHandler := FState.OnEnter();
-  if Assigned(LHandler) then
-    LHandler(Sender);
-end;
-
-procedure TRickUIBuilderButtonHoverBehavior.HandleMouseLeave(Sender: TObject);
-var
-  LHandler: TNotifyEvent;
-begin
-  if FState.HasHoverFillColor then
-    FButton.Fill.Color := FState.FillColor;
-
-  LHandler := FState.OnLeave();
-  if Assigned(LHandler) then
-    LHandler(Sender);
 end;
 
 end.

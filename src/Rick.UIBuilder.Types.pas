@@ -357,6 +357,18 @@ type
     class function None: TRickUIBuilderSpacing; static;
   end;
 
+
+  /// <summary>
+  ///   Representa um callback associado a uma instancia que retorna um valor
+  ///   Boolean.
+  /// </summary>
+  /// <returns>
+  ///   O valor Boolean determinado pela implementacao do callback.
+  /// </returns>
+  TRickUIBuilderBooleanCallback = function: Boolean of object;
+
+
+
 const
   /// <summary>Path vetorial padrao da seta para baixo, normalizado do SVG fornecido.</summary>
   RICK_COMBOBOX_ARROW_DOWN_PATH =
