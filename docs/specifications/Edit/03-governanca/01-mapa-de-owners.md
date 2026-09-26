@@ -16,6 +16,9 @@
 | EDIT-COMPOSITION | `02-edit/05-composicao-visual.md` | Não |
 | EDIT-INPUT | `02-edit/06-entrada-transformacao.md` | Não |
 | EDIT-VALIDATION | `02-edit/07-validacao.md` | Não |
+| EDIT-EVENTS | `02-edit/08-eventos.md` | Não |
+| EDIT-RUNTIME | `02-edit/09-runtime-handle-lifetime.md` | Não |
+| EDIT-DEFAULTS | `02-edit/10-defaults.md` | Não |
 
 ## Regra
 

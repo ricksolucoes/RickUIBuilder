@@ -34,7 +34,10 @@ Se uma informação necessária ao Edit não puder ser comprovada nas fontes per
 10. `02-edit/05-composicao-visual.md`
 11. `02-edit/06-entrada-transformacao.md`
 12. `02-edit/07-validacao.md`
-13. `03-governanca/01-mapa-de-owners.md`
+13. `02-edit/08-eventos.md`
+14. `02-edit/09-runtime-handle-lifetime.md`
+15. `02-edit/10-defaults.md`
+16. `03-governanca/01-mapa-de-owners.md`
 10. `CHECKLIST_MESTRE.md`
 
 ## Regra para implementação futura
