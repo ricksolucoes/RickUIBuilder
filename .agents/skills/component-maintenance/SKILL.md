@@ -1,4 +1,4 @@
----
+﻿---
 name: component-maintenance
 description: Guia análise e manutenção de qualquer componente ou domínio do RickUIBuilder sem impor arquitetura por simetria. Use ao alterar Label, Button, Badge, Divider, ComboBox, Factory, Composition, contratos compartilhados ou novos componentes.
 ---
@@ -133,19 +133,32 @@ Somente com autorização: `code-simplification`.
 
 Exemplos atuais:
 
+#### Label
+
+- `Margin.Left/Top` deslocam a posição configurada; `Margin.Right/Bottom` não redimensionam nem reposicionam o Label na implementação atual;
+- `Padding` é aplicado a `TLabel.Padding` e não altera `Width/Height`;
+- manter o componente sem Handle/Behavior enquanto não existir requisito runtime que os justifique.
+
 #### Button
 
 - hover callbacks e visual behavior coexistem conforme contrato;
+- `FillColor`, `HoverFillColor`, `OnEnter` e `OnLeave` permanecem mutáveis após Build e são consultados pelo Behavior nos eventos seguintes;
+- alterar `HoverState.Button` após Build não retargeta o Behavior existente;
+- uso direto de `HoverState.Build(AOwner)` exige `Button(AValue)` configurado com `TRectangle` válido antes do Build;
+- `HoverBehavior` mantém referência forte ao estado, mas não usa `FreeNotification` para observar destruição independente do Button;
 - Handle não deve inadvertidamente assumir ownership dos controles;
-- behavior criado em Build precisa sobreviver conforme ownership projetado.
+- `Build` e `BuildHandle` compartilham `BuildCore`; preserve equivalência de materialização.
 
 #### Badge
 
 - preservar handle/runtime semantics existentes;
+- `Factory.CreateBadge` materializa inicialmente um pill (`Height / 2`); o Fluent Builder tem `Pill=False` por padrão e então substitui o raio pelo `CornerRadius` configurado;
+- `Padding` é aplicado ao `TextLabel` interno;
 - não copiar HoverState do Button sem requisito.
 
 #### Divider
 
+- `Width` é o comprimento lógico: Horizontal materializa `Width × Thickness`; Vertical materializa `Thickness × Width`;
 - manter simplicidade; não criar runtime abstraction sem comportamento runtime necessário.
 
 #### ComboBox

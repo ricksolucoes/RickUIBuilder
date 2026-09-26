@@ -25,3 +25,9 @@ O estado não é proprietário do Button. O Behavior também não altera o owner
 ## Regra de uso
 
 Não use `Container` ou `TextLabel` do Handle depois que o Owner dos controles tiver sido destruído. O Handle não implementa detecção automática de destruição desses controles.
+
+## Destruição independente do Button
+
+`TRickUIBuilderButtonHoverBehavior` armazena `FButton: TRectangle` e uma referência forte à interface `FState`. Na implementação atual ele **não** chama `FButton.FreeNotification(Self)` e não sobrescreve `Notification` para observar a destruição independente desse Button. Isso difere de componentes runtime que monitoram explicitamente um container visual.
+
+No caminho normal do Fluent Builder, Button e Hover Behavior são criados no mesmo contexto de ownership de `AParent`; ainda assim, uma montagem direta/manual deve respeitar essa relação de lifetime: não destrua o Button configurado de forma independente enquanto um Behavior que o referencia ainda puder receber eventos. Isso descreve o contrato atual de lifetime e não representa transferência de ownership para o Behavior.

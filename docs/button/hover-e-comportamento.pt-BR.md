@@ -27,3 +27,7 @@ O Behavior consulta o estado a cada evento. Portanto, alterações posteriores e
 ## Builder
 
 `HoverFillColor` e `OnHover` configuram o mesmo estado usado pelo Behavior. Mesmo sem hover color explícita, o estado é criado e callbacks `OnHover` podem ser executados; a troca de cor só ocorre quando `HasHoverFillColor=True`.
+
+## Pré-condição no uso direto de HoverState
+
+Ao usar `TRickUIBuilderButtonHoverState` diretamente, chame `Button(AValue)` com um `TRectangle` válido antes de `Build(AOwner)`. A implementação atual de `Build` atribui `OnMouseEnter` e `OnMouseLeave` por meio do `FButton` armazenado, sem guarda para `nil`. O Fluent Button Builder satisfaz essa pré-condição antes de construir o estado de hover.

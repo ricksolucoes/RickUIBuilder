@@ -33,3 +33,16 @@ The Factory covers basic text configuration. The Builder adds `Anchors`, `Margin
 - `Margin.Left/Top` are added to `Position`; `Right/Bottom` do not resize the Label.
 - `Padding` affects the internal `TLabel` area and does not change `Width/Height`.
 - Label has no Handle or Behavior.
+
+## Maintenance map
+
+| Change | Read first |
+|---|---|
+| Fluent API or Build semantics | `src/Rick.UIBuilder._Label.pas`, `src/Rick.UIBuilder.Interfaces.pas` |
+| Shared text defaults/config | `src/Rick.UIBuilder.Types.pas`, `src/Rick.UIBuilder.Factory.pas` |
+| Layout (`Margin`/`Padding`) | `src/Rick.UIBuilder._Label.pas` and [Behavior and examples](comportamento-e-exemplos.md) |
+| Contract regression | `tests/src/Rick.UIBuilder.Tests._Label.pas` |
+
+## Tested contracts
+
+The current DUnitX fixture `tests/src/Rick.UIBuilder.Tests._Label.pas` covers fluent chaining and materialization contracts including Parent, position, size, text, font color, `Margin`, `Padding`, bold, `Tag`, and default values. This describes current test coverage; it is not a guarantee against future regressions.

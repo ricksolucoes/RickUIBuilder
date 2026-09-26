@@ -58,9 +58,10 @@ Factory materializa controles/configuração quando o design do componente deleg
 ```text
 src/Rick.UIBuilder._Label.pas
 tests/src/Rick.UIBuilder.Tests._Label.pas
+docs/label/**
 ```
 
-Componente relativamente simples. Use como evidência de que componentes não precisam compartilhar a mesma quantidade de camadas.
+Componente relativamente simples. Use como evidência de que componentes não precisam compartilhar a mesma quantidade de camadas. Antes de alterar Label, leia `docs/label/README*` e o documento específico do aspecto afetado.
 
 ## 5. Button
 
@@ -70,6 +71,7 @@ src/Rick.UIBuilder.Button.Handle.pas
 src/Rick.UIBuilder.Button.HoverState.pas
 src/Rick.UIBuilder.Button.HoverBehavior.pas
 tests/src/Rick.UIBuilder.Tests.Button.pas
+docs/button/**
 ```
 
 Características relevantes:
@@ -79,7 +81,7 @@ Características relevantes:
 - hover behavior/state;
 - testes puros de chaining e integração FMX com host visual.
 
-Mudanças em hover/lifetime exigem ler builder + Handle + HoverState + HoverBehavior + testes, não apenas uma unit.
+Mudanças em hover/lifetime exigem ler builder + Handle + HoverState + HoverBehavior + testes, não apenas uma unit. Antes de alterar Button, leia `docs/button/README*` e o documento específico do domínio afetado.
 
 ## 6. Badge
 
@@ -87,18 +89,20 @@ Mudanças em hover/lifetime exigem ler builder + Handle + HoverState + HoverBeha
 src/Rick.UIBuilder.Badge.pas
 src/Rick.UIBuilder.Badge.Handle.pas
 tests/src/Rick.UIBuilder.Tests.Badge.pas
+docs/badge/**
 ```
 
-Possui Handle runtime sem a mesma complexidade interna do ComboBox.
+Possui Handle runtime sem a mesma complexidade interna do ComboBox. A Factory materializa inicialmente o formato pill; o Fluent Builder tem `Pill=False` por padrão e pode substituir esse raio por `CornerRadius`. Antes de alterar Badge, leia `docs/badge/README*` e o documento específico do aspecto afetado.
 
 ## 7. Divider
 
 ```text
 src/Rick.UIBuilder.Divider.pas
 tests/src/Rick.UIBuilder.Tests.Divider.pas
+docs/divider/**
 ```
 
-Mantém superfície pequena. Não introduza Handle/State/etc. por simetria sem requisito real.
+Mantém superfície pequena. `Width` representa o comprimento lógico: Horizontal usa `Width × Thickness`; Vertical usa `Thickness × Width`. Não introduza Handle/State/etc. por simetria sem requisito real. Antes de alterar Divider, leia `docs/divider/README*` e o documento específico do aspecto afetado.
 
 ## 8. ComboBox
 

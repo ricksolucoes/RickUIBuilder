@@ -27,3 +27,16 @@ TRickUIBuilder.Badge → Builder → Factory.CreateBadge
 - The Builder defaults to `Pill=False` and then replaces the radius with configured `CornerRadius` (`0` by default).
 - The Handle does not own the FMX controls.
 - `Padding` is applied to the internal `TextLabel`.
+
+## Maintenance map
+
+| Change | Read first |
+|---|---|
+| Fluent API or shape semantics | `src/Rick.UIBuilder.Badge.pas`, `src/Rick.UIBuilder.Interfaces.pas` |
+| Factory materialization/default shape | `src/Rick.UIBuilder.Factory.pas`, `src/Rick.UIBuilder.Types.pas`, and [Behavior and examples](comportamento-e-exemplos.md) |
+| Handle/lifetime | `src/Rick.UIBuilder.Badge.Handle.pas` and [API, configuration, and handle](api-configuracao-e-handle.md) |
+| Contract regression | `tests/src/Rick.UIBuilder.Tests.Badge.pas` |
+
+## Tested contracts
+
+The current DUnitX fixture `tests/src/Rick.UIBuilder.Tests.Badge.pas` covers fluent chaining, Handle/container/label materialization, Parent relationships, text and position, `Margin`, `Pill=True`, `Pill=False` with `CornerRadius`, background/border behavior, and `Tag`. This records current coverage only.
