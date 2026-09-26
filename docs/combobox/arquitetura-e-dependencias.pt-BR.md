@@ -1,4 +1,4 @@
-# Arquitetura e Dependências
+﻿# Arquitetura e Dependências
 
 > [English](arquitetura-e-dependencias.md) | [Português do Brasil](arquitetura-e-dependencias.pt-BR.md)
 
@@ -18,6 +18,7 @@ TRickUIBuilderComboBoxConfig + TRickUIBuilderComboBoxData
 TRickUIBuilderFactory + TRickUIBuilderComboBoxHandle
         ↓
 TRickUIBuilderComboBoxState
+TRickUIBuilderComboBoxBehavior
 TRickUIBuilderComboBoxPresentation
 TRickUIBuilderComboBoxVirtualizer
 ```
@@ -36,7 +37,8 @@ A direção das dependências é intencionalmente assimétrica. O modelo de dado
 | `Rick.UIBuilder.ComboBox.Data.pas` | Itens de origem, seleção confirmada, texto do filtro e view de índices filtrados. | Camada de renderização FMX. |
 | `Rick.UIBuilder.ComboBox.State.pas` | Fase de abertura/fechamento e target index transitório. | Armazenamento da seleção confirmada. |
 | `Rick.UIBuilder.ComboBox.Style.pas` | Resolve style solicitado/efetivo e presentation `Auto`. | Serviço runtime com estado. |
-| `Rick.UIBuilder.ComboBox.Handle.pas` | Orquestrador runtime, eventos, navegação, seleção, pesquisa e ponte de lifetime. | Owner da árvore visual. |
+| `Rick.UIBuilder.ComboBox.Handle.pas` | Orquestrador runtime de eventos, navegação, seleção, pesquisa e dos serviços usados pelo controle materializado. | Owner da árvore visual ou observador de lifetime. |
+| `Rick.UIBuilder.ComboBox.Behavior.pas` | Ponte de lifetime gerenciada pelo Owner; mantém a interface do handle viva, observa o container visual e solicita detach por callback sem depender da classe concreta do handle. | Orquestrador runtime ou owner da árvore visual. |
 | `Rick.UIBuilder.ComboBox.Presentation.pas` | Materialização lazy e layout das superfícies Anchored, Overlay e FullWindow. | Implementação do filtro de dados. |
 | `Rick.UIBuilder.ComboBox.Virtualization.pas` | Pool de rows, mapeamento do viewport, colunas, estados visuais e custom slot. | Owner da coleção de origem. |
 
@@ -66,7 +68,7 @@ Quando o controle abre, o handle solicita a `Presentation` que crie/exiba a supe
 
 ## Limites públicos e internos
 
-Somente types/interfaces nas units públicas centralizadas fazem parte do contrato público. `Data`, `State`, `Style`, `Handle`, `Presentation` e `Virtualization` são units de implementação. Novas capacidades públicas devem entrar nos contratos centralizados somente quando houver consumidor externo real.
+Somente types/interfaces nas units públicas centralizadas fazem parte do contrato público. `Data`, `State`, `Style`, `Handle`, `Behavior`, `Presentation` e `Virtualization` são units de implementação. Novas capacidades públicas devem entrar nos contratos centralizados somente quando houver consumidor externo real.
 
 ## Invariantes arquiteturais
 
@@ -82,4 +84,4 @@ Somente types/interfaces nas units públicas centralizadas fazem parte do contra
 - Alterar identidade do item ou filtro impacta `Data`, `Handle`, `Virtualization` e testes.
 - Alterar geometria do controle fechado impacta `Types`, overrides do builder, `Factory`, dimensionamento runtime da seta no `Handle` e testes.
 - Alterar layout FullWindow impacta `Presentation`, testes de interação e validação manual no Sample.
-- Alterar ownership/lifetime impacta `Handle`, `Presentation`, `Virtualization`, lógica do behavior component e testes de destruição.
+- Alterar ownership/lifetime impacta `Handle`, `Behavior`, `Presentation`, `Virtualization` e testes de destruição.

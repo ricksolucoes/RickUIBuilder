@@ -1,4 +1,4 @@
-# Mapa de Arquitetura e Componentes
+﻿# Mapa de Arquitetura e Componentes
 
 Este mapa acelera descoberta. **O código é a fonte de verdade**; quando a estrutura mudar, atualize este arquivo na mesma tarefa.
 
@@ -68,6 +68,7 @@ Componente relativamente simples. Use como evidência de que componentes não pr
 src/Rick.UIBuilder.Button.pas
 src/Rick.UIBuilder.Button.Handle.pas
 src/Rick.UIBuilder.Button.HoverState.pas
+src/Rick.UIBuilder.Button.HoverBehavior.pas
 tests/src/Rick.UIBuilder.Tests.Button.pas
 ```
 
@@ -78,7 +79,7 @@ Características relevantes:
 - hover behavior/state;
 - testes puros de chaining e integração FMX com host visual.
 
-Mudanças em hover/lifetime exigem ler builder + Handle + HoverState + testes, não apenas uma unit.
+Mudanças em hover/lifetime exigem ler builder + Handle + HoverState + HoverBehavior + testes, não apenas uma unit.
 
 ## 6. Badge
 
@@ -106,6 +107,7 @@ src/Rick.UIBuilder.ComboBox.pas
 src/Rick.UIBuilder.ComboBox.Data.pas
 src/Rick.UIBuilder.ComboBox.State.pas
 src/Rick.UIBuilder.ComboBox.Style.pas
+src/Rick.UIBuilder.ComboBox.Behavior.pas
 src/Rick.UIBuilder.ComboBox.Presentation.pas
 src/Rick.UIBuilder.ComboBox.Virtualization.pas
 src/Rick.UIBuilder.ComboBox.Handle.pas
@@ -118,9 +120,10 @@ Responsabilidades especializadas existem porque o comportamento justifica:
 - Data: modelo lógico/filtro/seleção;
 - State: estado de navegação/open;
 - Style: resolução de style/presentation;
+- Behavior: lifetime do runtime, observação do container e solicitação de detach sem depender da classe concreta do Handle;
 - Presentation: materialização visual;
 - Virtualization: pool/render de rows;
-- Handle: runtime orchestration/lifecycle;
+- Handle: runtime orchestration e coordenação do detach visual;
 - Builder: configuração fluente/preparação;
 - Factory: materialização do controle fechado.
 

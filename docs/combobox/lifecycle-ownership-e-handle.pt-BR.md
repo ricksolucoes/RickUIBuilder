@@ -1,10 +1,10 @@
-# Lifecycle, Ownership e Handle
+﻿# Lifecycle, Ownership e Handle
 
 > [English](lifecycle-ownership-e-handle.md) | [Português do Brasil](lifecycle-ownership-e-handle.pt-BR.md)
 
 ## Fonte de verdade
 
-Leia `Rick.UIBuilder.ComboBox.Handle.pas`, `Rick.UIBuilder.ComboBox.Presentation.pas` e `Rick.UIBuilder.ComboBox.Virtualization.pas` em conjunto antes de alterar ownership ou comportamento de destruição.
+Leia `Rick.UIBuilder.ComboBox.Handle.pas`, `Rick.UIBuilder.ComboBox.Behavior.pas`, `Rick.UIBuilder.ComboBox.Presentation.pas` e `Rick.UIBuilder.ComboBox.Virtualization.pas` em conjunto antes de alterar ownership ou comportamento de destruição.
 
 ## Modelo de ownership
 
@@ -12,7 +12,7 @@ O builder cria o modelo lógico de dados e transfere a responsabilidade prática
 
 ## Behavior component
 
-`TRickUIBuilderComboBoxBehavior` é criado com `AParent` como owner. Ele armazena uma referência forte `IRickUIBuilderComboBoxHandle` (`FLifetime`) e um ponteiro raw para a implementação (`FHandle`). É isso que mantém o comportamento runtime vivo quando o consumidor usa `Build` e não preserva a interface local do handle retornada internamente por `BuildCore`.
+`TRickUIBuilderComboBoxBehavior` é criado com `AParent` como owner. Ele armazena uma referência forte `IRickUIBuilderComboBoxHandle` (`FLifetime`) e um callback de detach `TRickUIBuilderBooleanProcedure` (`FDetachVisual`). `FLifetime` mantém o handle runtime vivo quando o consumidor usa `Build` sem preservar a interface local retornada internamente por `BuildCore`; o callback serve somente para solicitar a desconexão visual e não substitui essa referência forte. Dessa forma, o behavior não depende da classe concreta `TRickUIBuilderComboBoxHandle`.
 
 ## Fluxo de lifetime no Build
 
@@ -42,7 +42,7 @@ Visual tree remains interactive after builder scope ends
 
 ## Notification da destruição do container
 
-Behavior assina `FContainer.FreeNotification`. Quando o container é removido, behavior chama `FHandle.DetachVisual(False)` antes de limpar sua referência ao container. O `False` evita tocar eventos de um container que já está em processo de remoção.
+Behavior assina `FContainer.FreeNotification`. Quando o container é removido, behavior executa `FDetachVisual(False)` antes de limpar sua referência ao container. O `False` evita tocar eventos de um container que já está em processo de remoção. Quando o próprio behavior é destruído enquanto o container ainda está disponível, seu destructor remove a free notification e executa `FDetachVisual(True)`, permitindo ao handle desconectar os eventos do container durante o teardown normal conduzido pelo owner.
 
 ## Notifications da Presentation
 

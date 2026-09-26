@@ -1,4 +1,4 @@
-# Architecture and Dependencies
+﻿# Architecture and Dependencies
 
 > [English](arquitetura-e-dependencias.md) | [Português do Brasil](arquitetura-e-dependencias.pt-BR.md)
 
@@ -18,6 +18,7 @@ TRickUIBuilderComboBoxConfig + TRickUIBuilderComboBoxData
 TRickUIBuilderFactory + TRickUIBuilderComboBoxHandle
         ↓
 TRickUIBuilderComboBoxState
+TRickUIBuilderComboBoxBehavior
 TRickUIBuilderComboBoxPresentation
 TRickUIBuilderComboBoxVirtualizer
 ```
@@ -36,7 +37,8 @@ The dependency direction is intentionally asymmetric. The data model is independ
 | `Rick.UIBuilder.ComboBox.Data.pas` | Source items, confirmed selection, filter text, filtered index view. | FMX rendering layer. |
 | `Rick.UIBuilder.ComboBox.State.pas` | Open/close phase and transient target index. | Confirmed selection store. |
 | `Rick.UIBuilder.ComboBox.Style.pas` | Resolves requested/effective style and `Auto` presentation. | Stateful runtime service. |
-| `Rick.UIBuilder.ComboBox.Handle.pas` | Runtime coordinator, events, navigation, selection, search, lifetime bridge. | Owner of the visual tree. |
+| `Rick.UIBuilder.ComboBox.Handle.pas` | Runtime coordinator for events, navigation, selection, search, and the services used by the materialized control. | Owner of the visual tree or lifetime observer. |
+| `Rick.UIBuilder.ComboBox.Behavior.pas` | Owner-managed lifetime bridge; retains the handle interface, observes the visual container, and requests detach through a callback without depending on the concrete handle class. | Runtime coordinator or visual-tree owner. |
 | `Rick.UIBuilder.ComboBox.Presentation.pas` | Lazy materialization and layout of Anchored, Overlay, and FullWindow surfaces. | Data filter implementation. |
 | `Rick.UIBuilder.ComboBox.Virtualization.pas` | Row pool, viewport mapping, columns, visual states, custom slot. | Source collection owner. |
 
@@ -66,7 +68,7 @@ When the control opens, the handle asks `Presentation` to create/show the select
 
 ## Public versus internal boundaries
 
-Only types/interfaces in the centralized public units are part of the public contract. `Data`, `State`, `Style`, `Handle`, `Presentation`, and `Virtualization` are implementation units. Future public capabilities should be added to the centralized contracts only when a real external consumer needs them.
+Only types/interfaces in the centralized public units are part of the public contract. `Data`, `State`, `Style`, `Handle`, `Behavior`, `Presentation`, and `Virtualization` are implementation units. Future public capabilities should be added to the centralized contracts only when a real external consumer needs them.
 
 ## Architectural invariants
 
@@ -82,4 +84,4 @@ Only types/interfaces in the centralized public units are part of the public con
 - Changing item identity or filtering impacts `Data`, `Handle`, `Virtualization`, and tests.
 - Changing closed-control geometry impacts `Types`, builder overrides, `Factory`, `Handle` runtime arrow sizing, and tests.
 - Changing FullWindow layout impacts `Presentation`, interaction tests, and manual Sample validation.
-- Changing ownership/lifetime impacts `Handle`, `Presentation`, `Virtualization`, behavior component logic, and destruction tests.
+- Changing ownership/lifetime impacts `Handle`, `Behavior`, `Presentation`, `Virtualization`, and destruction tests.
