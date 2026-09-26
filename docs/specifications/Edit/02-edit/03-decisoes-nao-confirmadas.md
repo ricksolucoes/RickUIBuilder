@@ -1,31 +1,18 @@
 # Owner EDIT-PENDING — Decisões não confirmadas
 
-Este arquivo é o único Owner das lacunas funcionais detectadas nesta reconstrução.
+Este arquivo é o único Owner das lacunas funcionais que permanecem abertas.
 
-A futura IA implementadora deve tratar todos os itens abaixo como **bloqueantes para a parte correspondente**, não como espaço para escolher livremente.
+A futura IA implementadora deve tratar os itens abaixo como **bloqueantes para a parte correspondente**, não como espaço para escolher livremente.
 
-## PEND-EDIT-001 — Superfície pública
+As antigas `PEND-EDIT-001` até `PEND-EDIT-004` foram resolvidas e migradas para Owners normativos próprios:
 
-Não confirmado se o Edit terá:
+- `PEND-EDIT-001` → `EDIT-PUBLIC` em `02-edit/04-superficie-publica.md`;
+- `PEND-EDIT-002` → `EDIT-COMPOSITION` em `02-edit/05-composicao-visual.md`;
+- `PEND-EDIT-003` → `EDIT-INPUT` em `02-edit/06-entrada-transformacao.md`;
+- `PEND-EDIT-004` → `EDIT-VALIDATION` em `02-edit/07-validacao.md`.
 
-- `TRickUIBuilder.Edit`;
-- `IRickUIBuilderEdit`;
-- `TRickUIBuilderEditConfig`;
-- Factory pública;
-- `BuildHandle`;
-- Handle runtime.
+Essas regras não devem ser redefinidas neste arquivo.
 
-## PEND-EDIT-002 — Composição visual
-
-Não confirmados root, controle de edição, label, helper/error, paths, hit areas e estados.
-
-## PEND-EDIT-003 — Entrada e transformação
-
-Não confirmadas máscaras, políticas de caracteres, normalização, MaxLength e regras de paste.
-
-## PEND-EDIT-004 — Validação
-
-Não confirmados validator, origem manual/automática de invalidade, mensagem e gatilhos.
 
 ## PEND-EDIT-005 — Eventos
 

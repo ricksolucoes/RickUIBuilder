@@ -48,8 +48,8 @@ Regra: `[x]` somente quando a evidência está materializada neste pacote ou no 
   - Evidência: tabela de `03-governanca/01-mapa-de-owners.md`.
 - [x] Regra de não redefinição está explícita.
   - Evidência: `README.md` e `03-governanca/01-mapa-de-owners.md`.
-- [x] Lacunas funcionais possuem Owner único.
-  - Evidência: `EDIT-PENDING`.
+- [x] Lacunas funcionais abertas possuem Owner único; decisões fechadas possuem Owners normativos próprios.
+  - Evidência: `EDIT-PENDING`, `EDIT-PUBLIC`, `EDIT-COMPOSITION`, `EDIT-INPUT` e `EDIT-VALIDATION`.
 - [x] O índice não contém cópia integral das regras.
   - Evidência: `03-governanca/01-mapa-de-owners.md`.
 
@@ -117,8 +117,8 @@ Regra: `[x]` somente quando a evidência está materializada neste pacote ou no 
   - Evidência: `README.md`.
 - [x] Mapa de Owners criado.
   - Evidência: `03-governanca/01-mapa-de-owners.md`.
-- [x] Requisitos não confirmados concentrados em um único Owner.
-  - Evidência: `EDIT-PENDING`.
+- [x] Requisitos ainda não confirmados permanecem concentrados em `EDIT-PENDING`; regras resolvidas 001–003 foram migradas para Owners próprios.
+  - Evidência: `EDIT-PENDING`, `EDIT-PUBLIC`, `EDIT-COMPOSITION`, `EDIT-INPUT` e `EDIT-VALIDATION`.
 - [x] Exemplos não foram usados para criar requisito funcional do Edit.
   - Evidência: não existem exemplos funcionais inventados.
 - [x] Defaults específicos do Edit não foram inventados.
@@ -139,7 +139,7 @@ Regra: `[x]` somente quando a evidência está materializada neste pacote ou no 
 - [x] Package isolado.
 - [x] Integração do Edit isolada.
 - [x] Contrato funcional confirmado isolado.
-- [x] Pendências isoladas.
+- [x] Pendências abertas isoladas; superfície pública, composição visual, entrada/transformação e validação isoladas em Owners próprios.
   - Evidência para todos: estrutura do pacote e `03-governanca/01-mapa-de-owners.md`.
 
 ## Fase 9 — Testes
@@ -159,13 +159,13 @@ A instrução atual do usuário define que este conjunto é para **orientar impl
   - Evidência: `03-governanca/01-mapa-de-owners.md`.
 - [x] Índice não redefine as regras.
   - Evidência: conteúdo do índice.
-- [x] Pendências possuem Owner identificável.
-  - Evidência: `EDIT-PENDING`.
+- [x] Pendências abertas e decisões resolvidas possuem Owner identificável.
+  - Evidência: `EDIT-PENDING`, `EDIT-PUBLIC`, `EDIT-COMPOSITION`, `EDIT-INPUT` e `EDIT-VALIDATION`.
 
 ## Fase 11 — Status
 
-- [x] Fatos confirmados estão separados de `Não confirmado`.
-  - Evidência: `EDIT-FUNCTION` versus `EDIT-PENDING`.
+- [x] Fatos confirmados estão separados de `Não confirmado`, e decisões resolvidas 001–003 não permanecem no Owner de pendências.
+  - Evidência: `EDIT-FUNCTION`, `EDIT-PUBLIC`, `EDIT-COMPOSITION`, `EDIT-INPUT`, `EDIT-VALIDATION` versus `EDIT-PENDING`.
 - [x] Não existe “APROVADO” funcional falso para o Edit.
   - Evidência: este checklist mantém itens funcionais pendentes.
 - [ ] Contrato funcional do Edit aprovado.

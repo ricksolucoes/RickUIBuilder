@@ -12,6 +12,10 @@
 | EDIT-INTEGRATION | `02-edit/01-integracao-no-framework.md` | Não |
 | EDIT-FUNCTION | `02-edit/02-contrato-funcional-confirmado.md` | Não |
 | EDIT-PENDING | `02-edit/03-decisoes-nao-confirmadas.md` | Não |
+| EDIT-PUBLIC | `02-edit/04-superficie-publica.md` | Não |
+| EDIT-COMPOSITION | `02-edit/05-composicao-visual.md` | Não |
+| EDIT-INPUT | `02-edit/06-entrada-transformacao.md` | Não |
+| EDIT-VALIDATION | `02-edit/07-validacao.md` | Não |
 
 ## Regra
 

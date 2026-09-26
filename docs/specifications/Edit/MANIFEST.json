@@ -2,6 +2,6 @@
   "purpose": "Documentação para futura IA implementadora; sem código",
   "source_snapshot": "RickUIBuilder-0.2.2.zip",
   "used_previous_generated_edit_docs": false,
-  "owners": 10,
-  "functional_edit_status": "Não confirmado nas fronteiras listadas em EDIT-PENDING"
+  "owners": 14,
+  "functional_edit_status": "PEND-EDIT-001..004 resolvidas em Owners próprios; PEND-EDIT-005..007 permanecem não confirmadas em EDIT-PENDING"
 }
