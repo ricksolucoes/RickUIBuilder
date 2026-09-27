@@ -49,12 +49,10 @@ type
     function ShouldShowAlertIcon: Boolean;
     procedure HandleEnter(Sender: TObject);
     procedure HandleExit(Sender: TObject);
+    function ResolveChangedText(const AText: string; out AResolved: string): Boolean;
     procedure HandleChange(Sender: TObject);
-    function ResolveChangedText(const AValue: string; out AResolved: string): Boolean;
     procedure HandleClear(Sender: TObject);
     procedure HandlePassword(Sender: TObject);
-    function IsMaskedPreset: Boolean;
-    function IsIncrementalChange(const AValue: string): Boolean;
   public
     procedure Configure(const AConfig: TRickUIBuilderEditConfig;
       AContainer: TRectangle; AEdit: TEdit; ALabel, ACounter,
@@ -85,7 +83,7 @@ begin
   FErrorLabel := AErrorLabel;
   FEdit.OnEnter := HandleEnter;
   FEdit.OnExit := HandleExit;
-  FEdit.OnChange := HandleChange;
+  FEdit.OnChangeTracking := HandleChange;
   FLastValidText := FEdit.Text;
   UpdateCounter;
 end;
@@ -102,36 +100,32 @@ begin
   FRequirementPath := ARequirementPath;
   if Assigned(FClearArea) then
     FClearArea.OnClick := HandleClear;
+  if Assigned(FClearPath) then
+  begin
+    FClearPath.HitTest := True;
+    FClearPath.Cursor := crHandPoint;
+    FClearPath.OnClick := HandleClear;
+  end;
   if Assigned(FPasswordArea) then
     FPasswordArea.OnClick := HandlePassword;
+  if Assigned(FPasswordPath) then
+  begin
+    FPasswordPath.HitTest := True;
+    FPasswordPath.Cursor := crHandPoint;
+    FPasswordPath.OnClick := HandlePassword;
+  end;
   UpdateClearVisibility;
   UpdatePasswordIcon;
   UpdateRequirementIcon;
 end;
 
-function TRickUIBuilderEditBehavior.IsMaskedPreset: Boolean;
+function TRickUIBuilderEditBehavior.ResolveChangedText(
+  const AText: string; out AResolved: string): Boolean;
 begin
-  Result := FConfig.Preset in [TRickUIBuilderEditPreset.CPF,
-    TRickUIBuilderEditPreset.CNPJ, TRickUIBuilderEditPreset.CEP,
-    TRickUIBuilderEditPreset.Phone, TRickUIBuilderEditPreset.Mobile];
-end;
-
-function TRickUIBuilderEditBehavior.IsIncrementalChange(
-  const AValue: string): Boolean;
-begin
-  Result := Abs(Length(AValue) - Length(FLastValidText)) <= 1;
-end;
-
-function TRickUIBuilderEditBehavior.ResolveChangedText(const AValue: string;
-  out AResolved: string): Boolean;
-begin
-  Result := TRickUIBuilderEditInput.IsTypedValueAllowed(AValue, FConfig);
+  Result := TRickUIBuilderEditInput.IsTypedValueAllowed(AText, FConfig);
   if not Result then
     Exit;
-  if IsMaskedPreset and not TRickUIBuilderEditInput.IsPasteAllowed(
-    AValue, FConfig) and not IsIncrementalChange(AValue) then
-    Exit(False);
-  AResolved := TRickUIBuilderEditInput.FormatTypedValue(AValue, FConfig);
+  AResolved := TRickUIBuilderEditInput.FormatTypedValue(AText, FConfig);
   Result := TRickUIBuilderEditInput.IsValueAllowed(AResolved, FConfig);
 end;
 

@@ -48,7 +48,9 @@ Nos presets mascarados, paste só é aceito quando o texto colado já possui a e
 
 ## Clear e senha
 
-`ClearButton` habilita o botão de limpeza. `Password` inicia o `TEdit` em modo de senha e habilita a alternância runtime entre conteúdo oculto e visível.
+`ClearButton` habilita o botão de limpeza. O ícone aparece quando existe texto, permanece na área de ações à direita e pode coexistir com os demais indicadores. `Password` inicia o `TEdit` em modo de senha e habilita a alternância runtime entre conteúdo oculto e visível.
+
+O `TEdit` interno usa fundo transparente por padrão. `EditBackgroundColor` permite definir um fundo próprio sem substituir a configuração do container (`BackgroundColor`, bordas, foco, estado inválido e `CornerRadius`).
 
 ## Estados e feedback
 
@@ -71,26 +73,8 @@ Os paths padrão usam os SVGs fornecidos para requisito atendido e não atendido
 
 ## TPath
 
-Alert, clear, visibilidade de senha e requisito são renderizados com `TPath`. Os paths e `IconColor`/`IconSize` são configuráveis.
+Alert, clear, visibilidade de senha e requisito são renderizados com `TPath` na área de ações à direita. Os paths e `IconSize` são configuráveis. `IconColor` continua configurando todos os ícones de uma vez; `AlertIconColor`, `ClearIconColor`, `PasswordIconColor` e `RequirementIconColor` permitem sobrescrever a cor de cada função individualmente.
 
 ## Lifetime
 
 O `Behavior` runtime é um `TComponent` pertencente ao `AParent`, portanto permanece vivo depois que o builder sai de escopo. O handle é non-owning em relação aos controles FMX e deve ser considerado inválido depois que o Parent for destruído, seguindo o mesmo princípio dos handles existentes do projeto.
-
-## Sample operacional
-
-O projeto em `sample/` possui uma seção dedicada ao `Edit` para validação visual e operacional em runtime. Ela cobre:
-
-- CPF, CNPJ alfanumérico e CEP com máscara;
-- e-mail, telefone e celular;
-- inteiro negativo e `FloatNumber` nos modos `Locale` e `Custom`;
-- todos os presets textuais;
-- `Uppercase`, `Lowercase` e os dois modos de URL;
-- `MaxLength` com contador, clear e password;
-- os três modos de feedback inválido e estado controlado pelo handle;
-- indicador de requisito controlado pelo consumidor;
-- cópia e paste de CPF válido e inválido.
-
-A bancada de clipboard usa `TEdit.SelectAll`, `CopyToClipboard` e `PasteFromClipboard`. Para o alvo CPF, o valor `123.456.789-01` representa um paste estruturalmente válido e `12345678901` permite verificar a rejeição do paste sem máscara.
-
-O Sample é uma verificação manual complementar aos testes automatizados; ele não substitui DUnitX nem validação por Method Toxicity Metrics.

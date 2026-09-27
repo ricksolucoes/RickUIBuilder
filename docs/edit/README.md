@@ -34,28 +34,12 @@ Negative numbers are opt-in. Float input can use locale separators or custom dec
 
 ## Runtime behavior
 
-The component supports max length, a single-line `current/max` counter, clear, password visibility toggle, normal/focus/invalid states, configurable invalid feedback, and optional requirement-state indication.
+The component supports max length, a single-line `current/max` counter, clear, password visibility toggle, normal/focus/invalid states, configurable invalid feedback, and optional requirement-state indication. Clear becomes visible when text exists and shares the right-side action area with the other enabled indicators.
+
+The internal `TEdit` uses a transparent background by default. `EditBackgroundColor` configures its own background independently from the container background, borders, focus/invalid colors, and corner radius.
 
 `SetInvalid` controls invalid state. `SetRequirementMet` controls the requirement indicator explicitly; the component does not invent semantic validation rules.
 
 ## TPath and lifetime
 
-Alert, clear, password visibility, and requirement icons use configurable `TPath` data. Runtime behavior is owned by `AParent`; the returned handle is non-owning with respect to FMX controls and must not be used after its Parent is destroyed.
-
-## Operational sample
-
-The project under `sample/` includes a dedicated runtime `Edit` section for visual and operational verification. It covers:
-
-- masked CPF, alphanumeric CNPJ, and CEP;
-- email, phone, and mobile phone;
-- negative integer and `FloatNumber` in both `Locale` and `Custom` modes;
-- every text preset;
-- `Uppercase`, `Lowercase`, and both URL case modes;
-- `MaxLength` with counter, clear, and password;
-- all three invalid-feedback modes and invalid state controlled through the handle;
-- requirement indicator controlled by the consumer;
-- copy and paste scenarios with valid and invalid CPF input.
-
-The clipboard bench uses `TEdit.SelectAll`, `CopyToClipboard`, and `PasteFromClipboard`. For the CPF target, `123.456.789-01` is the structurally valid paste example, while `12345678901` exercises rejection of unmasked paste.
-
-The Sample complements automated tests with manual runtime verification; it does not replace DUnitX or Method Toxicity Metrics validation.
+Alert, clear, password visibility, and requirement icons use configurable `TPath` data and are laid out in the right-side action area. `IconColor` sets all icon colors together; `AlertIconColor`, `ClearIconColor`, `PasswordIconColor`, and `RequirementIconColor` can override them individually. Runtime behavior is owned by `AParent`; the returned handle is non-owning with respect to FMX controls and must not be used after its Parent is destroyed.

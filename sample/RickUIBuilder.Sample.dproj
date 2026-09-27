@@ -276,7 +276,7 @@
             <Form>PageSampleMain</Form>
             <FormType>fmx</FormType>
         </DCCReference>
-        <DCCReference Include="src\RickUIBuilderSample.Edit.pas" />
+        <DCCReference Include="src\RickUIBuilderSample.Edit.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -321,6 +321,12 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="..\APP\Debug\RickUIBuilder.Sample.exe" Configuration="Debug" Class="ProjectOutput"/>
+                <DeployFile LocalName="..\APP\Debug\RickUIBuilder.Sample.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>RickUIBuilder.Sample.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployClass Name="AdditionalDebugSymbols">
                     <Platform Name="iOSSimulator">
                         <Operation>1</Operation>

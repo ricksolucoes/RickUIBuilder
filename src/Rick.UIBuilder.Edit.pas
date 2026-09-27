@@ -19,17 +19,31 @@ uses
 
 type
   TRickUIBuilderEditBuilder = class(TInterfacedObject, IRickUIBuilderEdit)
+  strict private type
+    TActionControls = record
+      Alert: TPath;
+      ClearArea: TLayout;
+      ClearIcon: TPath;
+      PasswordArea: TLayout;
+      PasswordIcon: TPath;
+      Requirement: TPath;
+    end;
   strict private
     FConfig: TRickUIBuilderEditConfig;
     function CreateContainer(AParent: TFmxObject): TRectangle;
     function CreateLabel(AContainer: TRectangle): TLabel;
+    function CreateEditBackground(AContainer: TRectangle): TRectangle;
     function CreateEdit(AContainer: TRectangle): TEdit;
     function CreateCounter(AContainer: TRectangle): TLabel;
     function CreateErrorLabel(AContainer: TRectangle): TLabel;
-    function CreatePath(AParent: TFmxObject; const AData: string): TPath;
+    function CreatePath(AParent: TFmxObject; const AData: string;
+      AColor: TAlphaColor): TPath;
     function CreateActionArea(AContainer: TRectangle; ALeft: Single): TLayout;
     function CreateAlert(AContainer: TRectangle): TPath;
-    function CreateRequirement(AContainer: TRectangle): TPath;
+    function CreateRequirement(AContainer: TRectangle; ALeft: Single): TPath;
+    function ActionCount: Integer;
+    function EditAreaWidth: Single;
+    function CreateActions(AContainer: TRectangle): TActionControls;
     function CreateBehavior(AParent: TFmxObject; AContainer: TRectangle;
       AEdit: TEdit; ALabel, ACounter, AError: TLabel)
     : TRickUIBuilderEditBehavior;
@@ -58,6 +72,7 @@ type
     : IRickUIBuilderEdit;
     function InvalidMessage(const AValue: string): IRickUIBuilderEdit;
     function BackgroundColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function EditBackgroundColor(AValue: TAlphaColor): IRickUIBuilderEdit;
     function BorderColor(AValue: TAlphaColor): IRickUIBuilderEdit;
     function FocusBorderColor(AValue: TAlphaColor): IRickUIBuilderEdit;
     function InvalidBorderColor(AValue: TAlphaColor): IRickUIBuilderEdit;
@@ -66,6 +81,10 @@ type
     function LabelColor(AValue: TAlphaColor): IRickUIBuilderEdit;
     function InvalidLabelColor(AValue: TAlphaColor): IRickUIBuilderEdit;
     function IconColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function AlertIconColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function ClearIconColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function PasswordIconColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function RequirementIconColor(AValue: TAlphaColor): IRickUIBuilderEdit;
     function CornerRadius(AValue: Single): IRickUIBuilderEdit;
     function BorderThickness(AValue: Single): IRickUIBuilderEdit;
     function FontSize(AValue: Single): IRickUIBuilderEdit;
@@ -93,6 +112,90 @@ uses
 
   Rick.UIBuilder.Edit.Input,
   Rick.UIBuilder.Edit.Handle;
+
+type
+  TRickUIBuilderRuntimeEdit = class(TEdit)
+  strict private
+    FInputConfig: TRickUIBuilderEditConfig;
+    FInputConfigured: Boolean;
+    FApplyingText: Boolean;
+    function ChangedCaretPosition(const AOldText, ANewText: string;
+      AOldCaret: Integer): Integer;
+    function FormattedCaretPosition(const AValue: string;
+      ARawCaret: Integer): Integer;
+  protected
+    procedure SetText(const Value: string); override;
+  public
+    procedure ConfigureInput(const AConfig: TRickUIBuilderEditConfig);
+  end;
+
+procedure TRickUIBuilderRuntimeEdit.ConfigureInput(
+  const AConfig: TRickUIBuilderEditConfig);
+begin
+  FInputConfig := AConfig;
+  FInputConfigured := True;
+end;
+
+function TRickUIBuilderRuntimeEdit.ChangedCaretPosition(const AOldText,
+  ANewText: string; AOldCaret: Integer): Integer;
+var
+  LPrefix, LSuffix: Integer;
+begin
+  if AOldText = ANewText then
+    Exit(AOldCaret);
+  LPrefix := 0;
+  while (LPrefix < Length(AOldText)) and (LPrefix < Length(ANewText)) and
+    (AOldText[LPrefix + 1] = ANewText[LPrefix + 1]) do
+    Inc(LPrefix);
+  LSuffix := 0;
+  while (LSuffix < Length(AOldText) - LPrefix) and
+    (LSuffix < Length(ANewText) - LPrefix) and
+    (AOldText[Length(AOldText) - LSuffix] =
+      ANewText[Length(ANewText) - LSuffix]) do
+    Inc(LSuffix);
+  Result := Length(ANewText) - LSuffix;
+end;
+
+function TRickUIBuilderRuntimeEdit.FormattedCaretPosition(const AValue: string;
+  ARawCaret: Integer): Integer;
+var
+  LPrefix: string;
+begin
+  if ARawCaret < 0 then
+    ARawCaret := 0;
+  if ARawCaret > Length(AValue) then
+    ARawCaret := Length(AValue);
+  LPrefix := Copy(AValue, 1, ARawCaret);
+  Result := Length(TRickUIBuilderEditInput.FormatTypedValue(LPrefix,
+    FInputConfig));
+end;
+
+procedure TRickUIBuilderRuntimeEdit.SetText(const Value: string);
+var
+  LCaret: Integer;
+  LOldText, LResolved: string;
+begin
+  if FApplyingText or not FInputConfigured then
+  begin
+    inherited SetText(Value);
+    Exit;
+  end;
+  if not TRickUIBuilderEditInput.IsTypedValueAllowed(Value, FInputConfig) then
+    Exit;
+  LOldText := Text;
+  LCaret := ChangedCaretPosition(LOldText, Value, SelStart);
+  LResolved := TRickUIBuilderEditInput.FormatTypedValue(Value, FInputConfig);
+  if not TRickUIBuilderEditInput.IsValueAllowed(LResolved, FInputConfig) then
+    Exit;
+  FApplyingText := True;
+  try
+    inherited SetText(LResolved);
+    SelStart := FormattedCaretPosition(Value, LCaret);
+    SelLength := 0;
+  finally
+    FApplyingText := False;
+  end;
+end;
 
 constructor TRickUIBuilderEditBuilder.Create;
 begin
@@ -254,6 +357,13 @@ begin
   Result := Self;
 end;
 
+function TRickUIBuilderEditBuilder.EditBackgroundColor(AValue: TAlphaColor)
+: IRickUIBuilderEdit;
+begin
+  FConfig.EditBackgroundColor := AValue;
+  Result := Self;
+end;
+
 function TRickUIBuilderEditBuilder.BorderColor(AValue: TAlphaColor)
 : IRickUIBuilderEdit;
 begin
@@ -307,6 +417,38 @@ function TRickUIBuilderEditBuilder.IconColor(AValue: TAlphaColor)
 : IRickUIBuilderEdit;
 begin
   FConfig.IconColor := AValue;
+  FConfig.AlertIconColor := AValue;
+  FConfig.ClearIconColor := AValue;
+  FConfig.PasswordIconColor := AValue;
+  FConfig.RequirementIconColor := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderEditBuilder.AlertIconColor(AValue: TAlphaColor)
+: IRickUIBuilderEdit;
+begin
+  FConfig.AlertIconColor := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderEditBuilder.ClearIconColor(AValue: TAlphaColor)
+: IRickUIBuilderEdit;
+begin
+  FConfig.ClearIconColor := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderEditBuilder.PasswordIconColor(AValue: TAlphaColor)
+: IRickUIBuilderEdit;
+begin
+  FConfig.PasswordIconColor := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderEditBuilder.RequirementIconColor(AValue: TAlphaColor)
+: IRickUIBuilderEdit;
+begin
+  FConfig.RequirementIconColor := AValue;
   Result := Self;
 end;
 
@@ -402,11 +544,47 @@ begin
   Result.HitTest := False;
 end;
 
-function TRickUIBuilderEditBuilder.CreateEdit(AContainer: TRectangle): TEdit;
+function TRickUIBuilderEditBuilder.ActionCount: Integer;
 begin
-  Result := TEdit.Create(AContainer);
+  Result := 0;
+  if FConfig.InvalidFeedback <> TRickUIBuilderEditInvalidFeedback.AlertOnly then
+    Inc(Result);
+  if FConfig.ShowClearButton then
+    Inc(Result);
+  if FConfig.Password then
+    Inc(Result);
+  if FConfig.ShowRequirementIndicator then
+    Inc(Result);
+end;
+
+function TRickUIBuilderEditBuilder.EditAreaWidth: Single;
+begin
+  Result := FConfig.Width - 16 - (ActionCount * 32);
+  if Result < 40 then
+    Result := 40;
+end;
+
+function TRickUIBuilderEditBuilder.CreateEditBackground(
+  AContainer: TRectangle): TRectangle;
+begin
+  Result := TRectangle.Create(AContainer);
   Result.Parent := AContainer;
-  Result.SetBounds(8, 19, FConfig.Width - 120, 32);
+  Result.SetBounds(8, 20, EditAreaWidth, 36);
+  Result.Fill.Color := FConfig.EditBackgroundColor;
+  Result.Stroke.Kind := TBrushKind.None;
+  Result.HitTest := False;
+end;
+
+function TRickUIBuilderEditBuilder.CreateEdit(AContainer: TRectangle): TEdit;
+var
+  LEdit: TRickUIBuilderRuntimeEdit;
+begin
+  LEdit := TRickUIBuilderRuntimeEdit.Create(AContainer);
+  LEdit.ConfigureInput(FConfig);
+  Result := LEdit;
+  Result.Parent := AContainer;
+  Result.SetBounds(8, 20, EditAreaWidth, 36);
+  Result.StyleLookup := 'transparentedit';
   Result.TextSettings.Font.Size := FConfig.FontSize;
   Result.TextSettings.FontColor := FConfig.TextColor;
   Result.Password := FConfig.Password;
@@ -436,7 +614,7 @@ begin
 end;
 
 function TRickUIBuilderEditBuilder.CreatePath(AParent: TFmxObject;
-  const AData: string): TPath;
+  const AData: string; AColor: TAlphaColor): TPath;
 begin
   Result := TPath.Create(AParent);
   Result.Parent := AParent;
@@ -445,7 +623,7 @@ begin
   Result.Height := FConfig.IconSize;
   Result.Data.Data := AData;
   Result.WrapMode := TPathWrapMode.Fit;
-  Result.Fill.Color := FConfig.IconColor;
+  Result.Fill.Color := AColor;
   Result.Stroke.Kind := TBrushKind.None;
   Result.HitTest := False;
 end;
@@ -455,21 +633,53 @@ function TRickUIBuilderEditBuilder.CreateActionArea(AContainer: TRectangle;
 begin
   Result := TLayout.Create(AContainer);
   Result.Parent := AContainer;
-  Result.SetBounds(ALeft, 19, 32, 32);
+  Result.SetBounds(ALeft, 20, 32, 36);
+  Result.HitTest := True;
+  Result.Cursor := crHandPoint;
+  Result.BringToFront;
 end;
 
 function TRickUIBuilderEditBuilder.CreateAlert(AContainer: TRectangle): TPath;
 begin
-  Result := CreatePath(AContainer, FConfig.AlertPath);
-  Result.SetBounds(FConfig.Width - 28, 4, FConfig.IconSize, FConfig.IconSize);
+  Result := CreatePath(AContainer, FConfig.AlertPath, FConfig.AlertIconColor);
+  Result.Align := TAlignLayout.None;
+  Result.SetBounds(FConfig.Width - 32 + ((32 - FConfig.IconSize) / 2), 28,
+    FConfig.IconSize, FConfig.IconSize);
   Result.Visible := False;
 end;
 
-function TRickUIBuilderEditBuilder.CreateRequirement
-(AContainer: TRectangle): TPath;
+function TRickUIBuilderEditBuilder.CreateRequirement(AContainer: TRectangle;
+  ALeft: Single): TPath;
 begin
-  Result := CreatePath(AContainer, FConfig.RequirementNotMetPath);
-  Result.SetBounds(FConfig.Width - 116, 25, FConfig.IconSize, FConfig.IconSize);
+  Result := CreatePath(AContainer, FConfig.RequirementNotMetPath,
+    FConfig.RequirementIconColor);
+  Result.Align := TAlignLayout.None;
+  Result.SetBounds(ALeft + ((32 - FConfig.IconSize) / 2), 28,
+    FConfig.IconSize, FConfig.IconSize);
+end;
+
+function TRickUIBuilderEditBuilder.CreateActions(
+  AContainer: TRectangle): TActionControls;
+var
+  X: Single;
+begin
+  X := FConfig.Width - 40;
+  Result.ClearArea := CreateActionArea(AContainer, X);
+  Result.ClearIcon := CreatePath(Result.ClearArea, FConfig.ClearPath,
+    FConfig.ClearIconColor);
+  if FConfig.ShowClearButton then
+    X := X - 32;
+  Result.PasswordArea := CreateActionArea(AContainer, X);
+  Result.PasswordIcon := CreatePath(Result.PasswordArea,
+    FConfig.VisibilityOffPath, FConfig.PasswordIconColor);
+  if FConfig.Password then
+    X := X - 32;
+  Result.Requirement := CreateRequirement(AContainer, X);
+  if FConfig.ShowRequirementIndicator then
+    X := X - 32;
+  Result.Alert := CreateAlert(AContainer);
+  Result.Alert.SetBounds(X + ((32 - FConfig.IconSize) / 2), 28,
+    FConfig.IconSize, FConfig.IconSize);
 end;
 
 function TRickUIBuilderEditBuilder.CreateBehavior(AParent: TFmxObject;
@@ -483,27 +693,23 @@ end;
 function TRickUIBuilderEditBuilder.Build(AParent: TFmxObject)
 : IRickUIBuilderEditHandle;
 var
-  C: TRectangle;
+  C, EditBackground: TRectangle;
   E: TEdit;
   L, Count, Err: TLabel;
-  Alert, ClearIcon, PasswordIcon, Requirement: TPath;
-  ClearArea, PasswordArea: TLayout;
+  Actions: TActionControls;
   Behavior: TRickUIBuilderEditBehavior;
 begin
   C := CreateContainer(AParent);
   L := CreateLabel(C);
+  EditBackground := CreateEditBackground(C);
+  EditBackground.SendToBack;
   E := CreateEdit(C);
   Count := CreateCounter(C);
   Err := CreateErrorLabel(C);
-  Alert := CreateAlert(C);
-  ClearArea := CreateActionArea(C, FConfig.Width - 84);
-  ClearIcon := CreatePath(ClearArea, FConfig.ClearPath);
-  PasswordArea := CreateActionArea(C, FConfig.Width - 52);
-  PasswordIcon := CreatePath(PasswordArea, FConfig.VisibilityOffPath);
-  Requirement := CreateRequirement(C);
+  Actions := CreateActions(C);
   Behavior := CreateBehavior(AParent, C, E, L, Count, Err);
-  Behavior.ConfigureIcons(Alert, ClearArea, ClearIcon, PasswordArea,
-    PasswordIcon, Requirement);
+  Behavior.ConfigureIcons(Actions.Alert, Actions.ClearArea, Actions.ClearIcon,
+    Actions.PasswordArea, Actions.PasswordIcon, Actions.Requirement);
   Behavior.SetText(FConfig.Text);
   Result := TRickUIBuilderEditHandle.New(C, E, Behavior);
 end;

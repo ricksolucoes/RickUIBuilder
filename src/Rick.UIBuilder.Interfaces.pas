@@ -1325,6 +1325,7 @@ type
     function InvalidFeedback(AValue: TRickUIBuilderEditInvalidFeedback): IRickUIBuilderEdit;
     function InvalidMessage(const AValue: string): IRickUIBuilderEdit;
     function BackgroundColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function EditBackgroundColor(AValue: TAlphaColor): IRickUIBuilderEdit;
     function BorderColor(AValue: TAlphaColor): IRickUIBuilderEdit;
     function FocusBorderColor(AValue: TAlphaColor): IRickUIBuilderEdit;
     function InvalidBorderColor(AValue: TAlphaColor): IRickUIBuilderEdit;
@@ -1333,6 +1334,10 @@ type
     function LabelColor(AValue: TAlphaColor): IRickUIBuilderEdit;
     function InvalidLabelColor(AValue: TAlphaColor): IRickUIBuilderEdit;
     function IconColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function AlertIconColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function ClearIconColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function PasswordIconColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function RequirementIconColor(AValue: TAlphaColor): IRickUIBuilderEdit;
     function CornerRadius(AValue: Single): IRickUIBuilderEdit;
     function BorderThickness(AValue: Single): IRickUIBuilderEdit;
     function FontSize(AValue: Single): IRickUIBuilderEdit;

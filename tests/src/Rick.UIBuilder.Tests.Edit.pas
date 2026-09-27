@@ -14,6 +14,9 @@ type
   TRickUIBuilderEditInputTests = class
   public
     [Test] procedure CPF_DeveAplicarMascaraDuranteFormatacao;
+    [Test] procedure CPF_DeveAplicarMascaraProgressivamente;
+    [Test] procedure CPF_DeveRejeitarLetrasDuranteDigitacao;
+    [Test] procedure CPF_DeveLimitarOnzeDigitos;
     [Test] procedure CPF_PasteSemMascara_DeveSerRejeitado;
     [Test] procedure CPF_PasteComMascara_DeveSerAceito;
     [Test] procedure CNPJ_DeveAceitarBaseAlfanumerica;
@@ -40,6 +43,7 @@ type
     [TearDown] procedure TearDown;
     [Test] procedure Facade_DeveCriarEditSingleLine;
     [Test] procedure Handle_DeveAlterarTextoELimpar;
+    [Test] procedure Edit_DeveFiltrarDuranteChangeTracking;
   end;
 
 implementation
@@ -60,6 +64,29 @@ begin
   LConfig := Config(TRickUIBuilderEditPreset.CPF);
   Assert.AreEqual('123.456.789-01',
     TRickUIBuilderEditInput.FormatTypedValue('12345678901', LConfig));
+end;
+
+procedure TRickUIBuilderEditInputTests.CPF_DeveAplicarMascaraProgressivamente;
+var LConfig: TRickUIBuilderEditConfig;
+begin
+  LConfig := Config(TRickUIBuilderEditPreset.CPF);
+  Assert.AreEqual('123.4',
+    TRickUIBuilderEditInput.FormatTypedValue('1234', LConfig));
+end;
+
+procedure TRickUIBuilderEditInputTests.CPF_DeveRejeitarLetrasDuranteDigitacao;
+var LConfig: TRickUIBuilderEditConfig;
+begin
+  LConfig := Config(TRickUIBuilderEditPreset.CPF);
+  Assert.IsFalse(TRickUIBuilderEditInput.IsTypedValueAllowed('12A', LConfig));
+end;
+
+procedure TRickUIBuilderEditInputTests.CPF_DeveLimitarOnzeDigitos;
+var LConfig: TRickUIBuilderEditConfig;
+begin
+  LConfig := Config(TRickUIBuilderEditPreset.CPF);
+  Assert.AreEqual('123.456.789-01',
+    TRickUIBuilderEditInput.FormatTypedValue('1234567890123', LConfig));
 end;
 
 procedure TRickUIBuilderEditInputTests.CPF_PasteSemMascara_DeveSerRejeitado;
@@ -197,6 +224,19 @@ begin
   Assert.AreEqual('abc', LHandle.Text);
   LHandle.Clear;
   Assert.AreEqual('', LHandle.Text);
+end;
+
+procedure TRickUIBuilderEditIntegrationTests.Edit_DeveFiltrarDuranteChangeTracking;
+var LHandle: IRickUIBuilderEditHandle;
+begin
+  LHandle := TRickUIBuilder.Edit
+    .Preset(TRickUIBuilderEditPreset.CPF)
+    .Build(FHostForm);
+  Assert.IsTrue(Assigned(LHandle.EditControl.OnChangeTracking));
+  LHandle.EditControl.Text := '1234';
+  Assert.AreEqual('123.4', LHandle.Text);
+  LHandle.EditControl.Text := LHandle.Text + 'A';
+  Assert.AreEqual('123.4', LHandle.Text);
 end;
 
 initialization

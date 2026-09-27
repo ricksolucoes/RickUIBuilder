@@ -257,6 +257,7 @@ type
     TextAlign: TTextAlign;
     Trimming: TTextTrimming;
     BackgroundColor: TAlphaColor;
+    EditBackgroundColor: TAlphaColor;
     BorderColor: TAlphaColor;
     TextColor: TAlphaColor;
     PlaceholderColor: TAlphaColor;
@@ -369,6 +370,7 @@ type
     ShowRequirementIndicator: Boolean;
     Password: Boolean;
     BackgroundColor: TAlphaColor;
+    EditBackgroundColor: TAlphaColor;
     BorderColor: TAlphaColor;
     FocusBorderColor: TAlphaColor;
     InvalidBorderColor: TAlphaColor;
@@ -377,6 +379,10 @@ type
     LabelColor: TAlphaColor;
     InvalidLabelColor: TAlphaColor;
     IconColor: TAlphaColor;
+    AlertIconColor: TAlphaColor;
+    ClearIconColor: TAlphaColor;
+    PasswordIconColor: TAlphaColor;
+    RequirementIconColor: TAlphaColor;
     CornerRadius: Single;
     BorderThickness: Single;
     FontSize: Single;
@@ -529,6 +535,7 @@ class procedure TRickUIBuilderEditConfig.InitVisual(
   var AValue: TRickUIBuilderEditConfig);
 begin
   AValue.BackgroundColor := TAlphaColors.White;
+  AValue.EditBackgroundColor := $00000000;
   AValue.BorderColor := $FFB0B0B0;
   AValue.FocusBorderColor := TAlphaColors.Black;
   AValue.InvalidBorderColor := $FFD93025;
@@ -537,6 +544,10 @@ begin
   AValue.LabelColor := $FF606060;
   AValue.InvalidLabelColor := $FFD93025;
   AValue.IconColor := $FF606060;
+  AValue.AlertIconColor := AValue.IconColor;
+  AValue.ClearIconColor := AValue.IconColor;
+  AValue.PasswordIconColor := AValue.IconColor;
+  AValue.RequirementIconColor := AValue.IconColor;
   AValue.CornerRadius := 8;
   AValue.BorderThickness := 1;
   AValue.FontSize := 14;

@@ -30,3 +30,11 @@ O `TRickUIBuilderEditBehavior` é criado com o `AParent` como Owner e mantém os
 ## Escopo preservado
 
 Nenhum componente existente foi redesenhado. As alterações compartilhadas ficaram limitadas a `Types`, `Interfaces`, Facade e arquivos de projeto necessários para expor e registrar o novo `Edit`.
+
+## Correção visual e operacional — 2026-09-27
+
+Esta correção adiciona fundo interno configurável (transparente por padrão), área útil do `TEdit` calculada conforme as ações habilitadas, alinhamento dos ícones à direita e cores individuais para alert, clear, password e requisito. `IconColor` permanece como configuração global retrocompatível.
+
+Foram adicionados testes de regressão para máscara progressiva do CPF, rejeição de letras e limite estrutural de 11 dígitos. Os resultados de testes/toxicidade obtidos antes desta correção não são usados como aprovação desta revisão.
+
+Neste ambiente não foi executado Delphi/MSBuild/RAD Studio após estas alterações. Portanto, para esta revisão: **compilação real, execução DUnitX, validação FMX e Toxicity composta real permanecem Não confirmadas** até nova execução no ambiente Delphi.
