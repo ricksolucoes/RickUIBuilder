@@ -14,6 +14,7 @@
   2. Builders fluentes (Opcao B) - TRickUIBuilder.Label_/Button/Badge/Divider
   3. ComboBox - matriz visual  - TRickUIBuilder.ComboBox
   4. Composicao (meio-termo)  - TRickUIBuilder.On(AParent)
+  5. Edit runtime              - presets, estados e clipboard
 
   Este formulario NAO e um exemplo de tela de producao - e uma
   vitrine deliberadamente simples, cujo unico objetivo e permitir a
@@ -45,7 +46,8 @@ uses
 
   Rick.UIBuilder,
   Rick.UIBuilder.Types,
-  Rick.UIBuilder.Interfaces;
+  Rick.UIBuilder.Interfaces,
+  RickUIBuilderSample.Edit;
 
 type
   TPageSampleMain = class(TForm)
@@ -56,6 +58,7 @@ type
 
     FHoverStateBadgeHandle : IRickUIBuilderBadgeHandle;
     FComboBoxHandle        : IRickUIBuilderComboBoxHandle;
+    FEditShowcase          : TRickUIBuilderEditShowcase;
 
     function CreateFactoryTextConfig(ATop: Single): TRickUIBuilderTextConfig;
     function CreateFactoryDividerConfig(ATop: Single): TRickUIBuilderDividerConfig;
@@ -179,6 +182,8 @@ begin
   BuildFluentButtonDemo(LTop);
   BuildComboBoxDemo(LTop);
   BuildCompositionSection(LTop);
+  FEditShowcase := TRickUIBuilderEditShowcase.Create(Self, FScroll);
+  FEditShowcase.Build(LTop);
 end;
 
 function TPageSampleMain.AddSectionHeader(const ATitle: string;

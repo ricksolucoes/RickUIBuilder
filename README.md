@@ -1,4 +1,4 @@
-﻿<div align="center">
+<div align="center">
 
 # 📱RickUIBuilder
 
@@ -546,6 +546,8 @@ Complete references for the builders are organized by component:
 - [Button](docs/button/README.md) — API, hover, Behavior, Handle, lifecycle, and examples.
 - [Badge](docs/badge/README.md) — API, Pill/CornerRadius, Handle, ownership, and examples.
 - [Divider](docs/divider/README.md) — API, orientation, geometry, Factory, and examples.
+- [Edit](docs/edit/README.md) — presets, masks, numbers, states, TPath, clipboard, and the operational Sample.
+
 - [ComboBox](docs/combobox/README.md) — complete ComboBox technical documentation.
 
 ## 🧩 Composition

@@ -1,4 +1,4 @@
-﻿<div align="center">
+<div align="center">
 
 # 📱RickUIBuilder
 
@@ -546,6 +546,8 @@ A referência completa dos builders simples está separada por componente:
 - [Button](docs/button/README.pt-BR.md) — API, hover, Behavior, Handle, lifecycle e exemplos.
 - [Badge](docs/badge/README.pt-BR.md) — API, Pill/CornerRadius, Handle, ownership e exemplos.
 - [Divider](docs/divider/README.pt-BR.md) — API, orientação, geometria, Factory e exemplos.
+- [Edit](docs/edit/README.pt-BR.md) — presets, máscaras, números, estados, TPath, clipboard e Sample operacional.
+
 - [ComboBox](docs/combobox/README.pt-BR.md) — documentação técnica completa do ComboBox.
 
 ## 🧩 Composition

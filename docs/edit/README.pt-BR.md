@@ -76,3 +76,21 @@ Alert, clear, visibilidade de senha e requisito são renderizados com `TPath`. O
 ## Lifetime
 
 O `Behavior` runtime é um `TComponent` pertencente ao `AParent`, portanto permanece vivo depois que o builder sai de escopo. O handle é non-owning em relação aos controles FMX e deve ser considerado inválido depois que o Parent for destruído, seguindo o mesmo princípio dos handles existentes do projeto.
+
+## Sample operacional
+
+O projeto em `sample/` possui uma seção dedicada ao `Edit` para validação visual e operacional em runtime. Ela cobre:
+
+- CPF, CNPJ alfanumérico e CEP com máscara;
+- e-mail, telefone e celular;
+- inteiro negativo e `FloatNumber` nos modos `Locale` e `Custom`;
+- todos os presets textuais;
+- `Uppercase`, `Lowercase` e os dois modos de URL;
+- `MaxLength` com contador, clear e password;
+- os três modos de feedback inválido e estado controlado pelo handle;
+- indicador de requisito controlado pelo consumidor;
+- cópia e paste de CPF válido e inválido.
+
+A bancada de clipboard usa `TEdit.SelectAll`, `CopyToClipboard` e `PasteFromClipboard`. Para o alvo CPF, o valor `123.456.789-01` representa um paste estruturalmente válido e `12345678901` permite verificar a rejeição do paste sem máscara.
+
+O Sample é uma verificação manual complementar aos testes automatizados; ele não substitui DUnitX nem validação por Method Toxicity Metrics.

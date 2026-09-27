@@ -276,6 +276,7 @@
             <Form>PageSampleMain</Form>
             <FormType>fmx</FormType>
         </DCCReference>
+        <DCCReference Include="src\RickUIBuilderSample.Edit.pas" />
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
