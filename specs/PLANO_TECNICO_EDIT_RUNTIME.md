@@ -2,15 +2,11 @@
 
 **Projeto:** RickUIBuilder\
 **Feature:** `Edit` runtime\
-**Status:** Planejamento técnico --- pré-implementação\
+**Status:** Implementação executada --- validação estática concluída; build/testes reais não confirmados\
 **Base funcional:** `specs/edit-runtime.pt-BR.md`\
 **Backlog:** `specs/BACKLOG_EDIT_RUNTIME.md`
 
-> Este documento organiza a execução técnica. Não afirma que a feature
-> já foi implementada.
->
-> As decisões marcadas como pendentes continuam pendentes. Nenhum sprint
-> de implementação pode resolvê-las por suposição.
+> Este documento organiza a execução técnica. As decisões funcionais usadas na implementação estão registradas na seção 34 da especificação. Resultados de build, DUnitX e Toxicity real continuam dependentes de execução efetiva das respectivas ferramentas.
 
 ## 1. Objetivo técnico
 
@@ -33,6 +29,38 @@ Fechar comportamento
 → validar
 → documentar o estado final
 ```
+
+## Regra permanente de entrega
+
+Ao final de qualquer execução relacionada ao componente `Edit`:
+
+-   a resposta ao usuário deverá disponibilizar **somente um arquivo
+    ZIP**;
+-   o ZIP deverá conter **exclusivamente arquivos efetivamente criados
+    ou modificados** pela execução;
+-   os caminhos relativos ao repositório deverão ser preservados dentro
+    do ZIP;
+-   arquivos apenas consultados, arquivos temporários e arquivos sem
+    alteração não deverão ser incluídos;
+-   arquivos removidos não poderão ser simulados no ZIP por
+    placeholders;
+-   nenhuma etapa poderá substituir essa regra por uma entrega do
+    repositório completo.
+
+Esta regra também se aplica a execuções parciais ou bloqueadas: somente
+artefatos realmente criados ou modificados poderão compor o ZIP.
+
+## Regra permanente de encoding Delphi
+
+Todo arquivo Delphi `.pas` criado ou modificado durante a implementação
+do componente `Edit` deverá ser salvo em **UTF-8 com BOM**.
+
+Esta regra é obrigatória para preservar corretamente caracteres
+acentuados e evitar problemas de encoding no código-fonte.
+
+Antes de incluir qualquer `.pas` no ZIP de entrega, verificar
+efetivamente a presença do BOM UTF-8 (`EF BB BF`). Arquivo `.pas` novo
+ou modificado sem esse encoding não atende ao Quality Gate.
 
 ## 2. Restrições permanentes
 

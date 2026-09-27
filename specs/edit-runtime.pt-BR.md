@@ -497,3 +497,23 @@ de ser tratado como requisito.
 
 Uma interpretação visual, conveniência de implementação ou comportamento
 de outro componente não altera esta especificação por inferência.
+
+## 34. Decisões fechadas para implementação
+
+As decisões abaixo substituem os estados pendentes da seção 31 para esta implementação:
+
+- **D01:** `unpublished...svg` confirmado como requisito não atendido.
+- **D02:** CPF por formato `000.000.000-00`, somente numérico, sem cálculo de DV; máscara automática na digitação e paste somente com a estrutura mascarada.
+- **D03:** CNPJ por formato `AA.AAA.AAA/AAAA-00`; 12 posições alfanuméricas `0-9`/`A-Z` e dois caracteres finais numéricos, sem cálculo de DV; máscara automática na digitação e paste somente mascarado.
+- **D04:** CEP por formato `00000-000`, mesma política de digitação/paste do CPF.
+- **D05:** telefone `0000-0000` ou `(00) 0000-0000`; DDD opcional e incorporado quando a quantidade de dígitos o comporta.
+- **D06:** celular `0 0000-0000` ou `(00) 0 0000-0000`; DDD opcional e incorporado quando a quantidade de dígitos o comporta.
+- **D07:** inteiro possui configuração explícita para permitir/proibir negativo.
+- **D08:** Float pode usar locale ou separadores customizados; negativo, separador de milhar e casas decimais são configuráveis.
+- **D09:** URL oferece `scheme + host` em lowercase ou conteúdo inteiro em lowercase.
+- **D10:** pontuação permitida: `. , ; : ! ? ... - — ( ) [ ] { } " ' « » ’ ` / \ | _ + = < > * @ # $ % & § ~ ^ ° º ª`.
+- **D11:** mensagem de alerta e ícone são suportados e configuráveis.
+- **D12:** contrato público definido tecnicamente conforme a arquitetura real existente.
+- **D13:** Handle/Behavior e lifetime definidos tecnicamente conforme a arquitetura real existente, somente quando necessários ao comportamento runtime.
+
+O indicador de requisito é stateful e seu estado é informado explicitamente pelo consumidor. Nenhuma regra semântica de validação é inferida pelo componente.

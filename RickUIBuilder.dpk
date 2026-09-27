@@ -1,4 +1,4 @@
-package RickUIBuilder;
+﻿package RickUIBuilder;
 
 {$R *.res}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
@@ -51,6 +51,10 @@ contains
   Rick.UIBuilder.ComboBox in 'src\Rick.UIBuilder.ComboBox.pas',
   Rick.UIBuilder in 'src\Rick.UIBuilder.pas',
   Rick.UIBuilder.Button.HoverBehavior in 'src\Rick.UIBuilder.Button.HoverBehavior.pas',
-  Rick.UIBuilder.ComboBox.Behavior in 'src\Rick.UIBuilder.ComboBox.Behavior.pas';
+  Rick.UIBuilder.ComboBox.Behavior in 'src\Rick.UIBuilder.ComboBox.Behavior.pas',
+  Rick.UIBuilder.Edit.Input in 'src\Rick.UIBuilder.Edit.Input.pas',
+  Rick.UIBuilder.Edit.Behavior in 'src\Rick.UIBuilder.Edit.Behavior.pas',
+  Rick.UIBuilder.Edit.Handle in 'src\Rick.UIBuilder.Edit.Handle.pas',
+  Rick.UIBuilder.Edit in 'src\Rick.UIBuilder.Edit.pas';
 
 end.

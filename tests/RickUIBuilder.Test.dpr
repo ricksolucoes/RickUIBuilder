@@ -1,4 +1,4 @@
-program RickUIBuilder.Test;
+Ôªøprogram RickUIBuilder.Test;
 
 {$IFNDEF TESTINSIGHT}
 {$APPTYPE CONSOLE}
@@ -22,7 +22,8 @@ uses
   Rick.UIBuilder.Tests.Button in 'src\Rick.UIBuilder.Tests.Button.pas',
   Rick.UIBuilder.Tests.Composition in 'src\Rick.UIBuilder.Tests.Composition.pas',
   Rick.UIBuilder.Tests.Facade in 'src\Rick.UIBuilder.Tests.Facade.pas',
-  Rick.UIBuilder.Tests.ComboBox in 'src\Rick.UIBuilder.Tests.ComboBox.pas';
+  Rick.UIBuilder.Tests.ComboBox in 'src\Rick.UIBuilder.Tests.ComboBox.pas',
+  Rick.UIBuilder.Tests.Edit in 'src\Rick.UIBuilder.Tests.Edit.pas';
 
 var
   runner      : ITestRunner;
@@ -34,7 +35,7 @@ var
 begin
 {$IFDEF TESTINSIGHT}
   // Se este define estiver ativo, o fluxo abaixo (incluindo o XML) NUNCA roda.
-  // Garanta que TESTINSIGHT esteja OFF no build usado para gerar o relatÛrio.
+  // Garanta que TESTINSIGHT esteja OFF no build usado para gerar o relat√≥rio.
   TestInsight.DUnitX.RunRegisteredTests;
   exit;
 {$ENDIF}
@@ -52,8 +53,8 @@ begin
     runner.AddLogger(logger);
 
     // --- Define explicitamente o caminho do XML ---
-    // Se o usu·rio n„o passou --xml=... na linha de comando, forÁa um caminho
-    // absoluto e previsÌvel, ao lado do execut·vel.
+    // Se o usu√°rio n√£o passou --xml=... na linha de comando, for√ßa um caminho
+    // absoluto e previs√≠vel, ao lado do execut√°vel.
     xmlOutputPath := TDUnitX.Options.XMLOutputFile;
     if xmlOutputPath.Trim.IsEmpty then
       xmlOutputPath := 'dunitx-results.xml';

@@ -300,6 +300,96 @@ type
     class function Default: TRickUIBuilderComboBoxConfig; static;
   end;
 
+
+  TRickUIBuilderEditPreset = (
+    AllCharacters,
+    CPF,
+    CNPJ,
+    CEP,
+    Email,
+    URL,
+    Phone,
+    Mobile,
+    IntegerNumber,
+    FloatNumber,
+    TextNoAccents,
+    TextPunctuationNoAccents,
+    TextWithAccents,
+    TextPunctuationWithAccents
+  );
+
+  TRickUIBuilderEditCaseMode = (
+    Preserve,
+    Uppercase,
+    Lowercase
+  );
+
+  TRickUIBuilderEditUrlCaseMode = (
+    SchemeAndHost,
+    EntireValue
+  );
+
+  TRickUIBuilderEditNumberFormatMode = (
+    Locale,
+    Custom
+  );
+
+  TRickUIBuilderEditInvalidFeedback = (
+    AlertOnly,
+    IconOnly,
+    AlertAndIcon
+  );
+
+  TRickUIBuilderEditConfig = record
+  private
+    class procedure InitBehavior(var AValue: TRickUIBuilderEditConfig); static;
+    class procedure InitVisual(var AValue: TRickUIBuilderEditConfig); static;
+    class procedure InitPaths(var AValue: TRickUIBuilderEditConfig); static;
+  public
+    Left: Single;
+    Top: Single;
+    Width: Single;
+    Height: Single;
+    LabelText: string;
+    Text: string;
+    MaxLength: Integer;
+    Preset: TRickUIBuilderEditPreset;
+    CaseMode: TRickUIBuilderEditCaseMode;
+    UrlCaseMode: TRickUIBuilderEditUrlCaseMode;
+    NumberFormatMode: TRickUIBuilderEditNumberFormatMode;
+    InvalidFeedback: TRickUIBuilderEditInvalidFeedback;
+    InvalidMessage: string;
+    AllowNegative: Boolean;
+    DecimalPlaces: Integer;
+    DecimalSeparator: Char;
+    ThousandSeparator: Char;
+    UseThousandSeparator: Boolean;
+    ShowCounter: Boolean;
+    ShowClearButton: Boolean;
+    ShowRequirementIndicator: Boolean;
+    Password: Boolean;
+    BackgroundColor: TAlphaColor;
+    BorderColor: TAlphaColor;
+    FocusBorderColor: TAlphaColor;
+    InvalidBorderColor: TAlphaColor;
+    InvalidBackgroundColor: TAlphaColor;
+    TextColor: TAlphaColor;
+    LabelColor: TAlphaColor;
+    InvalidLabelColor: TAlphaColor;
+    IconColor: TAlphaColor;
+    CornerRadius: Single;
+    BorderThickness: Single;
+    FontSize: Single;
+    IconSize: Single;
+    AlertPath: string;
+    ClearPath: string;
+    VisibilityPath: string;
+    VisibilityOffPath: string;
+    RequirementMetPath: string;
+    RequirementNotMetPath: string;
+    class function Default: TRickUIBuilderEditConfig; static;
+  end;
+
   /// <summary>
   ///    Representa um espacamento com valores independentes para cada
   ///    lado (esquerda, topo, direita, base). Utilizado pelos metodos
@@ -376,7 +466,8 @@ type
   /// </param>
   TRickUIBuilderBooleanProcedure = procedure(AValue: Boolean) of object;
 
-
+  TRickUIBuilderEditFormatterFunc = function(const AValue: string;
+    const AConfig: TRickUIBuilderEditConfig): string;
 
 const
   /// <summary>Path vetorial padrao da seta para baixo, normalizado do SVG fornecido.</summary>
@@ -398,6 +489,70 @@ const
 implementation
 
 { TRickUIBuilderTextConfig }
+
+
+class function TRickUIBuilderEditConfig.Default: TRickUIBuilderEditConfig;
+begin
+  Result.Left := 0;
+  Result.Top := 0;
+  Result.Width := 280;
+  Result.Height := 72;
+  Result.LabelText := '';
+  Result.Text := '';
+  InitBehavior(Result);
+  InitVisual(Result);
+  InitPaths(Result);
+end;
+
+class procedure TRickUIBuilderEditConfig.InitBehavior(
+  var AValue: TRickUIBuilderEditConfig);
+begin
+  AValue.MaxLength := 0;
+  AValue.Preset := TRickUIBuilderEditPreset.AllCharacters;
+  AValue.CaseMode := TRickUIBuilderEditCaseMode.Preserve;
+  AValue.UrlCaseMode := TRickUIBuilderEditUrlCaseMode.SchemeAndHost;
+  AValue.NumberFormatMode := TRickUIBuilderEditNumberFormatMode.Locale;
+  AValue.InvalidFeedback := TRickUIBuilderEditInvalidFeedback.AlertAndIcon;
+  AValue.InvalidMessage := '';
+  AValue.AllowNegative := False;
+  AValue.DecimalPlaces := 2;
+  AValue.DecimalSeparator := #0;
+  AValue.ThousandSeparator := #0;
+  AValue.UseThousandSeparator := False;
+  AValue.ShowCounter := False;
+  AValue.ShowClearButton := False;
+  AValue.ShowRequirementIndicator := False;
+  AValue.Password := False;
+end;
+
+class procedure TRickUIBuilderEditConfig.InitVisual(
+  var AValue: TRickUIBuilderEditConfig);
+begin
+  AValue.BackgroundColor := TAlphaColors.White;
+  AValue.BorderColor := $FFB0B0B0;
+  AValue.FocusBorderColor := TAlphaColors.Black;
+  AValue.InvalidBorderColor := $FFD93025;
+  AValue.InvalidBackgroundColor := $FFFFF0F0;
+  AValue.TextColor := TAlphaColors.Black;
+  AValue.LabelColor := $FF606060;
+  AValue.InvalidLabelColor := $FFD93025;
+  AValue.IconColor := $FF606060;
+  AValue.CornerRadius := 8;
+  AValue.BorderThickness := 1;
+  AValue.FontSize := 14;
+  AValue.IconSize := 20;
+end;
+
+class procedure TRickUIBuilderEditConfig.InitPaths(
+  var AValue: TRickUIBuilderEditConfig);
+begin
+  AValue.AlertPath := 'M378-246 154-470l43-43 181 181 384-384 43 43-427 427ZM588-96.5Q532-152 532-230q0-79 56-135t134-56q78 0 134 56t56 135q0 78-56 133.5T722-41q-78 0-134-55.5ZM722-117q9 0 15.5-6t6.5-16q0-10-6.5-16t-15.5-6q-10 0-16 6t-6 16q0 10 6 16t16 6Zm-18-85h35v-143h-35v143Z';
+  AValue.ClearPath := 'm330-288 150-150 150 150 42-42-150-150 150-150-42-42-150 150-150-150-42 42 150 150-150 150 42 42ZM480-80q-82 0-155-31.5t-127.5-86Q143-252 111.5-325T80-480q0-83 31.5-156t86-127Q252-817 325-848.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 82-31.5 155T763-197.5q-54 54.5-127 86T480-80Zm0-60q142 0 241-99.5T820-480q0-142-99-241t-241-99q-141 0-240.5 99T140-480q0 141 99.5 240.5T480-140Zm0-340Z';
+  AValue.VisibilityPath := 'M600.5-379.5Q650-429 650-500t-49.5-120.5Q551-670 480-670t-120.5 49.5Q310-571 310-500t49.5 120.5Q409-330 480-330t120.5-49.5Zm-200-41Q368-453 368-500t32.5-79.5Q433-612 480-612t79.5 32.5Q592-547 592-500t-32.5 79.5Q527-388 480-388t-79.5-32.5ZM216-283Q98-366 40-500q58-134 176-217t264-83q146 0 264 83t176 217q-58 134-176 217t-264 83q-146 0-264-83Zm264-217Zm222.5 174.5Q804-391 857-500q-53-109-154.5-174.5T480-740q-121 0-222.5 65.5T102-500q54 109 155.5 174.5T480-260q121 0 222.5-65.5Z';
+  AValue.VisibilityOffPath := 'm629-419-44-44q26-71-27-118t-115-24l-44-44q17-11 38-16t43-5q71 0 120.5 49.5T650-500q0 22-5.5 43.5T629-419Zm129 129-40-40q49-36 85.5-80.5T857-500q-50-111-150-175.5T490-740q-42 0-86 8t-69 19l-46-47q35-16 89.5-28T485-800q143 0 261.5 81.5T920-500q-26 64-67 117t-95 93Zm58 226L648-229q-35 14-79 21.5t-89 7.5q-146 0-265-81.5T40-500q20-52 55.5-101.5T182-696L56-822l42-43 757 757-39 44ZM223-654q-37 27-71.5 71T102-500q51 111 153.5 175.5T488-260q33 0 65-4t48-12l-64-64q-11 5-27 7.5t-30 2.5q-70 0-120-49t-50-121q0-15 2.5-30t7.5-27l-97-97Zm305 142Zm-116 58Z';
+  AValue.RequirementMetPath := 'M480-80q-85 0-158-30.5T195-195q-54-54-84.5-127T80-480q0-84 30.5-157T195-764q54-54 127-85t158-31q75 0 140 24t117 66l-43 43q-44-35-98-54t-116-19q-145 0-242.5 97.5T140-480q0 145 97.5 242.5T480-140q145 0 242.5-97.5T820-480q0-30-4.5-58.5T802-594l46-46q16 37 24 77t8 83q0 85-31 158t-85 127q-54 54-127 84.5T480-80Zm-59-218L256-464l45-45 120 120 414-414 46 45-460 460Z';
+  AValue.RequirementNotMetPath := 'M833-41 718-156q-50 36-110 56T480-80q-85 0-158-30.5T195-195q-54-54-84.5-127T80-480q0-68 20-128t56-110L26-848l43-43L876-84l-43 43Zm-353-99q55 0 104-15.5t91-43.5L498-376l-77 78-165-166 45-45 120 120 32-32-254-254q-28 42-43.5 91T140-480q0 145 97.5 242.5T480-140Zm324-102-43-43q28-42 43.5-91T820-480q0-145-97.5-242.5T480-820q-55 0-104 15.5T285-761l-43-43q50-36 110-56t128-20q84 0 157 31t127 85q54 54 85 127t31 157q0 68-20 128t-56 110ZM585-462l-46-45 119-119 46 45-119 119Zm-62-61Zm-86 86Z';
+end;
 
 class function TRickUIBuilderTextConfig.Default: TRickUIBuilderTextConfig;
 begin

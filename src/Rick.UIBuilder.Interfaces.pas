@@ -34,6 +34,7 @@ uses
   FMX.Controls,
   FMX.Objects,
   FMX.StdCtrls,
+  FMX.Edit,
   Rick.UIBuilder.Types;
 
 type
@@ -1290,6 +1291,61 @@ type
   ///    cada metodo aqui ja cria o controle imediatamente - nao ha um
   ///    Build final.
   /// </summary>
+  IRickUIBuilderEditHandle = interface
+    ['{A6DBF60F-A407-4EF1-8B2D-A674EB53553F}']
+    function Container: TRectangle;
+    function EditControl: TEdit;
+    function Text: string; overload;
+    procedure Text(const AValue: string); overload;
+    procedure Clear;
+    procedure SetInvalid(AValue: Boolean; const AMessage: string = '');
+    procedure SetRequirementMet(AValue: Boolean);
+  end;
+
+  IRickUIBuilderEdit = interface
+    ['{34DF449D-E467-460A-853D-8E706876EEBF}']
+    function Text(const AValue: string): IRickUIBuilderEdit;
+    function LabelText(const AValue: string): IRickUIBuilderEdit;
+    function Position(ALeft, ATop: Single): IRickUIBuilderEdit;
+    function Size(AWidth, AHeight: Single): IRickUIBuilderEdit;
+    function Preset(AValue: TRickUIBuilderEditPreset): IRickUIBuilderEdit;
+    function CaseMode(AValue: TRickUIBuilderEditCaseMode): IRickUIBuilderEdit;
+    function UrlCaseMode(AValue: TRickUIBuilderEditUrlCaseMode): IRickUIBuilderEdit;
+    function MaxLength(AValue: Integer): IRickUIBuilderEdit;
+    function CharacterCounter(AValue: Boolean = True): IRickUIBuilderEdit;
+    function AllowNegative(AValue: Boolean = True): IRickUIBuilderEdit;
+    function DecimalPlaces(AValue: Integer): IRickUIBuilderEdit;
+    function NumberFormatMode(AValue: TRickUIBuilderEditNumberFormatMode): IRickUIBuilderEdit;
+    function DecimalSeparator(AValue: Char): IRickUIBuilderEdit;
+    function ThousandSeparator(AValue: Char): IRickUIBuilderEdit;
+    function UseThousandSeparator(AValue: Boolean = True): IRickUIBuilderEdit;
+    function ClearButton(AValue: Boolean = True): IRickUIBuilderEdit;
+    function RequirementIndicator(AValue: Boolean = True): IRickUIBuilderEdit;
+    function Password(AValue: Boolean = True): IRickUIBuilderEdit;
+    function InvalidFeedback(AValue: TRickUIBuilderEditInvalidFeedback): IRickUIBuilderEdit;
+    function InvalidMessage(const AValue: string): IRickUIBuilderEdit;
+    function BackgroundColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function BorderColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function FocusBorderColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function InvalidBorderColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function InvalidBackgroundColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function TextColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function LabelColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function InvalidLabelColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function IconColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function CornerRadius(AValue: Single): IRickUIBuilderEdit;
+    function BorderThickness(AValue: Single): IRickUIBuilderEdit;
+    function FontSize(AValue: Single): IRickUIBuilderEdit;
+    function IconSize(AValue: Single): IRickUIBuilderEdit;
+    function AlertPath(const AValue: string): IRickUIBuilderEdit;
+    function ClearPath(const AValue: string): IRickUIBuilderEdit;
+    function VisibilityPath(const AValue: string): IRickUIBuilderEdit;
+    function VisibilityOffPath(const AValue: string): IRickUIBuilderEdit;
+    function RequirementMetPath(const AValue: string): IRickUIBuilderEdit;
+    function RequirementNotMetPath(const AValue: string): IRickUIBuilderEdit;
+    function Build(AParent: TFmxObject): IRickUIBuilderEditHandle;
+  end;
+
   IRickUIBuilderComposer = interface
     ['{4B7E9D2C-6A3F-4B8D-9E5C-1F2A3B4C5D6E}']
 

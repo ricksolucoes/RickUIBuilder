@@ -1071,3 +1071,9 @@ funcional e então refletido neste backlog.
 
 Não adicionar implementação ao backlog como forma de decidir requisito
 ainda indefinido.
+
+# Registro da execução do Edit
+
+As decisões BL-00.01 a BL-00.11 foram fechadas conforme a seção 34 da especificação. D12 e D13 foram autorizadas como decisão técnica conforme a arquitetura existente.
+
+A implementação deve manter como evidência separada: análise estática, testes realmente executados, build realmente executado e Method Toxicity real. A existência de código ou testes não implica aprovação de execução.

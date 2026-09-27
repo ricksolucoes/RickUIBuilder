@@ -1,4 +1,4 @@
-unit Rick.UIBuilder;
+﻿unit Rick.UIBuilder;
 (*
   ==============================================================================
   Unit: Rick.UIBuilder
@@ -38,6 +38,7 @@ uses
   Rick.UIBuilder.Badge,
   Rick.UIBuilder.Divider,
   Rick.UIBuilder.ComboBox,
+  Rick.UIBuilder.Edit,
   Rick.UIBuilder.Composition;
 
 type
@@ -104,6 +105,8 @@ type
     /// </summary>
     class function ComboBox: IRickUIBuilderComboBox; static;
 
+    class function Edit: IRickUIBuilderEdit; static;
+
     /// <summary>
     ///    Da acesso direto a TRickUIBuilderFactory (criacao direta,
     ///    Opcao A), para os cenarios em que um controle unico com
@@ -159,6 +162,11 @@ end;
 class function TRickUIBuilder.ComboBox: IRickUIBuilderComboBox;
 begin
   Result := TRickUIBuilderComboBoxBuilder.New;
+end;
+
+class function TRickUIBuilder.Edit: IRickUIBuilderEdit;
+begin
+  Result := TRickUIBuilderEditBuilder.New;
 end;
 
 class function TRickUIBuilder.Factory: TRickUIBuilderFactoryClass;

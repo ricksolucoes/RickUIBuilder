@@ -1,4 +1,4 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{18D3EC37-DC68-4E2A-90A5-D62ACC4E29DB}</ProjectGuid>
         <ProjectVersion>20.3</ProjectVersion>
@@ -179,6 +179,7 @@
         <DCCReference Include="src\Rick.UIBuilder.Tests.Composition.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.Tests.Facade.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.Tests.ComboBox.pas"/>
+        <DCCReference Include="src\Rick.UIBuilder.Tests.Edit.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
