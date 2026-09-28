@@ -119,10 +119,18 @@ type
     FInputConfig: TRickUIBuilderEditConfig;
     FInputConfigured: Boolean;
     FApplyingText: Boolean;
+    FPendingCaret: Integer;
+    FCaretUpdateQueued: Boolean;
+    FPendingGoToEnd: Boolean;
+    procedure ApplyPendingCaret;
+    procedure QueueCaretUpdate(ACaret: Integer; AGoToEnd: Boolean = False);
+    function IsAppendingAtEnd(const AOldText, ANewText: string): Boolean;
     function ChangedCaretPosition(const AOldText, ANewText: string;
       AOldCaret: Integer): Integer;
     function FormattedCaretPosition(const AValue: string;
       ARawCaret: Integer): Integer;
+    procedure ApplyResolvedText(const AValue, AResolved: string;
+      ACaret: Integer; AAppendAtEnd: Boolean);
   protected
     procedure SetText(const Value: string); override;
   public
@@ -134,6 +142,47 @@ procedure TRickUIBuilderRuntimeEdit.ConfigureInput(
 begin
   FInputConfig := AConfig;
   FInputConfigured := True;
+end;
+
+procedure TRickUIBuilderRuntimeEdit.ApplyPendingCaret;
+begin
+  FCaretUpdateQueued := False;
+  if csDestroying in ComponentState then
+    Exit;
+  if FPendingGoToEnd then
+  begin
+    FPendingGoToEnd := False;
+    GoToTextEnd;
+    Exit;
+  end;
+  if FPendingCaret > Length(Text) then
+    FPendingCaret := Length(Text);
+  CaretPosition := FPendingCaret;
+  SelLength := 0;
+end;
+
+procedure TRickUIBuilderRuntimeEdit.QueueCaretUpdate(ACaret: Integer;
+  AGoToEnd: Boolean);
+begin
+  FPendingCaret := ACaret;
+  FPendingGoToEnd := FPendingGoToEnd or AGoToEnd;
+  if FCaretUpdateQueued then
+    Exit;
+  FCaretUpdateQueued := True;
+  BeginInvoke(
+    procedure
+    begin
+      ApplyPendingCaret;
+    end, Self);
+end;
+
+function TRickUIBuilderRuntimeEdit.IsAppendingAtEnd(const AOldText,
+  ANewText: string): Boolean;
+begin
+  Result := IsFocused and (SelLength = 0) and
+    (CaretPosition = Length(AOldText)) and
+    (Length(ANewText) > Length(AOldText)) and
+    (Copy(ANewText, 1, Length(AOldText)) = AOldText);
 end;
 
 function TRickUIBuilderRuntimeEdit.ChangedCaretPosition(const AOldText,
@@ -170,8 +219,27 @@ begin
     FInputConfig));
 end;
 
+procedure TRickUIBuilderRuntimeEdit.ApplyResolvedText(const AValue,
+  AResolved: string; ACaret: Integer; AAppendAtEnd: Boolean);
+begin
+  FApplyingText := True;
+  try
+    inherited SetText(AResolved);
+    ACaret := FormattedCaretPosition(AValue, ACaret);
+    if AAppendAtEnd then
+      GoToTextEnd
+    else
+      CaretPosition := ACaret;
+    SelLength := 0;
+    QueueCaretUpdate(ACaret, AAppendAtEnd);
+  finally
+    FApplyingText := False;
+  end;
+end;
+
 procedure TRickUIBuilderRuntimeEdit.SetText(const Value: string);
 var
+  LAppendAtEnd: Boolean;
   LCaret: Integer;
   LOldText, LResolved: string;
 begin
@@ -183,18 +251,12 @@ begin
   if not TRickUIBuilderEditInput.IsTypedValueAllowed(Value, FInputConfig) then
     Exit;
   LOldText := Text;
-  LCaret := ChangedCaretPosition(LOldText, Value, SelStart);
+  LAppendAtEnd := IsAppendingAtEnd(LOldText, Value);
+  LCaret := ChangedCaretPosition(LOldText, Value, CaretPosition);
   LResolved := TRickUIBuilderEditInput.FormatTypedValue(Value, FInputConfig);
   if not TRickUIBuilderEditInput.IsValueAllowed(LResolved, FInputConfig) then
     Exit;
-  FApplyingText := True;
-  try
-    inherited SetText(LResolved);
-    SelStart := FormattedCaretPosition(Value, LCaret);
-    SelLength := 0;
-  finally
-    FApplyingText := False;
-  end;
+  ApplyResolvedText(Value, LResolved, LCaret, LAppendAtEnd);
 end;
 
 constructor TRickUIBuilderEditBuilder.Create;

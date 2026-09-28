@@ -65,6 +65,8 @@ type
       const AConfig: TRickUIBuilderEditConfig): Boolean; static;
     class function IsPasteAllowed(const AValue: string;
       const AConfig: TRickUIBuilderEditConfig): Boolean; static;
+    class function IsCompleteValue(const AValue: string;
+      const AConfig: TRickUIBuilderEditConfig): Boolean; static;
   end;
 
 implementation
@@ -145,7 +147,6 @@ begin
       Result := Result + APattern[I];
   end;
 end;
-
 class function TRickUIBuilderEditInput.FormatPhone(const ARaw: string;
   AMobile: Boolean): string;
 var
@@ -486,5 +487,28 @@ begin
     Result := True;
   end;
 end;
+
+
+class function TRickUIBuilderEditInput.IsCompleteValue(const AValue: string;
+  const AConfig: TRickUIBuilderEditConfig): Boolean;
+var
+  LFormatted: string;
+begin
+  case AConfig.Preset of
+    TRickUIBuilderEditPreset.CPF,
+    TRickUIBuilderEditPreset.CNPJ,
+    TRickUIBuilderEditPreset.CEP,
+    TRickUIBuilderEditPreset.Phone,
+    TRickUIBuilderEditPreset.Mobile:
+      begin
+        LFormatted := FormatTypedValue(AValue, AConfig);
+        Result := (AValue = LFormatted) and
+          HasCompleteMask(LFormatted, AConfig.Preset);
+      end;
+  else
+    Result := True;
+  end;
+end;
+
 
 end.

@@ -44,6 +44,7 @@ type
     procedure UpdateClearVisibility;
     procedure UpdatePasswordIcon;
     procedure UpdateRequirementIcon;
+    procedure AcceptCurrentText;
     procedure SignalInvalidInput;
     function ShouldShowErrorLabel(const AMessage: string): Boolean;
     function ShouldShowAlertIcon: Boolean;
@@ -51,6 +52,7 @@ type
     procedure HandleExit(Sender: TObject);
     function ResolveChangedText(const AText: string; out AResolved: string): Boolean;
     procedure HandleChange(Sender: TObject);
+    procedure QueueCaretToEnd;
     procedure HandleClear(Sender: TObject);
     procedure HandlePassword(Sender: TObject);
   public
@@ -132,18 +134,42 @@ end;
 procedure TRickUIBuilderEditBehavior.HandleChange(Sender: TObject);
 var
   LResolved: string;
+  LTypingAtEnd: Boolean;
 begin
   if FUpdating then
     Exit;
+  LTypingAtEnd := (FEdit.SelLength = 0) and
+    (Length(FEdit.Text) > Length(FLastValidText)) and
+    (Copy(FEdit.Text, 1, Length(FLastValidText)) = FLastValidText);
   if not ResolveChangedText(FEdit.Text, LResolved) then
   begin
     SetText(FLastValidText);
     SignalInvalidInput;
     Exit;
   end;
-  SetText(LResolved);
+  if LResolved <> FEdit.Text then
+  begin
+    SetText(LResolved);
+    if LTypingAtEnd then
+      QueueCaretToEnd;
+  end
+  else
+    AcceptCurrentText;
   if FInvalidFromInput then
     SetInvalid(False);
+end;
+
+procedure TRickUIBuilderEditBehavior.QueueCaretToEnd;
+begin
+  FEdit.BeginInvoke(
+    procedure
+    begin
+      if not (csDestroying in FEdit.ComponentState) then
+      begin
+        FEdit.GoToTextEnd;
+        FEdit.SelLength := 0;
+      end;
+    end, FEdit);
 end;
 
 procedure TRickUIBuilderEditBehavior.SetText(const AValue: string);
@@ -192,6 +218,9 @@ end;
 
 procedure TRickUIBuilderEditBehavior.HandleExit(Sender: TObject);
 begin
+  if (FEdit.Text <> '') and
+    not TRickUIBuilderEditInput.IsCompleteValue(FEdit.Text, FConfig) then
+    SignalInvalidInput;
   if FInvalid then
     ApplyInvalidState
   else
@@ -259,6 +288,13 @@ procedure TRickUIBuilderEditBehavior.SetRequirementMet(AValue: Boolean);
 begin
   FRequirementMet := AValue;
   UpdateRequirementIcon;
+end;
+
+procedure TRickUIBuilderEditBehavior.AcceptCurrentText;
+begin
+  FLastValidText := FEdit.Text;
+  UpdateCounter;
+  UpdateClearVisibility;
 end;
 
 procedure TRickUIBuilderEditBehavior.UpdateCounter;

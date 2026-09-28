@@ -277,6 +277,31 @@
             <FormType>fmx</FormType>
         </DCCReference>
         <DCCReference Include="src\RickUIBuilderSample.Edit.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder._Label.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder.Badge.Handle.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder.Badge.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder.Button.Handle.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder.Button.HoverBehavior.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder.Button.HoverState.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder.Button.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder.ComboBox.Behavior.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder.ComboBox.Data.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder.ComboBox.Handle.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder.ComboBox.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder.ComboBox.Presentation.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder.ComboBox.State.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder.ComboBox.Style.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder.ComboBox.Virtualization.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder.Composition.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder.Divider.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder.Edit.Behavior.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder.Edit.Handle.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder.Edit.Input.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder.Edit.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder.Factory.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder.Interfaces.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder.pas"/>
+        <DCCReference Include="..\src\Rick.UIBuilder.Types.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
