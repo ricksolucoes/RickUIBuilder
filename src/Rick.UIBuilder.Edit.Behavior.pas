@@ -26,6 +26,7 @@ type
     FLabel: TLabel;
     FCounter: TLabel;
     FErrorLabel: TLabel;
+    FUnderline: TRectangle;
     FAlertPath: TPath;
     FClearArea: TLayout;
     FClearPath: TPath;
@@ -42,6 +43,9 @@ type
     procedure ApplyInvalidState;
     procedure UpdateCounter;
     procedure UpdateClearVisibility;
+    procedure UpdateActionLayout;
+    procedure PlaceActionArea(AControl: TControl; var ALeft: Single);
+    procedure PlaceActionPath(AControl: TControl; var ALeft: Single);
     procedure UpdatePasswordIcon;
     procedure UpdateRequirementIcon;
     procedure AcceptCurrentText;
@@ -59,7 +63,7 @@ type
   public
     procedure Configure(const AConfig: TRickUIBuilderEditConfig;
       AContainer: TRectangle; AEdit: TEdit; ALabel, ACounter,
-      AErrorLabel: TLabel);
+      AErrorLabel: TLabel; AUnderline: TRectangle);
     procedure ConfigureIcons(AAlertPath: TPath; AClearArea: TLayout;
       AClearPath: TPath; APasswordArea: TLayout; APasswordPath,
       ARequirementPath: TPath);
@@ -76,7 +80,7 @@ uses
 
 procedure TRickUIBuilderEditBehavior.Configure(
   const AConfig: TRickUIBuilderEditConfig; AContainer: TRectangle;
-  AEdit: TEdit; ALabel, ACounter, AErrorLabel: TLabel);
+  AEdit: TEdit; ALabel, ACounter, AErrorLabel: TLabel; AUnderline: TRectangle);
 begin
   FConfig := AConfig;
   FContainer := AContainer;
@@ -84,11 +88,13 @@ begin
   FLabel := ALabel;
   FCounter := ACounter;
   FErrorLabel := AErrorLabel;
+  FUnderline := AUnderline;
   FEdit.OnEnter := HandleEnter;
   FEdit.OnExit := HandleExit;
   FEdit.OnChangeTracking := HandleChange;
   FLastValidText := FEdit.Text;
   UpdateCounter;
+  ApplyNormalState;
 end;
 
 procedure TRickUIBuilderEditBehavior.ConfigureIcons(AAlertPath: TPath;
@@ -120,6 +126,7 @@ begin
   UpdateClearVisibility;
   UpdatePasswordIcon;
   UpdateRequirementIcon;
+  UpdateActionLayout;
 end;
 
 function TRickUIBuilderEditBehavior.ResolveChangedText(
@@ -206,6 +213,7 @@ end;
 procedure TRickUIBuilderEditBehavior.Clear;
 begin
   SetText('');
+  SetInvalid(False);
   FEdit.SetFocus;
 end;
 
@@ -242,16 +250,36 @@ end;
 
 procedure TRickUIBuilderEditBehavior.ApplyNormalState;
 begin
+  if FConfig.ReadOnly then
+  begin
+    FContainer.Fill.Color := FConfig.ReadOnlyBackgroundColor;
+    FContainer.Stroke.Color := FConfig.ReadOnlyBorderColor;
+    FLabel.TextSettings.FontColor := FConfig.ReadOnlyLabelColor;
+    FEdit.TextSettings.FontColor := FConfig.ReadOnlyTextColor;
+    if Assigned(FUnderline) then
+      FUnderline.Fill.Color := FConfig.ReadOnlyUnderlineColor;
+    Exit;
+  end;
   FContainer.Fill.Color := FConfig.BackgroundColor;
   FContainer.Stroke.Color := FConfig.BorderColor;
   FLabel.TextSettings.FontColor := FConfig.LabelColor;
+  FEdit.TextSettings.FontColor := FConfig.TextColor;
+  if Assigned(FUnderline) then
+    FUnderline.Fill.Color := FConfig.UnderlineColor;
 end;
 
 procedure TRickUIBuilderEditBehavior.ApplyFocusState;
 begin
+  if FConfig.ReadOnly then
+  begin
+    ApplyNormalState;
+    Exit;
+  end;
   FContainer.Fill.Color := FConfig.BackgroundColor;
   FContainer.Stroke.Color := FConfig.FocusBorderColor;
   FLabel.TextSettings.FontColor := FConfig.LabelColor;
+  if Assigned(FUnderline) then
+    FUnderline.Fill.Color := FConfig.FocusUnderlineColor;
 end;
 
 procedure TRickUIBuilderEditBehavior.ApplyInvalidState;
@@ -259,6 +287,8 @@ begin
   FContainer.Fill.Color := FConfig.InvalidBackgroundColor;
   FContainer.Stroke.Color := FConfig.InvalidBorderColor;
   FLabel.TextSettings.FontColor := FConfig.InvalidLabelColor;
+  if Assigned(FUnderline) then
+    FUnderline.Fill.Color := FConfig.InvalidUnderlineColor;
 end;
 
 function TRickUIBuilderEditBehavior.ShouldShowErrorLabel(
@@ -283,6 +313,7 @@ begin
   FErrorLabel.Visible := AValue and ShouldShowErrorLabel(AMessage);
   if Assigned(FAlertPath) then
     FAlertPath.Visible := AValue and ShouldShowAlertIcon;
+  UpdateActionLayout;
   if AValue then
     ApplyInvalidState
   else if FEdit.IsFocused then
@@ -322,7 +353,38 @@ end;
 procedure TRickUIBuilderEditBehavior.UpdateClearVisibility;
 begin
   if Assigned(FClearArea) then
-    FClearArea.Visible := FConfig.ShowClearButton and (FEdit.Text <> '');
+    FClearArea.Visible := FConfig.ShowClearButton and (FEdit.Text <> '') and
+      not FConfig.ReadOnly;
+  UpdateActionLayout;
+end;
+
+procedure TRickUIBuilderEditBehavior.PlaceActionArea(AControl: TControl;
+  var ALeft: Single);
+begin
+  if not Assigned(AControl) or not AControl.Visible then
+    Exit;
+  AControl.Position.X := ALeft;
+  ALeft := ALeft - 32;
+end;
+
+procedure TRickUIBuilderEditBehavior.PlaceActionPath(AControl: TControl;
+  var ALeft: Single);
+begin
+  if not Assigned(AControl) or not AControl.Visible then
+    Exit;
+  AControl.Position.X := ALeft + ((32 - FConfig.IconSize) / 2);
+  ALeft := ALeft - 32;
+end;
+
+procedure TRickUIBuilderEditBehavior.UpdateActionLayout;
+var
+  LLeft: Single;
+begin
+  LLeft := FConfig.Width - 40;
+  PlaceActionArea(FClearArea, LLeft);
+  PlaceActionArea(FPasswordArea, LLeft);
+  PlaceActionPath(FRequirementPath, LLeft);
+  PlaceActionPath(FAlertPath, LLeft);
 end;
 
 procedure TRickUIBuilderEditBehavior.UpdatePasswordIcon;
@@ -349,6 +411,7 @@ begin
     FRequirementPath.Data.Data := FConfig.RequirementMetPath
   else
     FRequirementPath.Data.Data := FConfig.RequirementNotMetPath;
+  UpdateActionLayout;
 end;
 
 end.

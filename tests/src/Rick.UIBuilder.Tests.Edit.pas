@@ -44,6 +44,8 @@ type
     [Test] procedure Facade_DeveCriarEditSingleLine;
     [Test] procedure Handle_DeveAlterarTextoELimpar;
     [Test] procedure Edit_DeveFiltrarDuranteChangeTracking;
+    [Test] procedure Edit_ReadOnlyDeveBloquearEdicao;
+    [Test] procedure Edit_DefaultDevePreservarAparenciaAtual;
   end;
 
 implementation
@@ -237,6 +239,26 @@ begin
   Assert.AreEqual('123.4', LHandle.Text);
   LHandle.EditControl.Text := LHandle.Text + 'A';
   Assert.AreEqual('123.4', LHandle.Text);
+end;
+
+procedure TRickUIBuilderEditIntegrationTests.Edit_ReadOnlyDeveBloquearEdicao;
+var
+  LHandle: IRickUIBuilderEditHandle;
+begin
+  LHandle := TRickUIBuilder.Edit.Text('Somente leitura').ReadOnly.Build(FHostForm);
+  Assert.IsTrue(LHandle.EditControl.ReadOnly);
+  Assert.AreEqual('Somente leitura', LHandle.Text);
+end;
+
+procedure TRickUIBuilderEditIntegrationTests.Edit_DefaultDevePreservarAparenciaAtual;
+var
+  LConfig: TRickUIBuilderEditConfig;
+begin
+  LConfig := TRickUIBuilderEditConfig.Default;
+  Assert.AreEqual(Integer(TRickUIBuilderEditAppearance.Outlined),
+    Integer(LConfig.Appearance));
+  Assert.IsFalse(LConfig.ReadOnly);
+  Assert.AreEqual<Single>(11.0, LConfig.ErrorFontSize);
 end;
 
 initialization

@@ -341,6 +341,11 @@ type
     AlertAndIcon
   );
 
+  TRickUIBuilderEditAppearance = (
+    Outlined,
+    Underline
+  );
+
   TRickUIBuilderEditConfig = record
   private
     class procedure InitBehavior(var AValue: TRickUIBuilderEditConfig); static;
@@ -360,6 +365,8 @@ type
     NumberFormatMode: TRickUIBuilderEditNumberFormatMode;
     InvalidFeedback: TRickUIBuilderEditInvalidFeedback;
     InvalidMessage: string;
+    Appearance: TRickUIBuilderEditAppearance;
+    ReadOnly: Boolean;
     AllowNegative: Boolean;
     DecimalPlaces: Integer;
     DecimalSeparator: Char;
@@ -378,6 +385,15 @@ type
     TextColor: TAlphaColor;
     LabelColor: TAlphaColor;
     InvalidLabelColor: TAlphaColor;
+    ErrorTextColor: TAlphaColor;
+    ReadOnlyBackgroundColor: TAlphaColor;
+    ReadOnlyBorderColor: TAlphaColor;
+    ReadOnlyTextColor: TAlphaColor;
+    ReadOnlyLabelColor: TAlphaColor;
+    UnderlineColor: TAlphaColor;
+    FocusUnderlineColor: TAlphaColor;
+    InvalidUnderlineColor: TAlphaColor;
+    ReadOnlyUnderlineColor: TAlphaColor;
     IconColor: TAlphaColor;
     AlertIconColor: TAlphaColor;
     ClearIconColor: TAlphaColor;
@@ -386,6 +402,11 @@ type
     CornerRadius: Single;
     BorderThickness: Single;
     FontSize: Single;
+    ErrorFontFamily: string;
+    ErrorFontSize: Single;
+    ErrorFontStyles: TFontStyles;
+    ErrorSpacing: Single;
+    UnderlineThickness: Single;
     IconSize: Single;
     AlertPath: string;
     ClearPath: string;
@@ -520,6 +541,8 @@ begin
   AValue.NumberFormatMode := TRickUIBuilderEditNumberFormatMode.Locale;
   AValue.InvalidFeedback := TRickUIBuilderEditInvalidFeedback.AlertAndIcon;
   AValue.InvalidMessage := '';
+  AValue.Appearance := TRickUIBuilderEditAppearance.Outlined;
+  AValue.ReadOnly := False;
   AValue.AllowNegative := False;
   AValue.DecimalPlaces := 2;
   AValue.DecimalSeparator := #0;
@@ -543,6 +566,15 @@ begin
   AValue.TextColor := TAlphaColors.Black;
   AValue.LabelColor := $FF606060;
   AValue.InvalidLabelColor := $FFD93025;
+  AValue.ErrorTextColor := AValue.InvalidLabelColor;
+  AValue.ReadOnlyBackgroundColor := $FFF7F7F7;
+  AValue.ReadOnlyBorderColor := $FFD8D8D8;
+  AValue.ReadOnlyTextColor := $FFB8B8B8;
+  AValue.ReadOnlyLabelColor := $FFB8B8B8;
+  AValue.UnderlineColor := $FFB0B0B0;
+  AValue.FocusUnderlineColor := TAlphaColors.Black;
+  AValue.InvalidUnderlineColor := AValue.InvalidBorderColor;
+  AValue.ReadOnlyUnderlineColor := $FFD8D8D8;
   AValue.IconColor := $FF606060;
   AValue.AlertIconColor := AValue.IconColor;
   AValue.ClearIconColor := AValue.IconColor;
@@ -551,6 +583,11 @@ begin
   AValue.CornerRadius := 8;
   AValue.BorderThickness := 1;
   AValue.FontSize := 14;
+  AValue.ErrorFontFamily := '';
+  AValue.ErrorFontSize := 11;
+  AValue.ErrorFontStyles := [];
+  AValue.ErrorSpacing := 4;
+  AValue.UnderlineThickness := 1;
   AValue.IconSize := 20;
 end;
 

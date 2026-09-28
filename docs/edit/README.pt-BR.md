@@ -78,3 +78,11 @@ Alert, clear, visibilidade de senha e requisito são renderizados com `TPath` na
 ## Lifetime
 
 O `Behavior` runtime é um `TComponent` pertencente ao `AParent`, portanto permanece vivo depois que o builder sai de escopo. O handle é non-owning em relação aos controles FMX e deve ser considerado inválido depois que o Parent for destruído, seguindo o mesmo princípio dos handles existentes do projeto.
+
+## Aparência, mensagem de erro e somente leitura
+
+O `Edit` mantém `Outlined` como aparência padrão e também pode usar `TRickUIBuilderEditAppearance.Underline`. No modo `Underline`, `UnderlineColor`, `FocusUnderlineColor`, `InvalidUnderlineColor`, `ReadOnlyUnderlineColor` e `UnderlineThickness` controlam a linha inferior conforme o estado.
+
+A mensagem inferior de validação pode ser configurada independentemente com `ErrorTextColor`, `ErrorFontFamily`, `ErrorFontSize`, `ErrorFontStyles` e `ErrorSpacing`. O alerta e os demais ícones são reposicionados conforme a visibilidade; quando o alerta é a única ação visível, ele ocupa a posição mais à direita.
+
+`ReadOnly` impede edição pelo usuário sem desabilitar o controle. A aparência desse estado pode ser ajustada com `ReadOnlyBackgroundColor`, `ReadOnlyBorderColor`, `ReadOnlyTextColor`, `ReadOnlyLabelColor` e `ReadOnlyUnderlineColor`. O valor continua disponível para seleção e cópia pelo `TEdit` subjacente.

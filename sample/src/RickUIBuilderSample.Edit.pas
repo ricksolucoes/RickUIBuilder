@@ -43,7 +43,10 @@ type
       AFeedback: TRickUIBuilderEditInvalidFeedback; ATop: Single): Single;
     procedure BuildFeedback(var ATop: Single);
     procedure BuildRequirement(var ATop: Single);
+    function AddReadOnlySource(const ALabel, AText: string;
+      ATop: Single): IRickUIBuilderEditHandle;
     procedure BuildClipboard(var ATop: Single);
+    procedure BuildCustomAppearance(var ATop: Single);
     procedure CopyValid(Sender: TObject);
     procedure CopyInvalid(Sender: TObject);
     procedure PasteTarget(Sender: TObject);
@@ -234,42 +237,67 @@ begin
   ATop := ATop + 84;
 end;
 
+function TRickUIBuilderEditShowcase.AddReadOnlySource(const ALabel,
+  AText: string; ATop: Single): IRickUIBuilderEditHandle;
+begin
+  Result := TRickUIBuilder.Edit.LabelText(ALabel).Text(AText).ReadOnly
+    .ReadOnlyBackgroundColor($FFF5F5F5).ReadOnlyBorderColor($FFD8D8D8)
+    .ReadOnlyTextColor($FF8A8A8A).ReadOnlyLabelColor($FF8A8A8A)
+    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
+end;
+
 procedure TRickUIBuilderEditShowcase.BuildClipboard(var ATop: Single);
 begin
   ATop := AddTitle('Copiar e colar - validação operacional', ATop);
   ATop := AddNote('Copie um valor abaixo e cole no alvo CPF. O paste sem máscara deve ser rejeitado.', ATop);
-  FCopyValid := TRickUIBuilder.Edit.LabelText('Fonte válida').Text('123.456.789-01')
-    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
+  FCopyValid := AddReadOnlySource('Fonte válida', '123.456.789-01', ATop);
   AddButton('Copiar válido', CONTENT_LEFT + 374, ATop + 12, CopyValid);
   ATop := ATop + 70;
-  FCopyInvalid := TRickUIBuilder.Edit.LabelText('Fonte inválida').Text('12345678901')
-    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
+  FCopyInvalid := AddReadOnlySource('Fonte inválida', '12345678901', ATop);
   AddButton('Copiar sem máscara', CONTENT_LEFT + 374, ATop + 12, CopyInvalid);
   ATop := ATop + 70;
   FPasteTarget := TRickUIBuilder.Edit.LabelText('Alvo CPF - cole aqui')
     .Preset(TRickUIBuilderEditPreset.CPF).ClearButton
     .InvalidFeedback(TRickUIBuilderEditInvalidFeedback.AlertAndIcon)
-    .InvalidMessage('CPF incompleto ou paste inválido')
+    .InvalidMessage('CPF incompleto ou paste inválido').ErrorTextColor($FFB3261E)
+    .ErrorFontSize(12).ErrorFontStyles([TFontStyle.fsBold]).ErrorSpacing(6)
     .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
   AddButton('Colar no alvo', CONTENT_LEFT + 374, ATop + 12, PasteTarget);
   ATop := ATop + 84;
 
   ATop := AddNote('CNPJ: copie um valor abaixo e cole no alvo CNPJ. O paste sem máscara deve ser rejeitado.', ATop);
-  FCopyCNPJValid := TRickUIBuilder.Edit.LabelText('Fonte CNPJ válida').Text('12.ABC.345/01DE-35')
-    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
+  FCopyCNPJValid := AddReadOnlySource('Fonte CNPJ válida', '12.ABC.345/01DE-35', ATop);
   AddButton('Copiar CNPJ válido', CONTENT_LEFT + 374, ATop + 12, CopyCNPJValid);
   ATop := ATop + 70;
-  FCopyCNPJInvalid := TRickUIBuilder.Edit.LabelText('Fonte CNPJ sem máscara').Text('12ABC34501DE35')
-    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
+  FCopyCNPJInvalid := AddReadOnlySource('Fonte CNPJ sem máscara', '12ABC34501DE35', ATop);
   AddButton('Copiar CNPJ sem máscara', CONTENT_LEFT + 374, ATop + 12, CopyCNPJInvalid);
   ATop := ATop + 70;
   FPasteCNPJTarget := TRickUIBuilder.Edit.LabelText('Alvo CNPJ - cole aqui')
     .Preset(TRickUIBuilderEditPreset.CNPJ).ClearButton
     .InvalidFeedback(TRickUIBuilderEditInvalidFeedback.AlertAndIcon)
-    .InvalidMessage('CNPJ incompleto ou paste inválido')
+    .InvalidMessage('CNPJ incompleto ou paste inválido').ErrorTextColor($FFB3261E)
+    .ErrorFontSize(12).ErrorFontStyles([TFontStyle.fsBold]).ErrorSpacing(6)
     .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
   AddButton('Colar no alvo CNPJ', CONTENT_LEFT + 374, ATop + 12, PasteCNPJTarget);
   ATop := ATop + 84;
+end;
+
+procedure TRickUIBuilderEditShowcase.BuildCustomAppearance(var ATop: Single);
+begin
+  ATop := AddTitle('Edit customizado e somente leitura', ATop);
+  ATop := AddNote('Exemplos com linha inferior customizável e estado somente leitura.', ATop);
+  TRickUIBuilder.Edit.LabelText('Linha inferior - foco altera a cor')
+    .Appearance(TRickUIBuilderEditAppearance.Underline)
+    .UnderlineColor($FFB0B0B0).FocusUnderlineColor($FF202124)
+    .InvalidUnderlineColor($FFD93025).UnderlineThickness(2)
+    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
+  ATop := ATop + 70;
+  TRickUIBuilder.Edit.LabelText('Campo somente leitura').Text('Informação fornecida')
+    .Appearance(TRickUIBuilderEditAppearance.Underline).ReadOnly
+    .ReadOnlyBackgroundColor($00FFFFFF).ReadOnlyTextColor($FFB8B8B8)
+    .ReadOnlyLabelColor($FFB8B8B8).ReadOnlyUnderlineColor($FFD8D8D8)
+    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
+  ATop := ATop + 70;
 end;
 
 procedure TRickUIBuilderEditShowcase.CopyValid(Sender: TObject);
@@ -341,6 +369,7 @@ begin
   BuildFeedback(ATop);
   BuildRequirement(ATop);
   BuildClipboard(ATop);
+  BuildCustomAppearance(ATop);
 end;
 
 end.

@@ -43,3 +43,11 @@ The internal `TEdit` uses a transparent background by default. `EditBackgroundCo
 ## TPath and lifetime
 
 Alert, clear, password visibility, and requirement icons use configurable `TPath` data and are laid out in the right-side action area. `IconColor` sets all icon colors together; `AlertIconColor`, `ClearIconColor`, `PasswordIconColor`, and `RequirementIconColor` can override them individually. Runtime behavior is owned by `AParent`; the returned handle is non-owning with respect to FMX controls and must not be used after its Parent is destroyed.
+
+## Appearance, error message and read-only state
+
+`Edit` keeps `Outlined` as its default appearance and can also use `TRickUIBuilderEditAppearance.Underline`. In underline mode, `UnderlineColor`, `FocusUnderlineColor`, `InvalidUnderlineColor`, `ReadOnlyUnderlineColor`, and `UnderlineThickness` control the bottom line for each state.
+
+The lower validation message can be styled independently with `ErrorTextColor`, `ErrorFontFamily`, `ErrorFontSize`, `ErrorFontStyles`, and `ErrorSpacing`. Alert and action icons are dynamically repositioned according to visibility; when the alert is the only visible action, it occupies the rightmost slot.
+
+`ReadOnly` blocks user editing without disabling the control. Its visual state can be customized with `ReadOnlyBackgroundColor`, `ReadOnlyBorderColor`, `ReadOnlyTextColor`, `ReadOnlyLabelColor`, and `ReadOnlyUnderlineColor`. The underlying `TEdit` remains available for selection and copy operations.

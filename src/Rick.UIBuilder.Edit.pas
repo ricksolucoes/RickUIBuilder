@@ -36,6 +36,7 @@ type
     function CreateEdit(AContainer: TRectangle): TEdit;
     function CreateCounter(AContainer: TRectangle): TLabel;
     function CreateErrorLabel(AContainer: TRectangle): TLabel;
+    function CreateUnderline(AContainer: TRectangle): TRectangle;
     function CreatePath(AParent: TFmxObject; const AData: string;
       AColor: TAlphaColor): TPath;
     function CreateActionArea(AContainer: TRectangle; ALeft: Single): TLayout;
@@ -45,7 +46,7 @@ type
     function EditAreaWidth: Single;
     function CreateActions(AContainer: TRectangle): TActionControls;
     function CreateBehavior(AParent: TFmxObject; AContainer: TRectangle;
-      AEdit: TEdit; ALabel, ACounter, AError: TLabel)
+      AEdit: TEdit; ALabel, ACounter, AError: TLabel; AUnderline: TRectangle)
     : TRickUIBuilderEditBehavior;
   protected
     function Text(const AValue: string): IRickUIBuilderEdit;
@@ -71,6 +72,8 @@ type
     function InvalidFeedback(AValue: TRickUIBuilderEditInvalidFeedback)
     : IRickUIBuilderEdit;
     function InvalidMessage(const AValue: string): IRickUIBuilderEdit;
+    function Appearance(AValue: TRickUIBuilderEditAppearance): IRickUIBuilderEdit;
+    function ReadOnly(AValue: Boolean = True): IRickUIBuilderEdit;
     function BackgroundColor(AValue: TAlphaColor): IRickUIBuilderEdit;
     function EditBackgroundColor(AValue: TAlphaColor): IRickUIBuilderEdit;
     function BorderColor(AValue: TAlphaColor): IRickUIBuilderEdit;
@@ -80,6 +83,20 @@ type
     function TextColor(AValue: TAlphaColor): IRickUIBuilderEdit;
     function LabelColor(AValue: TAlphaColor): IRickUIBuilderEdit;
     function InvalidLabelColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function ErrorTextColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function ErrorFontFamily(const AValue: string): IRickUIBuilderEdit;
+    function ErrorFontSize(AValue: Single): IRickUIBuilderEdit;
+    function ErrorFontStyles(AValue: TFontStyles): IRickUIBuilderEdit;
+    function ErrorSpacing(AValue: Single): IRickUIBuilderEdit;
+    function ReadOnlyBackgroundColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function ReadOnlyBorderColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function ReadOnlyTextColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function ReadOnlyLabelColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function UnderlineColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function FocusUnderlineColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function InvalidUnderlineColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function ReadOnlyUnderlineColor(AValue: TAlphaColor): IRickUIBuilderEdit;
+    function UnderlineThickness(AValue: Single): IRickUIBuilderEdit;
     function IconColor(AValue: TAlphaColor): IRickUIBuilderEdit;
     function AlertIconColor(AValue: TAlphaColor): IRickUIBuilderEdit;
     function ClearIconColor(AValue: TAlphaColor): IRickUIBuilderEdit;
@@ -412,6 +429,19 @@ begin
   Result := Self;
 end;
 
+function TRickUIBuilderEditBuilder.Appearance(AValue: TRickUIBuilderEditAppearance)
+: IRickUIBuilderEdit;
+begin
+  FConfig.Appearance := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderEditBuilder.ReadOnly(AValue: Boolean): IRickUIBuilderEdit;
+begin
+  FConfig.ReadOnly := AValue;
+  Result := Self;
+end;
+
 function TRickUIBuilderEditBuilder.BackgroundColor(AValue: TAlphaColor)
 : IRickUIBuilderEdit;
 begin
@@ -472,6 +502,104 @@ function TRickUIBuilderEditBuilder.InvalidLabelColor(AValue: TAlphaColor)
 : IRickUIBuilderEdit;
 begin
   FConfig.InvalidLabelColor := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderEditBuilder.ErrorTextColor(AValue: TAlphaColor)
+: IRickUIBuilderEdit;
+begin
+  FConfig.ErrorTextColor := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderEditBuilder.ErrorFontFamily(const AValue: string)
+: IRickUIBuilderEdit;
+begin
+  FConfig.ErrorFontFamily := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderEditBuilder.ErrorFontSize(AValue: Single)
+: IRickUIBuilderEdit;
+begin
+  FConfig.ErrorFontSize := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderEditBuilder.ErrorFontStyles(AValue: TFontStyles)
+: IRickUIBuilderEdit;
+begin
+  FConfig.ErrorFontStyles := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderEditBuilder.ErrorSpacing(AValue: Single)
+: IRickUIBuilderEdit;
+begin
+  FConfig.ErrorSpacing := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderEditBuilder.ReadOnlyBackgroundColor(AValue: TAlphaColor)
+: IRickUIBuilderEdit;
+begin
+  FConfig.ReadOnlyBackgroundColor := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderEditBuilder.ReadOnlyBorderColor(AValue: TAlphaColor)
+: IRickUIBuilderEdit;
+begin
+  FConfig.ReadOnlyBorderColor := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderEditBuilder.ReadOnlyTextColor(AValue: TAlphaColor)
+: IRickUIBuilderEdit;
+begin
+  FConfig.ReadOnlyTextColor := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderEditBuilder.ReadOnlyLabelColor(AValue: TAlphaColor)
+: IRickUIBuilderEdit;
+begin
+  FConfig.ReadOnlyLabelColor := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderEditBuilder.UnderlineColor(AValue: TAlphaColor)
+: IRickUIBuilderEdit;
+begin
+  FConfig.UnderlineColor := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderEditBuilder.FocusUnderlineColor(AValue: TAlphaColor)
+: IRickUIBuilderEdit;
+begin
+  FConfig.FocusUnderlineColor := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderEditBuilder.InvalidUnderlineColor(AValue: TAlphaColor)
+: IRickUIBuilderEdit;
+begin
+  FConfig.InvalidUnderlineColor := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderEditBuilder.ReadOnlyUnderlineColor(AValue: TAlphaColor)
+: IRickUIBuilderEdit;
+begin
+  FConfig.ReadOnlyUnderlineColor := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderEditBuilder.UnderlineThickness(AValue: Single)
+: IRickUIBuilderEdit;
+begin
+  FConfig.UnderlineThickness := AValue;
   Result := Self;
 end;
 
@@ -593,6 +721,8 @@ begin
   Result.Fill.Color := FConfig.BackgroundColor;
   Result.Stroke.Color := FConfig.BorderColor;
   Result.Stroke.Thickness := FConfig.BorderThickness;
+  if FConfig.Appearance = TRickUIBuilderEditAppearance.Underline then
+    Result.Stroke.Kind := TBrushKind.None;
 end;
 
 function TRickUIBuilderEditBuilder.CreateLabel(AContainer: TRectangle): TLabel;
@@ -631,7 +761,7 @@ function TRickUIBuilderEditBuilder.CreateEditBackground(
 begin
   Result := TRectangle.Create(AContainer);
   Result.Parent := AContainer;
-  Result.SetBounds(8, 20, EditAreaWidth, 36);
+  Result.SetBounds(8, 20, EditAreaWidth, 24);
   Result.Fill.Color := FConfig.EditBackgroundColor;
   Result.Stroke.Kind := TBrushKind.None;
   Result.HitTest := False;
@@ -645,11 +775,12 @@ begin
   LEdit.ConfigureInput(FConfig);
   Result := LEdit;
   Result.Parent := AContainer;
-  Result.SetBounds(8, 20, EditAreaWidth, 36);
+  Result.SetBounds(8, 20, EditAreaWidth, 24);
   Result.StyleLookup := 'transparentedit';
   Result.TextSettings.Font.Size := FConfig.FontSize;
   Result.TextSettings.FontColor := FConfig.TextColor;
   Result.Password := FConfig.Password;
+  Result.ReadOnly := FConfig.ReadOnly;
 end;
 
 function TRickUIBuilderEditBuilder.CreateCounter
@@ -668,11 +799,26 @@ function TRickUIBuilderEditBuilder.CreateErrorLabel
 begin
   Result := TLabel.Create(AContainer);
   Result.Parent := AContainer;
-  Result.SetBounds(12, FConfig.Height - 20, FConfig.Width - 92, 16);
-  Result.TextSettings.Font.Size := FConfig.FontSize - 3;
-  Result.TextSettings.FontColor := FConfig.InvalidLabelColor;
+  Result.SetBounds(12, 44 + FConfig.ErrorSpacing, FConfig.Width - 24, 18);
+  Result.TextSettings.Font.Size := FConfig.ErrorFontSize;
+  Result.TextSettings.FontColor := FConfig.ErrorTextColor;
+  Result.TextSettings.Font.Style := FConfig.ErrorFontStyles;
+  if FConfig.ErrorFontFamily <> '' then
+    Result.TextSettings.Font.Family := FConfig.ErrorFontFamily;
   Result.Visible := False;
   Result.HitTest := False;
+end;
+
+function TRickUIBuilderEditBuilder.CreateUnderline(
+  AContainer: TRectangle): TRectangle;
+begin
+  Result := TRectangle.Create(AContainer);
+  Result.Parent := AContainer;
+  Result.SetBounds(8, 45, FConfig.Width - 16, FConfig.UnderlineThickness);
+  Result.Fill.Color := FConfig.UnderlineColor;
+  Result.Stroke.Kind := TBrushKind.None;
+  Result.HitTest := False;
+  Result.Visible := FConfig.Appearance = TRickUIBuilderEditAppearance.Underline;
 end;
 
 function TRickUIBuilderEditBuilder.CreatePath(AParent: TFmxObject;
@@ -745,17 +891,17 @@ begin
 end;
 
 function TRickUIBuilderEditBuilder.CreateBehavior(AParent: TFmxObject;
-  AContainer: TRectangle; AEdit: TEdit; ALabel, ACounter, AError: TLabel)
-: TRickUIBuilderEditBehavior;
+  AContainer: TRectangle; AEdit: TEdit; ALabel, ACounter, AError: TLabel;
+  AUnderline: TRectangle): TRickUIBuilderEditBehavior;
 begin
   Result := TRickUIBuilderEditBehavior.Create(AParent);
-  Result.Configure(FConfig, AContainer, AEdit, ALabel, ACounter, AError);
+  Result.Configure(FConfig, AContainer, AEdit, ALabel, ACounter, AError, AUnderline);
 end;
 
 function TRickUIBuilderEditBuilder.Build(AParent: TFmxObject)
 : IRickUIBuilderEditHandle;
 var
-  C, EditBackground: TRectangle;
+  C, EditBackground, Underline: TRectangle;
   E: TEdit;
   L, Count, Err: TLabel;
   Actions: TActionControls;
@@ -768,8 +914,9 @@ begin
   E := CreateEdit(C);
   Count := CreateCounter(C);
   Err := CreateErrorLabel(C);
+  Underline := CreateUnderline(C);
   Actions := CreateActions(C);
-  Behavior := CreateBehavior(AParent, C, E, L, Count, Err);
+  Behavior := CreateBehavior(AParent, C, E, L, Count, Err, Underline);
   Behavior.ConfigureIcons(Actions.Alert, Actions.ClearArea, Actions.ClearIcon,
     Actions.PasswordArea, Actions.PasswordIcon, Actions.Requirement);
   Behavior.SetText(FConfig.Text);
