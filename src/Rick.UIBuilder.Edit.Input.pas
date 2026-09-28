@@ -50,6 +50,12 @@ type
       const AConfig: TRickUIBuilderEditConfig): Boolean; static;
     class function IsTextAllowed(const AValue: string;
       const AConfig: TRickUIBuilderEditConfig): Boolean; static;
+    class function IsEmailAtext(AChar: Char): Boolean; static;
+    class function IsEmailAllowed(const AValue: string): Boolean; static;
+    class function IsEmailComplete(const AValue: string): Boolean; static;
+    class function IsEmailLocalPart(const AValue: string): Boolean; static;
+    class function IsEmailDomain(const AValue: string): Boolean; static;
+    class function FindEmailSeparator(const AValue: string): Integer; static;
     class function HasCompleteMask(const AValue: string;
       APreset: TRickUIBuilderEditPreset): Boolean; static;
     class function IsMaskedTypingAllowed(const AValue: string;
@@ -147,6 +153,7 @@ begin
       Result := Result + APattern[I];
   end;
 end;
+
 class function TRickUIBuilderEditInput.FormatPhone(const ARaw: string;
   AMobile: Boolean): string;
 var
@@ -383,6 +390,120 @@ begin
       Exit(False);
 end;
 
+class function TRickUIBuilderEditInput.IsEmailAtext(AChar: Char): Boolean;
+begin
+  Result := AChar.IsLetterOrDigit or CharInSet(AChar, ['_', '+', '-']);
+end;
+
+class function TRickUIBuilderEditInput.FindEmailSeparator(
+  const AValue: string): Integer;
+var
+  I: Integer;
+begin
+  Result := 0;
+  for I := 1 to Length(AValue) do
+    if AValue[I] = '@' then
+    begin
+      if Result > 0 then
+        Exit(-1);
+      Result := I;
+    end;
+end;
+
+class function TRickUIBuilderEditInput.IsEmailAllowed(
+  const AValue: string): Boolean;
+var
+  I, LAtIndex: Integer;
+  LChar: Char;
+begin
+  LAtIndex := FindEmailSeparator(AValue);
+  if LAtIndex < 0 then
+    Exit(False);
+
+  for I := 1 to Length(AValue) do
+  begin
+    LChar := AValue[I];
+    if LChar = '@' then
+      Continue;
+
+    if (LAtIndex = 0) or (I < LAtIndex) then
+    begin
+      if not (IsEmailAtext(LChar) or (LChar = '.')) then
+        Exit(False);
+    end
+    else if not (LChar.IsLetterOrDigit or CharInSet(LChar, ['-', '.'])) then
+      Exit(False);
+  end;
+  Result := True;
+end;
+
+class function TRickUIBuilderEditInput.IsEmailLocalPart(
+  const AValue: string): Boolean;
+var
+  I: Integer;
+begin
+  if (AValue = '') or (AValue[1] = '.') or
+    (AValue[Length(AValue)] = '.') or (Pos('..', AValue) > 0) then
+    Exit(False);
+
+  for I := 1 to Length(AValue) do
+    if not (IsEmailAtext(AValue[I]) or (AValue[I] = '.')) then
+      Exit(False);
+  Result := True;
+end;
+
+class function TRickUIBuilderEditInput.IsEmailDomain(
+  const AValue: string): Boolean;
+var
+  I, LLabelStart, LLabelLength: Integer;
+  LChar: Char;
+begin
+  if AValue = '' then
+    Exit(False);
+
+  LLabelStart := 1;
+  for I := 1 to Length(AValue) + 1 do
+  begin
+    if (I > Length(AValue)) or (AValue[I] = '.') then
+    begin
+      LLabelLength := I - LLabelStart;
+      if (LLabelLength = 0) or (LLabelLength > 63) then
+        Exit(False);
+      if (AValue[LLabelStart] = '-') or (AValue[I - 1] = '-') then
+        Exit(False);
+      LLabelStart := I + 1;
+      Continue;
+    end;
+
+    LChar := AValue[I];
+    if not (LChar.IsLetterOrDigit or (LChar = '-')) then
+      Exit(False);
+  end;
+  Result := True;
+end;
+
+class function TRickUIBuilderEditInput.IsEmailComplete(
+  const AValue: string): Boolean;
+var
+  LAtIndex: Integer;
+  LLocal, LDomain: string;
+begin
+  LAtIndex := FindEmailSeparator(AValue);
+  if LAtIndex <= 1 then
+    Exit(False);
+
+  LLocal := Copy(AValue, 1, LAtIndex - 1);
+  LDomain := Copy(AValue, LAtIndex + 1, MaxInt);
+  if (LLocal = '') or (LDomain = '') then
+    Exit(False);
+  if TEncoding.UTF8.GetByteCount(LLocal) > 64 then
+    Exit(False);
+  if TEncoding.UTF8.GetByteCount(AValue) > 254 then
+    Exit(False);
+
+  Result := IsEmailLocalPart(LLocal) and IsEmailDomain(LDomain);
+end;
+
 class function TRickUIBuilderEditInput.IsValueAllowed(const AValue: string;
   const AConfig: TRickUIBuilderEditConfig): Boolean;
 begin
@@ -393,6 +514,8 @@ begin
       Result := IsIntegerAllowed(AValue, AConfig);
     TRickUIBuilderEditPreset.FloatNumber:
       Result := ValidateNumber(AValue, AConfig);
+    TRickUIBuilderEditPreset.Email:
+      Result := IsEmailAllowed(AValue);
     TRickUIBuilderEditPreset.TextNoAccents,
     TRickUIBuilderEditPreset.TextPunctuationNoAccents,
     TRickUIBuilderEditPreset.TextWithAccents,
@@ -505,6 +628,8 @@ begin
         Result := (AValue = LFormatted) and
           HasCompleteMask(LFormatted, AConfig.Preset);
       end;
+    TRickUIBuilderEditPreset.Email:
+      Result := IsEmailComplete(AValue);
   else
     Result := True;
   end;

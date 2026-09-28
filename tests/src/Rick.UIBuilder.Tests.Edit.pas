@@ -27,6 +27,15 @@ type
     [Test] procedure Inteiro_NegativoDeveRespeitarConfiguracao;
     [Test] procedure Float_DeveRespeitarCasasDecimais;
     [Test] procedure Email_DeveConverterParaLowercase;
+    [Test] procedure Email_DeveRejeitarCaracteresForaDoAddrSpec;
+    [Test] procedure Email_DeveAceitarAtextConvencionadoNoLocalPart;
+    [Test] procedure Email_DominioDeveRejeitarUnderscore;
+    [Test] procedure Email_DeveRejeitarSegundoArroba;
+    [Test] procedure Email_IncompletoDeveSerInvalido;
+    [Test] procedure Email_CompletoDeveSerValido;
+    [Test] procedure Email_DotAtomInvalidoDeveSerRejeitado;
+    [Test] procedure Email_QuotedLocalPartDeveSerRejeitado;
+    [Test] procedure Email_EAIDeveAceitarUTF8;
     [Test] procedure URL_SchemeEHostDevemSerLowercase;
     [Test] procedure URL_EntireValueDeveSerLowercase;
     [Test] procedure TextoComPontuacao_DeveAceitarSimbolosAprovados;
@@ -168,6 +177,90 @@ begin
   LConfig := Config(TRickUIBuilderEditPreset.Email);
   Assert.AreEqual('nome@exemplo.com',
     TRickUIBuilderEditInput.FormatTypedValue('Nome@Exemplo.COM', LConfig));
+end;
+
+procedure TRickUIBuilderEditInputTests.Email_DeveRejeitarCaracteresForaDoAddrSpec;
+var LConfig: TRickUIBuilderEditConfig;
+begin
+  LConfig := Config(TRickUIBuilderEditPreset.Email);
+  Assert.IsFalse(TRickUIBuilderEditInput.IsTypedValueAllowed(
+    '***))))((((%cccc', LConfig));
+  Assert.IsFalse(TRickUIBuilderEditInput.IsTypedValueAllowed(
+    '*&&&&&&&$%#*!!!!!{{', LConfig));
+  Assert.IsFalse(TRickUIBuilderEditInput.IsTypedValueAllowed(
+    'nome&sobrenome@example.com', LConfig));
+  Assert.IsFalse(TRickUIBuilderEditInput.IsTypedValueAllowed(
+    'nome%tag@example.com', LConfig));
+end;
+
+procedure TRickUIBuilderEditInputTests.Email_DeveAceitarAtextConvencionadoNoLocalPart;
+var LConfig: TRickUIBuilderEditConfig;
+begin
+  LConfig := Config(TRickUIBuilderEditPreset.Email);
+  Assert.IsTrue(TRickUIBuilderEditInput.IsTypedValueAllowed(
+    'nome.sobrenome+tag@example.com', LConfig));
+  Assert.IsTrue(TRickUIBuilderEditInput.IsTypedValueAllowed(
+    'nome_sobrenome@example.com', LConfig));
+  Assert.IsTrue(TRickUIBuilderEditInput.IsTypedValueAllowed(
+    'nome-sobrenome@example.com', LConfig));
+end;
+
+procedure TRickUIBuilderEditInputTests.Email_DominioDeveRejeitarUnderscore;
+var LConfig: TRickUIBuilderEditConfig;
+begin
+  LConfig := Config(TRickUIBuilderEditPreset.Email);
+  Assert.IsFalse(TRickUIBuilderEditInput.IsTypedValueAllowed(
+    'nome@dominio_invalido.com', LConfig));
+end;
+
+procedure TRickUIBuilderEditInputTests.Email_DeveRejeitarSegundoArroba;
+var LConfig: TRickUIBuilderEditConfig;
+begin
+  LConfig := Config(TRickUIBuilderEditPreset.Email);
+  Assert.IsFalse(TRickUIBuilderEditInput.IsTypedValueAllowed(
+    'nome@@example.com', LConfig));
+end;
+
+procedure TRickUIBuilderEditInputTests.Email_IncompletoDeveSerInvalido;
+var LConfig: TRickUIBuilderEditConfig;
+begin
+  LConfig := Config(TRickUIBuilderEditPreset.Email);
+  Assert.IsFalse(TRickUIBuilderEditInput.IsCompleteValue('erwrwerw', LConfig));
+  Assert.IsFalse(TRickUIBuilderEditInput.IsCompleteValue('nome@', LConfig));
+end;
+
+procedure TRickUIBuilderEditInputTests.Email_CompletoDeveSerValido;
+var LConfig: TRickUIBuilderEditConfig;
+begin
+  LConfig := Config(TRickUIBuilderEditPreset.Email);
+  Assert.IsTrue(TRickUIBuilderEditInput.IsCompleteValue(
+    'nome.sobrenome+tag@example.com', LConfig));
+end;
+
+procedure TRickUIBuilderEditInputTests.Email_DotAtomInvalidoDeveSerRejeitado;
+var LConfig: TRickUIBuilderEditConfig;
+begin
+  LConfig := Config(TRickUIBuilderEditPreset.Email);
+  Assert.IsFalse(TRickUIBuilderEditInput.IsCompleteValue(
+    '.nome@example.com', LConfig));
+  Assert.IsFalse(TRickUIBuilderEditInput.IsCompleteValue(
+    'nome..sobrenome@example.com', LConfig));
+end;
+
+procedure TRickUIBuilderEditInputTests.Email_QuotedLocalPartDeveSerRejeitado;
+var LConfig: TRickUIBuilderEditConfig;
+begin
+  LConfig := Config(TRickUIBuilderEditPreset.Email);
+  Assert.IsFalse(TRickUIBuilderEditInput.IsCompleteValue(
+    '"Fred Bloggs"@example.com', LConfig));
+end;
+
+procedure TRickUIBuilderEditInputTests.Email_EAIDeveAceitarUTF8;
+var LConfig: TRickUIBuilderEditConfig;
+begin
+  LConfig := Config(TRickUIBuilderEditPreset.Email);
+  Assert.IsTrue(TRickUIBuilderEditInput.IsCompleteValue(
+    'usuário@exemplo.com', LConfig));
 end;
 
 procedure TRickUIBuilderEditInputTests.URL_SchemeEHostDevemSerLowercase;

@@ -133,7 +133,16 @@ end;
 procedure TRickUIBuilderEditShowcase.BuildContactPresets(var ATop: Single);
 begin
   ATop := AddTitle('Contato', ATop);
-  ATop := AddPreset('E-mail - lowercase automático', TRickUIBuilderEditPreset.Email, ATop);
+  TRickUIBuilder.Edit.LabelText('E-mail - lowercase automático')
+    .Preset(TRickUIBuilderEditPreset.Email).ClearButton
+    .InvalidFeedback(TRickUIBuilderEditInvalidFeedback.AlertAndIcon)
+    .InvalidMessage('E-mail incompleto ou inválido')
+    .InvalidBorderColor($FFD32F2F).InvalidBackgroundColor($FFFFF1F1)
+    .InvalidLabelColor($FFD32F2F).ErrorTextColor($FFD32F2F)
+    .AlertIconColor($FFD32F2F).ClearIconColor($FF616161)
+    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT)
+    .Build(FParent);
+  ATop := ATop + 84;
   ATop := AddPreset('Telefone - DDD opcional', TRickUIBuilderEditPreset.Phone, ATop);
   ATop := AddPreset('Celular - DDD opcional', TRickUIBuilderEditPreset.Mobile, ATop);
 end;
@@ -208,7 +217,7 @@ begin
   LHandle := TRickUIBuilder.Edit.LabelText(ALabel).InvalidFeedback(AFeedback)
     .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
   LHandle.SetInvalid(True, 'Valor inválido');
-  Result := ATop + LHandle.Container.Height + 12;
+  Result := ATop + 70;
 end;
 
 procedure TRickUIBuilderEditShowcase.BuildFeedback(var ATop: Single);
@@ -223,7 +232,7 @@ begin
     .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
   AddButton('Marcar inválido', CONTENT_LEFT + 374, ATop, MarkInvalid);
   AddButton('Marcar válido', CONTENT_LEFT + 374, ATop + 38, MarkValid);
-  ATop := ATop + FInvalidHandle.Container.Height + 12;
+  ATop := ATop + 84;
 end;
 
 procedure TRickUIBuilderEditShowcase.BuildRequirement(var ATop: Single);
