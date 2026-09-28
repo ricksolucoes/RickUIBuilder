@@ -46,6 +46,7 @@ type
     [Test] procedure Edit_DeveFiltrarDuranteChangeTracking;
     [Test] procedure Edit_ReadOnlyDeveBloquearEdicao;
     [Test] procedure Edit_DefaultDevePreservarAparenciaAtual;
+    [Test] procedure Edit_MensagemDeveForcarAlturaMinima;
   end;
 
 implementation
@@ -258,7 +259,19 @@ begin
   Assert.AreEqual(Integer(TRickUIBuilderEditAppearance.Outlined),
     Integer(LConfig.Appearance));
   Assert.IsFalse(LConfig.ReadOnly);
+  Assert.AreEqual<Single>(12.0, LConfig.LabelFontSize);
   Assert.AreEqual<Single>(11.0, LConfig.ErrorFontSize);
+end;
+
+
+procedure TRickUIBuilderEditIntegrationTests.Edit_MensagemDeveForcarAlturaMinima;
+var
+  LHandle: IRickUIBuilderEditHandle;
+begin
+  LHandle := TRickUIBuilder.Edit
+    .LabelText('Título').InvalidMessage('Mensagem').Size(300, 20)
+    .Build(FHostForm);
+  Assert.IsTrue(LHandle.Container.Height > 20);
 end;
 
 initialization

@@ -311,6 +311,9 @@ begin
   FInvalidFromInput := False;
   FErrorLabel.Text := AMessage;
   FErrorLabel.Visible := AValue and ShouldShowErrorLabel(AMessage);
+  if FErrorLabel.Visible and
+    (FContainer.Height < FErrorLabel.Position.Y + FErrorLabel.Height + 8) then
+    FContainer.Height := FErrorLabel.Position.Y + FErrorLabel.Height + 8;
   if Assigned(FAlertPath) then
     FAlertPath.Visible := AValue and ShouldShowAlertIcon;
   UpdateActionLayout;

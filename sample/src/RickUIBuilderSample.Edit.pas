@@ -208,7 +208,7 @@ begin
   LHandle := TRickUIBuilder.Edit.LabelText(ALabel).InvalidFeedback(AFeedback)
     .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
   LHandle.SetInvalid(True, 'Valor inválido');
-  Result := ATop + 70;
+  Result := ATop + LHandle.Container.Height + 12;
 end;
 
 procedure TRickUIBuilderEditShowcase.BuildFeedback(var ATop: Single);
@@ -223,7 +223,7 @@ begin
     .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
   AddButton('Marcar inválido', CONTENT_LEFT + 374, ATop, MarkInvalid);
   AddButton('Marcar válido', CONTENT_LEFT + 374, ATop + 38, MarkValid);
-  ATop := ATop + 84;
+  ATop := ATop + FInvalidHandle.Container.Height + 12;
 end;
 
 procedure TRickUIBuilderEditShowcase.BuildRequirement(var ATop: Single);
@@ -258,12 +258,17 @@ begin
   ATop := ATop + 70;
   FPasteTarget := TRickUIBuilder.Edit.LabelText('Alvo CPF - cole aqui')
     .Preset(TRickUIBuilderEditPreset.CPF).ClearButton
+    .BackgroundColor($FFF2F7FF).BorderColor($FF7A9CC6)
+    .FocusBorderColor($FF245A9C).TextColor($FF17365D).FontSize(15)
+    .LabelColor($FF6B4F1D).LabelFontSize(12).InvalidLabelColor($FF6B4F1D)
+    .AlertIconColor($FFD32F2F).ClearIconColor($FF245A9C)
     .InvalidFeedback(TRickUIBuilderEditInvalidFeedback.AlertAndIcon)
-    .InvalidMessage('CPF incompleto ou paste inválido').ErrorTextColor($FFB3261E)
-    .ErrorFontSize(12).ErrorFontStyles([TFontStyle.fsBold]).ErrorSpacing(6)
+    .InvalidMessage('CPF incompleto ou paste inválido').ErrorTextColor($FFD32F2F)
+    .ErrorFontFamily('Arial').ErrorFontSize(11)
+    .ErrorFontStyles([TFontStyle.fsBold]).ErrorSpacing(8)
     .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
   AddButton('Colar no alvo', CONTENT_LEFT + 374, ATop + 12, PasteTarget);
-  ATop := ATop + 84;
+  ATop := ATop + 98;
 
   ATop := AddNote('CNPJ: copie um valor abaixo e cole no alvo CNPJ. O paste sem máscara deve ser rejeitado.', ATop);
   FCopyCNPJValid := AddReadOnlySource('Fonte CNPJ válida', '12.ABC.345/01DE-35', ATop);
@@ -274,12 +279,17 @@ begin
   ATop := ATop + 70;
   FPasteCNPJTarget := TRickUIBuilder.Edit.LabelText('Alvo CNPJ - cole aqui')
     .Preset(TRickUIBuilderEditPreset.CNPJ).ClearButton
+    .BackgroundColor($FFF3FAF5).BorderColor($FF77A887)
+    .FocusBorderColor($FF287A46).TextColor($FF1E5130).FontSize(15)
+    .LabelColor($FF6B4F1D).LabelFontSize(12).InvalidLabelColor($FF6B4F1D)
+    .AlertIconColor($FFD32F2F).ClearIconColor($FF287A46)
     .InvalidFeedback(TRickUIBuilderEditInvalidFeedback.AlertAndIcon)
-    .InvalidMessage('CNPJ incompleto ou paste inválido').ErrorTextColor($FFB3261E)
-    .ErrorFontSize(12).ErrorFontStyles([TFontStyle.fsBold]).ErrorSpacing(6)
+    .InvalidMessage('CNPJ incompleto ou paste inválido').ErrorTextColor($FFD32F2F)
+    .ErrorFontFamily('Arial').ErrorFontSize(11)
+    .ErrorFontStyles([TFontStyle.fsBold]).ErrorSpacing(8)
     .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
   AddButton('Colar no alvo CNPJ', CONTENT_LEFT + 374, ATop + 12, PasteCNPJTarget);
-  ATop := ATop + 84;
+  ATop := ATop + 98;
 end;
 
 procedure TRickUIBuilderEditShowcase.BuildCustomAppearance(var ATop: Single);

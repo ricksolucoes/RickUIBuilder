@@ -1357,6 +1357,7 @@ type
     function CornerRadius(AValue: Single): IRickUIBuilderEdit;
     function BorderThickness(AValue: Single): IRickUIBuilderEdit;
     function FontSize(AValue: Single): IRickUIBuilderEdit;
+    function LabelFontSize(AValue: Single): IRickUIBuilderEdit;
     function IconSize(AValue: Single): IRickUIBuilderEdit;
     function AlertPath(const AValue: string): IRickUIBuilderEdit;
     function ClearPath(const AValue: string): IRickUIBuilderEdit;

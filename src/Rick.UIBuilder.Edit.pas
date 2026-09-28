@@ -44,6 +44,10 @@ type
     function CreateRequirement(AContainer: TRectangle; ALeft: Single): TPath;
     function ActionCount: Integer;
     function EditAreaWidth: Single;
+    function LabelHeight: Single;
+    function EditHeight: Single;
+    function ErrorHeight: Single;
+    function MinimumHeight: Single;
     function CreateActions(AContainer: TRectangle): TActionControls;
     function CreateBehavior(AParent: TFmxObject; AContainer: TRectangle;
       AEdit: TEdit; ALabel, ACounter, AError: TLabel; AUnderline: TRectangle)
@@ -105,6 +109,7 @@ type
     function CornerRadius(AValue: Single): IRickUIBuilderEdit;
     function BorderThickness(AValue: Single): IRickUIBuilderEdit;
     function FontSize(AValue: Single): IRickUIBuilderEdit;
+    function LabelFontSize(AValue: Single): IRickUIBuilderEdit;
     function IconSize(AValue: Single): IRickUIBuilderEdit;
     function AlertPath(const AValue: string): IRickUIBuilderEdit;
     function ClearPath(const AValue: string): IRickUIBuilderEdit;
@@ -124,6 +129,7 @@ implementation
 
 uses
   System.Classes,
+  System.Math,
 
   FMX.Graphics,
 
@@ -662,6 +668,13 @@ begin
   Result := Self;
 end;
 
+function TRickUIBuilderEditBuilder.LabelFontSize(
+  AValue: Single): IRickUIBuilderEdit;
+begin
+  FConfig.LabelFontSize := AValue;
+  Result := Self;
+end;
+
 function TRickUIBuilderEditBuilder.IconSize(AValue: Single): IRickUIBuilderEdit;
 begin
   FConfig.IconSize := AValue;
@@ -729,9 +742,11 @@ function TRickUIBuilderEditBuilder.CreateLabel(AContainer: TRectangle): TLabel;
 begin
   Result := TLabel.Create(AContainer);
   Result.Parent := AContainer;
-  Result.SetBounds(12, 3, FConfig.Width - 24, 18);
+  Result.SetBounds(12, 3, FConfig.Width - 24, LabelHeight);
   Result.Text := FConfig.LabelText;
-  Result.TextSettings.Font.Size := FConfig.FontSize - 2;
+  Result.StyledSettings := Result.StyledSettings -
+    [TStyledSetting.Size, TStyledSetting.FontColor];
+  Result.TextSettings.Font.Size := FConfig.LabelFontSize;
   Result.TextSettings.FontColor := FConfig.LabelColor;
   Result.HitTest := False;
 end;
@@ -756,12 +771,34 @@ begin
     Result := 40;
 end;
 
+function TRickUIBuilderEditBuilder.LabelHeight: Single;
+begin
+  Result := Max(18, FConfig.LabelFontSize + 6);
+end;
+
+function TRickUIBuilderEditBuilder.EditHeight: Single;
+begin
+  Result := Max(24, FConfig.FontSize + 10);
+end;
+
+function TRickUIBuilderEditBuilder.ErrorHeight: Single;
+begin
+  Result := Max(18, FConfig.ErrorFontSize + 6);
+end;
+
+function TRickUIBuilderEditBuilder.MinimumHeight: Single;
+begin
+  Result := 3 + LabelHeight + 3 + EditHeight + 8;
+  if FConfig.InvalidMessage <> '' then
+    Result := Result + FConfig.ErrorSpacing + ErrorHeight;
+end;
+
 function TRickUIBuilderEditBuilder.CreateEditBackground(
   AContainer: TRectangle): TRectangle;
 begin
   Result := TRectangle.Create(AContainer);
   Result.Parent := AContainer;
-  Result.SetBounds(8, 20, EditAreaWidth, 24);
+  Result.SetBounds(8, 6 + LabelHeight, EditAreaWidth, EditHeight);
   Result.Fill.Color := FConfig.EditBackgroundColor;
   Result.Stroke.Kind := TBrushKind.None;
   Result.HitTest := False;
@@ -775,8 +812,10 @@ begin
   LEdit.ConfigureInput(FConfig);
   Result := LEdit;
   Result.Parent := AContainer;
-  Result.SetBounds(8, 20, EditAreaWidth, 24);
+  Result.SetBounds(8, 6 + LabelHeight, EditAreaWidth, EditHeight);
   Result.StyleLookup := 'transparentedit';
+  Result.StyledSettings := Result.StyledSettings -
+    [TStyledSetting.Size, TStyledSetting.FontColor];
   Result.TextSettings.Font.Size := FConfig.FontSize;
   Result.TextSettings.FontColor := FConfig.TextColor;
   Result.Password := FConfig.Password;
@@ -799,7 +838,11 @@ function TRickUIBuilderEditBuilder.CreateErrorLabel
 begin
   Result := TLabel.Create(AContainer);
   Result.Parent := AContainer;
-  Result.SetBounds(12, 44 + FConfig.ErrorSpacing, FConfig.Width - 24, 18);
+  Result.SetBounds(12, 6 + LabelHeight + EditHeight + FConfig.ErrorSpacing,
+    FConfig.Width - 24, ErrorHeight);
+  Result.StyledSettings := Result.StyledSettings -
+    [TStyledSetting.Family, TStyledSetting.Size, TStyledSetting.Style,
+     TStyledSetting.FontColor];
   Result.TextSettings.Font.Size := FConfig.ErrorFontSize;
   Result.TextSettings.FontColor := FConfig.ErrorTextColor;
   Result.TextSettings.Font.Style := FConfig.ErrorFontStyles;
@@ -814,7 +857,8 @@ function TRickUIBuilderEditBuilder.CreateUnderline(
 begin
   Result := TRectangle.Create(AContainer);
   Result.Parent := AContainer;
-  Result.SetBounds(8, 45, FConfig.Width - 16, FConfig.UnderlineThickness);
+  Result.SetBounds(8, 6 + LabelHeight + EditHeight, FConfig.Width - 16,
+    FConfig.UnderlineThickness);
   Result.Fill.Color := FConfig.UnderlineColor;
   Result.Stroke.Kind := TBrushKind.None;
   Result.HitTest := False;
@@ -841,7 +885,7 @@ function TRickUIBuilderEditBuilder.CreateActionArea(AContainer: TRectangle;
 begin
   Result := TLayout.Create(AContainer);
   Result.Parent := AContainer;
-  Result.SetBounds(ALeft, 20, 32, 36);
+  Result.SetBounds(ALeft, 6 + LabelHeight, 32, EditHeight);
   Result.HitTest := True;
   Result.Cursor := crHandPoint;
   Result.BringToFront;
@@ -851,7 +895,8 @@ function TRickUIBuilderEditBuilder.CreateAlert(AContainer: TRectangle): TPath;
 begin
   Result := CreatePath(AContainer, FConfig.AlertPath, FConfig.AlertIconColor);
   Result.Align := TAlignLayout.None;
-  Result.SetBounds(FConfig.Width - 32 + ((32 - FConfig.IconSize) / 2), 28,
+  Result.SetBounds(FConfig.Width - 32 + ((32 - FConfig.IconSize) / 2),
+    6 + LabelHeight + ((EditHeight - FConfig.IconSize) / 2),
     FConfig.IconSize, FConfig.IconSize);
   Result.Visible := False;
 end;
@@ -862,7 +907,8 @@ begin
   Result := CreatePath(AContainer, FConfig.RequirementNotMetPath,
     FConfig.RequirementIconColor);
   Result.Align := TAlignLayout.None;
-  Result.SetBounds(ALeft + ((32 - FConfig.IconSize) / 2), 28,
+  Result.SetBounds(ALeft + ((32 - FConfig.IconSize) / 2),
+    6 + LabelHeight + ((EditHeight - FConfig.IconSize) / 2),
     FConfig.IconSize, FConfig.IconSize);
 end;
 
@@ -886,7 +932,8 @@ begin
   if FConfig.ShowRequirementIndicator then
     X := X - 32;
   Result.Alert := CreateAlert(AContainer);
-  Result.Alert.SetBounds(X + ((32 - FConfig.IconSize) / 2), 28,
+  Result.Alert.SetBounds(X + ((32 - FConfig.IconSize) / 2),
+    6 + LabelHeight + ((EditHeight - FConfig.IconSize) / 2),
     FConfig.IconSize, FConfig.IconSize);
 end;
 
@@ -907,6 +954,7 @@ var
   Actions: TActionControls;
   Behavior: TRickUIBuilderEditBehavior;
 begin
+  FConfig.Height := Max(FConfig.Height, MinimumHeight);
   C := CreateContainer(AParent);
   L := CreateLabel(C);
   EditBackground := CreateEditBackground(C);

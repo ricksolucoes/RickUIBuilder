@@ -402,6 +402,7 @@ type
     CornerRadius: Single;
     BorderThickness: Single;
     FontSize: Single;
+    LabelFontSize: Single;
     ErrorFontFamily: string;
     ErrorFontSize: Single;
     ErrorFontStyles: TFontStyles;
@@ -583,6 +584,7 @@ begin
   AValue.CornerRadius := 8;
   AValue.BorderThickness := 1;
   AValue.FontSize := 14;
+  AValue.LabelFontSize := 12;
   AValue.ErrorFontFamily := '';
   AValue.ErrorFontSize := 11;
   AValue.ErrorFontStyles := [];
