@@ -49,8 +49,9 @@ type
     function ErrorHeight: Single;
     function MinimumHeight: Single;
     function CreateActions(AContainer: TRectangle): TActionControls;
-    function CreateBehavior(AParent: TFmxObject; AContainer: TRectangle;
-      AEdit: TEdit; ALabel, ACounter, AError: TLabel; AUnderline: TRectangle)
+    function CreateBehavior(AParent: TFmxObject;
+      AContainer, AEditBackground: TRectangle; AEdit: TEdit;
+      ALabel, ACounter, AError: TLabel; AUnderline: TRectangle)
     : TRickUIBuilderEditBehavior;
   protected
     function Text(const AValue: string): IRickUIBuilderEdit;
@@ -155,7 +156,7 @@ type
     procedure ApplyResolvedText(const AValue, AResolved: string;
       ACaret: Integer; AAppendAtEnd: Boolean);
   protected
-    procedure SetText(const Value: string); override;
+    procedure SetText(const AValue: string); override;
   public
     procedure ConfigureInput(const AConfig: TRickUIBuilderEditConfig);
   end;
@@ -260,7 +261,7 @@ begin
   end;
 end;
 
-procedure TRickUIBuilderRuntimeEdit.SetText(const Value: string);
+procedure TRickUIBuilderRuntimeEdit.SetText(const AValue: string);
 var
   LAppendAtEnd: Boolean;
   LCaret: Integer;
@@ -268,18 +269,18 @@ var
 begin
   if FApplyingText or not FInputConfigured then
   begin
-    inherited SetText(Value);
+    inherited SetText(AValue);
     Exit;
   end;
-  if not TRickUIBuilderEditInput.IsTypedValueAllowed(Value, FInputConfig) then
+  if not TRickUIBuilderEditInput.IsTypedValueAllowed(AValue, FInputConfig) then
     Exit;
   LOldText := Text;
-  LAppendAtEnd := IsAppendingAtEnd(LOldText, Value);
-  LCaret := ChangedCaretPosition(LOldText, Value, CaretPosition);
-  LResolved := TRickUIBuilderEditInput.FormatTypedValue(Value, FInputConfig);
+  LAppendAtEnd := IsAppendingAtEnd(LOldText, AValue);
+  LCaret := ChangedCaretPosition(LOldText, AValue, CaretPosition);
+  LResolved := TRickUIBuilderEditInput.FormatTypedValue(AValue, FInputConfig);
   if not TRickUIBuilderEditInput.IsValueAllowed(LResolved, FInputConfig) then
     Exit;
-  ApplyResolvedText(Value, LResolved, LCaret, LAppendAtEnd);
+  ApplyResolvedText(AValue, LResolved, LCaret, LAppendAtEnd);
 end;
 
 constructor TRickUIBuilderEditBuilder.Create;
@@ -915,60 +916,63 @@ end;
 function TRickUIBuilderEditBuilder.CreateActions(
   AContainer: TRectangle): TActionControls;
 var
-  X: Single;
+  LLeft: Single;
 begin
-  X := FConfig.Width - 40;
-  Result.ClearArea := CreateActionArea(AContainer, X);
+  LLeft := FConfig.Width - 40;
+  Result.ClearArea := CreateActionArea(AContainer, LLeft);
   Result.ClearIcon := CreatePath(Result.ClearArea, FConfig.ClearPath,
     FConfig.ClearIconColor);
   if FConfig.ShowClearButton then
-    X := X - 32;
-  Result.PasswordArea := CreateActionArea(AContainer, X);
+    LLeft := LLeft - 32;
+  Result.PasswordArea := CreateActionArea(AContainer, LLeft);
   Result.PasswordIcon := CreatePath(Result.PasswordArea,
     FConfig.VisibilityOffPath, FConfig.PasswordIconColor);
   if FConfig.Password then
-    X := X - 32;
-  Result.Requirement := CreateRequirement(AContainer, X);
+    LLeft := LLeft - 32;
+  Result.Requirement := CreateRequirement(AContainer, LLeft);
   if FConfig.ShowRequirementIndicator then
-    X := X - 32;
+    LLeft := LLeft - 32;
   Result.Alert := CreateAlert(AContainer);
-  Result.Alert.SetBounds(X + ((32 - FConfig.IconSize) / 2),
+  Result.Alert.SetBounds(LLeft + ((32 - FConfig.IconSize) / 2),
     6 + LabelHeight + ((EditHeight - FConfig.IconSize) / 2),
     FConfig.IconSize, FConfig.IconSize);
 end;
 
 function TRickUIBuilderEditBuilder.CreateBehavior(AParent: TFmxObject;
-  AContainer: TRectangle; AEdit: TEdit; ALabel, ACounter, AError: TLabel;
+  AContainer, AEditBackground: TRectangle; AEdit: TEdit;
+  ALabel, ACounter, AError: TLabel;
   AUnderline: TRectangle): TRickUIBuilderEditBehavior;
 begin
   Result := TRickUIBuilderEditBehavior.Create(AParent);
-  Result.Configure(FConfig, AContainer, AEdit, ALabel, ACounter, AError, AUnderline);
+  Result.Configure(FConfig, AContainer, AEditBackground, AEdit,
+    ALabel, ACounter, AError, AUnderline);
 end;
 
 function TRickUIBuilderEditBuilder.Build(AParent: TFmxObject)
 : IRickUIBuilderEditHandle;
 var
-  C, EditBackground, Underline: TRectangle;
-  E: TEdit;
-  L, Count, Err: TLabel;
-  Actions: TActionControls;
-  Behavior: TRickUIBuilderEditBehavior;
+  LContainer, LEditBackground, LUnderline: TRectangle;
+  LEdit: TEdit;
+  LLabel, LCounter, LError: TLabel;
+  LActions: TActionControls;
+  LBehavior: TRickUIBuilderEditBehavior;
 begin
   FConfig.Height := Max(FConfig.Height, MinimumHeight);
-  C := CreateContainer(AParent);
-  L := CreateLabel(C);
-  EditBackground := CreateEditBackground(C);
-  EditBackground.SendToBack;
-  E := CreateEdit(C);
-  Count := CreateCounter(C);
-  Err := CreateErrorLabel(C);
-  Underline := CreateUnderline(C);
-  Actions := CreateActions(C);
-  Behavior := CreateBehavior(AParent, C, E, L, Count, Err, Underline);
-  Behavior.ConfigureIcons(Actions.Alert, Actions.ClearArea, Actions.ClearIcon,
-    Actions.PasswordArea, Actions.PasswordIcon, Actions.Requirement);
-  Behavior.SetText(FConfig.Text);
-  Result := TRickUIBuilderEditHandle.New(C, E, Behavior);
+  LContainer := CreateContainer(AParent);
+  LLabel := CreateLabel(LContainer);
+  LEditBackground := CreateEditBackground(LContainer);
+  LEditBackground.SendToBack;
+  LEdit := CreateEdit(LContainer);
+  LCounter := CreateCounter(LContainer);
+  LError := CreateErrorLabel(LContainer);
+  LUnderline := CreateUnderline(LContainer);
+  LActions := CreateActions(LContainer);
+  LBehavior := CreateBehavior(AParent, LContainer, LEditBackground, LEdit, LLabel, LCounter, LError,
+    LUnderline);
+  LBehavior.ConfigureIcons(LActions.Alert, LActions.ClearArea, LActions.ClearIcon,
+    LActions.PasswordArea, LActions.PasswordIcon, LActions.Requirement);
+  LBehavior.SetText(FConfig.Text);
+  Result := TRickUIBuilderEditHandle.New(LContainer, LEdit, LBehavior);
 end;
 
 end.

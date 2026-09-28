@@ -22,6 +22,7 @@ type
   strict private
     FConfig: TRickUIBuilderEditConfig;
     FContainer: TRectangle;
+    FEditBackground: TRectangle;
     FEdit: TEdit;
     FLabel: TLabel;
     FCounter: TLabel;
@@ -44,6 +45,7 @@ type
     procedure UpdateCounter;
     procedure UpdateClearVisibility;
     procedure UpdateActionLayout;
+    procedure UpdateEditAreaWidth(ALeft: Single);
     procedure PlaceActionArea(AControl: TControl; var ALeft: Single);
     procedure PlaceActionPath(AControl: TControl; var ALeft: Single);
     procedure UpdatePasswordIcon;
@@ -52,18 +54,18 @@ type
     procedure SignalInvalidInput;
     function ShouldShowErrorLabel(const AMessage: string): Boolean;
     function ShouldShowAlertIcon: Boolean;
-    procedure HandleEnter(Sender: TObject);
-    procedure HandleExit(Sender: TObject);
+    procedure HandleEnter(ASender: TObject);
+    procedure HandleExit(ASender: TObject);
     function ResolveChangedText(const AText: string; out AResolved: string): Boolean;
     function IsOverflowAttempt(const AText: string): Boolean;
-    procedure HandleChange(Sender: TObject);
+    procedure HandleChange(ASender: TObject);
     procedure QueueCaretToEnd;
-    procedure HandleClear(Sender: TObject);
-    procedure HandlePassword(Sender: TObject);
+    procedure HandleClear(ASender: TObject);
+    procedure HandlePassword(ASender: TObject);
   public
     procedure Configure(const AConfig: TRickUIBuilderEditConfig;
-      AContainer: TRectangle; AEdit: TEdit; ALabel, ACounter,
-      AErrorLabel: TLabel; AUnderline: TRectangle);
+      AContainer, AEditBackground: TRectangle; AEdit: TEdit;
+      ALabel, ACounter, AErrorLabel: TLabel; AUnderline: TRectangle);
     procedure ConfigureIcons(AAlertPath: TPath; AClearArea: TLayout;
       AClearPath: TPath; APasswordArea: TLayout; APasswordPath,
       ARequirementPath: TPath);
@@ -79,11 +81,13 @@ uses
   Rick.UIBuilder.Edit.Input;
 
 procedure TRickUIBuilderEditBehavior.Configure(
-  const AConfig: TRickUIBuilderEditConfig; AContainer: TRectangle;
-  AEdit: TEdit; ALabel, ACounter, AErrorLabel: TLabel; AUnderline: TRectangle);
+  const AConfig: TRickUIBuilderEditConfig;
+  AContainer, AEditBackground: TRectangle; AEdit: TEdit;
+  ALabel, ACounter, AErrorLabel: TLabel; AUnderline: TRectangle);
 begin
   FConfig := AConfig;
   FContainer := AContainer;
+  FEditBackground := AEditBackground;
   FEdit := AEdit;
   FLabel := ALabel;
   FCounter := ACounter;
@@ -146,7 +150,7 @@ begin
     TRickUIBuilderEditInput.IsCompleteValue(FLastValidText, FConfig);
 end;
 
-procedure TRickUIBuilderEditBehavior.HandleChange(Sender: TObject);
+procedure TRickUIBuilderEditBehavior.HandleChange(ASender: TObject);
 var
   LResolved: string;
   LTypingAtEnd: Boolean;
@@ -217,19 +221,19 @@ begin
   FEdit.SetFocus;
 end;
 
-procedure TRickUIBuilderEditBehavior.HandleClear(Sender: TObject);
+procedure TRickUIBuilderEditBehavior.HandleClear(ASender: TObject);
 begin
   Clear;
 end;
 
-procedure TRickUIBuilderEditBehavior.HandlePassword(Sender: TObject);
+procedure TRickUIBuilderEditBehavior.HandlePassword(ASender: TObject);
 begin
   FEdit.Password := not FEdit.Password;
   UpdatePasswordIcon;
   FEdit.SetFocus;
 end;
 
-procedure TRickUIBuilderEditBehavior.HandleEnter(Sender: TObject);
+procedure TRickUIBuilderEditBehavior.HandleEnter(ASender: TObject);
 begin
   if FInvalid then
     ApplyInvalidState
@@ -237,7 +241,7 @@ begin
     ApplyFocusState;
 end;
 
-procedure TRickUIBuilderEditBehavior.HandleExit(Sender: TObject);
+procedure TRickUIBuilderEditBehavior.HandleExit(ASender: TObject);
 begin
   if (FEdit.Text <> '') and
     not TRickUIBuilderEditInput.IsCompleteValue(FEdit.Text, FConfig) then
@@ -246,6 +250,8 @@ begin
     ApplyInvalidState
   else
     ApplyNormalState;
+  FEdit.CaretPosition := 0;
+  FEdit.SelLength := 0;
 end;
 
 procedure TRickUIBuilderEditBehavior.ApplyNormalState;
@@ -379,15 +385,32 @@ begin
   ALeft := ALeft - 32;
 end;
 
+procedure TRickUIBuilderEditBehavior.UpdateEditAreaWidth(ALeft: Single);
+var
+  LWidth: Single;
+begin
+  LWidth := ALeft - 8;
+  if LWidth < 40 then
+    LWidth := 40;
+  FEdit.Width := LWidth;
+  if Assigned(FEditBackground) then
+    FEditBackground.Width := LWidth;
+end;
+
 procedure TRickUIBuilderEditBehavior.UpdateActionLayout;
 var
-  LLeft: Single;
+  LActionLeft: Single;
+  LEditRight: Single;
 begin
-  LLeft := FConfig.Width - 40;
-  PlaceActionArea(FClearArea, LLeft);
-  PlaceActionArea(FPasswordArea, LLeft);
-  PlaceActionPath(FRequirementPath, LLeft);
-  PlaceActionPath(FAlertPath, LLeft);
+  LActionLeft := FConfig.Width - 40;
+  LEditRight := FConfig.Width - 8;
+  PlaceActionArea(FClearArea, LActionLeft);
+  PlaceActionArea(FPasswordArea, LActionLeft);
+  PlaceActionPath(FRequirementPath, LActionLeft);
+  PlaceActionPath(FAlertPath, LActionLeft);
+  if LActionLeft < FConfig.Width - 40 then
+    LEditRight := LActionLeft + 32;
+  UpdateEditAreaWidth(LEditRight);
 end;
 
 procedure TRickUIBuilderEditBehavior.UpdatePasswordIcon;

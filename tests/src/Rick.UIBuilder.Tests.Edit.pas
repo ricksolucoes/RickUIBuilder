@@ -56,6 +56,8 @@ type
     [Test] procedure Edit_ReadOnlyDeveBloquearEdicao;
     [Test] procedure Edit_DefaultDevePreservarAparenciaAtual;
     [Test] procedure Edit_MensagemDeveForcarAlturaMinima;
+    [Test] procedure Edit_SemIconeVisivelDeveUsarTodaLarguraUtil;
+    [Test] procedure Edit_AoSairDeveReposicionarVisualizacaoNoInicio;
   end;
 
 implementation
@@ -365,6 +367,31 @@ begin
     .LabelText('Título').InvalidMessage('Mensagem').Size(300, 20)
     .Build(FHostForm);
   Assert.IsTrue(LHandle.Container.Height > 20);
+end;
+
+procedure TRickUIBuilderEditIntegrationTests.Edit_SemIconeVisivelDeveUsarTodaLarguraUtil;
+var
+  LHandle: IRickUIBuilderEditHandle;
+begin
+  LHandle := TRickUIBuilder.Edit.ClearButton.Size(300, 56).Build(FHostForm);
+  Assert.AreEqual<Single>(284, LHandle.EditControl.Width);
+  LHandle.Text('conteúdo');
+  Assert.AreEqual<Single>(252, LHandle.EditControl.Width);
+  LHandle.Clear;
+  Assert.AreEqual<Single>(284, LHandle.EditControl.Width);
+end;
+
+procedure TRickUIBuilderEditIntegrationTests.Edit_AoSairDeveReposicionarVisualizacaoNoInicio;
+var
+  LHandle: IRickUIBuilderEditHandle;
+begin
+  LHandle := TRickUIBuilder.Edit
+    .Text('https://chatgpt.com/g/g-p-6ab4204f8ae48191bc9bf0b66dbefdd4')
+    .Build(FHostForm);
+  LHandle.EditControl.CaretPosition := Length(LHandle.Text);
+  Assert.IsTrue(Assigned(LHandle.EditControl.OnExit));
+  LHandle.EditControl.OnExit(LHandle.EditControl);
+  Assert.AreEqual(0, LHandle.EditControl.CaretPosition);
 end;
 
 initialization
