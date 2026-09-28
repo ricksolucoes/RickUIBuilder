@@ -22,6 +22,9 @@ type
     FCopyValid: IRickUIBuilderEditHandle;
     FCopyInvalid: IRickUIBuilderEditHandle;
     FPasteTarget: IRickUIBuilderEditHandle;
+    FCopyCNPJValid: IRickUIBuilderEditHandle;
+    FCopyCNPJInvalid: IRickUIBuilderEditHandle;
+    FPasteCNPJTarget: IRickUIBuilderEditHandle;
     FInvalidHandle: IRickUIBuilderEditHandle;
     FRequirementHandle: IRickUIBuilderEditHandle;
     function AddTitle(const AText: string; ATop: Single): Single;
@@ -44,6 +47,9 @@ type
     procedure CopyValid(Sender: TObject);
     procedure CopyInvalid(Sender: TObject);
     procedure PasteTarget(Sender: TObject);
+    procedure CopyCNPJValid(Sender: TObject);
+    procedure CopyCNPJInvalid(Sender: TObject);
+    procedure PasteCNPJTarget(Sender: TObject);
     procedure MarkInvalid(Sender: TObject);
     procedure MarkValid(Sender: TObject);
     procedure RequirementMet(Sender: TObject);
@@ -241,9 +247,28 @@ begin
   AddButton('Copiar sem máscara', CONTENT_LEFT + 374, ATop + 12, CopyInvalid);
   ATop := ATop + 70;
   FPasteTarget := TRickUIBuilder.Edit.LabelText('Alvo CPF - cole aqui')
-    .Preset(TRickUIBuilderEditPreset.CPF).InvalidMessage('Paste inválido')
+    .Preset(TRickUIBuilderEditPreset.CPF).ClearButton
+    .InvalidFeedback(TRickUIBuilderEditInvalidFeedback.AlertAndIcon)
+    .InvalidMessage('CPF incompleto ou paste inválido')
     .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
   AddButton('Colar no alvo', CONTENT_LEFT + 374, ATop + 12, PasteTarget);
+  ATop := ATop + 84;
+
+  ATop := AddNote('CNPJ: copie um valor abaixo e cole no alvo CNPJ. O paste sem máscara deve ser rejeitado.', ATop);
+  FCopyCNPJValid := TRickUIBuilder.Edit.LabelText('Fonte CNPJ válida').Text('12.ABC.345/01DE-35')
+    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
+  AddButton('Copiar CNPJ válido', CONTENT_LEFT + 374, ATop + 12, CopyCNPJValid);
+  ATop := ATop + 70;
+  FCopyCNPJInvalid := TRickUIBuilder.Edit.LabelText('Fonte CNPJ sem máscara').Text('12ABC34501DE35')
+    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
+  AddButton('Copiar CNPJ sem máscara', CONTENT_LEFT + 374, ATop + 12, CopyCNPJInvalid);
+  ATop := ATop + 70;
+  FPasteCNPJTarget := TRickUIBuilder.Edit.LabelText('Alvo CNPJ - cole aqui')
+    .Preset(TRickUIBuilderEditPreset.CNPJ).ClearButton
+    .InvalidFeedback(TRickUIBuilderEditInvalidFeedback.AlertAndIcon)
+    .InvalidMessage('CNPJ incompleto ou paste inválido')
+    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
+  AddButton('Colar no alvo CNPJ', CONTENT_LEFT + 374, ATop + 12, PasteCNPJTarget);
   ATop := ATop + 84;
 end;
 
@@ -264,6 +289,25 @@ begin
   FPasteTarget.EditControl.SetFocus;
   FPasteTarget.EditControl.SelectAll;
   FPasteTarget.EditControl.PasteFromClipboard;
+end;
+
+procedure TRickUIBuilderEditShowcase.CopyCNPJValid(Sender: TObject);
+begin
+  FCopyCNPJValid.EditControl.SelectAll;
+  FCopyCNPJValid.EditControl.CopyToClipboard;
+end;
+
+procedure TRickUIBuilderEditShowcase.CopyCNPJInvalid(Sender: TObject);
+begin
+  FCopyCNPJInvalid.EditControl.SelectAll;
+  FCopyCNPJInvalid.EditControl.CopyToClipboard;
+end;
+
+procedure TRickUIBuilderEditShowcase.PasteCNPJTarget(Sender: TObject);
+begin
+  FPasteCNPJTarget.EditControl.SetFocus;
+  FPasteCNPJTarget.EditControl.SelectAll;
+  FPasteCNPJTarget.EditControl.PasteFromClipboard;
 end;
 
 procedure TRickUIBuilderEditShowcase.MarkInvalid(Sender: TObject);

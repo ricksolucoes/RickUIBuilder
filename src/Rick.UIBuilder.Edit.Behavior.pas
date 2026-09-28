@@ -51,6 +51,7 @@ type
     procedure HandleEnter(Sender: TObject);
     procedure HandleExit(Sender: TObject);
     function ResolveChangedText(const AText: string; out AResolved: string): Boolean;
+    function IsOverflowAttempt(const AText: string): Boolean;
     procedure HandleChange(Sender: TObject);
     procedure QueueCaretToEnd;
     procedure HandleClear(Sender: TObject);
@@ -131,6 +132,13 @@ begin
   Result := TRickUIBuilderEditInput.IsValueAllowed(AResolved, FConfig);
 end;
 
+function TRickUIBuilderEditBehavior.IsOverflowAttempt(
+  const AText: string): Boolean;
+begin
+  Result := (Length(AText) > Length(FLastValidText)) and
+    TRickUIBuilderEditInput.IsCompleteValue(FLastValidText, FConfig);
+end;
+
 procedure TRickUIBuilderEditBehavior.HandleChange(Sender: TObject);
 var
   LResolved: string;
@@ -143,6 +151,11 @@ begin
     (Copy(FEdit.Text, 1, Length(FLastValidText)) = FLastValidText);
   if not ResolveChangedText(FEdit.Text, LResolved) then
   begin
+    if IsOverflowAttempt(FEdit.Text) then
+    begin
+      SetText(FLastValidText);
+      Exit;
+    end;
     SetText(FLastValidText);
     SignalInvalidInput;
     Exit;
