@@ -97,6 +97,37 @@ Método novo/alterado deve respeitar gates. Não use micro-abstrações cosméti
 
 Todo `.pas` efetivamente modificado precisa de UTF-8 BOM (`EF BB BF`). Não normalize arquivos untouched.
 
+### 9. Convenções obrigatórias de código Delphi
+
+Em todo código Delphi criado ou alterado:
+
+- parâmetros de métodos devem iniciar com `A`;
+- variáveis locais devem iniciar com `L`;
+- campos privados devem iniciar com `F`;
+- constantes devem usar caixa alta, iniciar e terminar com `_`, separando palavras por `_`;
+- para verificar semanticamente se um campo requerido está vazio, use `ATexto.Trim.IsEmpty`;
+- para atribuir ou representar string vazia, use `EmptyStr` em vez de `''`.
+- sempre que código criado ou alterado utilizar `EmptyStr` ou `[Texto].Trim.IsEmpty`, verifique se a unit declara `System.SysUtils` no `uses` aplicável; se não declarar, adicione-a;
+- não adicione `System.SysUtils` indiscriminadamente: essa dependência deve ser incluída quando os recursos utilizados pela alteração efetivamente a exigirem.
+
+Exemplo:
+
+```pascal
+const
+  _TEMPO_LIMITE_ = 30;
+
+procedure Processar(const ATexto: string);
+var
+  LValor: string;
+begin
+  LValor := EmptyStr;
+  if ATexto.Trim.IsEmpty then
+    Exit;
+end;
+```
+
+Essas convenções são gates de implementação, não preferências de estilo. Não as aplique automaticamente a linguagens diferentes de Delphi.
+
 ## Decision Rules
 
 ### Criar Handle?

@@ -38,6 +38,7 @@ type
     procedure BuildNumericPresets(var ATop: Single);
     procedure BuildTextPresets(var ATop: Single);
     procedure BuildCaseAndUrl(var ATop: Single);
+    procedure BuildRequired(var ATop: Single);
     procedure BuildCounterClearPassword(var ATop: Single);
     function AddInvalidExample(const ALabel: string;
       AFeedback: TRickUIBuilderEditInvalidFeedback; ATop: Single): Single;
@@ -47,16 +48,16 @@ type
       ATop: Single): IRickUIBuilderEditHandle;
     procedure BuildClipboard(var ATop: Single);
     procedure BuildCustomAppearance(var ATop: Single);
-    procedure CopyValid(Sender: TObject);
-    procedure CopyInvalid(Sender: TObject);
-    procedure PasteTarget(Sender: TObject);
-    procedure CopyCNPJValid(Sender: TObject);
-    procedure CopyCNPJInvalid(Sender: TObject);
-    procedure PasteCNPJTarget(Sender: TObject);
-    procedure MarkInvalid(Sender: TObject);
-    procedure MarkValid(Sender: TObject);
-    procedure RequirementMet(Sender: TObject);
-    procedure RequirementNotMet(Sender: TObject);
+    procedure CopyValid(ASender: TObject);
+    procedure CopyInvalid(ASender: TObject);
+    procedure PasteTarget(ASender: TObject);
+    procedure CopyCNPJValid(ASender: TObject);
+    procedure CopyCNPJInvalid(ASender: TObject);
+    procedure PasteCNPJTarget(ASender: TObject);
+    procedure MarkInvalid(ASender: TObject);
+    procedure MarkValid(ASender: TObject);
+    procedure RequirementMet(ASender: TObject);
+    procedure RequirementNotMet(ASender: TObject);
   public
     constructor Create(AOwner: TComponent; AParent: TFmxObject); reintroduce;
     procedure Build(var ATop: Single);
@@ -68,12 +69,12 @@ uses
   Rick.UIBuilder;
 
 const
-  CONTENT_LEFT = 24;
-  CONTENT_WIDTH = 552;
-  FIELD_WIDTH = 360;
-  FIELD_HEIGHT = 58;
-  TEXT_PRIMARY = $FF1A1D21;
-  TEXT_SECONDARY = $FF6B7280;
+  _CONTENT_LEFT_ = 24;
+  _CONTENT_WIDTH_ = 552;
+  _FIELD_WIDTH_ = 360;
+  _FIELD_HEIGHT_ = 58;
+  _TEXT_PRIMARY_ = $FF1A1D21;
+  _TEXT_SECONDARY_ = $FF6B7280;
 
 constructor TRickUIBuilderEditShowcase.Create(AOwner: TComponent;
   AParent: TFmxObject);
@@ -85,8 +86,8 @@ end;
 function TRickUIBuilderEditShowcase.AddTitle(const AText: string;
   ATop: Single): Single;
 begin
-  TRickUIBuilder.Label_.Text(AText).Position(CONTENT_LEFT, ATop)
-    .Size(CONTENT_WIDTH, 26).FontSize(18).FontColor(TEXT_PRIMARY)
+  TRickUIBuilder.Label_.Text(AText).Position(_CONTENT_LEFT_, ATop)
+    .Size(_CONTENT_WIDTH_, 26).FontSize(18).FontColor(_TEXT_PRIMARY_)
     .Bold.Build(FParent);
   Result := ATop + 34;
 end;
@@ -94,8 +95,8 @@ end;
 function TRickUIBuilderEditShowcase.AddNote(const AText: string;
   ATop: Single): Single;
 begin
-  TRickUIBuilder.Label_.Text(AText).Position(CONTENT_LEFT, ATop)
-    .Size(CONTENT_WIDTH, 36).FontSize(12).FontColor(TEXT_SECONDARY)
+  TRickUIBuilder.Label_.Text(AText).Position(_CONTENT_LEFT_, ATop)
+    .Size(_CONTENT_WIDTH_, 36).FontSize(12).FontColor(_TEXT_SECONDARY_)
     .Build(FParent);
   Result := ATop + 42;
 end;
@@ -104,7 +105,7 @@ function TRickUIBuilderEditShowcase.AddPreset(const ALabel: string;
   APreset: TRickUIBuilderEditPreset; ATop: Single): Single;
 begin
   TRickUIBuilder.Edit.LabelText(ALabel).Preset(APreset)
-    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT)
+    .Position(_CONTENT_LEFT_, ATop).Size(_FIELD_WIDTH_, _FIELD_HEIGHT_)
     .ClearButton.Build(FParent);
   Result := ATop + 70;
 end;
@@ -140,7 +141,7 @@ begin
     .InvalidBorderColor($FFD32F2F).InvalidBackgroundColor($FFFFF1F1)
     .InvalidLabelColor($FFD32F2F).ErrorTextColor($FFD32F2F)
     .AlertIconColor($FFD32F2F).ClearIconColor($FF616161)
-    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT)
+    .Position(_CONTENT_LEFT_, ATop).Size(_FIELD_WIDTH_, _FIELD_HEIGHT_)
     .Build(FParent);
   ATop := ATop + 84;
   ATop := AddPreset('Telefone - DDD opcional', TRickUIBuilderEditPreset.Phone, ATop);
@@ -152,18 +153,18 @@ begin
   ATop := AddTitle('Números', ATop);
   TRickUIBuilder.Edit.LabelText('Inteiro - negativo permitido')
     .Preset(TRickUIBuilderEditPreset.IntegerNumber).AllowNegative
-    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
+    .Position(_CONTENT_LEFT_, ATop).Size(_FIELD_WIDTH_, _FIELD_HEIGHT_).Build(FParent);
   ATop := ATop + 70;
   TRickUIBuilder.Edit.LabelText('Float - formatação do locale')
     .Preset(TRickUIBuilderEditPreset.FloatNumber).DecimalPlaces(2)
     .NumberFormatMode(TRickUIBuilderEditNumberFormatMode.Locale)
-    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
+    .Position(_CONTENT_LEFT_, ATop).Size(_FIELD_WIDTH_, _FIELD_HEIGHT_).Build(FParent);
   ATop := ATop + 70;
   TRickUIBuilder.Edit.LabelText('Float custom - 2 casas, decimal vírgula')
     .Preset(TRickUIBuilderEditPreset.FloatNumber).AllowNegative.DecimalPlaces(2)
     .NumberFormatMode(TRickUIBuilderEditNumberFormatMode.Custom)
     .DecimalSeparator(',').ThousandSeparator('.').UseThousandSeparator
-    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
+    .Position(_CONTENT_LEFT_, ATop).Size(_FIELD_WIDTH_, _FIELD_HEIGHT_).Build(FParent);
   ATop := ATop + 70;
 end;
 
@@ -181,31 +182,60 @@ procedure TRickUIBuilderEditShowcase.BuildCaseAndUrl(var ATop: Single);
 begin
   ATop := AddTitle('Case e URL', ATop);
   TRickUIBuilder.Edit.LabelText('Uppercase').CaseMode(TRickUIBuilderEditCaseMode.Uppercase)
-    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
+    .Position(_CONTENT_LEFT_, ATop).Size(_FIELD_WIDTH_, _FIELD_HEIGHT_).Build(FParent);
   ATop := ATop + 70;
   TRickUIBuilder.Edit.LabelText('Lowercase').CaseMode(TRickUIBuilderEditCaseMode.Lowercase)
-    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
+    .Position(_CONTENT_LEFT_, ATop).Size(_FIELD_WIDTH_, _FIELD_HEIGHT_).Build(FParent);
   ATop := ATop + 70;
   TRickUIBuilder.Edit.LabelText('URL - somente scheme + host em lowercase')
     .Preset(TRickUIBuilderEditPreset.URL).UrlCaseMode(TRickUIBuilderEditUrlCaseMode.SchemeAndHost)
-    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
+    .Position(_CONTENT_LEFT_, ATop).Size(_FIELD_WIDTH_, _FIELD_HEIGHT_).Build(FParent);
   ATop := ATop + 70;
   TRickUIBuilder.Edit.LabelText('URL - conteúdo inteiro em lowercase')
     .Preset(TRickUIBuilderEditPreset.URL).UrlCaseMode(TRickUIBuilderEditUrlCaseMode.EntireValue)
-    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
+    .Position(_CONTENT_LEFT_, ATop).Size(_FIELD_WIDTH_, _FIELD_HEIGHT_).Build(FParent);
   ATop := ATop + 70;
+end;
+
+procedure TRickUIBuilderEditShowcase.BuildRequired(var ATop: Single);
+var
+  LHandle: IRickUIBuilderEditHandle;
+begin
+  ATop := AddTitle('Obrigatoriedade', ATop);
+  ATop := AddNote(
+    'Required é uma capacidade geral do Edit. Espaços em branco também são tratados como vazio.',
+    ATop);
+
+  LHandle := TRickUIBuilder.Edit
+    .LabelText('Campo obrigatório')
+    .Required
+    .InvalidFeedback(TRickUIBuilderEditInvalidFeedback.AlertAndIcon)
+    .InvalidMessage('Este campo é obrigatório')
+    .Position(_CONTENT_LEFT_, ATop)
+    .Size(_FIELD_WIDTH_, _FIELD_HEIGHT_)
+    .Build(FParent);
+  ATop := ATop + LHandle.Container.Height + 12;
+
+  LHandle := TRickUIBuilder.Edit
+    .LabelText('Campo opcional')
+    .InvalidFeedback(TRickUIBuilderEditInvalidFeedback.AlertAndIcon)
+    .InvalidMessage('Este campo é opcional')
+    .Position(_CONTENT_LEFT_, ATop)
+    .Size(_FIELD_WIDTH_, _FIELD_HEIGHT_)
+    .Build(FParent);
+  ATop := ATop + LHandle.Container.Height + 12;
 end;
 
 procedure TRickUIBuilderEditShowcase.BuildCounterClearPassword(var ATop: Single);
 begin
   ATop := AddTitle('Limite, clear e senha', ATop);
   TRickUIBuilder.Edit.LabelText('Máximo 20 caracteres + contador')
-    .MaxLength(20).CharacterCounter.ClearButton.Position(CONTENT_LEFT, ATop)
-    .Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
+    .MaxLength(20).CharacterCounter.ClearButton.Position(_CONTENT_LEFT_, ATop)
+    .Size(_FIELD_WIDTH_, _FIELD_HEIGHT_).Build(FParent);
   ATop := ATop + 70;
   TRickUIBuilder.Edit.LabelText('Senha - use o ícone para mostrar/ocultar')
-    .Password.ClearButton.Position(CONTENT_LEFT, ATop)
-    .Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
+    .Password.ClearButton.Position(_CONTENT_LEFT_, ATop)
+    .Size(_FIELD_WIDTH_, _FIELD_HEIGHT_).Build(FParent);
   ATop := ATop + 70;
 end;
 
@@ -215,7 +245,7 @@ var
   LHandle: IRickUIBuilderEditHandle;
 begin
   LHandle := TRickUIBuilder.Edit.LabelText(ALabel).InvalidFeedback(AFeedback)
-    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
+    .Position(_CONTENT_LEFT_, ATop).Size(_FIELD_WIDTH_, _FIELD_HEIGHT_).Build(FParent);
   LHandle.SetInvalid(True, 'Valor inválido');
   Result := ATop + 70;
 end;
@@ -229,9 +259,9 @@ begin
     TRickUIBuilderEditInvalidFeedback.IconOnly, ATop);
   FInvalidHandle := TRickUIBuilder.Edit.LabelText('Feedback: mensagem + ícone')
     .InvalidFeedback(TRickUIBuilderEditInvalidFeedback.AlertAndIcon)
-    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
-  AddButton('Marcar inválido', CONTENT_LEFT + 374, ATop, MarkInvalid);
-  AddButton('Marcar válido', CONTENT_LEFT + 374, ATop + 38, MarkValid);
+    .Position(_CONTENT_LEFT_, ATop).Size(_FIELD_WIDTH_, _FIELD_HEIGHT_).Build(FParent);
+  AddButton('Marcar inválido', _CONTENT_LEFT_ + 374, ATop, MarkInvalid);
+  AddButton('Marcar válido', _CONTENT_LEFT_ + 374, ATop + 38, MarkValid);
   ATop := ATop + 84;
 end;
 
@@ -239,10 +269,10 @@ procedure TRickUIBuilderEditShowcase.BuildRequirement(var ATop: Single);
 begin
   ATop := AddTitle('Indicador de requisito', ATop);
   FRequirementHandle := TRickUIBuilder.Edit.LabelText('Requisito controlado externamente')
-    .RequirementIndicator.Position(CONTENT_LEFT, ATop)
-    .Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
-  AddButton('Requisito atendido', CONTENT_LEFT + 374, ATop, RequirementMet);
-  AddButton('Não atendido', CONTENT_LEFT + 374, ATop + 38, RequirementNotMet);
+    .RequirementIndicator.Position(_CONTENT_LEFT_, ATop)
+    .Size(_FIELD_WIDTH_, _FIELD_HEIGHT_).Build(FParent);
+  AddButton('Requisito atendido', _CONTENT_LEFT_ + 374, ATop, RequirementMet);
+  AddButton('Não atendido', _CONTENT_LEFT_ + 374, ATop + 38, RequirementNotMet);
   ATop := ATop + 84;
 end;
 
@@ -252,7 +282,7 @@ begin
   Result := TRickUIBuilder.Edit.LabelText(ALabel).Text(AText).ReadOnly
     .ReadOnlyBackgroundColor($FFF5F5F5).ReadOnlyBorderColor($FFD8D8D8)
     .ReadOnlyTextColor($FF8A8A8A).ReadOnlyLabelColor($FF8A8A8A)
-    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
+    .Position(_CONTENT_LEFT_, ATop).Size(_FIELD_WIDTH_, _FIELD_HEIGHT_).Build(FParent);
 end;
 
 procedure TRickUIBuilderEditShowcase.BuildClipboard(var ATop: Single);
@@ -260,10 +290,10 @@ begin
   ATop := AddTitle('Copiar e colar - validação operacional', ATop);
   ATop := AddNote('Copie um valor abaixo e cole no alvo CPF. O paste sem máscara deve ser rejeitado.', ATop);
   FCopyValid := AddReadOnlySource('Fonte válida', '123.456.789-01', ATop);
-  AddButton('Copiar válido', CONTENT_LEFT + 374, ATop + 12, CopyValid);
+  AddButton('Copiar válido', _CONTENT_LEFT_ + 374, ATop + 12, CopyValid);
   ATop := ATop + 70;
   FCopyInvalid := AddReadOnlySource('Fonte inválida', '12345678901', ATop);
-  AddButton('Copiar sem máscara', CONTENT_LEFT + 374, ATop + 12, CopyInvalid);
+  AddButton('Copiar sem máscara', _CONTENT_LEFT_ + 374, ATop + 12, CopyInvalid);
   ATop := ATop + 70;
   FPasteTarget := TRickUIBuilder.Edit.LabelText('Alvo CPF - cole aqui')
     .Preset(TRickUIBuilderEditPreset.CPF).ClearButton
@@ -275,16 +305,16 @@ begin
     .InvalidMessage('CPF incompleto ou paste inválido').ErrorTextColor($FFD32F2F)
     .ErrorFontFamily('Arial').ErrorFontSize(11)
     .ErrorFontStyles([TFontStyle.fsBold]).ErrorSpacing(8)
-    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
-  AddButton('Colar no alvo', CONTENT_LEFT + 374, ATop + 12, PasteTarget);
+    .Position(_CONTENT_LEFT_, ATop).Size(_FIELD_WIDTH_, _FIELD_HEIGHT_).Build(FParent);
+  AddButton('Colar no alvo', _CONTENT_LEFT_ + 374, ATop + 12, PasteTarget);
   ATop := ATop + 98;
 
   ATop := AddNote('CNPJ: copie um valor abaixo e cole no alvo CNPJ. O paste sem máscara deve ser rejeitado.', ATop);
   FCopyCNPJValid := AddReadOnlySource('Fonte CNPJ válida', '12.ABC.345/01DE-35', ATop);
-  AddButton('Copiar CNPJ válido', CONTENT_LEFT + 374, ATop + 12, CopyCNPJValid);
+  AddButton('Copiar CNPJ válido', _CONTENT_LEFT_ + 374, ATop + 12, CopyCNPJValid);
   ATop := ATop + 70;
   FCopyCNPJInvalid := AddReadOnlySource('Fonte CNPJ sem máscara', '12ABC34501DE35', ATop);
-  AddButton('Copiar CNPJ sem máscara', CONTENT_LEFT + 374, ATop + 12, CopyCNPJInvalid);
+  AddButton('Copiar CNPJ sem máscara', _CONTENT_LEFT_ + 374, ATop + 12, CopyCNPJInvalid);
   ATop := ATop + 70;
   FPasteCNPJTarget := TRickUIBuilder.Edit.LabelText('Alvo CNPJ - cole aqui')
     .Preset(TRickUIBuilderEditPreset.CNPJ).ClearButton
@@ -296,8 +326,8 @@ begin
     .InvalidMessage('CNPJ incompleto ou paste inválido').ErrorTextColor($FFD32F2F)
     .ErrorFontFamily('Arial').ErrorFontSize(11)
     .ErrorFontStyles([TFontStyle.fsBold]).ErrorSpacing(8)
-    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
-  AddButton('Colar no alvo CNPJ', CONTENT_LEFT + 374, ATop + 12, PasteCNPJTarget);
+    .Position(_CONTENT_LEFT_, ATop).Size(_FIELD_WIDTH_, _FIELD_HEIGHT_).Build(FParent);
+  AddButton('Colar no alvo CNPJ', _CONTENT_LEFT_ + 374, ATop + 12, PasteCNPJTarget);
   ATop := ATop + 98;
 end;
 
@@ -309,70 +339,70 @@ begin
     .Appearance(TRickUIBuilderEditAppearance.Underline)
     .UnderlineColor($FFB0B0B0).FocusUnderlineColor($FF202124)
     .InvalidUnderlineColor($FFD93025).UnderlineThickness(2)
-    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
+    .Position(_CONTENT_LEFT_, ATop).Size(_FIELD_WIDTH_, _FIELD_HEIGHT_).Build(FParent);
   ATop := ATop + 70;
   TRickUIBuilder.Edit.LabelText('Campo somente leitura').Text('Informação fornecida')
     .Appearance(TRickUIBuilderEditAppearance.Underline).ReadOnly
     .ReadOnlyBackgroundColor($00FFFFFF).ReadOnlyTextColor($FFB8B8B8)
     .ReadOnlyLabelColor($FFB8B8B8).ReadOnlyUnderlineColor($FFD8D8D8)
-    .Position(CONTENT_LEFT, ATop).Size(FIELD_WIDTH, FIELD_HEIGHT).Build(FParent);
+    .Position(_CONTENT_LEFT_, ATop).Size(_FIELD_WIDTH_, _FIELD_HEIGHT_).Build(FParent);
   ATop := ATop + 70;
 end;
 
-procedure TRickUIBuilderEditShowcase.CopyValid(Sender: TObject);
+procedure TRickUIBuilderEditShowcase.CopyValid(ASender: TObject);
 begin
   FCopyValid.EditControl.SelectAll;
   FCopyValid.EditControl.CopyToClipboard;
 end;
 
-procedure TRickUIBuilderEditShowcase.CopyInvalid(Sender: TObject);
+procedure TRickUIBuilderEditShowcase.CopyInvalid(ASender: TObject);
 begin
   FCopyInvalid.EditControl.SelectAll;
   FCopyInvalid.EditControl.CopyToClipboard;
 end;
 
-procedure TRickUIBuilderEditShowcase.PasteTarget(Sender: TObject);
+procedure TRickUIBuilderEditShowcase.PasteTarget(ASender: TObject);
 begin
   FPasteTarget.EditControl.SetFocus;
   FPasteTarget.EditControl.SelectAll;
   FPasteTarget.EditControl.PasteFromClipboard;
 end;
 
-procedure TRickUIBuilderEditShowcase.CopyCNPJValid(Sender: TObject);
+procedure TRickUIBuilderEditShowcase.CopyCNPJValid(ASender: TObject);
 begin
   FCopyCNPJValid.EditControl.SelectAll;
   FCopyCNPJValid.EditControl.CopyToClipboard;
 end;
 
-procedure TRickUIBuilderEditShowcase.CopyCNPJInvalid(Sender: TObject);
+procedure TRickUIBuilderEditShowcase.CopyCNPJInvalid(ASender: TObject);
 begin
   FCopyCNPJInvalid.EditControl.SelectAll;
   FCopyCNPJInvalid.EditControl.CopyToClipboard;
 end;
 
-procedure TRickUIBuilderEditShowcase.PasteCNPJTarget(Sender: TObject);
+procedure TRickUIBuilderEditShowcase.PasteCNPJTarget(ASender: TObject);
 begin
   FPasteCNPJTarget.EditControl.SetFocus;
   FPasteCNPJTarget.EditControl.SelectAll;
   FPasteCNPJTarget.EditControl.PasteFromClipboard;
 end;
 
-procedure TRickUIBuilderEditShowcase.MarkInvalid(Sender: TObject);
+procedure TRickUIBuilderEditShowcase.MarkInvalid(ASender: TObject);
 begin
   FInvalidHandle.SetInvalid(True, 'Valor inválido definido pelo Sample');
 end;
 
-procedure TRickUIBuilderEditShowcase.MarkValid(Sender: TObject);
+procedure TRickUIBuilderEditShowcase.MarkValid(ASender: TObject);
 begin
   FInvalidHandle.SetInvalid(False);
 end;
 
-procedure TRickUIBuilderEditShowcase.RequirementMet(Sender: TObject);
+procedure TRickUIBuilderEditShowcase.RequirementMet(ASender: TObject);
 begin
   FRequirementHandle.SetRequirementMet(True);
 end;
 
-procedure TRickUIBuilderEditShowcase.RequirementNotMet(Sender: TObject);
+procedure TRickUIBuilderEditShowcase.RequirementNotMet(ASender: TObject);
 begin
   FRequirementHandle.SetRequirementMet(False);
 end;
@@ -384,6 +414,7 @@ begin
   BuildNumericPresets(ATop);
   BuildTextPresets(ATop);
   BuildCaseAndUrl(ATop);
+  BuildRequired(ATop);
   BuildCounterClearPassword(ATop);
   BuildFeedback(ATop);
   BuildRequirement(ATop);

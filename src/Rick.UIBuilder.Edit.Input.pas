@@ -56,6 +56,13 @@ type
     class function IsEmailLocalPart(const AValue: string): Boolean; static;
     class function IsEmailDomain(const AValue: string): Boolean; static;
     class function FindEmailSeparator(const AValue: string): Integer; static;
+    class function IsUrlComplete(const AValue: string): Boolean; static;
+    class function IsUrlAuthorityValid(const AValue: string): Boolean; static;
+    class function IsUrlHostValid(const AValue: string): Boolean; static;
+    class function IsDomainHostValid(const AValue: string): Boolean; static;
+    class function IsIPv4Valid(const AValue: string): Boolean; static;
+    class function IsIPv6Valid(const AValue: string): Boolean; static;
+    class function IsPortValid(const AValue: string): Boolean; static;
     class function HasCompleteMask(const AValue: string;
       APreset: TRickUIBuilderEditPreset): Boolean; static;
     class function IsMaskedTypingAllowed(const AValue: string;
@@ -76,6 +83,9 @@ type
   end;
 
 implementation
+
+uses
+  System.StrUtils;
 
 class function TRickUIBuilderEditInput.IsBasicLetter(AChar: Char): Boolean;
 begin
@@ -504,6 +514,189 @@ begin
   Result := IsEmailLocalPart(LLocal) and IsEmailDomain(LDomain);
 end;
 
+class function TRickUIBuilderEditInput.IsPortValid(
+  const AValue: string): Boolean;
+var
+  LPort: Integer;
+  LChar: Char;
+begin
+  if AValue.Trim.IsEmpty then
+    Exit(False);
+  for LChar in AValue do
+    if not LChar.IsDigit then
+      Exit(False);
+  Result := TryStrToInt(AValue, LPort) and (LPort >= 0) and (LPort <= 65535);
+end;
+
+class function TRickUIBuilderEditInput.IsIPv4Valid(
+  const AValue: string): Boolean;
+var
+  LParts: TArray<string>;
+  LPart: string;
+  LValue: Integer;
+begin
+  LParts := AValue.Split(['.']);
+  if Length(LParts) <> 4 then
+    Exit(False);
+  for LPart in LParts do
+  begin
+    if LPart.Trim.IsEmpty or (Length(LPart) > 3) then
+      Exit(False);
+    if not TryStrToInt(LPart, LValue) or (LValue < 0) or (LValue > 255) then
+      Exit(False);
+  end;
+  Result := True;
+end;
+
+class function TRickUIBuilderEditInput.IsIPv6Valid(
+  const AValue: string): Boolean;
+var
+  LParts: TArray<string>;
+  LPart: string;
+  LDoubleColon, LIndex, LCount: Integer;
+  LChar: Char;
+begin
+  if AValue.Trim.IsEmpty then
+    Exit(False);
+  LDoubleColon := Pos('::', AValue);
+  if (LDoubleColon > 0) and
+    (Pos('::', Copy(AValue, LDoubleColon + 2, MaxInt)) > 0) then
+    Exit(False);
+  LParts := AValue.Split([':']);
+  LCount := 0;
+  for LIndex := 0 to High(LParts) do
+  begin
+    LPart := LParts[LIndex];
+    if LPart.IsEmpty then
+      Continue;
+    if Length(LPart) > 4 then
+      Exit(False);
+    for LChar in LPart do
+      if not CharInSet(LChar, ['0'..'9', 'a'..'f', 'A'..'F']) then
+        Exit(False);
+    Inc(LCount);
+  end;
+  if LDoubleColon > 0 then
+    Result := LCount < 8
+  else
+    Result := LCount = 8;
+end;
+
+class function TRickUIBuilderEditInput.IsDomainHostValid(
+  const AValue: string): Boolean;
+var
+  LLabels: TArray<string>;
+  LLabel: string;
+  LChar: Char;
+begin
+  if AValue.Trim.IsEmpty then
+    Exit(False);
+  if SameText(AValue, 'localhost') then
+    Exit(True);
+  LLabels := AValue.Split(['.']);
+  if Length(LLabels) < 2 then
+    Exit(False);
+  for LLabel in LLabels do
+  begin
+    if LLabel.Trim.IsEmpty or (Length(LLabel) > 63) then
+      Exit(False);
+    if (LLabel[1] = '-') or (LLabel[Length(LLabel)] = '-') then
+      Exit(False);
+    for LChar in LLabel do
+      if not (LChar.IsLetterOrDigit or (LChar = '-')) then
+        Exit(False);
+  end;
+  Result := True;
+end;
+
+class function TRickUIBuilderEditInput.IsUrlHostValid(
+  const AValue: string): Boolean;
+var
+  LChar: Char;
+  LHasDot: Boolean;
+begin
+  if AValue.Trim.IsEmpty then
+    Exit(False);
+  LHasDot := False;
+  for LChar in AValue do
+    if LChar = '.' then
+      LHasDot := True;
+  if LHasDot and IsIPv4Valid(AValue) then
+    Exit(True);
+  if LHasDot and AValue[1].IsDigit then
+    Exit(False);
+  Result := IsDomainHostValid(AValue);
+end;
+
+class function TRickUIBuilderEditInput.IsUrlAuthorityValid(
+  const AValue: string): Boolean;
+var
+  LCloseBracket, LColon: Integer;
+  LHost, LPort: string;
+begin
+  if AValue.Trim.IsEmpty or (Pos('@', AValue) > 0) then
+    Exit(False);
+  if AValue[1] = '[' then
+  begin
+    LCloseBracket := Pos(']', AValue);
+    if LCloseBracket = 0 then
+      Exit(False);
+    LHost := Copy(AValue, 2, LCloseBracket - 2);
+    if not IsIPv6Valid(LHost) then
+      Exit(False);
+    LPort := Copy(AValue, LCloseBracket + 1, MaxInt);
+    if LPort.IsEmpty then
+      Exit(True);
+    if LPort[1] <> ':' then
+      Exit(False);
+    Exit(IsPortValid(Copy(LPort, 2, MaxInt)));
+  end;
+
+  LColon := LastDelimiter(':', AValue);
+  if LColon > 0 then
+  begin
+    LHost := Copy(AValue, 1, LColon - 1);
+    LPort := Copy(AValue, LColon + 1, MaxInt);
+    if Pos(':', LHost) > 0 then
+      Exit(False);
+    Result := IsUrlHostValid(LHost) and IsPortValid(LPort);
+    Exit;
+  end;
+  Result := IsUrlHostValid(AValue);
+end;
+
+class function TRickUIBuilderEditInput.IsUrlComplete(
+  const AValue: string): Boolean;
+var
+  LValue, LAuthority: string;
+  LBoundary: Integer;
+begin
+  LValue := AValue;
+  if LValue.Trim.IsEmpty or (LValue <> LValue.Trim) then
+    Exit(False);
+
+  if Pos('://', LValue) > 0 then
+  begin
+    if StartsText('https://', LValue) then
+      Delete(LValue, 1, Length('https://'))
+    else if StartsText('http://', LValue) then
+      Delete(LValue, 1, Length('http://'))
+    else
+      Exit(False);
+  end;
+
+  LBoundary := Length(LValue) + 1;
+  if Pos('/', LValue) > 0 then
+    LBoundary := Pos('/', LValue);
+  if (Pos('?', LValue) > 0) and (Pos('?', LValue) < LBoundary) then
+    LBoundary := Pos('?', LValue);
+  if (Pos('#', LValue) > 0) and (Pos('#', LValue) < LBoundary) then
+    LBoundary := Pos('#', LValue);
+
+  LAuthority := Copy(LValue, 1, LBoundary - 1);
+  Result := IsUrlAuthorityValid(LAuthority);
+end;
+
 class function TRickUIBuilderEditInput.IsValueAllowed(const AValue: string;
   const AConfig: TRickUIBuilderEditConfig): Boolean;
 begin
@@ -617,6 +810,8 @@ class function TRickUIBuilderEditInput.IsCompleteValue(const AValue: string;
 var
   LFormatted: string;
 begin
+  if AValue.Trim.IsEmpty then
+    Exit(not AConfig.Required);
   case AConfig.Preset of
     TRickUIBuilderEditPreset.CPF,
     TRickUIBuilderEditPreset.CNPJ,
@@ -630,6 +825,8 @@ begin
       end;
     TRickUIBuilderEditPreset.Email:
       Result := IsEmailComplete(AValue);
+    TRickUIBuilderEditPreset.URL:
+      Result := IsUrlComplete(AValue);
   else
     Result := True;
   end;

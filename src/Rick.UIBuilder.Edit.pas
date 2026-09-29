@@ -79,6 +79,7 @@ type
     function InvalidMessage(const AValue: string): IRickUIBuilderEdit;
     function Appearance(AValue: TRickUIBuilderEditAppearance): IRickUIBuilderEdit;
     function ReadOnly(AValue: Boolean = True): IRickUIBuilderEdit;
+    function Required(AValue: Boolean = True): IRickUIBuilderEdit;
     function BackgroundColor(AValue: TAlphaColor): IRickUIBuilderEdit;
     function EditBackgroundColor(AValue: TAlphaColor): IRickUIBuilderEdit;
     function BorderColor(AValue: TAlphaColor): IRickUIBuilderEdit;
@@ -446,6 +447,12 @@ end;
 function TRickUIBuilderEditBuilder.ReadOnly(AValue: Boolean): IRickUIBuilderEdit;
 begin
   FConfig.ReadOnly := AValue;
+  Result := Self;
+end;
+
+function TRickUIBuilderEditBuilder.Required(AValue: Boolean): IRickUIBuilderEdit;
+begin
+  FConfig.Required := AValue;
   Result := Self;
 end;
 

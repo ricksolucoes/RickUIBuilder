@@ -24,15 +24,26 @@ Audite:
 
 ## Audit Process
 
-### 1. Reconstruct the task contract
+### 1. Reconstruct the task contract and normative baseline
 
-Sem usar resumo do implementador como única fonte, identifique:
+Sem usar resumo do implementador como única fonte:
+
+1. consulte `AGENTS.md`;
+2. consulte as instruções normativas do projeto aplicáveis;
+3. consulte as skills aplicáveis à mudança;
+4. considere os requisitos explícitos da tarefa atual;
+5. considere regras adicionais estabelecidas pelo usuário para a tarefa ou para o projeto.
+
+A partir dessas fontes, identifique:
 
 - objetivo;
 - files expected;
 - behavior to preserve;
 - acceptance criteria;
-- explicit exclusions.
+- explicit exclusions;
+- regras obrigatórias de implementação e entrega.
+
+Não trate o checklist deste arquivo como substituto das fontes normativas. Quando uma regra aplicável existir nelas, ela faz parte do gate mesmo que não esteja repetida aqui.
 
 ### 2. Verify diff scope
 
@@ -53,7 +64,19 @@ Para cada path alterado:
 - lifetime/ownership;
 - callbacks;
 - compiler assumptions;
-- UTF-8 BOM.
+- UTF-8 BOM;
+- parâmetros de métodos com prefixo `A`;
+- variáveis locais com prefixo `L`;
+- campos privados com prefixo `F`;
+- constantes em caixa alta, iniciando e terminando com `_`, com palavras separadas por `_`;
+- verificação de campo requerido vazio com `ATexto.Trim.IsEmpty`;
+- atribuição ou representação de string vazia com `EmptyStr`, não `''`;
+- quando `EmptyStr` ou `[Texto].Trim.IsEmpty` forem utilizados em código criado ou alterado, presença de `System.SysUtils` no `uses` aplicável;
+- `System.SysUtils` não deve ser adicionado indiscriminadamente: audite a dependência conforme os recursos efetivamente utilizados pela alteração.
+
+A ausência de `System.SysUtils` quando necessária para esses recursos é finding de conformidade e deve impedir aprovação até a correção.
+
+Essas convenções devem ser auditadas em todo código Delphi criado ou alterado. Não as aplique automaticamente a outras linguagens.
 
 #### FMX
 
@@ -156,7 +179,9 @@ Se não existe, a classificação é `não executado` ou `não confirmado`.
 ## Rules
 
 - não repita a implementação; audite;
-- não “corrija” silenciosamente finding — devolva para correção quando necessário;
+- não altere a implementação que está auditando;
+- não “corrija” silenciosamente finding — registre a evidência, classifique a severidade e devolva para correção quando necessário;
+- após correção de finding bloqueante, execute nova auditoria independente sobre a versão corrigida;
 - não considere ausência de evidência como sucesso;
 - não bloqueie por preferência estética;
 - não permita arquivos untouched no pacote;

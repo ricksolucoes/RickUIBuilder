@@ -38,6 +38,14 @@ type
     [Test] procedure Email_EAIDeveAceitarUTF8;
     [Test] procedure URL_SchemeEHostDevemSerLowercase;
     [Test] procedure URL_EntireValueDeveSerLowercase;
+    [Test] procedure URL_DeveAceitarHostsWebValidos;
+    [Test] procedure URL_DeveAceitarLocalhost;
+    [Test] procedure URL_DeveAceitarIPv4EIPv6;
+    [Test] procedure URL_DeveValidarPorta;
+    [Test] procedure URL_DeveRejeitarHostsInvalidos;
+    [Test] procedure URL_DeveRejeitarSchemeInvalido;
+    [Test] procedure Required_DeveConsiderarTrimComoVazio;
+    [Test] procedure Opcional_DevePermitirVazio;
     [Test] procedure TextoComPontuacao_DeveAceitarSimbolosAprovados;
     [Test] procedure TextoSemAcentos_DeveRejeitarAcentos;
   end;
@@ -64,7 +72,7 @@ implementation
 
 uses
   Rick.UIBuilder,
-  Rick.UIBuilder.Edit.Input;
+  Rick.UIBuilder.Edit.Input, System.SysUtils;
 
 function Config(APreset: TRickUIBuilderEditPreset): TRickUIBuilderEditConfig;
 begin
@@ -282,6 +290,83 @@ begin
     TRickUIBuilderEditInput.FormatTypedValue('HTTPS://Example.COM/Path?Token=ABC', LConfig));
 end;
 
+procedure TRickUIBuilderEditInputTests.URL_DeveAceitarHostsWebValidos;
+var LConfig: TRickUIBuilderEditConfig;
+begin
+  LConfig := Config(TRickUIBuilderEditPreset.URL);
+  Assert.IsTrue(TRickUIBuilderEditInput.IsCompleteValue('example.com', LConfig));
+  Assert.IsTrue(TRickUIBuilderEditInput.IsCompleteValue('example.ai', LConfig));
+  Assert.IsTrue(TRickUIBuilderEditInput.IsCompleteValue('a.b', LConfig));
+  Assert.IsTrue(TRickUIBuilderEditInput.IsCompleteValue('empresa.com.br/path?x=1#top', LConfig));
+  Assert.IsTrue(TRickUIBuilderEditInput.IsCompleteValue('https://example.ai/Path?Token=ABC', LConfig));
+end;
+
+procedure TRickUIBuilderEditInputTests.URL_DeveAceitarLocalhost;
+var LConfig: TRickUIBuilderEditConfig;
+begin
+  LConfig := Config(TRickUIBuilderEditPreset.URL);
+  Assert.IsTrue(TRickUIBuilderEditInput.IsCompleteValue('localhost', LConfig));
+  Assert.IsTrue(TRickUIBuilderEditInput.IsCompleteValue('localhost:8080/api', LConfig));
+  Assert.IsTrue(TRickUIBuilderEditInput.IsCompleteValue('http://localhost', LConfig));
+end;
+
+procedure TRickUIBuilderEditInputTests.URL_DeveAceitarIPv4EIPv6;
+var LConfig: TRickUIBuilderEditConfig;
+begin
+  LConfig := Config(TRickUIBuilderEditPreset.URL);
+  Assert.IsTrue(TRickUIBuilderEditInput.IsCompleteValue('127.0.0.1/test', LConfig));
+  Assert.IsTrue(TRickUIBuilderEditInput.IsCompleteValue('[2001:db8::1]/api', LConfig));
+  Assert.IsTrue(TRickUIBuilderEditInput.IsCompleteValue('http://[::1]:8080/api', LConfig));
+  Assert.IsFalse(TRickUIBuilderEditInput.IsCompleteValue('256.1.1.1', LConfig));
+  Assert.IsFalse(TRickUIBuilderEditInput.IsCompleteValue('[1::1::1]', LConfig));
+end;
+
+procedure TRickUIBuilderEditInputTests.URL_DeveValidarPorta;
+var LConfig: TRickUIBuilderEditConfig;
+begin
+  LConfig := Config(TRickUIBuilderEditPreset.URL);
+  Assert.IsTrue(TRickUIBuilderEditInput.IsCompleteValue('example.com:65535', LConfig));
+  Assert.IsFalse(TRickUIBuilderEditInput.IsCompleteValue('example.com:65536', LConfig));
+  Assert.IsFalse(TRickUIBuilderEditInput.IsCompleteValue('example.com:abc', LConfig));
+end;
+
+procedure TRickUIBuilderEditInputTests.URL_DeveRejeitarHostsInvalidos;
+var LConfig: TRickUIBuilderEditConfig;
+begin
+  LConfig := Config(TRickUIBuilderEditPreset.URL);
+  Assert.IsFalse(TRickUIBuilderEditInput.IsCompleteValue('-teste.com', LConfig));
+  Assert.IsFalse(TRickUIBuilderEditInput.IsCompleteValue('teste-.com', LConfig));
+  Assert.IsFalse(TRickUIBuilderEditInput.IsCompleteValue('teste..com', LConfig));
+  Assert.IsFalse(TRickUIBuilderEditInput.IsCompleteValue('exa_mple.com', LConfig));
+  Assert.IsFalse(TRickUIBuilderEditInput.IsCompleteValue('/abc', LConfig));
+end;
+
+procedure TRickUIBuilderEditInputTests.URL_DeveRejeitarSchemeInvalido;
+var LConfig: TRickUIBuilderEditConfig;
+begin
+  LConfig := Config(TRickUIBuilderEditPreset.URL);
+  Assert.IsFalse(TRickUIBuilderEditInput.IsCompleteValue('ftp://example.com', LConfig));
+  Assert.IsFalse(TRickUIBuilderEditInput.IsCompleteValue('https://', LConfig));
+  Assert.IsFalse(TRickUIBuilderEditInput.IsCompleteValue('https:///example.com', LConfig));
+end;
+
+procedure TRickUIBuilderEditInputTests.Required_DeveConsiderarTrimComoVazio;
+var LConfig: TRickUIBuilderEditConfig;
+begin
+  LConfig := Config(TRickUIBuilderEditPreset.URL);
+  LConfig.Required := True;
+  Assert.IsFalse(TRickUIBuilderEditInput.IsCompleteValue(EmptyStr, LConfig));
+  Assert.IsFalse(TRickUIBuilderEditInput.IsCompleteValue('   ', LConfig));
+end;
+
+procedure TRickUIBuilderEditInputTests.Opcional_DevePermitirVazio;
+var LConfig: TRickUIBuilderEditConfig;
+begin
+  LConfig := Config(TRickUIBuilderEditPreset.URL);
+  Assert.IsTrue(TRickUIBuilderEditInput.IsCompleteValue(EmptyStr, LConfig));
+  Assert.IsTrue(TRickUIBuilderEditInput.IsCompleteValue('   ', LConfig));
+end;
+
 procedure TRickUIBuilderEditInputTests.TextoComPontuacao_DeveAceitarSimbolosAprovados;
 var LConfig: TRickUIBuilderEditConfig;
 begin
@@ -354,6 +439,7 @@ begin
   Assert.AreEqual(Integer(TRickUIBuilderEditAppearance.Outlined),
     Integer(LConfig.Appearance));
   Assert.IsFalse(LConfig.ReadOnly);
+  Assert.IsFalse(LConfig.Required);
   Assert.AreEqual<Single>(12.0, LConfig.LabelFontSize);
   Assert.AreEqual<Single>(11.0, LConfig.ErrorFontSize);
 end;

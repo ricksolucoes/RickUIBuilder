@@ -367,6 +367,7 @@ type
     InvalidMessage: string;
     Appearance: TRickUIBuilderEditAppearance;
     ReadOnly: Boolean;
+    Required: Boolean;
     AllowNegative: Boolean;
     DecimalPlaces: Integer;
     DecimalSeparator: Char;
@@ -516,7 +517,8 @@ const
 
 implementation
 
-{ TRickUIBuilderTextConfig }
+uses
+  System.SysUtils;
 
 
 class function TRickUIBuilderEditConfig.Default: TRickUIBuilderEditConfig;
@@ -525,8 +527,8 @@ begin
   Result.Top := 0;
   Result.Width := 280;
   Result.Height := 72;
-  Result.LabelText := '';
-  Result.Text := '';
+  Result.LabelText := EmptyStr;
+  Result.Text := EmptyStr;
   InitBehavior(Result);
   InitVisual(Result);
   InitPaths(Result);
@@ -541,9 +543,10 @@ begin
   AValue.UrlCaseMode := TRickUIBuilderEditUrlCaseMode.SchemeAndHost;
   AValue.NumberFormatMode := TRickUIBuilderEditNumberFormatMode.Locale;
   AValue.InvalidFeedback := TRickUIBuilderEditInvalidFeedback.AlertAndIcon;
-  AValue.InvalidMessage := '';
+  AValue.InvalidMessage := EmptyStr;
   AValue.Appearance := TRickUIBuilderEditAppearance.Outlined;
   AValue.ReadOnly := False;
+  AValue.Required := False;
   AValue.AllowNegative := False;
   AValue.DecimalPlaces := 2;
   AValue.DecimalSeparator := #0;

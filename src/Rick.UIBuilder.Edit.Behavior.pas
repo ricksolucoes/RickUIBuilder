@@ -243,8 +243,7 @@ end;
 
 procedure TRickUIBuilderEditBehavior.HandleExit(ASender: TObject);
 begin
-  if (FEdit.Text <> '') and
-    not TRickUIBuilderEditInput.IsCompleteValue(FEdit.Text, FConfig) then
+  if not TRickUIBuilderEditInput.IsCompleteValue(FEdit.Text, FConfig) then
     SignalInvalidInput;
   if FInvalid then
     ApplyInvalidState
