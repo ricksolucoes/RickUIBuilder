@@ -1,25 +1,38 @@
-﻿(******************************************************************************
-  Unit: RickUIBuilder.Samples.Home.Style
+﻿{******************************************************************************}
+{                                                                              }
+{  RickUIBuilder.Samples.Home.Style                                            }
+{                                                                              }
+{  Finalidade                                                                  }
+{  ----------                                                                  }
+{  Tokens visuais e geometria específicos da Home.                             }
+{                                                                              }
+{  Funcionalidade                                                              }
+{  --------------                                                              }
+{  Centraliza cores, dimensões do formulário, header, cards, ícones e grid da  }
+{  Home.                                                                       }
+{                                                                              }
+{  Dependências do projeto                                                     }
+{  -----------------------                                                     }
+{  - Não possui dependências internas do projeto.                              }
+{                                                                              }
+{  Fluxo / colaboração                                                         }
+{  -------------------                                                         }
+{  - Home e ComponentCard consomem estas constantes para manter a geometria    }
+{    visual consistente.                                                       }
+{                                                                              }
+{  Restrições e responsabilidades                                              }
+{  -----------------------------                                               }
+{  - Tipografia compartilhada pertence a RickUIBuilder.Samples.App.Typography. }
+{  - Alterações de tamanho devem preservar header sem margem externa e cards   }
+{    sem clipping.                                                             }
+{                                                                              }
+{  Manutenção                                                                  }
+{  ----------                                                                  }
+{  Este cabeçalho deve ser atualizado quando responsabilidade, dependências,   }
+{  fluxo, ownership/lifetime ou restrições desta unit mudarem.                 }
+{                                                                              }
+{******************************************************************************}
 
-  FINALIDADE
-  Tokens visuais e geometria específicos da Home.
-
-  FUNCIONALIDADE
-  Centraliza cores, dimensões do formulário, header, cards, ícones e grid da Home.
-
-  DEPENDÊNCIAS DO PROJETO
-  - Não possui dependências internas do projeto.
-
-  FLUXO / COLABORAÇÃO
-  - Home e ComponentCard consomem estas constantes para manter a geometria visual consistente.
-
-  RESTRIÇÕES E RESPONSABILIDADES
-  - Tipografia compartilhada pertence a RickUIBuilder.Samples.App.Typography.
-  - Alterações de tamanho devem preservar header sem margem externa e cards sem clipping.
-
-  Manutenção: este cabeçalho deve ser atualizado quando responsabilidade,
-  dependências, fluxo, ownership/lifetime ou restrições desta unit mudarem.
-******************************************************************************)
 unit RickUIBuilder.Samples.Home.Style;
 
 interface

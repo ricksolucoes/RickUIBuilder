@@ -1,25 +1,38 @@
-﻿(******************************************************************************
-  Unit: RickUIBuilder.Samples.Home.Presenter.Intf
+﻿{******************************************************************************}
+{                                                                              }
+{  RickUIBuilder.Samples.Home.Presenter.Intf                                   }
+{                                                                              }
+{  Finalidade                                                                  }
+{  ----------                                                                  }
+{  Contrato de apresentação da Home.                                           }
+{                                                                              }
+{  Funcionalidade                                                              }
+{  --------------                                                              }
+{  Define as operações pelas quais a Home comunica intenção de fechar o        }
+{  Samples ou abrir um componente.                                             }
+{                                                                              }
+{  Dependências do projeto                                                     }
+{  -----------------------                                                     }
+{  - RickUIBuilder.Samples.App.Types                                           }
+{      Fornece TSampleComponent usado por OpenComponent.                       }
+{                                                                              }
+{  Fluxo / colaboração                                                         }
+{  -------------------                                                         }
+{  - TPageSamplesHome depende deste contrato; THomePresenter o implementa e    }
+{    delega as operações ao Coordinator.                                       }
+{                                                                              }
+{  Restrições e responsabilidades                                              }
+{  -----------------------------                                               }
+{  - Contratos do Samples usam function, não procedure.                        }
+{  - O contrato não expõe tipos visuais FMX nem conhece a View concreta.       }
+{                                                                              }
+{  Manutenção                                                                  }
+{  ----------                                                                  }
+{  Este cabeçalho deve ser atualizado quando responsabilidade, dependências,   }
+{  fluxo, ownership/lifetime ou restrições desta unit mudarem.                 }
+{                                                                              }
+{******************************************************************************}
 
-  FINALIDADE
-  Contrato de apresentação da Home.
-
-  FUNCIONALIDADE
-  Define as operações pelas quais a Home comunica intenção de fechar o Samples ou abrir um componente.
-
-  DEPENDÊNCIAS DO PROJETO
-  - RickUIBuilder.Samples.App.Types — fornece TSampleComponent usado por OpenComponent.
-
-  FLUXO / COLABORAÇÃO
-  - TPageSamplesHome depende deste contrato; THomePresenter o implementa e delega as operações ao Coordinator.
-
-  RESTRIÇÕES E RESPONSABILIDADES
-  - Contratos do Samples usam function, não procedure.
-  - O contrato não expõe tipos visuais FMX nem conhece a View concreta.
-
-  Manutenção: este cabeçalho deve ser atualizado quando responsabilidade,
-  dependências, fluxo, ownership/lifetime ou restrições desta unit mudarem.
-******************************************************************************)
 unit RickUIBuilder.Samples.Home.Presenter.Intf;
 
 interface

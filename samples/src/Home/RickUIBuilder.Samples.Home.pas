@@ -1,31 +1,57 @@
-﻿(******************************************************************************
-  Unit: RickUIBuilder.Samples.Home
+﻿{******************************************************************************}
+{                                                                              }
+{  RickUIBuilder.Samples.Home                                                  }
+{                                                                              }
+{  Finalidade                                                                  }
+{  ----------                                                                  }
+{  View principal do catálogo de componentes do Samples.                       }
+{                                                                              }
+{  Funcionalidade                                                              }
+{  --------------                                                              }
+{  Constrói o header, título, descrição e grid 3 x 2; captura fechamento e     }
+{  seleção de componente e comunica essas intenções ao Presenter.              }
+{                                                                              }
+{  Dependências do projeto                                                     }
+{  -----------------------                                                     }
+{  - RickUIBuilder.Samples.App.Types                                           }
+{      Identifica o componente associado a cada card.                          }
+{                                                                              }
+{  - RickUIBuilder.Samples.Home.Presenter.Intf                                 }
+{      Boundary usado pela View para emitir intenções.                         }
+{                                                                              }
+{  - RickUIBuilder.Samples.Home.ComponentCard                                  }
+{      Constrói os cards do catálogo.                                          }
+{                                                                              }
+{  - RickUIBuilder.Samples.Home.Icons                                          }
+{      Fornece os paths SVG oficiais.                                          }
+{                                                                              }
+{  - RickUIBuilder.Samples.Home.Style                                          }
+{      Fornece geometria e cores específicas da Home.                          }
+{                                                                              }
+{  - RickUIBuilder.Samples.App.Typography                                      }
+{      Fornece a escala tipográfica compartilhada.                             }
+{                                                                              }
+{  Fluxo / colaboração                                                         }
+{  -------------------                                                         }
+{  - Interação do usuário -> TPageSamplesHome -> IHomePresenter -> coordenação }
+{    da aplicação.                                                             }
+{  - O header é filho direto do formulário e permanece alinhado ao topo; o     }
+{    conteúdo centralizado fica abaixo dele.                                   }
+{                                                                              }
+{  Restrições e responsabilidades                                              }
+{  -----------------------------                                               }
+{  - A View não executa comandos de aplicação, não cria páginas de destino e   }
+{    não decide o fluxo global.                                                }
+{  - O Presenter é recebido por injeção no construtor e mantido pela           }
+{    interface.                                                                }
+{                                                                              }
+{  Manutenção                                                                  }
+{  ----------                                                                  }
+{  Este cabeçalho deve ser atualizado quando responsabilidade, dependências,   }
+{  fluxo, ownership/lifetime ou restrições desta unit mudarem.                 }
+{                                                                              }
+{******************************************************************************}
 
-  FINALIDADE
-  View principal do catálogo de componentes do Samples.
-
-  FUNCIONALIDADE
-  Constrói o header, título, descrição e grid 3 x 2; captura fechamento e seleção de componente e comunica essas intenções ao Presenter.
-
-  DEPENDÊNCIAS DO PROJETO
-  - RickUIBuilder.Samples.App.Types — identifica o componente associado a cada card.
-  - RickUIBuilder.Samples.Home.Presenter.Intf — boundary usado pela View para emitir intenções.
-  - RickUIBuilder.Samples.Home.ComponentCard — constrói os cards do catálogo.
-  - RickUIBuilder.Samples.Home.Icons — fornece os paths SVG oficiais.
-  - RickUIBuilder.Samples.Home.Style — fornece geometria e cores específicas da Home.
-  - RickUIBuilder.Samples.App.Typography — fornece a escala tipográfica compartilhada.
-
-  FLUXO / COLABORAÇÃO
-  - Interação do usuário -> TPageSamplesHome -> IHomePresenter -> coordenação da aplicação.
-  - O header é filho direto do formulário e permanece alinhado ao topo; o conteúdo centralizado fica abaixo dele.
-
-  RESTRIÇÕES E RESPONSABILIDADES
-  - A View não executa comandos de aplicação, não cria páginas de destino e não decide o fluxo global.
-  - O Presenter é recebido por injeção no construtor e mantido pela interface.
-
-  Manutenção: este cabeçalho deve ser atualizado quando responsabilidade,
-  dependências, fluxo, ownership/lifetime ou restrições desta unit mudarem.
-******************************************************************************)
 unit RickUIBuilder.Samples.Home;
 
 interface

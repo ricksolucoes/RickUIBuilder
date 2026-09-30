@@ -1,27 +1,45 @@
-﻿(******************************************************************************
-  Unit: RickUIBuilder.Samples.ComponentPage
+﻿{******************************************************************************}
+{                                                                              }
+{  RickUIBuilder.Samples.ComponentPage                                         }
+{                                                                              }
+{  Finalidade                                                                  }
+{  ----------                                                                  }
+{  Página visual comum para as abordagens de um componente.                    }
+{                                                                              }
+{  Funcionalidade                                                              }
+{  --------------                                                              }
+{  Apresenta o componente selecionado e somente as abordagens atualmente       }
+{  suportadas pela API pública confirmada.                                     }
+{                                                                              }
+{  Dependências do projeto                                                     }
+{  -----------------------                                                     }
+{  - RickUIBuilder.Samples.App.Types                                           }
+{      Identifica o componente apresentado.                                    }
+{                                                                              }
+{  - RickUIBuilder.Samples.App.Typography                                      }
+{      Fornece tipografia compartilhada.                                       }
+{                                                                              }
+{  - RickUIBuilder.Samples.Home.Style                                          }
+{      Fornece os tokens visuais atualmente reutilizados pela página.          }
+{                                                                              }
+{  Fluxo / colaboração                                                         }
+{  -------------------                                                         }
+{  - TSampleApplicationCoordinator cria esta página com um TSampleComponent;   }
+{    a página deriva título e opções visuais desse valor.                      }
+{                                                                              }
+{  Restrições e responsabilidades                                              }
+{  -----------------------------                                               }
+{  - Não inventar Factory para Edit enquanto Factory.CreateEdit não existir na }
+{    API confirmada.                                                           }
+{  - Esta página apresenta opções; não altera a API pública do Rick.UIBuilder. }
+{                                                                              }
+{  Manutenção                                                                  }
+{  ----------                                                                  }
+{  Este cabeçalho deve ser atualizado quando responsabilidade, dependências,   }
+{  fluxo, ownership/lifetime ou restrições desta unit mudarem.                 }
+{                                                                              }
+{******************************************************************************}
 
-  FINALIDADE
-  Página visual comum para as abordagens de um componente.
-
-  FUNCIONALIDADE
-  Apresenta o componente selecionado e somente as abordagens atualmente suportadas pela API pública confirmada.
-
-  DEPENDÊNCIAS DO PROJETO
-  - RickUIBuilder.Samples.App.Types — identifica o componente apresentado.
-  - RickUIBuilder.Samples.App.Typography — fornece tipografia compartilhada.
-  - RickUIBuilder.Samples.Home.Style — fornece os tokens visuais atualmente reutilizados pela página.
-
-  FLUXO / COLABORAÇÃO
-  - TSampleApplicationCoordinator cria esta página com um TSampleComponent; a página deriva título e opções visuais desse valor.
-
-  RESTRIÇÕES E RESPONSABILIDADES
-  - Não inventar Factory para Edit enquanto Factory.CreateEdit não existir na API confirmada.
-  - Esta página apresenta opções; não altera a API pública do Rick.UIBuilder.
-
-  Manutenção: este cabeçalho deve ser atualizado quando responsabilidade,
-  dependências, fluxo, ownership/lifetime ou restrições desta unit mudarem.
-******************************************************************************)
 unit RickUIBuilder.Samples.ComponentPage;
 
 interface

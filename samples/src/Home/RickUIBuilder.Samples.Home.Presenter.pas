@@ -1,27 +1,44 @@
-﻿(******************************************************************************
-  Unit: RickUIBuilder.Samples.Home.Presenter
+﻿{******************************************************************************}
+{                                                                              }
+{  RickUIBuilder.Samples.Home.Presenter                                        }
+{                                                                              }
+{  Finalidade                                                                  }
+{  ----------                                                                  }
+{  Implementação do contrato IHomePresenter.                                   }
+{                                                                              }
+{  Funcionalidade                                                              }
+{  --------------                                                              }
+{  Recebe as intenções da Home e as delega ao TSampleApplicationCoordinator    }
+{  sem introduzir dependência de controles FMX.                                }
+{                                                                              }
+{  Dependências do projeto                                                     }
+{  -----------------------                                                     }
+{  - RickUIBuilder.Samples.Home.Presenter.Intf                                 }
+{      Contrato implementado.                                                  }
+{                                                                              }
+{  - RickUIBuilder.Samples.App.Coordinator                                     }
+{      Executa o fluxo global solicitado.                                      }
+{                                                                              }
+{  - RickUIBuilder.Samples.App.Types                                           }
+{      Fornece TSampleComponent transportado na navegação.                     }
+{                                                                              }
+{  Fluxo / colaboração                                                         }
+{  -------------------                                                         }
+{  - A Home chama IHomePresenter; THomePresenter delega ao Coordinator e       }
+{    retorna a interface sem alterar configuração contratual.                  }
+{                                                                              }
+{  Restrições e responsabilidades                                              }
+{  -----------------------------                                               }
+{  - FCoordinator é referência não-owning.                                     }
+{  - O Presenter não referencia a Home e não cria páginas.                     }
+{                                                                              }
+{  Manutenção                                                                  }
+{  ----------                                                                  }
+{  Este cabeçalho deve ser atualizado quando responsabilidade, dependências,   }
+{  fluxo, ownership/lifetime ou restrições desta unit mudarem.                 }
+{                                                                              }
+{******************************************************************************}
 
-  FINALIDADE
-  Implementação do contrato IHomePresenter.
-
-  FUNCIONALIDADE
-  Recebe as intenções da Home e as delega ao TSampleApplicationCoordinator sem introduzir dependência de controles FMX.
-
-  DEPENDÊNCIAS DO PROJETO
-  - RickUIBuilder.Samples.Home.Presenter.Intf — contrato implementado.
-  - RickUIBuilder.Samples.App.Coordinator — executa o fluxo global solicitado.
-  - RickUIBuilder.Samples.App.Types — fornece TSampleComponent transportado na navegação.
-
-  FLUXO / COLABORAÇÃO
-  - A Home chama IHomePresenter; THomePresenter delega ao Coordinator e retorna a interface sem alterar configuração contratual.
-
-  RESTRIÇÕES E RESPONSABILIDADES
-  - FCoordinator é referência não-owning.
-  - O Presenter não referencia a Home e não cria páginas.
-
-  Manutenção: este cabeçalho deve ser atualizado quando responsabilidade,
-  dependências, fluxo, ownership/lifetime ou restrições desta unit mudarem.
-******************************************************************************)
 unit RickUIBuilder.Samples.Home.Presenter;
 
 interface

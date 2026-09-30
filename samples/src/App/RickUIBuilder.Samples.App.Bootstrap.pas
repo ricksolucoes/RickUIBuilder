@@ -1,29 +1,49 @@
-﻿(******************************************************************************}
-  Unit: RickUIBuilder.Samples.App.Bootstrap
+﻿{******************************************************************************}
+{                                                                              }
+{  RickUIBuilder.Samples.App.Bootstrap                                         }
+{                                                                              }
+{  Finalidade                                                                  }
+{  ----------                                                                  }
+{  Composition Root do executável Samples.                                     }
+{                                                                              }
+{  Funcionalidade                                                              }
+{  --------------                                                              }
+{  Inicializa a composição da aplicação e mantém o ciclo de vida do            }
+{  Coordinator, Presenter e Home durante a execução.                           }
+{                                                                              }
+{  Dependências do projeto                                                     }
+{  -----------------------                                                     }
+{  - RickUIBuilder.Samples.App.Coordinator                                     }
+{      Fornece o coordenador de fluxo criado e possuído pelo bootstrap.        }
+{                                                                              }
+{  - RickUIBuilder.Samples.Home.Presenter                                      }
+{      Cria a implementação de IHomePresenter ligada ao Coordinator.           }
+{                                                                              }
+{  - RickUIBuilder.Samples.Home                                                }
+{      Fornece a View principal executada pelo Samples.                        }
+{                                                                              }
+{  - RickUIBuilder.Samples.Home.Presenter.Intf                                 }
+{      Define o contrato mantido pela Home.                                    }
+{                                                                              }
+{  Fluxo / colaboração                                                         }
+{  -------------------                                                         }
+{  - Cria o Coordinator, cria o Presenter, injeta-o na Home e executa          }
+{    Application.Run.                                                          }
+{  - A Home é destruída antes do Coordinator; o Presenter referencia o         }
+{    Coordinator de forma não-owning.                                          }
+{                                                                              }
+{  Restrições e responsabilidades                                              }
+{  -----------------------------                                               }
+{  - Não contém regras visuais da Home nem regras de negócio dos componentes.  }
+{  - É o ponto de composição das dependências do executável Samples.           }
+{                                                                              }
+{  Manutenção                                                                  }
+{  ----------                                                                  }
+{  Este cabeçalho deve ser atualizado quando responsabilidade, dependências,   }
+{  fluxo, ownership/lifetime ou restrições desta unit mudarem.                 }
+{                                                                              }
+{******************************************************************************}
 
-  FINALIDADE
-  Composition Root do executável Samples.
-
-  FUNCIONALIDADE
-  Inicializa a composição da aplicação e mantém o ciclo de vida do Coordinator, Presenter e Home durante a execução.
-
-  DEPENDÊNCIAS DO PROJETO
-  - RickUIBuilder.Samples.App.Coordinator — fornece o coordenador de fluxo criado e possuído pelo bootstrap.
-  - RickUIBuilder.Samples.Home.Presenter — cria a implementação de IHomePresenter ligada ao Coordinator.
-  - RickUIBuilder.Samples.Home — fornece a View principal executada pelo Samples.
-  - RickUIBuilder.Samples.Home.Presenter.Intf — define o contrato mantido pela Home.
-
-  FLUXO / COLABORAÇÃO
-  - Cria o Coordinator, cria o Presenter, injeta-o na Home e executa Application.Run.
-  - A Home é destruída antes do Coordinator; o Presenter referencia o Coordinator de forma não-owning.
-
-  RESTRIÇÕES E RESPONSABILIDADES
-  - Não contém regras visuais da Home nem regras de negócio dos componentes.
-  - É o ponto de composição das dependências do executável Samples.
-
-  Manutenção: este cabeçalho deve ser atualizado quando responsabilidade,
-  dependências, fluxo, ownership/lifetime ou restrições desta unit mudarem.
-******************************************************************************)
 unit RickUIBuilder.Samples.App.Bootstrap;
 
 interface

@@ -1,24 +1,37 @@
-﻿(******************************************************************************
-  Unit: RickUIBuilder.Samples.App.Types
+﻿{******************************************************************************}
+{                                                                              }
+{  RickUIBuilder.Samples.App.Types                                             }
+{                                                                              }
+{  Finalidade                                                                  }
+{  ----------                                                                  }
+{  Tipos compartilhados pela aplicação Samples.                                }
+{                                                                              }
+{  Funcionalidade                                                              }
+{  --------------                                                              }
+{  Declara TSampleComponent, enum que identifica os seis destinos de           }
+{  componente atualmente navegáveis.                                           }
+{                                                                              }
+{  Dependências do projeto                                                     }
+{  -----------------------                                                     }
+{  - Não possui dependências internas do projeto.                              }
+{                                                                              }
+{  Fluxo / colaboração                                                         }
+{  -------------------                                                         }
+{  - TPageSamplesHome associa cada card a um TSampleComponent; Presenter e     }
+{    Coordinator transportam esse valor até a navegação.                       }
+{                                                                              }
+{  Restrições e responsabilidades                                              }
+{  -----------------------------                                               }
+{  - Adicionar valores somente quando existir destino real correspondente no   }
+{    Samples.                                                                  }
+{                                                                              }
+{  Manutenção                                                                  }
+{  ----------                                                                  }
+{  Este cabeçalho deve ser atualizado quando responsabilidade, dependências,   }
+{  fluxo, ownership/lifetime ou restrições desta unit mudarem.                 }
+{                                                                              }
+{******************************************************************************}
 
-  FINALIDADE
-  Tipos compartilhados pela aplicação Samples.
-
-  FUNCIONALIDADE
-  Declara TSampleComponent, enum que identifica os seis destinos de componente atualmente navegáveis.
-
-  DEPENDÊNCIAS DO PROJETO
-  - Não possui dependências internas do projeto.
-
-  FLUXO / COLABORAÇÃO
-  - TPageSamplesHome associa cada card a um TSampleComponent; Presenter e Coordinator transportam esse valor até a navegação.
-
-  RESTRIÇÕES E RESPONSABILIDADES
-  - Adicionar valores somente quando existir destino real correspondente no Samples.
-
-  Manutenção: este cabeçalho deve ser atualizado quando responsabilidade,
-  dependências, fluxo, ownership/lifetime ou restrições desta unit mudarem.
-******************************************************************************)
 unit RickUIBuilder.Samples.App.Types;
 
 interface

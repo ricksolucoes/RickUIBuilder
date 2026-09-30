@@ -1,27 +1,43 @@
-﻿(******************************************************************************
-  Unit: RickUIBuilder.Samples.App.Coordinator
+﻿{******************************************************************************}
+{                                                                              }
+{  RickUIBuilder.Samples.App.Coordinator                                       }
+{                                                                              }
+{  Finalidade                                                                  }
+{  ----------                                                                  }
+{  Coordenação do fluxo global do Samples.                                     }
+{                                                                              }
+{  Funcionalidade                                                              }
+{  --------------                                                              }
+{  Executa operações de aplicação solicitadas pelos presenters, atualmente     }
+{  encerramento e abertura modal da página de componente.                      }
+{                                                                              }
+{  Dependências do projeto                                                     }
+{  -----------------------                                                     }
+{  - RickUIBuilder.Samples.App.Types                                           }
+{      Identifica o componente solicitado na navegação.                        }
+{                                                                              }
+{  - RickUIBuilder.Samples.ComponentPage                                       }
+{      Página criada para apresentar as abordagens do componente.              }
+{                                                                              }
+{  Fluxo / colaboração                                                         }
+{  -------------------                                                         }
+{  - Recebe uma operação do Presenter e a converte em ação de aplicação.       }
+{  - OpenComponent cria e libera a página modal; Close solicita                }
+{    Application.Terminate.                                                    }
+{                                                                              }
+{  Restrições e responsabilidades                                              }
+{  -----------------------------                                               }
+{  - Não contém controles ou layout da Home.                                   }
+{  - Não é possuído pelo Presenter; seu lifetime é controlado pelo             }
+{    Composition Root.                                                         }
+{                                                                              }
+{  Manutenção                                                                  }
+{  ----------                                                                  }
+{  Este cabeçalho deve ser atualizado quando responsabilidade, dependências,   }
+{  fluxo, ownership/lifetime ou restrições desta unit mudarem.                 }
+{                                                                              }
+{******************************************************************************}
 
-  FINALIDADE
-  Coordenação do fluxo global do Samples.
-
-  FUNCIONALIDADE
-  Executa operações de aplicação solicitadas pelos presenters, atualmente encerramento e abertura modal da página de componente.
-
-  DEPENDÊNCIAS DO PROJETO
-  - RickUIBuilder.Samples.App.Types — identifica o componente solicitado na navegação.
-  - RickUIBuilder.Samples.ComponentPage — página criada para apresentar as abordagens do componente.
-
-  FLUXO / COLABORAÇÃO
-  - Recebe uma operação do Presenter e a converte em ação de aplicação.
-  - OpenComponent cria e libera a página modal; Close solicita Application.Terminate.
-
-  RESTRIÇÕES E RESPONSABILIDADES
-  - Não contém controles ou layout da Home.
-  - Não é possuído pelo Presenter; seu lifetime é controlado pelo Composition Root.
-
-  Manutenção: este cabeçalho deve ser atualizado quando responsabilidade,
-  dependências, fluxo, ownership/lifetime ou restrições desta unit mudarem.
-******************************************************************************)
 unit RickUIBuilder.Samples.App.Coordinator;
 
 interface

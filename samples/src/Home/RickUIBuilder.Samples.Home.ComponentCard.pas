@@ -1,27 +1,44 @@
-﻿(******************************************************************************
-  Unit: RickUIBuilder.Samples.Home.ComponentCard
+﻿{******************************************************************************}
+{                                                                              }
+{  RickUIBuilder.Samples.Home.ComponentCard                                    }
+{                                                                              }
+{  Finalidade                                                                  }
+{  ----------                                                                  }
+{  Construção visual dos cards da Home.                                        }
+{                                                                              }
+{  Funcionalidade                                                              }
+{  --------------                                                              }
+{  Cria superfície, ícone SVG, título, descrição e ação Ver exemplos de cada   }
+{  componente.                                                                 }
+{                                                                              }
+{  Dependências do projeto                                                     }
+{  -----------------------                                                     }
+{  - RickUIBuilder.Samples.App.Typography                                      }
+{      Fornece os tamanhos tipográficos semânticos.                            }
+{                                                                              }
+{  - RickUIBuilder.Samples.Home.Icons                                          }
+{      Fornece o chevron SVG da ação.                                          }
+{                                                                              }
+{  - RickUIBuilder.Samples.Home.Style                                          }
+{      Fornece cores e geometria dos cards.                                    }
+{                                                                              }
+{  Fluxo / colaboração                                                         }
+{  -------------------                                                         }
+{  - TPageSamplesHome fornece parent, conteúdo e callback; esta unit apenas    }
+{    materializa a apresentação e conecta o callback à ação.                   }
+{                                                                              }
+{  Restrições e responsabilidades                                              }
+{  -----------------------------                                               }
+{  - Não conhece Presenter, Coordinator ou destino de navegação.               }
+{  - A geometria deve comportar conteúdo sem reduzir a tipografia aprovada.    }
+{                                                                              }
+{  Manutenção                                                                  }
+{  ----------                                                                  }
+{  Este cabeçalho deve ser atualizado quando responsabilidade, dependências,   }
+{  fluxo, ownership/lifetime ou restrições desta unit mudarem.                 }
+{                                                                              }
+{******************************************************************************}
 
-  FINALIDADE
-  Construção visual dos cards da Home.
-
-  FUNCIONALIDADE
-  Cria superfície, ícone SVG, título, descrição e ação Ver exemplos de cada componente.
-
-  DEPENDÊNCIAS DO PROJETO
-  - RickUIBuilder.Samples.App.Typography — fornece os tamanhos tipográficos semânticos.
-  - RickUIBuilder.Samples.Home.Icons — fornece o chevron SVG da ação.
-  - RickUIBuilder.Samples.Home.Style — fornece cores e geometria dos cards.
-
-  FLUXO / COLABORAÇÃO
-  - TPageSamplesHome fornece parent, conteúdo e callback; esta unit apenas materializa a apresentação e conecta o callback à ação.
-
-  RESTRIÇÕES E RESPONSABILIDADES
-  - Não conhece Presenter, Coordinator ou destino de navegação.
-  - A geometria deve comportar conteúdo sem reduzir a tipografia aprovada.
-
-  Manutenção: este cabeçalho deve ser atualizado quando responsabilidade,
-  dependências, fluxo, ownership/lifetime ou restrições desta unit mudarem.
-******************************************************************************)
 unit RickUIBuilder.Samples.Home.ComponentCard;
 
 interface
