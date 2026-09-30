@@ -22,3 +22,10 @@ Quando houver reorganização de `src`, alteração de `.dpr`/`.dproj`/Search Pa
 
 ## Cabeçalhos das units
 Auditar individualmente toda unit `.pas` criada ou modificada. O cabeçalho superior deve ser derivado do código final e explicar o que a unit faz, sua responsabilidade, dependências internas relevantes e por que existem, fluxo/colaboração e, quando relevante, ownership/lifetime e restrições arquiteturais. Confrontar o texto com `interface`, `implementation`, `uses` e consumidores reais. Ausência, informação futura tratada como existente ou divergência Código ↔ Cabeçalho resulta em `FAIL`.
+
+## Coerência da governança documentada
+- Confirmar que `samples/.agents/README.md` cataloga exatamente os agents existentes em `samples/.agents/agents/`.
+- Confirmar que `docs/samples` registra as decisões arquiteturais e de processo vigentes sem contradizer `samples/AGENTS.md`.
+- Confirmar que decisões numeradas permanecem rastreáveis e sem identificadores duplicados.
+- Não usar `__history/`, `__recovery/`, `.identcache` ou `.dproj.local` como fonte para documentar o estado oficial do Samples.
+- Quando a política de entrega for documentada, distinguir artefatos locais/temporários de recursos realmente necessários ao build, como `.res` quando referenciado pelo projeto.

@@ -29,3 +29,9 @@ A evidência de inclusão no `.dproj` deve verificar especificamente um `DCCRefe
 
 ## Gate documental das units
 Quando houver `.pas` criado ou modificado, `PASS` exige evidência de que cada unit possui cabeçalho estrutural superior verdadeiro e atualizado, e que Delphi Code Auditor e Documentation Auditor confrontaram esse cabeçalho com a implementação e dependências finais.
+
+## Gates especializados obrigatórios
+Quando `.pas` for criado/modificado, `PASS` exige evidência do Naming Auditor. Quando a alteração puder afetar corpo de método, exige evidência do Toxicity Auditor, com distinção explícita entre avaliação estática e `Toxicity` real. Quando interfaces, GUIDs, reference counting, ownership ou lifetime forem aplicáveis, exige evidência do Contract & Lifetime Auditor. Nenhum desses gates pode ser presumido a partir do `PASS` de outro auditor.
+
+## Higiene da entrega
+Em pacote/release, reprovar presença de `__history/`, `__recovery/`, `.identcache` ou `.dproj.local` sem necessidade explícita e comprovada. Verificar recursos de build como `.res` pela referência real no projeto, sem remoção automática.

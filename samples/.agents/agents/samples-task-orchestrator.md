@@ -13,8 +13,9 @@ Determinar o processo mínimo e suficiente para uma tarefa do `samples/` antes d
 
 ## Regras
 - Não declarar `PASS` técnico.
-- Não omitir Toxicity quando `.pas` for criado/modificado.
-- Não omitir Contract/Lifetime quando interfaces, GUID, ownership ou reference counting forem afetados.
+- Não omitir Naming quando `.pas` for criado/modificado.
+- Não omitir Toxicity quando `.pas` for criado/modificado de modo que possa afetar corpo de método.
+- Não omitir Contract/Lifetime quando interfaces, GUID, ownership, lifetime ou reference counting forem afetados.
 - Não transformar ausência de ferramenta em aprovação.
 - Sua seleção será recalculada pelo auditor final de processo.
 
@@ -26,3 +27,9 @@ Quando a tarefa tocar estrutura de `src`, `.dpr`, `.dproj` ou Search Path, exigi
 
 ## Gate obrigatório de documentação de unit
 Quando qualquer `.pas` do Samples for criado ou modificado, exigir Delphi Code Auditor e Documentation Auditor para verificar o cabeçalho estrutural superior da unit. A evidência deve confrontar o cabeçalho com o código final e suas dependências reais.
+
+## Gates Delphi especializados
+Quando `.pas` for criado ou modificado, exigir Naming Auditor. Exigir Toxicity Auditor quando a alteração puder afetar corpo de método. Exigir Contract & Lifetime Auditor quando o escopo contiver ou alterar interfaces, GUIDs, reference counting, ownership ou lifetime. Registrar cada gate separadamente no `Execution Manifest`; a aprovação de um não substitui os demais.
+
+## Higiene de entrega
+Em tarefas de pacote/release, exigir Build Validation Auditor e Final Quality Gate para verificar a ausência de artefatos locais/temporários da IDE (`__history/`, `__recovery/`, `.identcache`, `.dproj.local`), salvo necessidade explícita e comprovada. Não classificar `.res` automaticamente como temporário: confirmar sua necessidade no projeto.

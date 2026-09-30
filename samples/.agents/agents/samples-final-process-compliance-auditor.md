@@ -37,4 +37,7 @@ Não implementar, não corrigir, não modificar artefatos, não exigir gate sem 
 Se o artefato final alterar estrutura de `src`, `.dpr`, `.dproj`, Search Path, header ou cards, recalcular como obrigatórios os gates correspondentes. A evidência de processo deve demonstrar verificação explícita de inclusão das units no projeto, ausência de Search Path interno, coerência dos caminhos físicos e validação da geometria final da Home; não aceitar um `PASS` anterior que não tenha verificado esses pontos.
 
 ## Recalculo obrigatório para documentação de unit
-Se houver `.pas` criado ou modificado, recalcular como obrigatórios Delphi Code Auditor e Documentation Auditor e exigir evidência específica da auditoria dos cabeçalhos estruturais. Um `PASS` sem essa evidência não comprova o processo.
+Se houver `.pas` criado ou modificado, recalcular como obrigatórios Delphi Code Auditor, Documentation Auditor e Naming Auditor e exigir evidência específica da auditoria dos cabeçalhos estruturais e nomenclatura. Se a alteração puder afetar corpo de método, recalcular Toxicity Auditor. Se interfaces, GUIDs, reference counting, ownership ou lifetime forem aplicáveis, recalcular Contract & Lifetime Auditor. Um `PASS` genérico sem evidência desses gates especializados não comprova o processo.
+
+## Recalculo obrigatório para catálogo e entrega
+Confirmar que todos os agents declarados em `.agents/README.md` existem fisicamente em `.agents/agents/` e que os obrigatórios para a tarefa estão catalogados. Em pacote/release, recalcular a verificação de higiene: `__history/`, `__recovery/`, `.identcache` e `.dproj.local` não podem integrar a entrega sem necessidade explícita e comprovada; `.res` deve ser decidido pela dependência real do build.

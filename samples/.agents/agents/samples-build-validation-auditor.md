@@ -26,3 +26,10 @@ Este auditor não modifica `.dpr`, `.dproj`, units, documentação ou qualquer a
 - Reprovar se `DCC_UnitSearchPath` contiver `src` ou qualquer pasta interna do próprio Samples para tornar essas units encontráveis.
 - Permitir no Search Path somente dependências externas realmente necessárias e o Search Path herdado; para a estrutura atual, `..\src` representa a biblioteca Rick.UIBuilder.
 - Confirmar que os caminhos registrados no `.dpr` e `.dproj` correspondem aos arquivos físicos finais após qualquer reorganização.
+
+
+## Higiene do pacote de entrega
+- Reprovar pacote que inclua `__history/`, `__recovery/`, `.identcache` ou `.dproj.local` sem necessidade explícita e comprovada.
+- Esses artefatos locais não devem ser utilizados como fonte para reconstruir arquitetura, documentação ou estado oficial do código.
+- Não remover nem reprovar `.res` apenas por ser arquivo gerado: verificar se o `.dpr`/`.dproj` o referencia e se é necessário ao build.
+- Em entrega incremental, confirmar que somente arquivos criados/modificados necessários à correção foram incluídos, preservando os caminhos relativos à raiz do repositório.

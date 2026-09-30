@@ -60,3 +60,13 @@ Os agentes aplicáveis devem tratar como critérios objetivos: units internas ex
 ## Cabeçalho estrutural das units Delphi
 
 Sempre que uma unit `.pas` do Samples for criada ou modificada, o Orchestrator deve exigir auditoria do cabeçalho documental superior. O Delphi Code Auditor valida a coerência técnica com o código e as dependências; o Documentation Auditor valida finalidade, funcionalidade, responsabilidades, fluxo, ownership/lifetime quando aplicável e restrições. O Final Quality Gate exige essas evidências, e o Final Process Compliance Auditor recalcula esses gates como obrigatórios. O cabeçalho é orientação para humanos e IA, mas não substitui a inspeção do código final.
+
+## Gates obrigatórios para Delphi
+
+Sempre que `.pas` for criado ou modificado, o Orchestrator exige `samples-naming-auditor`. Se a alteração puder afetar corpo de método, exige também `samples-toxicity-auditor`. Quando houver interface, GUID, reference counting, ownership ou lifetime no escopo ou afetados pela mudança, exige `samples-contract-lifetime-auditor`. Esses gates especializados não são substituídos pelo Delphi Code Auditor.
+
+O catálogo desta página deve corresponder aos arquivos físicos em `.agents/agents/`. Agente declarado e ausente, ou arquivo de agente obrigatório não catalogado, reprova a conformidade do processo.
+
+## Higiene de artefatos de entrega
+
+`__history/`, `__recovery/`, `.identcache` e `.dproj.local` são artefatos locais/temporários da IDE para fins desta governança: não servem como evidência arquitetural ou documental e não devem integrar o pacote de entrega sem necessidade explícita e comprovada. Recursos necessários ao build, como `.res`, devem ser avaliados pelo Build Validation Auditor e não removidos mecanicamente.

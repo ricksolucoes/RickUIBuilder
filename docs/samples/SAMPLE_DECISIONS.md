@@ -63,25 +63,38 @@ Units `.pas` modificadas com textos em português devem ser salvas em UTF-8 com 
 Pacotes de entrega contêm somente arquivos criados ou modificados na execução, mantendo caminhos relativos à raiz do repositório.
 
 
-## DEC — Units internas pertencem explicitamente ao projeto
+### DEC-016 — Units internas pertencem explicitamente ao projeto
 
 As units do Samples são registradas no `.dpr` com seus caminhos físicos e no `.dproj` como `DCCReference`. O Search Path não é usado para incorporar units internas do próprio Samples.
 
-## DEC — Estrutura física acompanha responsabilidades existentes
+### DEC-017 — Estrutura física acompanha responsabilidades existentes
 
 `src/App`, `src/Home` e `src/Components/Common` refletem responsabilidades já implementadas. Diretórios por componente somente serão criados quando houver units reais que os justifiquem.
 
-## DEC — Header ocupa o client sem respiro externo
+### DEC-018 — Header ocupa o client sem respiro externo
 
 O header da Home é alinhado diretamente ao topo do formulário e ocupa sua largura. Margens e respiros pertencem ao conteúdo abaixo dele, não ao retângulo do header.
 
-## DEC — Geometria não reduz tipografia
+### DEC-019 — Geometria não reduz tipografia
 
 Quando o conteúdo dos cards exigir mais espaço, largura e altura devem ser ajustadas moderadamente. A tipografia aprovada não deve ser reduzida para esconder clipping ou sobreposição.
 
-## DEC — Cabeçalho estrutural obrigatório nas units do Samples
+### DEC-020 — Cabeçalho estrutural obrigatório nas units do Samples
 
 Toda unit `.pas` criada ou modificada no Samples deve iniciar com um cabeçalho documental estrutural, produzido a partir da implementação final. O cabeçalho serve como mapa local para manutenção humana e para análise por IA, mas nunca substitui a leitura do código.
 
 O cabeçalho deve registrar, quando aplicável: finalidade, funcionalidade existente, responsabilidades, dependências internas do projeto e o motivo de cada dependência, fluxo/colaboração com outras units, ownership/lifetime e restrições arquiteturais. Se uma alteração mudar qualquer uma dessas informações, o cabeçalho deve ser atualizado na mesma execução. Comentário genérico, copiado mecanicamente ou divergente do código reprova a documentação.
 
+
+
+### DEC-021 — Gates Delphi especializados são independentes
+
+Código Delphi criado ou modificado é auditado por Naming; alterações capazes de afetar corpos de métodos são auditadas também por Toxicity; interfaces, GUIDs, reference counting, ownership e lifetime acionam Contract & Lifetime. Delphi Code Auditor continua responsável pela revisão técnica geral, mas não substitui esses gates especializados.
+
+### DEC-022 — Catálogo de agents deve corresponder aos arquivos reais
+
+Todo agent declarado em `samples/.agents/README.md` deve possuir arquivo correspondente em `samples/.agents/agents/`. O Final Process Compliance Auditor verifica essa correspondência antes de permitir uma entrega relevante.
+
+### DEC-023 — Artefatos locais da IDE não integram a entrega
+
+`__history/`, `__recovery/`, `.identcache` e `.dproj.local` são tratados como artefatos locais/temporários e não integram pacotes de entrega sem necessidade explícita e comprovada. Eles também não são fonte arquitetural ou documental. Arquivos necessários ao build, como `.res`, são avaliados pela referência real no projeto e não são removidos mecanicamente.

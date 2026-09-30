@@ -113,3 +113,14 @@ As units Delphi do Samples começam com um cabeçalho estrutural que descreve o 
 
 Esse cabeçalho é uma orientação local para desenvolvedores e IA. Ele não é fonte superior ao código: os auditores devem confrontá-lo com `interface`, `implementation`, `uses` e consumidores reais. Alterações que modifiquem responsabilidade, dependências, fluxo ou lifetime exigem atualização simultânea do cabeçalho.
 
+
+
+## Governança de auditoria Delphi
+
+A governança local do Samples separa revisão técnica geral de gates especializados. Toda unit `.pas` criada ou modificada passa por Naming; alterações que possam afetar corpos de métodos passam também por Toxicity; mudanças relacionadas a interfaces, GUIDs, reference counting, ownership ou lifetime passam por Contract & Lifetime. O Delphi Code Auditor não substitui esses gates.
+
+O catálogo em `samples/.agents/README.md` deve corresponder aos arquivos existentes em `samples/.agents/agents/`. O Final Process Compliance Auditor recalcula a aplicabilidade e verifica a existência e a evidência dos gates obrigatórios.
+
+## Artefatos locais e pacote de entrega
+
+`__history/`, `__recovery/`, `.identcache` e `.dproj.local` são artefatos locais/temporários da IDE e não representam a arquitetura oficial do Samples. Eles não devem integrar pacotes de entrega sem necessidade explícita e comprovada. Recursos necessários ao build, como `.res`, são mantidos ou removidos somente após verificação de sua referência real no projeto.
