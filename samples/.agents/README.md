@@ -1,0 +1,62 @@
+# Governança de Agents do RickUIBuilder.Samples
+
+Esta pasta contém agentes locais do `samples/`. Eles não alteram a governança global do RickUIBuilder.
+
+## Agentes
+
+| Agente | Aplicabilidade | Responsabilidade |
+|---|---|---|
+| `samples-task-orchestrator` | toda tarefa relevante do Samples | define escopo, riscos, gates e evidências |
+| `samples-architecture-auditor` | mudanças arquiteturais/fluxo/dependências | audita boundaries, responsabilidades, acoplamento e abstrações |
+| `samples-delphi-code-auditor` | código Delphi criado/modificado | audita código, `uses`, dependências e compatibilidade observável |
+| `samples-contract-lifetime-auditor` | interfaces/GUID/lifetime/ownership | audita contratos, imutabilidade, reference counting e ciclos |
+| `samples-naming-auditor` | código Delphi criado/modificado | audita parâmetros, locais, fields e constantes |
+| `samples-toxicity-auditor` | código Delphi criado/modificado | audita Length, Parameters, If Depth e Cyclomatic Complexity; distingue métrica real de estática |
+| `samples-documentation-auditor` | documentação criada/modificada ou entrega documentada | compara documentação com implementação final |
+| `samples-build-validation-auditor` | entrega Delphi | valida estrutura de build e executa compilação somente se ferramenta existir |
+| `samples-final-quality-gate` | entrega relevante | avalia qualidade do resultado final |
+| `samples-final-process-compliance-auditor` | último gate de entrega relevante | prova que o processo e gates obrigatórios foram cumpridos |
+
+Não existe `Samples Test Auditor` nesta versão porque sua criação depende da existência de testes do Samples ou de requisito concreto de testes. A ausência do agente não autoriza ignorar testes existentes: se forem encontrados, o Orchestrator deve registrar a necessidade e bloquear até existir o gate adequado ou utilizar o Test Engineer normativo aplicável.
+
+## Estados
+
+- `PASS`: gate executado e sustentado por evidência.
+- `FAIL`: gate executado e encontrou violação.
+- `NOT_APPLICABLE`: domínio não pertence à tarefa, com evidência.
+- `NOT_EXECUTED`: gate aplicável não executado.
+- `BLOCKED`: dependência impede conclusão.
+
+## Execution Manifest
+
+O Orchestrator inicia um manifesto por tarefa. Ele pode ser mantido como artefato de execução e não precisa integrar o pacote de release.
+
+```text
+Gate:
+Applicability:
+Status:
+Artifact/version audited:
+Evidence:
+Execution mode:
+Invalidated by later change?:
+```
+
+O manifesto registra fatos e evidências, nunca cadeia de pensamento.
+
+## Invalidação
+
+Após qualquer alteração, determinar quais gates podem ter sido afetados. Um `PASS` sobre versão anterior não aprova automaticamente o estado novo. Os gates afetados devem ser repetidos sobre o artefato completo.
+
+## Isolamento
+
+Auditores especializados não devem receber conclusões de outros auditores nem justificativas persuasivas do implementador. Recebem requisitos, regras, artefatos e evidências primárias.
+
+O auditor final de processo recebe o manifesto, mas não confia na seleção do Orchestrator: recalcula os gates obrigatórios a partir da solicitação e do artefato final.
+
+## Regras obrigatórias para estrutura e UI da Home
+
+Os agentes aplicáveis devem tratar como critérios objetivos: units internas explicitamente incluídas no `.dpr` e `.dproj`; ausência do próprio `samples/src` no Search Path; organização física por responsabilidade (`App`, `Home`, `Components/Common`); header alinhado a `Top/Left/Right` do client sem margem externa; e cards dimensionados para o conteúdo sem reduzir a tipografia aprovada.
+
+## Cabeçalho estrutural das units Delphi
+
+Sempre que uma unit `.pas` do Samples for criada ou modificada, o Orchestrator deve exigir auditoria do cabeçalho documental superior. O Delphi Code Auditor valida a coerência técnica com o código e as dependências; o Documentation Auditor valida finalidade, funcionalidade, responsabilidades, fluxo, ownership/lifetime quando aplicável e restrições. O Final Quality Gate exige essas evidências, e o Final Process Compliance Auditor recalcula esses gates como obrigatórios. O cabeçalho é orientação para humanos e IA, mas não substitui a inspeção do código final.

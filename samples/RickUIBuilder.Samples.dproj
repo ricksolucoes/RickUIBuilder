@@ -89,7 +89,7 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <DCC_DcuOutput>.\Temp\RickUIBuilder\Samples\$(Platform)\$(Config)</DCC_DcuOutput>
+        <DCC_DcuOutput>.\..\Temp\RickUIBuilder\Samples\$(Platform)\$(Config)</DCC_DcuOutput>
         <DCC_ExeOutput>.\..\APP\$(Config)</DCC_ExeOutput>
         <DCC_E>false</DCC_E>
         <DCC_N>false</DCC_N>
@@ -301,9 +301,17 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="src\RickUIBuilder.Samples.Home.ApproachCard.pas"/>
-        <DCCReference Include="src\RickUIBuilder.Samples.Home.pas"/>
-        <DCCReference Include="src\RickUIBuilder.Samples.Home.Style.pas"/>
+        <DCCReference Include="src\App\RickUIBuilder.Samples.App.Bootstrap.pas"/>
+        <DCCReference Include="src\App\RickUIBuilder.Samples.App.Coordinator.pas"/>
+        <DCCReference Include="src\App\RickUIBuilder.Samples.App.Types.pas"/>
+        <DCCReference Include="src\App\RickUIBuilder.Samples.App.Typography.pas"/>
+        <DCCReference Include="src\Home\RickUIBuilder.Samples.Home.pas"/>
+        <DCCReference Include="src\Home\RickUIBuilder.Samples.Home.ComponentCard.pas"/>
+        <DCCReference Include="src\Home\RickUIBuilder.Samples.Home.Icons.pas"/>
+        <DCCReference Include="src\Home\RickUIBuilder.Samples.Home.Presenter.Intf.pas"/>
+        <DCCReference Include="src\Home\RickUIBuilder.Samples.Home.Presenter.pas"/>
+        <DCCReference Include="src\Home\RickUIBuilder.Samples.Home.Style.pas"/>
+        <DCCReference Include="src\Components\Common\RickUIBuilder.Samples.ComponentPage.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -345,7 +353,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="..\APP\Debug\RickUIBuilder.Samples.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="Win32\Debug\RickUIBuilder.Samples.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>RickUIBuilder.Samples.exe</RemoteName>
                         <Overwrite>true</Overwrite>
