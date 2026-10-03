@@ -24,6 +24,12 @@ Home
 
 Composition continua sendo uma abordagem pública do Rick.UIBuilder, mas não foi adicionada às páginas de componente nesta implementação. Sua apresentação no Samples permanece trabalho futuro até existir uma decisão específica de UX/navegação.
 
+## Próxima evolução aprovada da Component Page
+
+O modelo visual aprovado para a próxima alteração da `TComponentPage` está especificado em [`SAMPLE_COMPONENT_PAGE_SPEC.md`](SAMPLE_COMPONENT_PAGE_SPEC.md). A especificação cobre as seis variações (`Text / Label`, `Button`, `Badge`, `Divider`, `ComboBox` e `Edit`), os assets de Factory/Fluent/informação, o painel `Sobre este componente`, a assimetria do `Edit` e os critérios de aceitação visual.
+
+Essa especificação é **alvo de implementação**, não descrição do estado já existente. Enquanto o código atual não for alterado e validado, a seção **Fluxo atual** acima continua representando o comportamento implementado.
+
 ## Boundary da Home
 
 A Home é uma View FMX. Suas responsabilidades são apresentação, layout, estados visuais e captura de intenção. Ela não executa comandos de aplicação.
@@ -97,7 +103,7 @@ A Home mantém geometria e cores específicas em `Home.Style`. A escala tipográ
 
 O header é filho direto do formulário, usa alinhamento superior e ocupa toda a largura do client, sem margem externa superior ou lateral. O respiro pertence ao conteúdo abaixo do header. O header possui superfície discretamente diferente do body.
 
-Controles efetivamente clicáveis usam `crHandPoint`. O fechamento possui área de hit maior que o SVG e feedback de hover. Os botões `Ver exemplos` são clicáveis porque a navegação para a página de componente está implementada.
+Controles efetivamente clicáveis usam `crHandPoint`. O fechamento possui área de hit maior que o SVG e feedback de hover. Na Home, os botões `Ver exemplos` são clicáveis porque a navegação para a página de componente está implementada. Isso não implica que a ação `Ver exemplos` da futura Component Page já possua destino; esse comportamento permanece separado em `SAMPLE_COMPONENT_PAGE_SPEC.md` e `SAMPLE_FUTURE_WORK.md`.
 
 Os cards preservam a escala tipográfica aprovada e possuem geometria suficiente para título, descrição e ação sem recorte ou sobreposição.
 

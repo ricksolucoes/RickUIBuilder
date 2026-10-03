@@ -98,3 +98,31 @@ Todo agent declarado em `samples/.agents/README.md` deve possuir arquivo corresp
 ### DEC-023 — Artefatos locais da IDE não integram a entrega
 
 `__history/`, `__recovery/`, `.identcache` e `.dproj.local` são tratados como artefatos locais/temporários e não integram pacotes de entrega sem necessidade explícita e comprovada. Eles também não são fonte arquitetural ou documental. Arquivos necessários ao build, como `.res`, são avaliados pela referência real no projeto e não são removidos mecanicamente.
+
+### DEC-024 — Component Page adota a referência visual aprovada
+
+A próxima evolução da `TComponentPage` deve seguir a referência visual fornecida para `Button` como modelo de hierarquia, proporção, alinhamento e densidade. O detalhamento implementável fica em `SAMPLE_COMPONENT_PAGE_SPEC.md`, explicitamente marcado como especificação futura até a alteração correspondente chegar ao código.
+
+### DEC-025 — Uma página comum possui seis variações de conteúdo
+
+`TComponentPage` permanece uma única página reutilizável. `Text / Label`, `Button`, `Badge`, `Divider` e `ComboBox` apresentam Factory e Fluent Builder; `Edit` apresenta somente Fluent Builder enquanto `Factory.CreateEdit` não existir. O card único do Edit é centralizado, sem placeholder de Factory.
+
+### DEC-026 — Assets oficiais da Component Page são os SVGs fornecidos
+
+A página usa `factory_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.svg` para Factory, `link-03-svgrepo-com.svg` para Fluent Builder e `info_48dp_E3E3E3_FILL0_wght400_GRAD0_opsz48.svg` para o painel informativo. A geometria vetorial é preservada; emoji, caractere Unicode e aproximações desenhadas não substituem esses assets.
+
+### DEC-027 — Referência visual não substitui a verdade técnica do código
+
+Textos técnicos da imagem não são copiados quando divergirem da implementação. Em particular, o Button atual não é documentado como `TButton`: sua implementação é composta por `TRectangle + TLabel`. Títulos, subtítulos e texto de `Sobre este componente` são derivados da API/documentação real do componente.
+
+### DEC-028 — Ação visual exige destino real
+
+`Ver exemplos` representa a ação futura para abrir exemplos de Factory ou Fluent Builder. A aparência de ação não autoriza callback vazio, navegação fictícia ou tela inexistente. A interatividade deve ser habilitada quando houver destino real; qualquer etapa intermediária exclusivamente visual precisa decidir explicitamente o comportamento antes da entrega.
+
+### DEC-029 — Tipografia é preservada na Component Page
+
+A Component Page reutiliza a escala semântica de `App.Typography`: 24 para título, 14 para subtítulo, 16 para título de card, 14 para corpo, 14 para ação e 13 para navegação. Geometria e espaçamento devem acomodar esses tokens sem redução de fonte para mascarar clipping.
+
+### DEC-030 — O painel “Sobre este componente” é obrigatório nas seis variações
+
+Cada estado da `TComponentPage` possui painel informativo inferior com ícone oficial, título `Sobre este componente` e texto curto baseado no comportamento real do componente. O painel não deve antecipar APIs inexistentes nem simplificar detalhes de modo a produzir afirmação tecnicamente falsa.
