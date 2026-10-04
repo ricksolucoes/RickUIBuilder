@@ -27,17 +27,17 @@ Nesta etapa não existem páginas de destino Factory/Fluent, samples demonstrati
 
 ## Arquitetura da família de páginas
 
-A infraestrutura comum reside em `RickUIBuilder.Samples.ComponentPage.pas`.
+A infraestrutura comum reside em `RickUIBuilder.Samples.Component.Common.pas`. Os tokens de geometria e cor ficam em `RickUIBuilder.Samples.Component.Common.Style.pas`, e os paths vetoriais compartilhados ficam em `RickUIBuilder.Samples.Component.Common.Icons.pas`.
 
 ```text
-TComponentPage
+TComponentCommon
       ▲
-      ├── TTextLabelComponentPage
-      ├── TButtonComponentPage
-      ├── TBadgeComponentPage
-      ├── TDividerComponentPage
-      ├── TComboBoxComponentPage
-      └── TEditComponentPage
+      ├── TComponentTextLabel
+      ├── TComponentButton
+      ├── TComponentBadge
+      ├── TComponentDivider
+      ├── TComponentComboBox
+      └── TComponentEdit
 ```
 
 A classe-base é abstrata e não conhece `TSampleComponent`. Ela define somente formulário, header, retorno, geometria, cards e painel informativo compartilhados.
@@ -86,7 +86,7 @@ A seta possui uma área clicável maior que o SVG, cursor `crHandPoint` e feedba
 O retorno mantém o fluxo existente:
 
 ```text
-TComponentPage.Close
+TComponentCommon.Close
         ↓
 ShowModal retorna
         ↓
@@ -137,7 +137,7 @@ O card único é centralizado. Não existe placeholder de Factory.
 
 ## Assets vetoriais
 
-Os paths da família de páginas ficam em `RickUIBuilder.Samples.ComponentPage.Icons`.
+Os paths da família de páginas ficam em `RickUIBuilder.Samples.Component.Common.Icons`. Dimensões, espaçamentos e cores compartilhados ficam em `RickUIBuilder.Samples.Component.Common.Style`.
 
 | Uso | Asset fornecido |
 |---|---|
@@ -179,7 +179,7 @@ A geometria deve acomodar essa escala. Não reduzir fonte para mascarar clipping
 
 ### Text / Label
 
-**Classe:** `TTextLabelComponentPage`
+**Classe:** `TComponentTextLabel`
 
 **Subtítulo:** `Crie e configure textos FireMonkey com Rick.UIBuilder.`
 
@@ -209,7 +209,7 @@ A geometria deve acomodar essa escala. Não reduzir fonte para mascarar clipping
 
 ### Button
 
-**Classe:** `TButtonComponentPage`
+**Classe:** `TComponentButton`
 
 **Subtítulo:** `Crie e configure botões FireMonkey com Rick.UIBuilder.`
 
@@ -221,7 +221,7 @@ A referência visual original mencionava `TButton`, mas a implementação real d
 
 ### Badge
 
-**Classe:** `TBadgeComponentPage`
+**Classe:** `TComponentBadge`
 
 **Subtítulo:** `Crie badges compostos e configure sua apresentação com Rick.UIBuilder.`
 
@@ -231,7 +231,7 @@ A referência visual original mencionava `TButton`, mas a implementação real d
 
 ### Divider
 
-**Classe:** `TDividerComponentPage`
+**Classe:** `TComponentDivider`
 
 **Subtítulo:** `Crie separadores horizontais ou verticais com Rick.UIBuilder.`
 
@@ -241,7 +241,7 @@ A referência visual original mencionava `TButton`, mas a implementação real d
 
 ### ComboBox
 
-**Classe:** `TComboBoxComponentPage`
+**Classe:** `TComponentComboBox`
 
 **Subtítulo:** `Crie seleções FireMonkey configuráveis com Rick.UIBuilder.`
 
@@ -251,7 +251,7 @@ A referência visual original mencionava `TButton`, mas a implementação real d
 
 ### Edit
 
-**Classe:** `TEditComponentPage`
+**Classe:** `TComponentEdit`
 
 **Subtítulo:** `Crie campos de texto de uma linha em runtime com Rick.UIBuilder.`
 
@@ -282,7 +282,7 @@ A referência visual original mencionava `TButton`, mas a implementação real d
 
 ## Limites de responsabilidade
 
-`TComponentPage` pode conhecer:
+`TComponentCommon` pode conhecer:
 
 - regras visuais comuns da família;
 - geometria;
@@ -290,7 +290,7 @@ A referência visual original mencionava `TButton`, mas a implementação real d
 - header e retorno;
 - construção comum de cards e painel informativo.
 
-`TComponentPage` não pode conhecer:
+`TComponentCommon` não pode conhecer:
 
 - `TSampleComponent`;
 - arrays com conteúdo dos seis componentes;
@@ -313,7 +313,7 @@ A implementação deve manter simultaneamente:
 - tipografia aprovada preservada;
 - Factory ausente no Edit sem espaço vazio;
 - nenhuma dependência de Components para `Home.Style`;
-- uma unit concreta por componente herdando de `TComponentPage`;
+- uma unit concreta por componente herdando de `TComponentCommon`;
 - `.dpr` e `.dproj` contendo explicitamente todas as units;
 - nenhum `samples/src` no Search Path;
 - nenhuma página futura Factory/Fluent criada nesta etapa.

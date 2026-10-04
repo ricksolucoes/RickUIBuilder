@@ -1,3 +1,40 @@
+﻿{******************************************************************************}
+{                                                                              }
+{  RickUIBuilder.Samples.Component.Common.Style                                }
+{                                                                              }
+{  Finalidade                                                                  }
+{  ----------                                                                  }
+{  Centralizar tokens visuais e geometria compartilhados pelas páginas         }
+{  intermediárias de componente do Samples.                                    }
+{                                                                              }
+{  Funcionalidade                                                              }
+{  --------------                                                              }
+{  Expõe dimensões do formulário, header, conteúdo, cards e painel             }
+{  informativo, além da paleta usada pela infraestrutura comum.                }
+{                                                                              }
+{  Dependências do projeto                                                     }
+{  -----------------------                                                     }
+{  - Não possui dependências internas do projeto.                              }
+{                                                                              }
+{  Fluxo / colaboração                                                         }
+{  -------------------                                                         }
+{  - RickUIBuilder.Samples.Component.Common consome estas constantes para      }
+{    construir a geometria e aparência compartilhadas pelas páginas derivadas. }
+{                                                                              }
+{  Restrições e responsabilidades                                              }
+{  -----------------------------                                               }
+{  - A tipografia compartilhada permanece em                                  }
+{    RickUIBuilder.Samples.App.Typography.                                     }
+{  - Conteúdo específico de cada componente permanece em sua página concreta.  }
+{  - Esta unit não depende de RickUIBuilder.Samples.Home.Style.                }
+{                                                                              }
+{  Manutenção                                                                  }
+{  ----------                                                                  }
+{  Este cabeçalho deve ser atualizado quando responsabilidade, geometria,      }
+{  paleta, dependências ou restrições desta unit mudarem.                      }
+{                                                                              }
+{******************************************************************************}
+
 unit RickUIBuilder.Samples.Component.Common.Style;
 
 interface

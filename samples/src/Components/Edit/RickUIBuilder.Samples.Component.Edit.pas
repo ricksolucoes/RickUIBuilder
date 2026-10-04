@@ -1,6 +1,6 @@
 ﻿{******************************************************************************}
 {                                                                              }
-{  RickUIBuilder.Samples.ComponentPage.Edit                                    }
+{  RickUIBuilder.Samples.Component.Edit                                        }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
@@ -8,27 +8,26 @@
 {                                                                              }
 {  Funcionalidade                                                              }
 {  --------------                                                              }
-{  Define título, subtítulo, abordagens e texto informativo próprios.          }
-{  Apresenta somente Fluent Builder porque Factory.CreateEdit não existe na    }
-{  API atual.                                                                  }
+{  Define título, subtítulo, abordagem e texto informativo próprios.           }
+{  Apresenta somente Fluent Builder como divisão visual para destino futuro.   }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
-{  RickUIBuilder.Samples.ComponentPage: fornece formulário, header, layout     }
-{  comum, cards e painel informativo.                                          }
+{  - RickUIBuilder.Samples.Component.Common                                    }
+{      Fornece TComponentCommon, header, layout, cards e painel informativo.   }
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
-{  TSampleApplicationCoordinator seleciona esta classe para o componente       }
-{  correspondente e a exibe modalmente.                                        }
-{  O retorno e o lifetime modal permanecem implementados na classe-base e no   }
-{  Coordinator, respectivamente.                                               }
+{  - TSampleApplicationCoordinator seleciona esta classe para o componente     }
+{    correspondente e a exibe modalmente.                                      }
+{  - O retorno e o lifetime modal permanecem na classe-base e no Coordinator,  }
+{    respectivamente.                                                          }
 {                                                                              }
 {  Restrições e responsabilidades                                              }
 {  -----------------------------                                               }
-{  Não criar Factory vazia/desabilitada enquanto Factory.CreateEdit não        }
-{  existir.                                                                    }
-{  Esta página não cria samples nem páginas de destino Factory/Fluent.         }
+{  - A página apresenta Fluent Builder centralizado e não cria opção Factory,  }
+{    pois a API atual não expõe Factory.CreateEdit.                            }
+{  - Esta página não cria samples nem páginas de destino Factory/Fluent.       }
 {                                                                              }
 {  Manutenção                                                                  }
 {  ----------                                                                  }

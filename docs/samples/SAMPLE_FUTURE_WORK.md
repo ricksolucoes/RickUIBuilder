@@ -6,7 +6,7 @@ A API pública possui Composition por meio de `TRickUIBuilder.On(AParent)`. A po
 
 ## Páginas de samples Factory e Fluent Builder
 
-As páginas intermediárias de `Text / Label`, `Button`, `Badge`, `Divider`, `ComboBox` e `Edit` já existem como páginas concretas herdadas de `TComponentPage`.
+As páginas intermediárias de `Text / Label`, `Button`, `Badge`, `Divider`, `ComboBox` e `Edit` já existem como páginas concretas herdadas de `TComponentCommon`.
 
 Elas apresentam somente a divisão entre as abordagens suportadas. As páginas posteriores que realmente conterão os samples de Factory e Fluent Builder **ainda não existem**.
 
@@ -26,7 +26,7 @@ A interatividade deve ser habilitada somente quando a página de destino corresp
 
 ## Factory.Edit
 
-No estado analisado, `TRickUIBuilderFactory` não expõe `CreateEdit`. Por isso, `TEditComponentPage` apresenta apenas Fluent Builder e centraliza o card.
+No estado analisado, `TRickUIBuilderFactory` não expõe `CreateEdit`. Por isso, `TComponentEdit` apresenta apenas Fluent Builder e centraliza o card.
 
 Se a API mudar, revisar novamente o contrato público antes de alterar o Samples. Não criar entrada Factory vazia, desabilitada ou fictícia.
 
@@ -34,7 +34,7 @@ Se a API mudar, revisar novamente o contrato público antes de alterar o Samples
 
 Os controles e demonstrações reais de uso do Rick.UIBuilder pertencem às futuras páginas Factory/Fluent Builder, e não às páginas intermediárias implementadas nesta etapa.
 
-Nenhum sample real deve ser adicionado à `TComponentPage` base somente para antecipar esse trabalho futuro.
+Nenhum sample real deve ser adicionado à `TComponentCommon` base somente para antecipar esse trabalho futuro.
 
 ## Testes do Samples
 

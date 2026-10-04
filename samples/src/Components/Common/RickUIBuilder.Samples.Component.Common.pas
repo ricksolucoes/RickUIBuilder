@@ -1,6 +1,6 @@
 ﻿{******************************************************************************}
 {                                                                              }
-{  RickUIBuilder.Samples.ComponentPage                                         }
+{  RickUIBuilder.Samples.Component.Common                                      }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
@@ -9,25 +9,28 @@
 {                                                                              }
 {  Funcionalidade                                                              }
 {  --------------                                                              }
-{  Configura um formulário FMX borderless, cria o header com retorno, define   }
-{  a geometria comum e oferece operações protegidas para que páginas concretas }
-{  adicionem identidade, Factory, Fluent Builder e o painel informativo.       }
+{  Configura um formulário FMX borderless, cria o header com retorno, aplica   }
+{  estilo e geometria comuns e oferece operações protegidas para que páginas   }
+{  concretas adicionem identidade, Factory, Fluent Builder e informação.       }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
 {  - RickUIBuilder.Samples.App.Typography                                      }
 {      Fornece a escala tipográfica compartilhada pelo Samples.                }
 {                                                                              }
-{  - RickUIBuilder.Samples.ComponentPage.Icons                                 }
+{  - RickUIBuilder.Samples.Component.Common.Icons                              }
 {      Fornece as geometrias vetoriais usadas pelos controles comuns.          }
+{                                                                              }
+{  - RickUIBuilder.Samples.Component.Common.Style                              }
+{      Fornece dimensões, espaçamentos e cores da família de páginas.          }
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
 {  - As páginas concretas de Text / Label, Button, Badge, Divider, ComboBox e  }
 {    Edit herdam desta classe e adicionam apenas conteúdo/capacidades próprios.}
 {  - TSampleApplicationCoordinator cria a página concreta e a exibe modalmente.}
-{  - A ação de retorno fecha a janela modal atual; o Coordinator mantém o       }
-{    ownership e libera a instância após ShowModal.                            }
+{  - O retorno fecha a janela modal; o Coordinator mantém o ownership e libera }
+{    a instância após ShowModal.                                               }
 {                                                                              }
 {  Ownership / lifetime                                                        }
 {  --------------------                                                        }
@@ -40,7 +43,7 @@
 {  - Não conhece TSampleComponent nem decide conteúdo de componentes.          }
 {  - Não depende de Home.Style.                                                }
 {  - Não cria páginas futuras de samples Factory/Fluent Builder.               }
-{  - Ver exemplos permanece somente visual enquanto esses destinos não existirem.}
+{  - Ver exemplos permanece somente visual enquanto os destinos não existirem. }
 {                                                                              }
 {  Manutenção                                                                  }
 {  ----------                                                                  }

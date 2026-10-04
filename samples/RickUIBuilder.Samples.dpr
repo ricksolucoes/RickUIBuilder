@@ -31,8 +31,8 @@
 {      e estilo específico.                                                    }
 {                                                                              }
 {  - src\Components\Common                                                     }
-{      Contém a base visual e os ícones compartilhados pelas páginas de        }
-{      componentes.                                                            }
+{      Contém a base visual, os ícones e o estilo compartilhados pelas páginas }
+{      de componentes.                                                         }
 {                                                                              }
 {  - src\Components\<Componente>                                               }
 {      Contém a página intermediária concreta de cada componente navegável.    }
@@ -41,6 +41,12 @@
 {  -----------------------                                                     }
 {  - FMX.Forms                                                                 }
 {      Fornece a infraestrutura da aplicação FireMonkey.                       }
+{                                                                              }
+{  - FMX.Types                                                                 }
+{      Fornece GlobalUseDX usado pelo fallback -nodx.                          }
+{                                                                              }
+{  - System.SysUtils                                                           }
+{      Fornece FindCmdLineSwitch para detectar o parâmetro -nodx.              }
 {                                                                              }
 {  - RickUIBuilder.Samples.App.Bootstrap                                       }
 {      Disponibiliza TSampleApplication, responsável pelo Composition Root     }

@@ -32,7 +32,7 @@ Parecer de outro auditor, aprovação anterior, justificativa persuasiva do impl
 Quando uma alteração arquitetural modificar responsabilidade, boundary, dependência, fluxo ou ownership/lifetime de uma unit, verificar também se o cabeçalho estrutural superior foi atualizado para refletir o estado final. Divergência arquitetural entre cabeçalho e código resulta em `FAIL`.
 
 ## Critérios específicos das Component Pages
-- `TComponentPage` deve concentrar somente infraestrutura visual comum e não conhecer `TSampleComponent`, arrays de conteúdo dos seis componentes ou regras específicas como a ausência de Factory no Edit.
+- `TComponentCommon` deve concentrar somente construção/comportamento visual comum, consumindo tokens de `RickUIBuilder.Samples.Component.Common.Style`, e não conhecer `TSampleComponent`, arrays de conteúdo dos seis componentes ou regras específicas como a ausência de Factory no Edit.
 - Cada componente navegável deve possuir page concreta derivada da base quando essa arquitetura estiver vigente.
 - `Components` não deve depender de `RickUIBuilder.Samples.Home.Style`; reutilização compartilhada deve ocorrer somente por dependência realmente comum, como `App.Typography`.
 - O Coordinator pode resolver `TSampleComponent` para a classe concreta, mas não deve conter layout ou conteúdo visual.

@@ -16,10 +16,10 @@
 {  - RickUIBuilder.Samples.App.Types                                           }
 {      Identifica o componente solicitado na navegação.                        }
 {                                                                              }
-{  - RickUIBuilder.Samples.ComponentPage                                       }
-{      Fornece a base/metaclasse comum para as páginas intermediárias.         }
+{  - RickUIBuilder.Samples.Component.Common                                    }
+{      Fornece TComponentCommon e a metaclasse usada para criação modal.       }
 {                                                                              }
-{  - RickUIBuilder.Samples.ComponentPage.*                                     }
+{  - RickUIBuilder.Samples.Component.*                                         }
 {      Fornecem as seis páginas concretas selecionadas pelo componente.        }
 {                                                                              }
 {  Fluxo / colaboração                                                         }
@@ -31,7 +31,7 @@
 {                                                                              }
 {  Ownership / lifetime                                                        }
 {  --------------------                                                        }
-{  - O Coordinator é o responsável pela instância modal de Component Page.    }
+{  - O Coordinator é responsável pela instância modal da página de componente. }
 {  - A página é criada sem Owner e sempre liberada no bloco finally.           }
 {                                                                              }
 {  Restrições e responsabilidades                                              }

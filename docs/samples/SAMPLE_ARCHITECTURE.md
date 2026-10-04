@@ -8,14 +8,14 @@ O Samples é um catálogo navegável da API pública atual do Rick.UIBuilder. A 
 
 ```text
 Home
-├── Text / Label ──► TTextLabelComponentPage
-├── Button ─────────► TButtonComponentPage
-├── Badge ──────────► TBadgeComponentPage
-├── Divider ────────► TDividerComponentPage
-├── ComboBox ───────► TComboBoxComponentPage
-└── Edit ───────────► TEditComponentPage
+├── Text / Label ──► TComponentTextLabel
+├── Button ─────────► TComponentButton
+├── Badge ──────────► TComponentBadge
+├── Divider ────────► TComponentDivider
+├── ComboBox ───────► TComponentComboBox
+└── Edit ───────────► TComponentEdit
                          │
-                         └── herda TComponentPage
+                         └── herda TComponentCommon
                               ├── Factory        [quando suportado]
                               └── Fluent Builder
 ```
@@ -28,7 +28,7 @@ Composition continua sendo uma abordagem pública do Rick.UIBuilder, mas não fo
 
 ## Base e páginas concretas de componente
 
-`RickUIBuilder.Samples.ComponentPage` é uma classe-base abstrata responsável somente pela infraestrutura visual comum:
+A unit `RickUIBuilder.Samples.Component.Common` expõe a classe-base abstrata `TComponentCommon`, responsável somente pela infraestrutura visual comum:
 
 - formulário FMX borderless;
 - dimensões e superfície da janela;
@@ -42,22 +42,22 @@ Composition continua sendo uma abordagem pública do Rick.UIBuilder, mas não fo
 
 A base **não conhece `TSampleComponent`**, não contém arrays de configuração dos seis componentes e não decide se um componente suporta Factory.
 
-Cada componente possui uma página concreta que herda de `TComponentPage` e define apenas seu conteúdo e as abordagens que aparecem:
+Cada componente possui uma página concreta que herda de `TComponentCommon` e define apenas seu conteúdo e as abordagens que aparecem:
 
 ```text
-TComponentPage
+TComponentCommon
       ▲
-      ├── TTextLabelComponentPage
-      ├── TButtonComponentPage
-      ├── TBadgeComponentPage
-      ├── TDividerComponentPage
-      ├── TComboBoxComponentPage
-      └── TEditComponentPage
+      ├── TComponentTextLabel
+      ├── TComponentButton
+      ├── TComponentBadge
+      ├── TComponentDivider
+      ├── TComponentComboBox
+      └── TComponentEdit
 ```
 
-As páginas de Text / Label, Button, Badge, Divider e ComboBox adicionam Factory e Fluent Builder. `TEditComponentPage` adiciona somente Fluent Builder e usa a variante centralizada do card.
+As páginas de Text / Label, Button, Badge, Divider e ComboBox adicionam Factory e Fluent Builder. `TComponentEdit` adiciona somente Fluent Builder e usa a variante centralizada do card.
 
-Os SVGs compartilhados da família de páginas ficam em `RickUIBuilder.Samples.ComponentPage.Icons`. Geometria e regras de layout permanecem na classe-base `TComponentPage`.
+Os SVGs compartilhados ficam em `RickUIBuilder.Samples.Component.Common.Icons`. Dimensões, espaçamentos e cores ficam em `RickUIBuilder.Samples.Component.Common.Style`; `TComponentCommon` consome esses tokens e implementa a construção e o comportamento visual comuns.
 
 ## Navegação e retorno
 
@@ -81,7 +81,7 @@ página concreta do componente
 
 O `TSampleApplicationCoordinator` resolve `TSampleComponent` para a classe concreta correspondente, cria a página sem Owner, executa `ShowModal` e libera a instância no `finally`.
 
-A seta de retorno da `TComponentPage` fecha a janela modal atual. O retorno não cria Router, Presenter adicional ou nova camada de navegação: ao fechar a modal, o fluxo retorna ao Coordinator e a Home volta a ficar ativa.
+A seta de retorno da `TComponentCommon` fecha a janela modal atual. O retorno não cria Router, Presenter adicional ou nova camada de navegação: ao fechar a modal, o fluxo retorna ao Coordinator e a Home volta a ficar ativa.
 
 ## Boundary da Home
 
@@ -130,20 +130,21 @@ samples/
     │   └── RickUIBuilder.Samples.Home.Style.pas
     └── Components/
         ├── Common/
-        │   ├── RickUIBuilder.Samples.ComponentPage.pas
-        │   └── RickUIBuilder.Samples.ComponentPage.Icons.pas
+        │   ├── RickUIBuilder.Samples.Component.Common.pas
+        │   ├── RickUIBuilder.Samples.Component.Common.Icons.pas
+        │   └── RickUIBuilder.Samples.Component.Common.Style.pas
         ├── TextLabel/
-        │   └── RickUIBuilder.Samples.ComponentPage.TextLabel.pas
+        │   └── RickUIBuilder.Samples.Component.TextLabel.pas
         ├── Button/
-        │   └── RickUIBuilder.Samples.ComponentPage.Button.pas
+        │   └── RickUIBuilder.Samples.Component.Button.pas
         ├── Badge/
-        │   └── RickUIBuilder.Samples.ComponentPage.Badge.pas
+        │   └── RickUIBuilder.Samples.Component.Badge.pas
         ├── Divider/
-        │   └── RickUIBuilder.Samples.ComponentPage.Divider.pas
+        │   └── RickUIBuilder.Samples.Component.Divider.pas
         ├── ComboBox/
-        │   └── RickUIBuilder.Samples.ComponentPage.ComboBox.pas
+        │   └── RickUIBuilder.Samples.Component.ComboBox.pas
         └── Edit/
-            └── RickUIBuilder.Samples.ComponentPage.Edit.pas
+            └── RickUIBuilder.Samples.Component.Edit.pas
 ```
 
 Diretórios específicos de componentes existem porque agora possuem units concretas. Não criar novos diretórios antecipadamente sem implementação real que os justifique.
@@ -154,7 +155,7 @@ Todas as units internas do Samples são incorporadas explicitamente ao `.dpr` e 
 
 A Home mantém geometria e cores específicas em `Home.Style`. A escala tipográfica semanticamente reutilizável permanece em `App.Typography`.
 
-A família `ComponentPage` não depende de `Home.Style`. Sua geometria e sua paleta local são definidas pela própria base `TComponentPage`, evitando acoplamento de uma feature de Components com uma unit específica da Home.
+A família `ComponentPage` não depende de `Home.Style`. Sua geometria e sua paleta local ficam em `RickUIBuilder.Samples.Component.Common.Style`, consumida pela base `TComponentCommon`, evitando acoplamento de Components com uma unit específica da Home.
 
 A Component Page atual usa client de `500 × 500`, formulário `TFmxFormBorderStyle.None` e header de `40` unidades alinhado ao topo. O conteúdo possui área suficiente para os maiores subtítulos e textos informativos atuais sem reduzir a escala tipográfica aprovada.
 
@@ -169,6 +170,16 @@ Os cards preservam os SVGs oficiais fornecidos:
 A geometria de Factory e informação é renderizada por fill; Fluent Builder usa stroke, seguindo os assets originais.
 
 `Ver exemplos` permanece sem `HitTest` e sem callback enquanto as páginas de destino não existirem.
+
+## Inicialização gráfica e acesso remoto
+
+O ponto de entrada `RickUIBuilder.Samples.dpr` aceita o parâmetro de linha de comando `-nodx`. Quando `FindCmdLineSwitch('nodx', True)` localiza o parâmetro, o executável define `FMX.Types.GlobalUseDX := False` antes de `Application.Initialize`.
+
+Esse caminho existe como alternativa para ambientes de acesso remoto nos quais superfícies FMX baseadas em DirectX podem não ser capturadas corretamente. Sem o parâmetro, o Samples preserva o backend gráfico padrão do FireMonkey.
+
+```text
+RickUIBuilder.Samples.exe -nodx
+```
 
 ## Encoding
 

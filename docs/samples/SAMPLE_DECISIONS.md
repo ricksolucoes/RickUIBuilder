@@ -105,7 +105,7 @@ A família de páginas de componente segue a referência visual fornecida para `
 
 ### DEC-025 — Modelo parametrizado único foi substituído por herança explícita
 
-A decisão anterior de representar os seis componentes como estados parametrizados dentro de uma única `TComponentPage` foi substituída. `TComponentPage` agora é uma base abstrata comum, e cada componente possui uma página concreta derivada. Conteúdo específico não fica centralizado em arrays ou `case/if` na classe-base.
+A decisão anterior de representar os seis componentes como estados parametrizados dentro de uma única página genérica foi substituída. `TComponentCommon` é a base abstrata comum atual, e cada componente possui uma página concreta derivada. Conteúdo específico não fica centralizado em arrays ou `case/if` na classe-base.
 
 ### DEC-026 — Assets oficiais da Component Page são os SVGs fornecidos
 
@@ -129,7 +129,7 @@ Cada página concreta possui painel informativo inferior com ícone oficial, tí
 
 ### DEC-031 — Cada componente possui uma página concreta
 
-`Text / Label`, `Button`, `Badge`, `Divider`, `ComboBox` e `Edit` possuem classes próprias herdando de `TComponentPage`. A classe-base concentra somente layout e comportamento comum; cada derivada decide seu conteúdo e quais abordagens aparecem.
+`Text / Label`, `Button`, `Badge`, `Divider`, `ComboBox` e `Edit` possuem classes próprias herdando de `TComponentCommon`. A classe-base concentra somente layout e comportamento comum; cada derivada decide seu conteúdo e quais abordagens aparecem.
 
 ### DEC-032 — Component Page é somente a divisão para Factory e Fluent Builder
 
@@ -141,4 +141,13 @@ A família de páginas utiliza `TFmxFormBorderStyle.None`, seguindo o padrão vi
 
 ### DEC-034 — Components não depende de `Home.Style`
 
-A base `TComponentPage` mantém sua própria geometria e paleta local e reutiliza somente a tipografia global de `App.Typography`. A feature de Components não deve depender de `RickUIBuilder.Samples.Home.Style`.
+`TComponentCommon` reutiliza a tipografia global de `App.Typography`, mas Components não deve depender de `RickUIBuilder.Samples.Home.Style`. Geometria e paleta próprias da família permanecem no domínio de Components.
+
+### DEC-035 — Geometria e paleta comuns ficam em `Component.Common.Style`
+
+Os tokens de dimensão, espaçamento e cor compartilhados pelas páginas intermediárias ficam em `RickUIBuilder.Samples.Component.Common.Style`. `TComponentCommon` mantém a construção e o comportamento comuns e consome essa unit; os paths vetoriais permanecem em `RickUIBuilder.Samples.Component.Common.Icons`. Essa separação não introduz dependência com `Home.Style`.
+
+### DEC-036 — `-nodx` é fallback explícito de inicialização gráfica
+
+O executável `RickUIBuilder.Samples` aceita `-nodx` e, quando o parâmetro é localizado, define `FMX.Types.GlobalUseDX := False` antes de `Application.Initialize`. Sem o parâmetro, o comportamento gráfico padrão do FireMonkey é preservado. A opção existe para execução em ambientes de acesso remoto nos quais a captura de superfícies DirectX pode ser problemática.
+

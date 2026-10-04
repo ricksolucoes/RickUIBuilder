@@ -57,7 +57,7 @@ O auditor final de processo recebe o manifesto, mas não confia na seleção do 
 
 Os agentes aplicáveis devem tratar como critérios objetivos: units internas explicitamente incluídas no `.dpr` e `.dproj`; ausência do próprio `samples/src` no Search Path; organização física por responsabilidade (`App`, `Home`, `Components/Common` e diretórios concretos por componente quando houver unit real); header da Home alinhado ao client sem margem externa; e cards dimensionados para o conteúdo sem reduzir a tipografia aprovada.
 
-Para Component Pages, `RickUIBuilder.Samples.ComponentPage` deve permanecer base comum de layout/comportamento, sem conteúdo centralizado dos seis componentes e sem dependência de `Home.Style`. Cada componente navegável possui page concreta derivada. A página é intermediária: Factory/Fluent são divisões visuais e seus samples/destinos continuam fora do escopo até implementação explícita. O formulário deve ser borderless, o retorno deve fechar a modal e nenhum texto/card/painel pode sofrer clipping.
+Para Component Pages, `RickUIBuilder.Samples.Component.Common` (`TComponentCommon`) deve permanecer base comum de layout/comportamento, com tokens visuais locais em `RickUIBuilder.Samples.Component.Common.Style`, sem conteúdo centralizado dos seis componentes e sem dependência de `Home.Style`. Cada componente navegável possui page concreta derivada. A página é intermediária: Factory/Fluent são divisões visuais e seus samples/destinos continuam fora do escopo até implementação explícita. O formulário deve ser borderless, o retorno deve fechar a modal e nenhum texto/card/painel pode sofrer clipping.
 
 ## Cabeçalho estrutural das units Delphi
 

@@ -1,6 +1,6 @@
 ﻿{******************************************************************************}
 {                                                                              }
-{  RickUIBuilder.Samples.ComponentPage.Divider                                 }
+{  RickUIBuilder.Samples.Component.Divider                                     }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
@@ -14,21 +14,21 @@
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
-{  RickUIBuilder.Samples.ComponentPage: fornece formulário, header, layout     }
-{  comum, cards e painel informativo.                                          }
+{  - RickUIBuilder.Samples.Component.Common                                    }
+{      Fornece TComponentCommon, header, layout, cards e painel informativo.   }
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
-{  TSampleApplicationCoordinator seleciona esta classe para o componente       }
-{  correspondente e a exibe modalmente.                                        }
-{  O retorno e o lifetime modal permanecem implementados na classe-base e no   }
-{  Coordinator, respectivamente.                                               }
+{  - TSampleApplicationCoordinator seleciona esta classe para o componente     }
+{    correspondente e a exibe modalmente.                                      }
+{  - O retorno e o lifetime modal permanecem na classe-base e no Coordinator,  }
+{    respectivamente.                                                          }
 {                                                                              }
 {  Restrições e responsabilidades                                              }
 {  -----------------------------                                               }
-{  A página contém Factory e Fluent Builder, sem implementar seus destinos     }
-{  futuros.                                                                    }
-{  Esta página não cria samples nem páginas de destino Factory/Fluent.         }
+{  - A página contém Factory e Fluent Builder, sem implementar seus destinos   }
+{    futuros.                                                                  }
+{  - Esta página não cria samples nem páginas de destino Factory/Fluent.       }
 {                                                                              }
 {  Manutenção                                                                  }
 {  ----------                                                                  }

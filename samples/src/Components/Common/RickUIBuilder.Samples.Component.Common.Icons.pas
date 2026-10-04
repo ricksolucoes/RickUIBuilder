@@ -1,10 +1,10 @@
 ﻿{******************************************************************************}
 {                                                                              }
-{  RickUIBuilder.Samples.ComponentPage.Icons                                   }
+{  RickUIBuilder.Samples.Component.Common.Icons                                }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
-{  Centralizar as geometrias vetoriais compartilhadas pelas páginas de        }
+{  Centralizar as geometrias vetoriais compartilhadas pelas páginas de         }
 {  componente do Samples.                                                      }
 {                                                                              }
 {  Funcionalidade                                                              }
@@ -18,7 +18,7 @@
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
-{  - RickUIBuilder.Samples.ComponentPage consome estas constantes ao criar     }
+{  - RickUIBuilder.Samples.Component.Common consome estas constantes ao criar  }
 {    os controles visuais comuns das páginas derivadas.                        }
 {                                                                              }
 {  Restrições e responsabilidades                                              }
