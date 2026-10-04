@@ -141,13 +141,33 @@ A família de páginas utiliza `TFmxFormBorderStyle.None`, seguindo o padrão vi
 
 ### DEC-034 — Components não depende de `Home.Style`
 
-`TComponentCommon` reutiliza a tipografia global de `App.Typography`, mas Components não deve depender de `RickUIBuilder.Samples.Home.Style`. Geometria e paleta próprias da família permanecem no domínio de Components.
+A família de Component Pages mantém geometria e paleta local em `RickUIBuilder.Samples.Component.Common.Style`, consumida por `TComponentCommon`, e reutiliza a tipografia global de `App.Typography`. A feature de Components não deve depender de `RickUIBuilder.Samples.Home.Style`.
 
-### DEC-035 — Geometria e paleta comuns ficam em `Component.Common.Style`
+### DEC-035 — A página de exemplos possui uma base visual própria
 
-Os tokens de dimensão, espaçamento e cor compartilhados pelas páginas intermediárias ficam em `RickUIBuilder.Samples.Component.Common.Style`. `TComponentCommon` mantém a construção e o comportamento comuns e consome essa unit; os paths vetoriais permanecem em `RickUIBuilder.Samples.Component.Common.Icons`. Essa separação não introduz dependência com `Home.Style`.
+A próxima camada de navegação terá uma Sample Page Base própria, distinta da Home e da Component Page. Ela será reutilizada por herança pelas futuras páginas concretas de exemplos, sem centralizar regras específicas de componentes ou abordagens. Esta decisão está especificada, mas ainda não implementada.
 
-### DEC-036 — `-nodx` é fallback explícito de inicialização gráfica
+### DEC-036 — Sample Page permanece menor que a Home
 
-O executável `RickUIBuilder.Samples` aceita `-nodx` e, quando o parâmetro é localizado, define `FMX.Types.GlobalUseDX := False` antes de `Application.Initialize`. Sem o parâmetro, o comportamento gráfico padrão do FireMonkey é preservado. A opção existe para execução em ambientes de acesso remoto nos quais a captura de superfícies DirectX pode ser problemática.
+A família de páginas de exemplos deve permanecer estritamente menor que a Home. No baseline atual, a Home usa referência de `644 × 534`; a implementação futura deve escolher dimensões inferiores a esses limites e tratar excesso de conteúdo dentro das regiões apropriadas, sem aumentar a janela acima da Home e sem reduzir tipografia para mascarar clipping.
+
+### DEC-037 — O textframe fixa a sequência estrutural da Sample Page
+
+O Design System pode fornecer tokens e componentes visuais, mas não pode alterar a ordem estrutural definida em `SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`: header/back → identidade da página → corpo dividido em navegação lateral e conteúdo → identificação do exemplo → seletor visual local → superfície de código → área de resultado executável. Mudança nessa sequência exige decisão documental explícita.
+
+### DEC-038 — Conteúdo e execução pertencem às páginas derivadas
+
+A Sample Page Base fornece apenas infraestrutura comum. A página derivada de cada componente/abordagem define categorias, exemplos, código Delphi apresentado e execução do resultado. A base não contém `case/if` por componente, catálogo global de exemplos nem regras específicas de Factory ou Fluent Builder.
+
+### DEC-039 — Back da Sample Page retorna à Component Page de origem
+
+O header da futura página de exemplos preserva o contexto do componente pai. Exemplo: `Button - Factory` exibe `Button` no header e o retorno encerra somente essa página, devolvendo o usuário à Component Page de Button; a Component Page continua responsável por retornar à Home.
+
+### DEC-040 — Cobertura de exemplos deriva da API pública real
+
+Quando uma página concreta de exemplos for implementada, sua cobertura deve ser levantada a partir da API pública real daquele componente e daquela abordagem no código vigente. Todas as funcionalidades públicas relevantes devem estar representadas por exemplos individuais ou compostos. A Sample Page Base não fixa antecipadamente categorias como `Básico`, `Estilo`, `Ícones` ou `Estados`; esses nomes pertencem às páginas concretas quando sustentados pela API real.
+
+### DEC-041 — Referência visual não autoriza comportamento não confirmado
+
+Elementos presentes no mockup preservam posição, hierarquia e intenção visual, mas comportamentos não confirmados não são inventados. Em especial, a faixa visual `Código Delphi` / `Resultado` é reservada na estrutura; sua semântica de alternância só será implementada quando houver requisito explícito ou confirmação durante a implementação da primeira página concreta.
 

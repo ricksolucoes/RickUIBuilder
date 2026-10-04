@@ -27,7 +27,7 @@ Nesta etapa não existem páginas de destino Factory/Fluent, samples demonstrati
 
 ## Arquitetura da família de páginas
 
-A infraestrutura comum reside em `RickUIBuilder.Samples.Component.Common.pas`. Os tokens de geometria e cor ficam em `RickUIBuilder.Samples.Component.Common.Style.pas`, e os paths vetoriais compartilhados ficam em `RickUIBuilder.Samples.Component.Common.Icons.pas`.
+A infraestrutura comum reside em `RickUIBuilder.Samples.Component.Common.pas`, com tokens visuais em `RickUIBuilder.Samples.Component.Common.Style` e SVGs compartilhados em `RickUIBuilder.Samples.Component.Common.Icons`.
 
 ```text
 TComponentCommon
@@ -137,7 +137,7 @@ O card único é centralizado. Não existe placeholder de Factory.
 
 ## Assets vetoriais
 
-Os paths da família de páginas ficam em `RickUIBuilder.Samples.Component.Common.Icons`. Dimensões, espaçamentos e cores compartilhados ficam em `RickUIBuilder.Samples.Component.Common.Style`.
+Os paths da família de páginas ficam em `RickUIBuilder.Samples.Component.Common.Icons`; dimensões, cores e espaçamentos específicos ficam em `RickUIBuilder.Samples.Component.Common.Style`.
 
 | Uso | Asset fornecido |
 |---|---|
@@ -279,6 +279,12 @@ A referência visual original mencionava `TButton`, mas a implementação real d
 │  └──────────────────────────────────────────────────────┘  │
 └────────────────────────────────────────────────────────────┘
 ```
+
+## Próxima camada planejada
+
+A ação `Ver exemplos` será conectada futuramente à camada de páginas de exemplos. Essa camada possui especificação própria em `SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md` e **não faz parte da implementação atual**.
+
+A Component Page continua tendo somente a responsabilidade de escolher a abordagem. Ela não deve absorver menu lateral, código Delphi, resultado executável ou qualquer sample real.
 
 ## Limites de responsabilidade
 

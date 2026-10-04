@@ -4,19 +4,21 @@
 
 A API pública possui Composition por meio de `TRickUIBuilder.On(AParent)`. A posição dessa abordagem nas páginas component-first ainda não foi implementada. Não adicionar a opção até existir decisão explícita de UX e mapeamento dos exemplos suportados.
 
-## Páginas de samples Factory e Fluent Builder
+## Sample Page Base e páginas de exemplos Factory/Fluent Builder
 
 As páginas intermediárias de `Text / Label`, `Button`, `Badge`, `Divider`, `ComboBox` e `Edit` já existem como páginas concretas herdadas de `TComponentCommon`.
 
-Elas apresentam somente a divisão entre as abordagens suportadas. As páginas posteriores que realmente conterão os samples de Factory e Fluent Builder **ainda não existem**.
+A próxima etapa possui agora uma especificação documental em `SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`, mas **nenhuma Sample Page Base ou página concreta de exemplos foi implementada ainda**.
 
-Quando essas páginas forem implementadas:
+A evolução prevista é deliberadamente faseada:
 
-- derivar os exemplos da API pública real naquele momento;
-- definir a navegação concreta a partir de `Ver exemplos`;
-- não reaproveitar callback vazio ou destino provisório;
-- manter cada componente responsável por seus próprios exemplos e controles;
-- revisar a documentação após a implementação final.
+1. implementar e validar somente a Sample Page Base;
+2. manter essa base sem conhecimento de componente ou abordagem específica;
+3. depois criar páginas derivadas concretas por componente/abordagem;
+4. em cada derivada, levantar a API pública vigente e cobrir suas funcionalidades com exemplos reais;
+5. somente após existir um destino concreto, conectar `Ver exemplos` da Component Page.
+
+A matriz atualmente esperada pela API conhecida é: Text / Label, Button, Badge, Divider e ComboBox com Factory + Fluent Builder; Edit apenas com Fluent Builder enquanto não existir `Factory.CreateEdit`. Essa matriz deve ser revalidada contra a API real no momento de cada implementação.
 
 ## `Ver exemplos`
 
