@@ -117,7 +117,7 @@ Textos técnicos da imagem não são copiados quando divergirem da implementaç�
 
 ### DEC-028 — `Ver exemplos` não possui destino fictício
 
-`Ver exemplos` representa a ação para abrir uma Sample Page de Factory ou Fluent Builder. A ação só recebe callback, `crHandPoint` e hit testing quando o destino correspondente realmente existe. No estado atual, `Text / Label → Factory` e `Text / Label → Fluent Builder` possuem destinos concretos; as abordagens dos demais componentes permanecem somente visuais até sua implementação.
+`Ver exemplos` representa a ação para abrir uma Sample Page de Factory ou Fluent Builder. A ação só recebe callback, `crHandPoint` e hit testing quando o destino correspondente realmente existe. No estado atual, `Text / Label → Factory`, `Text / Label → Fluent Builder` e `Button → Factory` possuem destinos concretos; Button Fluent Builder e as abordagens sem destino permanecem somente visuais até sua implementação.
 
 ### DEC-029 — Tipografia é preservada na Component Page
 
@@ -181,11 +181,11 @@ A implementação comum fica em `samples/src/Examples/Common`. `TExampleCommon` 
 
 ### DEC-044 — Text / Label - Factory é o primeiro sample concreto
 
-`TExampleTextLabelFactory` é a primeira derivada real de `TExampleCommon`. A implementação fica em `src/Examples/TextLabel` e separa coordenação da page (`Factory`), conteúdo/snippets (`Factory.Content`) e execução real (`Factory.Runner`). Os exemplos Básico, Geometria, Tipografia, Alinhamento e Completo cobrem `CreateText` e todos os campos públicos atuais de `TRickUIBuilderTextConfig`.
+`TExampleTextLabelFactory` é a primeira derivada real de `TExampleCommon`. A implementação fica em `src/Examples/TextLabel/Factory` e separa coordenação da page (`Factory`), conteúdo/snippets (`Factory.Content`) e execução real (`Factory.Runner`). Os exemplos Básico, Geometria, Tipografia, Alinhamento e Completo cobrem `CreateText` e todos os campos públicos atuais de `TRickUIBuilderTextConfig`.
 
 ### DEC-045 — Navegação só é habilitada para destino real e permanece coordenada fora da View
 
-`TComponentTextLabel` captura separadamente os cliques Factory e Fluent Builder e emite `OnFactoryExamples` / `OnFluentExamples`; não cria Sample Pages. `TSampleApplicationCoordinator` conecta os dois callbacks, cria `TExampleTextLabelFactory` ou `TExampleTextLabelFluent` sem Owner, executa `ShowModal` e libera a instância em `finally`. Cards dos demais componentes sem destino continuam sem callback e sem `HitTest`.
+`TComponentTextLabel` captura separadamente os cliques Factory e Fluent Builder e emite `OnFactoryExamples` / `OnFluentExamples`; `TComponentButton` emite somente `OnFactoryExamples`. Nenhuma Component Page cria Sample Pages. `TSampleApplicationCoordinator` conecta os callbacks que possuem destino real, cria `TExampleTextLabelFactory`, `TExampleTextLabelFluent` ou `TExampleButtonFactory` sem Owner, executa `ShowModal` e libera a instância em `finally`. Cards sem destino continuam sem callback e sem `HitTest`.
 
 ### DEC-046 — Dependências FMX de símbolos visuais devem ser explícitas
 
@@ -234,3 +234,12 @@ As units comuns de seletor, código e resultado usam os nomes físicos e declara
 ### DEC-056 — Exemplos `Completo` são exaustivos para a configuração pública
 
 Em cada abordagem concreta, o item `Completo` funciona como referência exaustiva da configuração pública atual. Em Factory, todo campo público do record de configuração usado pelo método deve ser atribuído explicitamente; para Text / Label isso significa todos os campos de `TRickUIBuilderTextConfig`. Em Fluent Builder, todos os métodos públicos configuráveis da interface devem ser chamados; records auxiliares usados na cadeia devem ter todas as opções/campos relevantes explicitados. Para `TRickUIBuilderSpacing`, Left, Top, Right e Bottom são informados por `Create`. Expansão futura da API invalida a cobertura até que snippet, Runner e documentação sejam atualizados.
+
+### DEC-057 — Button - Factory é o terceiro destino concreto da Sample Page
+
+`TExampleButtonFactory` herda de `TExampleCommon` e fica em `src/Examples/Button/Factory`, separando coordenação (`Factory`), conteúdo/snippets (`Factory.Content`) e execução (`Factory.Runner`). A página possui oito exemplos: Básico, Geometria, Cores, Tipografia, Identificação, Caption interno, Clique e Completo. O exemplo Clique configura `OnClick` no `TRectangle` retornado por `CreateButton` e altera sua cor como feedback real; `OnClick` não é tratado como campo de `TRickUIBuilderButtonConfig`.
+
+### DEC-058 — Examples concretos são organizados por componente e abordagem
+
+Páginas reais da terceira camada seguem `samples/src/Examples/<Componente>/<Abordagem>`. Text / Label mantém `Factory/` e `Fluent/`; Button possui somente `Factory/` nesta etapa. Diretórios de abordagem sem implementação não são criados. `Button - Factory` mantém o exemplo `Completo` exaustivo para os nove campos públicos de `TRickUIBuilderButtonConfig` e demonstra também as duas sobrecargas públicas de `CreateButton` ao longo da página.
+

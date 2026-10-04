@@ -2,11 +2,11 @@
 
 ## Status
 
-**Sample Page Base implementada e duas páginas concretas disponíveis: Text / Label - Factory e Text / Label - Fluent Builder.**
+**Sample Page Base implementada e três páginas concretas disponíveis: Text / Label - Factory, Text / Label - Fluent Builder e Button - Factory.**
 
 Este documento fixa a intenção visual, a sequência estrutural, os limites de responsabilidade e o comportamento da base das páginas de exemplos do `RickUIBuilder.Samples`.
 
-A implementação comum é coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A família é dividida por responsabilidade em units próprias para header, navegação, seletor de visualização, painel de código, painel de resultado, ícones e estilo. As derivadas reais atuais são `TExampleTextLabelFactory` e `TExampleTextLabelFluent`; os demais destinos permanecem futuros.
+A implementação comum é coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A família é dividida por responsabilidade em units próprias para header, navegação, seletor de visualização, painel de código, painel de resultado, ícones e estilo. As derivadas reais atuais são `TExampleTextLabelFactory`, `TExampleTextLabelFluent` e `TExampleButtonFactory`; os demais destinos permanecem futuros.
 
 ## Papel na navegação
 
@@ -33,7 +33,7 @@ Factory             Fluent Builder
        SAMPLE PAGE BASE
 ```
 
-A Component Page continua sendo somente o divisor entre abordagens. A Sample Page concreta é onde os samples reais são apresentados e executados; Text / Label possui hoje destinos concretos para Factory e Fluent Builder.
+A Component Page continua sendo somente o divisor entre abordagens. A Sample Page concreta é onde os samples reais são apresentados e executados; Text / Label possui Factory e Fluent Builder concretos, enquanto Button possui somente Factory concreto nesta etapa.
 
 ## Regra de tamanho
 
@@ -78,7 +78,7 @@ src/Examples/Common/
 
 Essa separação é estrutural e não cria regras específicas de componente. `TExampleCommon` coordena os controles acima; não reimplementa internamente header, navegação, seletor, painel de código ou painel de resultado.
 
-`RickUIBuilder.Samples.App.Types` fornece atualmente os enums compartilhados usados por esta camada: `TExampleView` representa a seleção `Código Delphi`/`Resultado`, `TTextLabelFactoryExample` identifica os exemplos de Text / Label - Factory e `TTextLabelFluentExample` identifica os exemplos de Text / Label - Fluent Builder. O seletor, a page concreta, o conteúdo e o Runner consomem esses tipos; `Factory.Content` mantém apenas textos/snippets e não declara o enum dos exemplos.
+`RickUIBuilder.Samples.App.Types` fornece atualmente os enums compartilhados usados por esta camada: `TExampleView` representa a seleção `Código Delphi`/`Resultado`, `TTextLabelFactoryExample` identifica Text / Label - Factory, `TTextLabelFluentExample` identifica Text / Label - Fluent Builder e `TButtonFactoryExample` identifica Button - Factory. O seletor, as pages concretas, Contents e Runners consomem esses tipos sem redeclará-los.
 
 A base implementada expõe pontos de extensão protegidos para as derivadas:
 
@@ -101,7 +101,7 @@ Esses pontos de extensão não materializam componente ou abordagem. `AddNavigat
 A primeira implementação derivada valida a base sem transformá-la em catálogo global:
 
 ```text
-src/Examples/TextLabel/
+src/Examples/TextLabel/Factory/
 ├── RickUIBuilder.Samples.Example.TextLabel.Factory.pas
 ├── RickUIBuilder.Samples.Example.TextLabel.Factory.Content.pas
 └── RickUIBuilder.Samples.Example.TextLabel.Factory.Runner.pas
@@ -132,7 +132,7 @@ Ao trocar a seleção, a page executa a sequência `SelectNavigationItem → Set
 A implementação Fluent reutiliza a mesma base e preserva a separação entre coordenação, conteúdo e execução:
 
 ```text
-src/Examples/TextLabel/
+src/Examples/TextLabel/Fluent/
 ├── RickUIBuilder.Samples.Example.TextLabel.Fluent.pas
 ├── RickUIBuilder.Samples.Example.TextLabel.Fluent.Content.pas
 └── RickUIBuilder.Samples.Example.TextLabel.Fluent.Runner.pas
@@ -151,7 +151,33 @@ Cobertura da API pública `TRickUIBuilder.Label_` / `IRickUIBuilderLabel`:
 | `Estado` | `Opacity`, `Visible`, `HitTest`, `Tag` |
 | `Completo` | todos os métodos públicos configuráveis de `IRickUIBuilderLabel`, incluindo `Build`; `Margin` e `Padding` usam `TRickUIBuilderSpacing.Create` com os quatro lados explícitos |
 
-O exemplo `Completo` é deliberadamente exaustivo. Para Factory, `Completo` continua atribuindo todos os campos públicos de `TRickUIBuilderTextConfig`; para Fluent Builder, chama todos os métodos públicos configuráveis de `IRickUIBuilderLabel`. Se a API ou um record público usado por esses exemplos ganhar nova opção configurável, o snippet, o Runner e esta matriz devem ser atualizados em conjunto.
+O exemplo `Completo` é deliberadamente exaustivo. Para Text / Label Factory, atribui todos os campos de `TRickUIBuilderTextConfig`; para Text / Label Fluent, chama todos os métodos configuráveis de `IRickUIBuilderLabel`; para Button Factory, atribui todos os nove campos de `TRickUIBuilderButtonConfig`. Se a API ou um record público usado por esses exemplos ganhar nova opção configurável, snippet, Runner e matriz devem ser atualizados em conjunto.
+
+## Página concreta — Button - Factory
+
+Button Factory segue a estrutura física por componente e abordagem:
+
+```text
+src/Examples/Button/Factory/
+├── RickUIBuilder.Samples.Example.Button.Factory.pas
+├── RickUIBuilder.Samples.Example.Button.Factory.Content.pas
+└── RickUIBuilder.Samples.Example.Button.Factory.Runner.pas
+```
+
+Cobertura da API pública `TRickUIBuilderFactory.CreateButton`:
+
+| Exemplo | Cobertura |
+|---|---|
+| `Básico` | overload simples, `ACaption` e `TRickUIBuilderButtonConfig.Default` |
+| `Geometria` | `Left`, `Top`, `Width`, `Height` |
+| `Cores` | `FillColor`, `BorderColor`, `TextColor` |
+| `Tipografia` | `FontSize` |
+| `Identificação` | `Tag` e leitura pelo `TRectangle` retornado |
+| `Caption interno` | overload com `out ATextLabel` e alteração pela referência non-owning |
+| `Clique` | `OnClick` configurado no `TRectangle` retornado; o clique muda a cor do próprio Button |
+| `Completo` | todos os nove campos públicos de `TRickUIBuilderButtonConfig` e overload com `out ATextLabel` |
+
+`OnClick` não é campo de `TRickUIBuilderButtonConfig`: o exemplo interativo demonstra a propriedade pública do `TRectangle` retornado pela Factory. O helper que recebe o evento é owned pelo próprio Button e é liberado com o resultado quando `ClearResult` substitui o sample.
 
 ## Textframe normativo da tela-base
 
@@ -325,7 +351,7 @@ Comportamento comum esperado:
 - permitir quantidade variável de itens;
 - quando a quantidade exceder a área disponível, a solução deve preservar a largura/posição da coluna e tratar o overflow sem aumentar a janela acima da Home.
 
-Cada página derivada é responsável por declarar quais categorias/exemplos existem. Text / Label - Factory usa atualmente Básico, Geometria, Tipografia, Alinhamento e Completo.
+Cada página derivada é responsável por declarar quais categorias/exemplos existem. Text / Label - Factory usa Básico, Geometria, Tipografia, Alinhamento e Completo; Button - Factory usa Básico, Geometria, Cores, Tipografia, Identificação, Caption interno, Clique e Completo.
 
 ## Conteúdo do exemplo
 
@@ -480,9 +506,9 @@ código mostrado = execução apresentada no Resultado
 
 Uma funcionalidade pode ser demonstrada isoladamente ou em exemplo composto quando isso tornar o uso mais claro, sem criar categorias artificiais apenas para aumentar a quantidade de exemplos.
 
-## Exemplo visual futuro — Button / Factory
+## Exemplo visual — Button / Factory
 
-Este textframe ilustra uma futura derivada sem declarar implementação atual:
+A derivada concreta Button - Factory utiliza as categorias levantadas da API pública real, não as categorias genéricas do mockup inicial:
 
 ```text
 ┌────────────────────────────────────────────────────────────────────┐
@@ -490,22 +516,21 @@ Este textframe ilustra uma futura derivada sem declarar implementação atual:
 ├────────────────────────────────────────────────────────────────────┤
 │                                                                    │
 │  Button - Factory                                                  │
-│  Exemplos de criação de botões usando a abordagem Factory.         │
+│  Criação direta de TRectangle + TLabel com CreateButton.           │
 │                                                                    │
 ├───────────────────┬────────────────────────────────────────────────┤
-│ Básico            │ Exemplo básico                                 │
-│ Estilo            │ Criação de um botão simples usando a Factory.  │
-│ Ícones            │                                                │
-│ Estados           │ [ Código Delphi ] [ Resultado ]                │
-│ Exemplos completos│                                                │
-│                   │ ┌────────────────────────────────────────────┐ │
-│                   │ │ código Delphi do exemplo                  │ │
-│                   │ │ (view Código Delphi ativa)                │ │
-│                   │ └────────────────────────────────────────────┘ │
+│ Básico            │ {título/descrição do exemplo selecionado}      │
+│ Geometria         │                                                │
+│ Cores             │ [ Código Delphi ] [ Resultado ]                │
+│ Tipografia        │                                                │
+│ Identificação     │ ┌────────────────────────────────────────────┐ │
+│ Caption interno   │ │ view ativa: código OU resultado           │ │
+│ Clique            │ └────────────────────────────────────────────┘ │
+│ Completo          │                                                │
 └───────────────────┴────────────────────────────────────────────────┘
 ```
 
-Os itens do menu são somente os fornecidos pela referência visual. Sua validade como cobertura da API de Button deverá ser verificada quando a página concreta for realmente implementada. Na view `Resultado`, esse mesmo espaço passa a exibir somente o título `Resultado` e a superfície executável, nunca simultaneamente ao código.
+O exemplo `Clique` é interativo: o Runner associa `OnClick` ao `TRectangle` retornado por `CreateButton`; ao clicar no Button da aba Resultado, sua cor muda para verde, tornando a execução observável sem atribuir `OnClick` ao record de configuração.
 
 ## Critérios de aderência da implementação da base
 
@@ -529,7 +554,7 @@ A implementação atual da base deve ser considerada aderente a esta especifica�
 
 Continuam fora do escopo até nova autorização:
 
-- páginas concretas `Button - Factory`, `Button - Fluent Builder` e equivalentes;
+- página concreta `Button - Fluent Builder` e demais destinos ainda não autorizados/implementados;
 - implementação dos menus definitivos dos destinos ainda não implementados;
 - snippets reais de API para destinos ainda não implementados;
 - criação/execução real dos controles dos samples ainda não implementados;

@@ -1,4 +1,5 @@
-﻿{******************************************************************************}
+﻿{ Esta unit implementa a Component Page de Button, habilitando somente o destino Factory realmente existente e mantendo Fluent Builder apenas visual até que sua Sample Page seja implementada. }
+{******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.Component.Button                                      }
 {                                                                              }
@@ -8,9 +9,9 @@
 {                                                                              }
 {  Funcionalidade                                                              }
 {  --------------                                                              }
-{  Define título, subtítulo, abordagens e texto informativo próprios.          }
-{  Apresenta Factory e Fluent Builder como divisões visuais para destinos      }
-{  futuros.                                                                    }
+{  Define título, subtítulo, informação e as abordagens Factory e Fluent       }
+{  Builder. Factory encaminha uma intenção de navegação quando o Coordinator   }
+{  conecta OnFactoryExamples; Fluent Builder permanece sem destino navegável.  }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
@@ -19,21 +20,28 @@
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
-{  - TSampleApplicationCoordinator seleciona esta classe para o componente     }
-{    correspondente e a exibe modalmente.                                      }
-{  - O retorno e o lifetime modal permanecem na classe-base e no Coordinator,  }
-{    respectivamente.                                                          }
+{  - O Coordinator cria esta page, conecta Factory e chama ShowModal.          }
+{  - O clique Factory é encaminhado ao callback externo; esta page não cria    }
+{    diretamente TExampleButtonFactory.                                        }
+{  - Fluent Builder continua somente visual enquanto não existir destino real. }
+{  - O retorno para a Home permanece implementado pela classe-base.            }
+{                                                                              }
+{  Ownership / lifetime                                                        }
+{  --------------------                                                        }
+{  - OnFactoryExamples é um evento non-owning para o Coordinator, cujo         }
+{    lifetime é superior durante a navegação.                                  }
+{  - A page não possui Coordinator nem a Sample Page de destino.               }
 {                                                                              }
 {  Restrições e responsabilidades                                              }
 {  -----------------------------                                               }
-{  - A página contém Factory e Fluent Builder, sem implementar seus destinos   }
-{    futuros.                                                                  }
-{  - Esta página não cria samples nem páginas de destino Factory/Fluent.       }
+{  - Não implementa os samples Factory; somente emite a intenção de navegação. }
+{  - Não habilita ou antecipa destino Fluent Builder nesta etapa.              }
+{  - Não conhece TExampleButtonFactory.                                        }
 {                                                                              }
 {  Manutenção                                                                  }
 {  ----------                                                                  }
-{  Este cabeçalho deve ser atualizado quando conteúdo, dependências, fluxo ou  }
-{  restrições desta unit mudarem.                                              }
+{  Atualizar este cabeçalho quando conteúdo, eventos, fluxo ou restrições      }
+{  desta page mudarem.                                                         }
 {                                                                              }
 {******************************************************************************}
 
@@ -48,9 +56,15 @@ uses
 type
   /// <summary>Página intermediária específica de Button.</summary>
   TComponentButton = class(TComponentCommon)
+  strict private
+    FOnFactoryExamples: TNotifyEvent;
+    procedure FactoryExamplesRequested(ASender: TObject);
   public
     /// <summary>Cria a página com o conteúdo específico de Button.</summary>
     constructor Create(AOwner: TComponent); override;
+    /// <summary>Intenção non-owning para abrir o destino Button - Factory.</summary>
+    property OnFactoryExamples: TNotifyEvent read FOnFactoryExamples
+      write FOnFactoryExamples;
   end;
 
 implementation
@@ -64,9 +78,15 @@ constructor TComponentButton.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   AddIdentity(_TITLE_, _SUBTITLE_);
-  AddFactoryApproach;
+  AddFactoryApproach(FactoryExamplesRequested);
   AddFluentApproach;
   AddInfoPanel(_INFO_);
+end;
+
+procedure TComponentButton.FactoryExamplesRequested(ASender: TObject);
+begin
+  if Assigned(FOnFactoryExamples) then
+    FOnFactoryExamples(ASender);
 end;
 
 end.

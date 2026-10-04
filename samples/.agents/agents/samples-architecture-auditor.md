@@ -36,14 +36,14 @@ Quando uma alteração arquitetural modificar responsabilidade, boundary, depend
 - Cada componente navegável deve possuir page concreta derivada da base quando essa arquitetura estiver vigente.
 - `Components` não deve depender de `RickUIBuilder.Samples.Home.Style`; reutilização compartilhada deve ocorrer somente por dependência realmente comum, como `App.Typography`.
 - O Coordinator pode resolver `TSampleComponent` para a classe concreta, mas não deve conter layout ou conteúdo visual.
-- Component Pages são intermediárias; destinos Factory/Fluent só podem existir quando houver requisito explícito e implementação real. `Text / Label → Factory` e `Text / Label → Fluent Builder` são os destinos concretos atuais.
+- Component Pages são intermediárias; destinos Factory/Fluent só podem existir quando houver requisito explícito e implementação real. `Text / Label → Factory`, `Text / Label → Fluent Builder` e `Button → Factory` são os destinos concretos atuais.
 - O retorno local da modal não deve introduzir Router, Presenter ou abstração artificial quando `Close` satisfizer o fluxo existente.
 
 ## Critérios específicos da Sample Page Base
 
 - `TExampleCommon` deve coordenar somente a infraestrutura comum da terceira camada; header/back, navegação lateral, seletor Código/Resultado, painel de código e painel de resultado devem permanecer nas units especializadas `.Header`, `.Navigation`, `.View.Selector`, `.Code.Panel` e `.Result.Panel`, sem reabsorção monolítica dessas responsabilidades.
 - A base não pode conhecer `TSampleComponent`, componente concreto, Factory/Fluent como regra específica, categorias fixas ou catálogo global de exemplos.
-- `src/Examples/Common` é permitido porque contém implementação comum real e coesa; cada helper deve possuir responsabilidade estrutural verificável, sem abstração cosmética. Diretórios futuros por componente/abordagem exigem páginas concretas reais.
+- `src/Examples/Common` é permitido porque contém implementação comum real e coesa; cada helper deve possuir responsabilidade estrutural verificável, sem abstração cosmética. Páginas concretas devem seguir `src/Examples/<Componente>/<Abordagem>` e diretórios futuros exigem implementação real.
 - A geometria da Sample Page deve permanecer estritamente menor que a Home e preservar a sequência definida em `SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`.
 - O retorno local pode usar `Close`; não introduzir Router/Presenter/Coordinator novo enquanto não houver navegação concreta que o justifique.
 - O seletor `Código Delphi` / `Resultado` deve manter exatamente uma view ativa, iniciar em Código Delphi e permanecer responsabilidade da infraestrutura comum; páginas concretas não devem duplicar a alternância.
@@ -53,6 +53,6 @@ Quando uma alteração arquitetural modificar responsabilidade, boundary, depend
 
 - A derivada deve herdar de `TExampleCommon` sem copiar header, sidebar, painel de código ou `ResultHost`.
 - Conteúdo de uma abordagem não pode contaminar `Examples/Common` nem páginas de outros componentes.
-- Quando a página acumular conteúdo textual e execução real, manter essas responsabilidades separadas em units coesas; para Text / Label, Factory usa `.Factory/.Factory.Content/.Factory.Runner` e Fluent Builder usa `.Fluent/.Fluent.Content/.Fluent.Runner`.
+- Quando a página acumular conteúdo textual e execução real, manter essas responsabilidades separadas em units coesas; Text / Label usa `Factory/` e `Fluent/`, e Button Factory usa `Button/Factory/`, preservando page, Content e Runner em cada abordagem.
 - Coordinator pode conhecer o destino concreto para navegação e lifetime, mas não snippets, configuração Factory ou controles de resultado.
 - Component Page deve emitir intenção/callback; não deve criar diretamente a Sample Page quando a arquitetura coordenada estiver vigente.

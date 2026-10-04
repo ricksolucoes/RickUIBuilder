@@ -346,12 +346,15 @@
         <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.Result.Panel.pas"/>
         <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.Icons.pas"/>
         <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.Style.pas"/>
-        <DCCReference Include="src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Factory.pas"/>
-        <DCCReference Include="src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Factory.Content.pas"/>
-        <DCCReference Include="src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Factory.Runner.pas"/>
-        <DCCReference Include="src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Fluent.pas"/>
-        <DCCReference Include="src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Fluent.Content.pas"/>
-        <DCCReference Include="src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Fluent.Runner.pas"/>
+        <DCCReference Include="src\Examples\Button\Factory\RickUIBuilder.Samples.Example.Button.Factory.pas"/>
+        <DCCReference Include="src\Examples\Button\Factory\RickUIBuilder.Samples.Example.Button.Factory.Content.pas"/>
+        <DCCReference Include="src\Examples\Button\Factory\RickUIBuilder.Samples.Example.Button.Factory.Runner.pas"/>
+        <DCCReference Include="src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.Content.pas"/>
+        <DCCReference Include="src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.pas"/>
+        <DCCReference Include="src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.Runner.pas"/>
+        <DCCReference Include="src\Examples\TextLabel\Fluent\RickUIBuilder.Samples.Example.TextLabel.Fluent.Content.pas"/>
+        <DCCReference Include="src\Examples\TextLabel\Fluent\RickUIBuilder.Samples.Example.TextLabel.Fluent.pas"/>
+        <DCCReference Include="src\Examples\TextLabel\Fluent\RickUIBuilder.Samples.Example.TextLabel.Fluent.Runner.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

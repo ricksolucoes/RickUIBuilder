@@ -1,11 +1,16 @@
-﻿{ Esta unit mantém o conteúdo didático dos exemplos Text / Label - Fluent Builder, associando cada TTextLabelFluentExample a caption, título, descrição e snippet comentado coerentes com a execução real e garantindo que o exemplo Completo exponha toda a API pública configurável de IRickUIBuilderLabel. }
-{******************************************************************************}
+﻿{******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.Example.TextLabel.Fluent.Content                      }
 {                                                                              }
+{ Esta unit mantém o conteúdo didático dos exemplos Text / Label - Fluent      }
+{ Builder, associando cada TTextLabelFluentExample a caption, título,          }
+{ descrição e snippet comentado coerentes com a execução real e garantindo     }
+{ que o exemplo Completo exponha toda a API pública configurável de            }
+{ IRickUIBuilderLabel.                                                         }
+{                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
-{  Centralizar exclusivamente o conteúdo textual dos exemplos Fluent Builder  }
+{  Centralizar exclusivamente o conteúdo textual dos exemplos Fluent Builder   }
 {  de Text / Label exibidos pela página concreta do Samples.                   }
 {                                                                              }
 {  Funcionalidade                                                              }

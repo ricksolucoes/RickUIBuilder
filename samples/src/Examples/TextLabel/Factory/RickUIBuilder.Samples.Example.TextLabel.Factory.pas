@@ -1,5 +1,4 @@
-﻿{ Esta unit coordena a página concreta Text / Label - Factory, criando a navegação dos cinco TTextLabelFactoryExample compartilhados, sincronizando conteúdo/snippet e delegando ao Runner a materialização do resultado no ResultHost. }
-{******************************************************************************}
+﻿{******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.Example.TextLabel.Factory                             }
 {                                                                              }
@@ -7,6 +6,11 @@
 {  ----------                                                                  }
 {  Implementar a primeira página concreta de exemplos do Samples:              }
 {  Text / Label usando a abordagem Factory.                                    }
+{                                                                              }
+{ Esta unit coordena a página concreta Text / Label - Factory, criando a       }
+{ navegação dos cinco TTextLabelFactoryExample compartilhados, sincronizando   }
+{ conteúdo/snippet e delegando ao Runner a materialização do resultado no      }
+{ ResultHost.                                                                  }
 {                                                                              }
 {  Funcionalidade                                                              }
 {  --------------                                                              }

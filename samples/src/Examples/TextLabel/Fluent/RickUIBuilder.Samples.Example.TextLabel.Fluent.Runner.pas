@@ -1,7 +1,11 @@
-﻿{ Esta unit executa os exemplos Text / Label - Fluent Builder no ResultHost usando exclusivamente a API pública TRickUIBuilder.Label_; o exemplo Completo chama todos os métodos configuráveis de IRickUIBuilderLabel e utiliza os quatro lados de cada TRickUIBuilderSpacing empregado. }
-{******************************************************************************}
+﻿{******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.Example.TextLabel.Fluent.Runner                       }
+{                                                                              }
+{ Esta unit executa os exemplos Text / Label - Fluent Builder no ResultHost    }
+{ usando exclusivamente a API pública TRickUIBuilder.Label_; o exemplo         }
+{ Completo chama todos os métodos configuráveis de IRickUIBuilderLabel e       }
+{ utiliza os quatro lados de cada TRickUIBuilderSpacing empregado.             }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }

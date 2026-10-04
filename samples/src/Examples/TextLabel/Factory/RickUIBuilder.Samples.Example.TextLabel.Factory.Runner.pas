@@ -1,7 +1,10 @@
-﻿{ Esta unit executa os exemplos Text / Label - Factory no ResultHost via TRickUIBuilderFactory.CreateText, mantendo o exemplo Completo sincronizado com todos os campos públicos de TRickUIBuilderTextConfig. }
-{******************************************************************************}
+﻿{******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.Example.TextLabel.Factory.Runner                      }
+{                                                                              }
+{ Esta unit executa os exemplos Text / Label - Factory no ResultHost via       }
+{ TRickUIBuilderFactory.CreateText, mantendo o exemplo Completo sincronizado   }
+{ com todos os campos públicos de TRickUIBuilderTextConfig.                    }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }

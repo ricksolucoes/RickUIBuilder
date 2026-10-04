@@ -44,7 +44,7 @@ Quando a tarefa criar ou alterar qualquer unit de `src/Examples/Common`, exigir 
 
 ## Regra específica para páginas concretas de Examples
 
-Quando uma tarefa implementar `src/Examples/<Componente>`, exigir Architecture, Delphi Code, Documentation, Naming, Toxicity, Contract & Lifetime quando o `ResultHost`/ownership for utilizado e Build Validation quando `.dpr`/`.dproj` mudarem. Verificar cobertura da API pública da abordagem, sincronismo entre snippet e execução, `ClearResult` antes da nova materialização, ausência de catálogo global e separação proporcional entre page, conteúdo e execução. Quando existir exemplo `Completo`, exigir cobertura exaustiva: todos os métodos públicos configuráveis da abordagem e todos os campos/opções públicos dos records de configuração utilizados devem aparecer explicitamente; para `TRickUIBuilderSpacing`, os quatro lados devem ser informados.
+Quando uma tarefa implementar `src/Examples/<Componente>/<Abordagem>`, exigir Architecture, Delphi Code, Documentation, Naming, Toxicity, Contract & Lifetime quando o `ResultHost`/ownership for utilizado e Build Validation quando `.dpr`/`.dproj` mudarem. Verificar cobertura da API pública da abordagem, sincronismo entre snippet e execução, `ClearResult` antes da nova materialização, ausência de catálogo global e separação proporcional entre page, conteúdo e execução. Quando existir exemplo `Completo`, exigir cobertura exaustiva: todos os métodos públicos configuráveis da abordagem e todos os campos/opções públicos dos records de configuração utilizados devem aparecer explicitamente; para `TRickUIBuilderSpacing`, os quatro lados devem ser informados.
 
 ## Dependências FMX obrigatórias
 

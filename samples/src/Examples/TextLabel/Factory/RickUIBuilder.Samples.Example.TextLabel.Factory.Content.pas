@@ -1,8 +1,12 @@
-﻿{ Esta unit mantém o conteúdo didático dos exemplos Text / Label - Factory, associando cada TTextLabelFactoryExample a caption, título, descrição e snippet coerentes com a execução real e mantendo o exemplo Completo com todos os campos públicos de TRickUIBuilderTextConfig. }
-{******************************************************************************}
+﻿{******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.Example.TextLabel.Factory.Content                     }
 {                                                                              }
+{ Esta unit mantém o conteúdo didático dos exemplos Text / Label - Factory,    }
+{ associando cada TTextLabelFactoryExample a caption, título, descrição e      }
+{ snippet coerentes com a execução real e mantendo o exemplo Completo com      }
+{ todos os campos públicos de TRickUIBuilderTextConfig.                        }
+{                                                                               }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
 {  Centralizar exclusivamente o conteúdo textual dos exemplos Factory de       }
@@ -10,7 +14,7 @@
 {                                                                              }
 {  Funcionalidade                                                              }
 {  --------------                                                              }
-{  Associa cada TTextLabelFactoryExample a caption de navegação, título,        }
+{  Associa cada TTextLabelFactoryExample a caption de navegação, título,       }
 {  descrição e snippet Delphi. Cada snippet começa com comentários curtos em   }
 {  `//` que explicam a intenção e indicam que o controle materializado deve    }
 {  ser conferido na aba Resultado, evitando documentação extensa que force     }

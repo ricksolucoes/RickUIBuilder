@@ -8,7 +8,7 @@ Este documento descreve a página intermediária de componente e suas seis imple
 
 ## Papel da página
 
-A Component Page é o ponto intermediário entre a Home e as páginas de samples de cada abordagem. No estado atual, Text / Label possui destinos concretos para Factory e Fluent Builder.
+A Component Page é o ponto intermediário entre a Home e as páginas de samples de cada abordagem. No estado atual, Text / Label possui destinos concretos para Factory e Fluent Builder, e Button possui destino concreto para Factory.
 
 ```text
 Home
@@ -18,6 +18,7 @@ Component Page do componente
   │
   ├── Factory
   │      ├── Text / Label → TExampleTextLabelFactory [implementado]
+  │      ├── Button → TExampleButtonFactory [implementado]
   │      └── demais componentes → futuro
   │
   └── Fluent Builder
@@ -25,7 +26,7 @@ Component Page do componente
          └── demais componentes → futuro
 ```
 
-Callbacks só existem quando há destino real. `Text / Label → Factory` e `Text / Label → Fluent Builder` navegam para suas Sample Pages concretas; as abordagens dos demais componentes permanecem somente visuais.
+Callbacks só existem quando há destino real. `Text / Label → Factory`, `Text / Label → Fluent Builder` e `Button → Factory` navegam para suas Sample Pages concretas; Button Fluent Builder e as demais abordagens sem destino permanecem somente visuais.
 
 ## Arquitetura da família de páginas
 
@@ -135,7 +136,7 @@ Quando somente Fluent Builder existe, como no Edit:
 
 O card único é centralizado. Não existe placeholder de Factory.
 
-`Ver exemplos` permanece com `HitTest := False` e sem callback enquanto o destino real não existir. Quando existe destino, como nas duas abordagens de Text / Label, a ação recebe `HitTest := True`, `crHandPoint` e callback real.
+`Ver exemplos` permanece com `HitTest := False` e sem callback enquanto o destino real não existir. Quando existe destino, como nas duas abordagens de Text / Label e em Button Factory, a ação recebe `HitTest := True`, `crHandPoint` e callback real.
 
 ## Assets vetoriais
 
@@ -219,7 +220,7 @@ A geometria deve acomodar essa escala. Não reduzir fonte para mascarar clipping
 
 **Sobre:** `Button é composto por TRectangle + TLabel. A Factory materializa a estrutura visual e o Fluent Builder acrescenta configuração e comportamento de hover.`
 
-A referência visual original mencionava `TButton`, mas a implementação real do Rick.UIBuilder materializa o Button como `TRectangle + TLabel`; a página preserva a verdade técnica do código.
+A referência visual original mencionava `TButton`, mas a implementação real do Rick.UIBuilder materializa o Button como `TRectangle + TLabel`; a página preserva a verdade técnica do código. Nesta etapa, somente o card Factory possui callback real para `TExampleButtonFactory`; Fluent Builder permanece visual sem destino.
 
 ### Badge
 
@@ -284,7 +285,7 @@ A referência visual original mencionava `TButton`, mas a implementação real d
 
 ## Próxima camada planejada
 
-A ação `Ver exemplos` é conectada individualmente apenas a destinos reais. `Text / Label → Factory` já abre `TExampleTextLabelFactory`; os demais destinos continuam futuros. A terceira camada é especificada em `SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`.
+A ação `Ver exemplos` é conectada individualmente apenas a destinos reais. Text / Label abre Factory e Fluent Builder; Button abre somente `TExampleButtonFactory`. Button Fluent Builder e os destinos ainda não implementados permanecem sem callback. A terceira camada é especificada em `SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`.
 
 A Component Page continua tendo somente a responsabilidade de escolher a abordagem. Ela não deve absorver menu lateral, código Delphi, resultado executável ou qualquer sample real.
 
@@ -304,7 +305,7 @@ A Component Page continua tendo somente a responsabilidade de escolher a abordag
 - arrays com conteúdo dos seis componentes;
 - regra específica `Edit não possui Factory`;
 - páginas Factory/Fluent ainda não implementadas;
-- novos samples além de Text / Label - Factory.
+- samples concretos pertencentes à terceira camada, incluindo Text / Label e Button Factory.
 
 Cada página concreta pode conhecer somente o conteúdo e as abordagens do seu próprio componente.
 
@@ -324,4 +325,4 @@ A implementação deve manter simultaneamente:
 - uma unit concreta por componente herdando de `TComponentCommon`;
 - `.dpr` e `.dproj` contendo explicitamente todas as units;
 - nenhum `samples/src` no Search Path;
-- nenhum callback habilitado para destino inexistente; Text / Label possui navegação concreta para Factory e Fluent Builder nesta etapa.
+- nenhum callback habilitado para destino inexistente; Text / Label possui Factory/Fluent concretos e Button possui somente Factory concreto nesta etapa.

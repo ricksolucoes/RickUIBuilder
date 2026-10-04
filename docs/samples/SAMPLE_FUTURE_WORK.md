@@ -8,9 +8,9 @@ A API pública possui Composition por meio de `TRickUIBuilder.On(AParent)`. A po
 
 As páginas intermediárias de `Text / Label`, `Button`, `Badge`, `Divider`, `ComboBox` e `Edit` já existem como páginas concretas herdadas de `TComponentCommon`.
 
-A Sample Page Base já está implementada e coordenada por `RickUIBuilder.Samples.Example.Common` (`TExampleCommon`). Header, navegação, seletor Código/Resultado, painel de código e painel de resultado ficam separados em `.Header`, `.Navigation`, `.View.Selector`, `.Code.Panel` e `.Result.Panel`; tokens permanecem em `.Style` e o vetor comum de retorno em `.Icons`. O seletor já alterna funcionalmente views mutuamente exclusivas, iniciando em `Código Delphi`. **Text / Label - Factory e Text / Label - Fluent Builder estão implementadas**; os destinos dos demais componentes continuam futuros.
+A Sample Page Base já está implementada e coordenada por `RickUIBuilder.Samples.Example.Common` (`TExampleCommon`). Header, navegação, seletor Código/Resultado, painel de código e painel de resultado ficam separados em `.Header`, `.Navigation`, `.View.Selector`, `.Code.Panel` e `.Result.Panel`; tokens permanecem em `.Style` e o vetor comum de retorno em `.Icons`. O seletor já alterna funcionalmente views mutuamente exclusivas, iniciando em `Código Delphi`. **Text / Label - Factory, Text / Label - Fluent Builder e Button - Factory estão implementadas**; Button Fluent Builder e os destinos ainda não materializados dos demais componentes continuam futuros.
 
-Os enums atualmente compartilhados pela terceira camada ficam em `RickUIBuilder.Samples.App.Types`: `TExampleView` para a view ativa, `TTextLabelFactoryExample` para Text / Label - Factory e `TTextLabelFluentExample` para Text / Label - Fluent Builder. Essa localização descreve o código vigente e deve ser revista somente se a arquitetura real mudar.
+Os enums atualmente compartilhados pela terceira camada ficam em `RickUIBuilder.Samples.App.Types`: `TExampleView` para a view ativa, `TTextLabelFactoryExample` para Text / Label - Factory, `TTextLabelFluentExample` para Text / Label - Fluent Builder e `TButtonFactoryExample` para Button - Factory. Essa localização descreve o código vigente e deve ser revista somente se a arquitetura real mudar.
 
 A evolução restante é deliberadamente faseada:
 
@@ -24,7 +24,7 @@ A matriz atualmente esperada pela API conhecida é: Text / Label, Button, Badge,
 
 ## `Ver exemplos`
 
-Na implementação atual, `Text / Label → Factory` e `Text / Label → Fluent Builder` possuem destinos reais e ações clicáveis. Todo `Ver exemplos` sem destino permanece visual com `HitTest := False`, evitando comunicar navegação inexistente como funcionalidade pronta.
+Na implementação atual, `Text / Label → Factory`, `Text / Label → Fluent Builder` e `Button → Factory` possuem destinos reais e ações clicáveis. Button Fluent Builder permanece visual sem callback. Todo `Ver exemplos` sem destino continua com `HitTest := False`, evitando comunicar navegação inexistente como funcionalidade pronta.
 
 A interatividade deve ser habilitada somente quando a página de destino correspondente existir.
 
@@ -36,10 +36,10 @@ Se a API mudar, revisar novamente o contrato público antes de alterar o Samples
 
 ## Samples reais por componente
 
-Os controles e demonstrações reais pertencem às páginas concretas Factory/Fluent Builder, e não às Component Pages intermediárias. `Text / Label - Factory` e `Text / Label - Fluent Builder` já materializam resultados reais; os demais componentes/abordagens continuam futuros.
+Os controles e demonstrações reais pertencem às páginas concretas Factory/Fluent Builder, e não às Component Pages intermediárias. `Text / Label - Factory`, `Text / Label - Fluent Builder` e `Button - Factory` já materializam resultados reais; Button Fluent Builder e os destinos sem implementação continuam futuros.
 
 Nenhum sample real deve ser adicionado à `TComponentCommon` ou `TExampleCommon`: conteúdo e execução permanecem nas derivadas concretas.
 
 ## Testes do Samples
 
-Não existem testes automatizados específicos do projeto `samples/` nesta etapa. Como a navegação Text / Label → Factory/Fluent Builder e a substituição de resultados já foram implementadas, permanece como trabalho futuro avaliar testes do Coordinator, da seleção de exemplos e das regras de navegação sem acoplamento desnecessário a controles FMX.
+Não existem testes automatizados específicos do projeto `samples/` nesta etapa. Como a navegação Text / Label → Factory/Fluent Builder e Button → Factory, inclusive o clique interativo, já foram implementadas, permanece como trabalho futuro avaliar testes do Coordinator, da seleção de exemplos e das regras de navegação sem acoplamento desnecessário a controles FMX.

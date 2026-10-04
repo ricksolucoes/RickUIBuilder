@@ -1,16 +1,19 @@
-﻿{ Esta unit coordena o fluxo e o lifetime das páginas modais do Samples, resolve a Component Page concreta e conecta os dois destinos reais de Text / Label: Factory e Fluent Builder. }
-{******************************************************************************}
+﻿{******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.App.Coordinator                                       }
 {                                                                              }
+{ Esta unit coordena o fluxo e o lifetime das páginas modais do Samples,       }
+{ conectando os destinos reais de Text / Label e o novo destino                }
+{ Button - Factory sem habilitar abordagens ainda não implementadas.           }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
 {  Coordenar o fluxo global e o lifetime das páginas modais do Samples.        }
 {                                                                              }
 {  Funcionalidade                                                              }
 {  --------------                                                              }
-{  Encerra a aplicação, resolve a Component Page concreta e, para Text / Label,}
-{  conecta as intenções Factory e Fluent aos destinos concretos existentes.    }
+{  Encerra a aplicação, resolve a Component Page concreta e conecta somente    }
+{  intenções que possuem Sample Pages reais: Text / Label Factory/Fluent e     }
+{  Button Factory.                                                             }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
@@ -24,26 +27,29 @@
 {      Fornece o destino concreto Text / Label - Factory.                      }
 {  - RickUIBuilder.Samples.Example.TextLabel.Fluent                            }
 {      Fornece o destino concreto Text / Label - Fluent Builder.               }
+{  - RickUIBuilder.Samples.Example.Button.Factory                              }
+{      Fornece o destino concreto Button - Factory.                            }
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
 {  - Home/Presenter solicitam OpenComponent.                                   }
 {  - OpenComponent cria a Component Page, conecta intenções disponíveis e      }
 {    aguarda ShowModal.                                                        }
-{  - Os callbacks de Text / Label abrem a Sample Page correspondente modal.    }
-{  - Ao fechar a Sample Page, a Component Page de Text / Label volta a ativa.  }
+{  - Os callbacks abrem somente Sample Pages concretas existentes.             }
+{  - Ao fechar a Sample Page, a Component Page correspondente volta a ativa.   }
 {                                                                              }
 {  Ownership / lifetime                                                        }
 {  --------------------                                                        }
 {  - Component Pages e Sample Pages são criadas sem Owner.                     }
 {  - O Coordinator libera cada instância em bloco finally após ShowModal.      }
-{  - Os callbacks armazenados pela Component Page são non-owning; o            }
+{  - Os callbacks armazenados pelas Component Pages são non-owning; o          }
 {    Coordinator possui lifetime superior durante toda a navegação.            }
 {                                                                              }
 {  Restrições e responsabilidades                                              }
 {  -----------------------------                                               }
 {  - Não contém controles, snippets ou regras visuais das pages.               }
 {  - Só conhece destinos que realmente existem no código final.               }
+{  - Button Fluent Builder permanece sem callback nesta etapa.                 }
 {  - Não executa Factory/Fluent; somente coordena a navegação.                 }
 {                                                                              }
 {  Manutenção                                                                  }
@@ -68,8 +74,10 @@ type
       const APage: TObject);
     procedure TextLabelFactoryRequested(ASender: TObject);
     procedure TextLabelFluentRequested(ASender: TObject);
+    procedure ButtonFactoryRequested(ASender: TObject);
     procedure OpenTextLabelFactory;
     procedure OpenTextLabelFluent;
+    procedure OpenButtonFactory;
   public
     /// <summary>Encerra o loop principal da aplicação.</summary>
     function Close: TSampleApplicationCoordinator;
@@ -88,6 +96,7 @@ uses
   RickUIBuilder.Samples.Component.Divider,
   RickUIBuilder.Samples.Component.ComboBox,
   RickUIBuilder.Samples.Component.TextLabel,
+  RickUIBuilder.Samples.Example.Button.Factory,
   RickUIBuilder.Samples.Example.TextLabel.Factory,
   RickUIBuilder.Samples.Example.TextLabel.Fluent;
 
@@ -124,10 +133,15 @@ end;
 procedure TSampleApplicationCoordinator.ConfigureComponentPage(
   const AComponent: TSampleComponent; const APage: TObject);
 begin
-  if AComponent <> TSampleComponent.TextLabel then
-    Exit;
-  TComponentTextLabel(APage).OnFactoryExamples := TextLabelFactoryRequested;
-  TComponentTextLabel(APage).OnFluentExamples := TextLabelFluentRequested;
+  case AComponent of
+    TSampleComponent.TextLabel:
+      begin
+        TComponentTextLabel(APage).OnFactoryExamples := TextLabelFactoryRequested;
+        TComponentTextLabel(APage).OnFluentExamples := TextLabelFluentRequested;
+      end;
+    TSampleComponent.Button:
+      TComponentButton(APage).OnFactoryExamples := ButtonFactoryRequested;
+  end;
 end;
 
 procedure TSampleApplicationCoordinator.TextLabelFactoryRequested(
@@ -140,6 +154,12 @@ procedure TSampleApplicationCoordinator.TextLabelFluentRequested(
   ASender: TObject);
 begin
   OpenTextLabelFluent;
+end;
+
+procedure TSampleApplicationCoordinator.ButtonFactoryRequested(
+  ASender: TObject);
+begin
+  OpenButtonFactory;
 end;
 
 procedure TSampleApplicationCoordinator.OpenTextLabelFactory;
@@ -159,6 +179,18 @@ var
   LPage: TExampleTextLabelFluent;
 begin
   LPage := TExampleTextLabelFluent.Create(nil);
+  try
+    LPage.ShowModal;
+  finally
+    LPage.Free;
+  end;
+end;
+
+procedure TSampleApplicationCoordinator.OpenButtonFactory;
+var
+  LPage: TExampleButtonFactory;
+begin
+  LPage := TExampleButtonFactory.Create(nil);
   try
     LPage.ShowModal;
   finally

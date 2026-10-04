@@ -41,9 +41,12 @@
 {      Contém a base visual e os controles estruturais comuns de header,       }
 {      navegação, código e resultado, além de ícones e tokens visuais.         }
 {                                                                              }
-{  - src\Examples\TextLabel                                                  }
+{  - src\Examples\TextLabel\<Abordagem>                                      }
 {      Contém as páginas concretas Text / Label - Factory e Fluent Builder,    }
-{      além de conteúdo e execução específicos de cada abordagem.              }
+{      separadas fisicamente por abordagem.                                    }
+{                                                                              }
+{  - src\Examples\Button\Factory                                             }
+{      Contém a página concreta Button - Factory, seu conteúdo e Runner.        }
 {                                                                              }
 {  Dependências principais                                                     }
 {  -----------------------                                                     }
@@ -143,12 +146,15 @@ uses
   RickUIBuilder.Samples.Example.Common.Result.Panel in 'src\Examples\Common\RickUIBuilder.Samples.Example.Common.Result.Panel.pas',
   RickUIBuilder.Samples.Example.Common.Icons in 'src\Examples\Common\RickUIBuilder.Samples.Example.Common.Icons.pas',
   RickUIBuilder.Samples.Example.Common.Style in 'src\Examples\Common\RickUIBuilder.Samples.Example.Common.Style.pas',
-  RickUIBuilder.Samples.Example.TextLabel.Factory in 'src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Factory.pas',
-  RickUIBuilder.Samples.Example.TextLabel.Factory.Content in 'src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Factory.Content.pas',
-  RickUIBuilder.Samples.Example.TextLabel.Factory.Runner in 'src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Factory.Runner.pas',
-  RickUIBuilder.Samples.Example.TextLabel.Fluent in 'src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Fluent.pas',
-  RickUIBuilder.Samples.Example.TextLabel.Fluent.Content in 'src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Fluent.Content.pas',
-  RickUIBuilder.Samples.Example.TextLabel.Fluent.Runner in 'src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Fluent.Runner.pas';
+  RickUIBuilder.Samples.Example.Button.Factory in 'src\Examples\Button\Factory\RickUIBuilder.Samples.Example.Button.Factory.pas',
+  RickUIBuilder.Samples.Example.Button.Factory.Content in 'src\Examples\Button\Factory\RickUIBuilder.Samples.Example.Button.Factory.Content.pas',
+  RickUIBuilder.Samples.Example.Button.Factory.Runner in 'src\Examples\Button\Factory\RickUIBuilder.Samples.Example.Button.Factory.Runner.pas',
+  RickUIBuilder.Samples.Example.TextLabel.Factory.Content in 'src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.Content.pas',
+  RickUIBuilder.Samples.Example.TextLabel.Factory in 'src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.pas',
+  RickUIBuilder.Samples.Example.TextLabel.Factory.Runner in 'src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.Runner.pas',
+  RickUIBuilder.Samples.Example.TextLabel.Fluent.Content in 'src\Examples\TextLabel\Fluent\RickUIBuilder.Samples.Example.TextLabel.Fluent.Content.pas',
+  RickUIBuilder.Samples.Example.TextLabel.Fluent in 'src\Examples\TextLabel\Fluent\RickUIBuilder.Samples.Example.TextLabel.Fluent.pas',
+  RickUIBuilder.Samples.Example.TextLabel.Fluent.Runner in 'src\Examples\TextLabel\Fluent\RickUIBuilder.Samples.Example.TextLabel.Fluent.Runner.pas';
 
 {$R *.res}
 

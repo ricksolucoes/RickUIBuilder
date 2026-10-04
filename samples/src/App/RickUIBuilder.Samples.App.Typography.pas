@@ -1,25 +1,37 @@
-﻿(******************************************************************************
-  Unit: RickUIBuilder.Samples.App.Typography
+﻿{******************************************************************************}
+{                                                                              }
+{ RickUIBuilder.Samples.App.Typography                                         }
+{                                                                              }
+{ Finalidade                                                                   }
+{ ----------                                                                   }
+{ Escala tipográfica semântica compartilhada pelo Samples.                     }
+{                                                                              }
+{ Funcionalidade                                                               }
+{ --------------                                                               }
+{ Centraliza tamanhos de fonte reutilizados por páginas e componentes visuais  }
+{ do Samples.                                                                  }
+{                                                                              }
+{ Dependências do projeto                                                      }
+{ -----------------------                                                      }
+{ - Não possui dependências internas do projeto.                               }
+{                                                                              }
+{ Fluxo / colaboração                                                          }
+{ -------------------                                                          }
+{ - Units visuais consomem os tokens pelo papel semântico: título, subtítulo,  }
+{   card, body, ação e navegação.                                              }
+{                                                                              }
+{ Restrições e responsabilidades                                               }
+{ -----------------------------                                                }
+{ - Geometria específica de uma página não pertence a esta unit.               }
+{ - Não reduzir tokens para compensar falta de espaço em layouts.              }
+{                                                                              }
+{ Manutenção                                                                   }
+{ ----------                                                                   }
+{ Este cabeçalho deve ser atualizado quando responsabilidade, dependências,    }
+{ fluxo, ownership/lifetime ou restrições desta unit mudarem.                  }
+{                                                                              }
+{******************************************************************************}
 
-  FINALIDADE
-  Escala tipográfica semântica compartilhada pelo Samples.
-
-  FUNCIONALIDADE
-  Centraliza tamanhos de fonte reutilizados por páginas e componentes visuais do Samples.
-
-  DEPENDÊNCIAS DO PROJETO
-  - Não possui dependências internas do projeto.
-
-  FLUXO / COLABORAÇÃO
-  - Units visuais consomem os tokens pelo papel semântico: título, subtítulo, card, body, ação e navegação.
-
-  RESTRIÇÕES E RESPONSABILIDADES
-  - Geometria específica de uma página não pertence a esta unit.
-  - Não reduzir tokens para compensar falta de espaço em layouts.
-
-  Manutenção: este cabeçalho deve ser atualizado quando responsabilidade,
-  dependências, fluxo, ownership/lifetime ou restrições desta unit mudarem.
-******************************************************************************)
 unit RickUIBuilder.Samples.App.Typography;
 
 interface
