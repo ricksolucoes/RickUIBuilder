@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="100 145 1045 1005" role="img" aria-label="RickSoluções R logo" fill="none">
+  <!-- Upper ribbon / bowl -->
+  <path d="M116 160H866C1018 160 1128 278 1128 444C1128 610 1017 716 887 754H623L438 574H829C911 574 960 528 960 455C960 384 910 329 829 329H267Z" fill="#ECECEC"/>
+
+  <!-- Upper lower-face facet -->
+  <path d="M438 574H829C911 574 960 528 960 455C960 509 938 566 892 622C850 673 803 708 742 724H623Z" fill="#E3E3E3"/>
+
+  <!-- Left stem -->
+  <path d="M213 393L437 579V1133H286C245 1133 213 1101 213 1060Z" fill="#ECECEC"/>
+
+  <!-- Left stem facet -->
+  <path d="M213 393L437 579V920L213 1097Z" fill="#E4E4E4"/>
+
+  <!-- Diagonal leg -->
+  <path d="M443 766H783L1118 1133H775Z" fill="#ECECEC"/>
+
+  <!-- Diagonal leg facet -->
+  <path d="M443 766H596L936 1133H775Z" fill="#E2E2E2"/>
+
+  <!-- Subtle edge lines preserved from the source appearance -->
+  <path d="M116 160H866C1018 160 1128 278 1128 444C1128 610 1017 716 887 754" stroke="#F7F7F7" stroke-opacity="0.9" stroke-width="2" vector-effect="non-scaling-stroke"/>
+  <path d="M213 393L437 579V1133H286C245 1133 213 1101 213 1060" stroke="#F7F7F7" stroke-opacity="0.75" stroke-width="2" vector-effect="non-scaling-stroke"/>
+  <path d="M443 766H783L1118 1133" stroke="#F7F7F7" stroke-opacity="0.75" stroke-width="2" vector-effect="non-scaling-stroke"/>
+</svg>

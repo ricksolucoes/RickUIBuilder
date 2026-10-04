@@ -1,10 +1,11 @@
-﻿{******************************************************************************}
+﻿{ Esta unit implementa o seletor reutilizável Código Delphi/Resultado da Sample Page Base, mantendo uma única TExampleView ativa e notificando TExampleCommon quando o usuário alterna a visualização. }
+{******************************************************************************}
 {                                                                              }
-{  RickUIBuilder.Samples.Example.Common.ViewSelector                          }
+{  RickUIBuilder.Samples.Example.Common.View.Selector                          }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
-{  Encapsular o seletor reutilizável entre Código Delphi e Resultado da       }
+{  Encapsular o seletor reutilizável entre Código Delphi e Resultado da        }
 {  Sample Page Base.                                                           }
 {                                                                              }
 {  Funcionalidade                                                              }
@@ -14,6 +15,8 @@
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
+{  - RickUIBuilder.Samples.App.Types                                           }
+{      Fornece TExampleView, estado compartilhado da seleção Código/Resultado. }
 {  - RickUIBuilder.Samples.App.Typography                                      }
 {      Fornece o token tipográfico das opções do seletor.                      }
 {  - RickUIBuilder.Samples.Example.Common.Style                                }
@@ -37,8 +40,8 @@
 {                                                                              }
 {  Manutenção                                                                  }
 {  ----------                                                                  }
-{  Este cabeçalho deve ser atualizado quando responsabilidade, dependências,   }
-{  fluxo ou restrições desta unit mudarem.                                     }
+{  Atualizar este cabeçalho quando responsabilidade, dependências, fluxo ou    }
+{  restrições desta unit mudarem.                                              }
 {                                                                              }
 {******************************************************************************}
 

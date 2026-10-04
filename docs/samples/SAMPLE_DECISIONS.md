@@ -177,7 +177,7 @@ A implementação comum fica em `samples/src/Examples/Common`. `TExampleCommon` 
 
 ### DEC-043 — Controles estruturais da Sample Page Base são separados por responsabilidade
 
-`TExampleCommon` não concentra toda a materialização visual. Header, navegação, seletor Código/Resultado, painel de código e painel de resultado são implementados respectivamente em `RickUIBuilder.Samples.Example.Common.Header`, `.Navigation`, `.ViewSelector`, `.CodePanel` e `.ResultPanel`; `.Icons` mantém vetores e `.Style` mantém os tokens visuais. A classe-base coordena esses elementos e preserva a API protegida destinada às páginas derivadas. Essa separação segue o padrão de responsabilidades já usado no Samples e evita transformar a base em um arquivo monolítico.
+`TExampleCommon` não concentra toda a materialização visual. Header, navegação, seletor Código/Resultado, painel de código e painel de resultado são implementados respectivamente em `RickUIBuilder.Samples.Example.Common.Header`, `.Navigation`, `.View.Selector`, `.Code.Panel` e `.Result.Panel`; `.Icons` mantém vetores e `.Style` mantém os tokens visuais. A classe-base coordena esses elementos e preserva a API protegida destinada às páginas derivadas. Essa separação segue o padrão de responsabilidades já usado no Samples e evita transformar a base em um arquivo monolítico.
 
 ### DEC-044 — Text / Label - Factory é o primeiro sample concreto
 
@@ -213,3 +213,15 @@ O item ativo da navegação lateral usa fundo azul-claro, texto azul e indicador
 ### DEC-051 — CodePanel fornece feedback de cópia, leitura escura e snippets didáticos compactos
 
 `TExampleCodePanel` mantém o `TMemo` read-only/selecionável integrado à paleta escura da superfície de código, em vez de aceitar o fundo branco do estilo padrão. A ação `Copiar código` altera temporariamente seu estado visual para `Copiado` somente após a escrita bem-sucedida no clipboard e retorna automaticamente ao estado normal. Snippets concretos começam com comentários `//` curtos e padronizados que explicam a intenção do exemplo e orientam a conferência na aba `Resultado`; comentários não devem ser verbosos a ponto de criar scroll vertical apenas pela documentação.
+
+### DEC-052 — Tipos compartilhados da navegação de examples ficam em App.Types
+
+O código vigente centraliza `TSampleComponent`, `TTextLabelFactoryExample` e `TExampleView` em `RickUIBuilder.Samples.App.Types`. `TTextLabelFactoryExample` é compartilhado por `TextLabel.Factory`, `Factory.Content` e `Factory.Runner`; `TExampleView` é compartilhado por `TExampleCommon` e `TExampleViewSelector`. As units de conteúdo não declaram esses enums.
+
+### DEC-053 — Units estruturais de examples usam namespaces físicos segmentados
+
+As units comuns de seletor, código e resultado usam os nomes físicos e declarações `RickUIBuilder.Samples.Example.Common.View.Selector`, `RickUIBuilder.Samples.Example.Common.Code.Panel` e `RickUIBuilder.Samples.Example.Common.Result.Panel`. `.dpr`, `.dproj`, cabeçalhos, documentação e governança devem usar exatamente esses nomes.
+
+### DEC-054 — O executável Samples aceita `-nodx` antes da inicialização FMX
+
+`RickUIBuilder.Samples.dpr` aceita o parâmetro opcional `-nodx`. Quando detectado por `FindCmdLineSwitch`, o ponto de entrada define `FMX.Types.GlobalUseDX := False` antes de `Application.Initialize`; sem o parâmetro, o comportamento gráfico padrão do FireMonkey é preservado. Essa opção pertence ao bootstrap do executável e não altera os contratos de navegação ou as páginas do Samples.

@@ -107,6 +107,8 @@ A implementação específica fica separada por responsabilidade:
 
 A página demonstra cinco exemplos: `Básico`, `Geometria`, `Tipografia`, `Alinhamento` e `Completo`. Em conjunto, eles cobrem a criação via `CreateText`, o texto informado e todos os campos públicos atuais de `TRickUIBuilderTextConfig`: `Left`, `Top`, `Width`, `Height`, `FontSize`, `FontColor`, `HorizontalAlign` e `Bold`.
 
+Os tipos compartilhados usados por essa terceira camada ficam atualmente em `RickUIBuilder.Samples.App.Types`: `TExampleView` identifica a view `Código Delphi`/`Resultado` ativa e `TTextLabelFactoryExample` identifica os cinco exemplos de Text / Label - Factory. `Factory.Content` e `Factory.Runner` consomem esse enum compartilhado; o conteúdo textual não declara mais o identificador dos exemplos.
+
 A base continua responsável somente pela infraestrutura comum:
 
 - `TExampleCommon`: formulário FMX borderless, composição das regiões e API protegida para derivadas;
@@ -151,6 +153,12 @@ Contratos do Samples não usam `procedure`. Operações contratuais são funçõ
 
 As operações atuais do Presenter não alteram estado contratual. A implementação delega a intenção ao Coordinator e retorna a própria interface sem mutar sua configuração.
 
+## Inicialização e compatibilidade gráfica opcional
+
+O ponto de entrada `RickUIBuilder.Samples.dpr` aceita o parâmetro opcional `-nodx`. Quando presente, `FMX.Types.GlobalUseDX` é definido como `False` antes de `Application.Initialize`; sem o parâmetro, o backend gráfico padrão do FireMonkey é preservado. A detecção usa `System.SysUtils.FindCmdLineSwitch` sem diferenciar maiúsculas/minúsculas.
+
+Esse comportamento pertence exclusivamente ao bootstrap do executável Samples e não altera Home, Component Pages ou Sample Pages.
+
 ## Organização atual
 
 ```text
@@ -192,9 +200,9 @@ samples/
         │   ├── RickUIBuilder.Samples.Example.Common.pas
         │   ├── RickUIBuilder.Samples.Example.Common.Header.pas
         │   ├── RickUIBuilder.Samples.Example.Common.Navigation.pas
-        │   ├── RickUIBuilder.Samples.Example.Common.ViewSelector.pas
-        │   ├── RickUIBuilder.Samples.Example.Common.CodePanel.pas
-        │   ├── RickUIBuilder.Samples.Example.Common.ResultPanel.pas
+        │   ├── RickUIBuilder.Samples.Example.Common.View.Selector.pas
+        │   ├── RickUIBuilder.Samples.Example.Common.Code.Panel.pas
+        │   ├── RickUIBuilder.Samples.Example.Common.Result.Panel.pas
         │   ├── RickUIBuilder.Samples.Example.Common.Icons.pas
         │   └── RickUIBuilder.Samples.Example.Common.Style.pas
         └── TextLabel/
@@ -227,7 +235,7 @@ A geometria de Factory e informação é renderizada por fill; Fluent Builder us
 
 `Ver exemplos` permanece sem `HitTest` e sem callback quando o destino não existe. No estado atual, somente `Text / Label → Factory` recebe callback e `crHandPoint`, porque `TExampleTextLabelFactory` é um destino real.
 
-A Sample Page Base usa geometria e paleta próprias em `RickUIBuilder.Samples.Example.Common.Style`, vetor de retorno em `.Icons` e controles estruturais separados em `.Header`, `.Navigation`, `.ViewSelector`, `.CodePanel` e `.ResultPanel`. `TExampleCommon` apenas os coordena. A página possui client de `620 × 510`, é borderless e permanece menor que a Home. A sequência visual segue o textframe normativo: header → identidade → navegação/conteúdo → identificação do exemplo → seletor `Código Delphi`/`Resultado` → uma única view ativa. O estado selecionado da navegação usa fundo azul-claro e indicador vertical azul; o `CodePanel` usa `TMemo` read-only/selecionável com ação `Copiar código`; o `ResultPanel` preenche toda a área restante da view e mantém `ResultHost` como container estável owned pela própria superfície.
+A Sample Page Base usa geometria e paleta próprias em `RickUIBuilder.Samples.Example.Common.Style`, vetor de retorno em `.Icons` e controles estruturais separados em `.Header`, `.Navigation`, `.View.Selector`, `.Code.Panel` e `.Result.Panel`. `TExampleCommon` apenas os coordena. A página possui client de `620 × 510`, é borderless e permanece menor que a Home. A sequência visual segue o textframe normativo: header → identidade → navegação/conteúdo → identificação do exemplo → seletor `Código Delphi`/`Resultado` → uma única view ativa. O estado selecionado da navegação usa fundo azul-claro e indicador vertical azul; o `CodePanel` usa `TMemo` read-only/selecionável com ação `Copiar código`; o `ResultPanel` preenche toda a área restante da view e mantém `ResultHost` como container estável owned pela própria superfície.
 
 ## Encoding
 

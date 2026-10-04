@@ -1,4 +1,5 @@
-﻿{******************************************************************************}
+﻿{ Esta unit executa os exemplos Text / Label - Factory no ResultHost, usando TTextLabelFactoryExample compartilhado para materializar via TRickUIBuilderFactory.CreateText exatamente a configuração apresentada pelo snippet selecionado. }
+{******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.Example.TextLabel.Factory.Runner                      }
 {                                                                              }
@@ -13,17 +14,19 @@
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
+{  - RickUIBuilder.Samples.App.Types                                           }
+{      Fornece TTextLabelFactoryExample usado para selecionar a execução.      }
 {  - Rick.UIBuilder.Factory                                                    }
-{      Fornece TRickUIBuilderFactory.CreateText usado em todos os exemplos.     }
+{      Fornece TRickUIBuilderFactory.CreateText usado em todos os exemplos.    }
 {  - Rick.UIBuilder.Types                                                      }
 {      Fornece TRickUIBuilderTextConfig e seus defaults.                       }
-{  - RickUIBuilder.Samples.Example.TextLabel.Factory.Content                   }
-{      Fornece o identificador compartilhado dos exemplos.                     }
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
 {  - TExampleTextLabelFactory limpa ResultHost e solicita Render.              }
 {  - Cada método cria somente o controle correspondente ao exemplo selecionado.}
+{  - Factory.Content fornece o snippet equivalente, mas não é dependência      }
+{    direta desta unit.                                                        }
 {                                                                              }
 {  Ownership / lifetime                                                        }
 {  --------------------                                                        }
@@ -49,8 +52,7 @@ interface
 
 uses
   FMX.Layouts,
-  RickUIBuilder.Samples.App.Types,
-  RickUIBuilder.Samples.Example.TextLabel.Factory.Content;
+  RickUIBuilder.Samples.App.Types;
 
 type
   /// <summary>Executa o resultado visual dos exemplos Factory de Text / Label.</summary>

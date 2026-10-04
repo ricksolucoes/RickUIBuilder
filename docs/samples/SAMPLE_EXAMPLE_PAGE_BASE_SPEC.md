@@ -64,11 +64,11 @@ src/Examples/Common/
 ├── RickUIBuilder.Samples.Example.Common.Navigation.pas
 │   ├── TExampleNavigation: sidebar rolável e seleção visual
 │   └── TExampleNavigationItem: item visual reutilizável
-├── RickUIBuilder.Samples.Example.Common.ViewSelector.pas
+├── RickUIBuilder.Samples.Example.Common.View.Selector.pas
 │   └── TExampleViewSelector: alternância funcional Código Delphi/Resultado
-├── RickUIBuilder.Samples.Example.Common.CodePanel.pas
+├── RickUIBuilder.Samples.Example.Common.Code.Panel.pas
 │   └── TExampleCodePanel: código read-only/selecionável, scroll sob demanda e cópia integral
-├── RickUIBuilder.Samples.Example.Common.ResultPanel.pas
+├── RickUIBuilder.Samples.Example.Common.Result.Panel.pas
 │   └── TExampleResultPanel: título, superfície e ResultHost
 ├── RickUIBuilder.Samples.Example.Common.Icons.pas
 │   └── geometria vetorial comum
@@ -77,6 +77,8 @@ src/Examples/Common/
 ```
 
 Essa separação é estrutural e não cria regras específicas de componente. `TExampleCommon` coordena os controles acima; não reimplementa internamente header, navegação, seletor, painel de código ou painel de resultado.
+
+`RickUIBuilder.Samples.App.Types` fornece atualmente os enums compartilhados usados por esta camada: `TExampleView` representa a seleção `Código Delphi`/`Resultado` e `TTextLabelFactoryExample` identifica os exemplos concretos de Text / Label - Factory. O seletor, a page concreta, o conteúdo e o Runner consomem esses tipos; `Factory.Content` mantém apenas textos/snippets e não declara o enum dos exemplos.
 
 A base implementada expõe pontos de extensão protegidos para as derivadas:
 

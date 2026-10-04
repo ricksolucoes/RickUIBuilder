@@ -1,15 +1,20 @@
-﻿{******************************************************************************}
+﻿{ Esta unit centraliza os enums compartilhados pelo Samples, identificando componentes navegáveis, os exemplos atuais de Text / Label - Factory e a view Código/Resultado ativa na Sample Page Base. }
+{******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.App.Types                                             }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
-{  Tipos compartilhados pela aplicação Samples.                                }
+{  Centralizar tipos enumerados compartilhados entre navegação, páginas de     }
+{  componente e páginas de exemplos do RickUIBuilder.Samples.                  }
 {                                                                              }
 {  Funcionalidade                                                              }
 {  --------------                                                              }
-{  Declara TSampleComponent, enum que identifica os seis destinos de           }
-{  componente atualmente navegáveis.                                           }
+{  - TSampleComponent identifica os seis componentes navegáveis da Home.       }
+{  - TTextLabelFactoryExample identifica os cinco exemplos atuais da página    }
+{    concreta Text / Label - Factory.                                          }
+{  - TExampleView identifica qual view estrutural da Sample Page Base está     }
+{    ativa: Código Delphi ou Resultado.                                        }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
@@ -17,18 +22,22 @@
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
-{  - TPageSamplesHome associa cada card a um TSampleComponent; Presenter e     }
-{    Coordinator transportam esse valor até a navegação.                       }
+{  - Home, Presenter e Coordinator transportam TSampleComponent na navegação.  }
+{  - TextLabel.Factory, Factory.Content e Factory.Runner compartilham           }
+{    TTextLabelFactoryExample para manter seleção, conteúdo e execução         }
+{    sincronizados.                                                            }
+{  - Example.Common e Example.Common.View.Selector usam TExampleView para      }
+{    coordenar a alternância Código Delphi/Resultado.                          }
 {                                                                              }
 {  Restrições e responsabilidades                                              }
 {  -----------------------------                                               }
-{  - Adicionar valores somente quando existir destino real correspondente no   }
-{    Samples.                                                                  }
+{  - Adicionar ou mover tipos somente quando houver consumidores reais.        }
+{  - Esta unit não implementa navegação, renderização ou execução de samples.  }
 {                                                                              }
 {  Manutenção                                                                  }
 {  ----------                                                                  }
-{  Este cabeçalho deve ser atualizado quando responsabilidade, dependências,   }
-{  fluxo, ownership/lifetime ou restrições desta unit mudarem.                 }
+{  Atualizar este cabeçalho quando os tipos compartilhados ou seus             }
+{  consumidores mudarem.                                                       }
 {                                                                              }
 {******************************************************************************}
 
@@ -39,10 +48,10 @@ interface
 {$SCOPEDENUMS ON}
 
 type
-  /// <summary>Identifica os exemplos Factory atualmente demonstrados.</summary>
+  /// <summary>Identifica os exemplos da página Text / Label - Factory.</summary>
   TTextLabelFactoryExample = (Basic, Geometry, Typography, Alignment, Complete);
 
-  /// <summary>Identifica os componentes navegaveis apresentados pelo Samples.</summary>
+  /// <summary>Identifica os componentes navegáveis apresentados pelo Samples.</summary>
   TSampleComponent = (TextLabel, Button, Badge, Divider, ComboBox, Edit);
 
   /// <summary>Visualização ativa da área principal do exemplo.</summary>

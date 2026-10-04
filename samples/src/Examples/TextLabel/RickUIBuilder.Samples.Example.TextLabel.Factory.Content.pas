@@ -1,4 +1,4 @@
-﻿{ Esta unit mantém o conteúdo didático dos exemplos Text / Label - Factory, incluindo captions, descrições e snippets comentados que explicam objetivamente a configuração executada e orientam o usuário a conferir o resultado na aba Resultado. }
+﻿{ Esta unit mantém o conteúdo didático dos exemplos Text / Label - Factory, associando cada TTextLabelFactoryExample compartilhado a caption, título, descrição e snippet comentado coerentes com a execução real. }
 {******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.Example.TextLabel.Factory.Content                     }
@@ -10,25 +10,28 @@
 {                                                                              }
 {  Funcionalidade                                                              }
 {  --------------                                                              }
-{  Declara os exemplos disponíveis e fornece caption de navegação, título,     }
-{  descrição e snippet Delphi correspondente a cada exemplo. Cada snippet      }
-{  começa com comentários curtos em `//` que explicam a intenção e indicam     }
-{  que o controle materializado deve ser conferido na aba Resultado, evitando  }
-{  documentação extensa que force scroll vertical por si só.                   }
+{  Associa cada TTextLabelFactoryExample a caption de navegação, título,        }
+{  descrição e snippet Delphi. Cada snippet começa com comentários curtos em   }
+{  `//` que explicam a intenção e indicam que o controle materializado deve    }
+{  ser conferido na aba Resultado, evitando documentação extensa que force     }
+{  scroll vertical por si só.                                                  }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
-{  - Não possui dependências internas do projeto.                              }
+{  - RickUIBuilder.Samples.App.Types                                           }
+{      Fornece TTextLabelFactoryExample, compartilhado por page, conteúdo e    }
+{      Runner.                                                                 }
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
-{  - TExampleTextLabelFactory consulta esta unit ao selecionar um exemplo.      }
-{  - TTextLabelFactoryRunner executa o mesmo exemplo identificado pelo enum.    }
+{  - TExampleTextLabelFactory consulta esta unit ao selecionar um exemplo.     }
+{  - TTextLabelFactoryRunner executa o mesmo exemplo identificado pelo enum    }
+{    compartilhado em App.Types.                                               }
 {                                                                              }
 {  Restrições e responsabilidades                                              }
 {  -----------------------------                                               }
 {  - Contém somente conteúdo de Text / Label na abordagem Factory.             }
-{  - Não executa Factory, não cria controles e não conhece outras páginas.     }
+{  - Não declara o enum dos exemplos, não executa Factory e não cria controles.}
 {  - Os snippets devem permanecer coerentes com a execução real do Runner.     }
 {  - Comentários didáticos devem ser curtos, padronizados e úteis à leitura.   }
 {                                                                              }

@@ -1,7 +1,7 @@
 ﻿{ Esta unit implementa a view de Resultado ocupando toda a área útil restante e fornece o ResultHost, container estável onde as páginas derivadas materializam e substituem os controles executáveis de cada sample. }
 {******************************************************************************}
 {                                                                              }
-{  RickUIBuilder.Samples.Example.Common.ResultPanel                            }
+{  RickUIBuilder.Samples.Example.Common.Result.Panel                            }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }

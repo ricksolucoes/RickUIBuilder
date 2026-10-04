@@ -1,4 +1,4 @@
-﻿{ Esta unit orquestra a Sample Page Base, alterna as views Código/Resultado e expõe o ResultHost sem assumir conteúdo ou execução específica das páginas derivadas. }
+﻿{ Esta unit orquestra a Sample Page Base, compõe os controles estruturais separados, alterna Código/Resultado por TExampleView e expõe ResultHost às páginas derivadas sem conhecer conteúdo específico de componente ou abordagem. }
 {******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.Example.Common                                        }
@@ -16,17 +16,19 @@
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
+{  - RickUIBuilder.Samples.App.Types                                           }
+{      Fornece TExampleView usado para decidir a view estrutural ativa.        }
 {  - RickUIBuilder.Samples.App.Typography                                      }
 {      Fornece a escala tipográfica compartilhada pelo Samples.                }
 {  - RickUIBuilder.Samples.Example.Common.Header                               }
 {      Materializa o header e a ação visual de retorno.                        }
 {  - RickUIBuilder.Samples.Example.Common.Navigation                           }
 {      Materializa a navegação lateral e seu estado visual selecionado.        }
-{  - RickUIBuilder.Samples.Example.Common.ViewSelector                         }
+{  - RickUIBuilder.Samples.Example.Common.View.Selector                        }
 {      Materializa e controla a seleção visual Código Delphi/Resultado.        }
-{  - RickUIBuilder.Samples.Example.Common.CodePanel                            }
-{      Materializa exclusivamente a superfície rolável de código.              }
-{  - RickUIBuilder.Samples.Example.Common.ResultPanel                          }
+{  - RickUIBuilder.Samples.Example.Common.Code.Panel                           }
+{      Materializa exclusivamente a superfície de código read-only.            }
+{  - RickUIBuilder.Samples.Example.Common.Result.Panel                         }
 {      Materializa exclusivamente a superfície e o host do resultado.          }
 {  - RickUIBuilder.Samples.Example.Common.Style                                }
 {      Fornece dimensões, espaçamentos e paleta específicos desta família.     }
@@ -43,8 +45,9 @@
 {  Ownership / lifetime                                                        }
 {  --------------------                                                        }
 {  - Controles estruturais são owned pela page ou por sua árvore visual.       }
-{  - ResultHost pertence a TExampleResultPanel; derivadas apenas anexam controles   }
-{    ao host e ClearResult libera esses filhos sem substituir a infraestrutura.  }
+{  - ResultHost pertence a TExampleResultPanel; derivadas apenas anexam        }
+{    controles ao host e ClearResult libera esses filhos sem substituir a      }
+{    infraestrutura.                                                           }
 {  - A base não possui Coordinator, Presenter ou Component Page.               }
 {                                                                              }
 {  Restrições e responsabilidades                                              }

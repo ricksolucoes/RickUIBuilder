@@ -1,7 +1,7 @@
 ﻿{ Esta unit implementa a superfície de código read-only da Sample Page Base, garantindo leitura em tema escuro, seleção parcial/total, cópia integral com feedback visual e scroll exibido somente quando o conteúdo ultrapassa o viewport. }
 {******************************************************************************}
 {                                                                              }
-{  RickUIBuilder.Samples.Example.Common.CodePanel                              }
+{  RickUIBuilder.Samples.Example.Common.Code.Panel                              }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }

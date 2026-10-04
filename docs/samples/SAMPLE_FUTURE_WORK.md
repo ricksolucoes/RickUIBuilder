@@ -8,7 +8,9 @@ A API pública possui Composition por meio de `TRickUIBuilder.On(AParent)`. A po
 
 As páginas intermediárias de `Text / Label`, `Button`, `Badge`, `Divider`, `ComboBox` e `Edit` já existem como páginas concretas herdadas de `TComponentCommon`.
 
-A Sample Page Base já está implementada e coordenada por `RickUIBuilder.Samples.Example.Common` (`TExampleCommon`). Header, navegação, seletor Código/Resultado, painel de código e painel de resultado ficam separados em `.Header`, `.Navigation`, `.ViewSelector`, `.CodePanel` e `.ResultPanel`; tokens permanecem em `.Style` e o vetor comum de retorno em `.Icons`. O seletor já alterna funcionalmente views mutuamente exclusivas, iniciando em `Código Delphi`. **Text / Label - Factory é a primeira página concreta implementada**; os demais destinos continuam futuros.
+A Sample Page Base já está implementada e coordenada por `RickUIBuilder.Samples.Example.Common` (`TExampleCommon`). Header, navegação, seletor Código/Resultado, painel de código e painel de resultado ficam separados em `.Header`, `.Navigation`, `.View.Selector`, `.Code.Panel` e `.Result.Panel`; tokens permanecem em `.Style` e o vetor comum de retorno em `.Icons`. O seletor já alterna funcionalmente views mutuamente exclusivas, iniciando em `Código Delphi`. **Text / Label - Factory é a primeira página concreta implementada**; os demais destinos continuam futuros.
+
+Os enums atualmente compartilhados pela terceira camada ficam em `RickUIBuilder.Samples.App.Types`: `TExampleView` para a view ativa e `TTextLabelFactoryExample` para os exemplos concretos de Text / Label - Factory. Essa localização descreve o código vigente e deve ser revista somente se a arquitetura real mudar.
 
 A evolução restante é deliberadamente faseada:
 

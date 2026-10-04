@@ -1,4 +1,5 @@
-﻿{******************************************************************************}
+﻿{ Esta unit coordena a página concreta Text / Label - Factory, criando a navegação dos cinco TTextLabelFactoryExample compartilhados, sincronizando conteúdo/snippet e delegando ao Runner a materialização do resultado no ResultHost. }
+{******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.Example.TextLabel.Factory                             }
 {                                                                              }
@@ -14,12 +15,14 @@
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
+{  - RickUIBuilder.Samples.App.Types                                           }
+{      Fornece TTextLabelFactoryExample compartilhado com Content e Runner.    }
 {  - RickUIBuilder.Samples.Example.Common                                      }
 {      Fornece TExampleCommon e a infraestrutura visual compartilhada.         }
 {  - RickUIBuilder.Samples.Example.Common.Navigation                           }
 {      Fornece TExampleNavigationItem retornado pela API protegida da base.    }
 {  - RickUIBuilder.Samples.Example.TextLabel.Factory.Content                   }
-{      Fornece conteúdo e identificação dos exemplos desta página.             }
+{      Fornece captions, títulos, descrições e snippets dos exemplos.          }
 {  - RickUIBuilder.Samples.Example.TextLabel.Factory.Runner                    }
 {      Executa a Factory real no ResultHost.                                   }
 {                                                                              }
