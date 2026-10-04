@@ -153,7 +153,7 @@ A família de páginas de exemplos deve permanecer estritamente menor que a Home
 
 ### DEC-037 — O textframe fixa a sequência estrutural da Sample Page
 
-O Design System pode fornecer tokens e componentes visuais, mas não pode alterar a ordem estrutural definida em `SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`: header/back → identidade da página → corpo dividido em navegação lateral e conteúdo → identificação do exemplo → seletor visual local → superfície de código → área de resultado executável. Mudança nessa sequência exige decisão documental explícita.
+O Design System pode fornecer tokens e componentes visuais, mas não pode alterar a ordem estrutural definida em `SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`. A sequência originalmente registrava código e resultado em série; **DEC-047 substitui essa parte** pela regra atual de uma única view ativa após o seletor. Mudança adicional nessa sequência exige decisão documental explícita.
 
 ### DEC-038 — Conteúdo e execução pertencem às páginas derivadas
 
@@ -169,7 +169,7 @@ Quando uma página concreta de exemplos for implementada, sua cobertura deve ser
 
 ### DEC-041 — Referência visual não autoriza comportamento não confirmado
 
-Elementos presentes no mockup preservam posição, hierarquia e intenção visual, mas comportamentos não confirmados não são inventados. Em especial, a faixa visual `Código Delphi` / `Resultado` permanece estrutural e não alterna regiões. A primeira página concreta (`Text / Label - Factory`) preserva esse comportamento porque não houve requisito explícito para alternância; qualquer mudança futura exige decisão documental própria.
+Elementos presentes no mockup preservam posição, hierarquia e intenção visual, mas comportamentos não confirmados não são inventados. A ausência inicial de requisito manteve `Código Delphi` / `Resultado` apenas visual. **Essa parte da decisão foi superada por DEC-047**, após requisito explícito definir a alternância funcional.
 
 ### DEC-042 — Estrutura física e API protegida da Sample Page Base
 
@@ -177,7 +177,7 @@ A implementação comum fica em `samples/src/Examples/Common`. `TExampleCommon` 
 
 ### DEC-043 — Controles estruturais da Sample Page Base são separados por responsabilidade
 
-`TExampleCommon` não concentra toda a materialização visual. Header, navegação, painel de código e painel de resultado são implementados respectivamente em `RickUIBuilder.Samples.Example.Common.Header`, `.Navigation`, `.CodePanel` e `.ResultPanel`; `.Icons` mantém vetores e `.Style` mantém os tokens visuais. A classe-base coordena esses elementos e preserva a API protegida destinada às páginas derivadas. Essa separação segue o padrão de responsabilidades já usado no Samples e evita transformar a base em um arquivo monolítico.
+`TExampleCommon` não concentra toda a materialização visual. Header, navegação, seletor Código/Resultado, painel de código e painel de resultado são implementados respectivamente em `RickUIBuilder.Samples.Example.Common.Header`, `.Navigation`, `.ViewSelector`, `.CodePanel` e `.ResultPanel`; `.Icons` mantém vetores e `.Style` mantém os tokens visuais. A classe-base coordena esses elementos e preserva a API protegida destinada às páginas derivadas. Essa separação segue o padrão de responsabilidades já usado no Samples e evita transformar a base em um arquivo monolítico.
 
 ### DEC-044 — Text / Label - Factory é o primeiro sample concreto
 
@@ -191,3 +191,12 @@ A implementação comum fica em `samples/src/Examples/Common`. `TExampleCommon` 
 
 Toda unit do Samples que utilizar `TTextAlign` deve declarar `FMX.Types` explicitamente no `uses`. Toda unit que utilizar `TBrushKind` deve declarar `FMX.Graphics` explicitamente. A regra evita dependência acidental de símbolos trazidos transitivamente por outras units e faz parte da auditoria Delphi local.
 
+
+
+### DEC-047 — Código Delphi e Resultado são views mutuamente exclusivas
+
+O requisito atual confirma a semântica do seletor `Código Delphi` / `Resultado`. A Sample Page inicia em `Código Delphi`; selecionar `Resultado` oculta o painel de código e exibe somente o painel de resultado, e selecionar `Código Delphi` executa a alternância inversa. A responsabilidade fica em `TExampleViewSelector` + `TExampleCommon`; páginas concretas não duplicam essa lógica.
+
+### DEC-048 — Estado selecionado e superfície de resultado seguem a referência aprovada
+
+O item ativo da navegação lateral usa fundo azul-claro, texto azul e indicador vertical azul à esquerda, sem depender de bold para comunicar seleção. A superfície de resultado usa fundo claro próprio, borda suave e cantos arredondados conforme a referência visual. Esses tokens pertencem a `RickUIBuilder.Samples.Example.Common.Style`; a navegação e o painel de resultado apenas os materializam.

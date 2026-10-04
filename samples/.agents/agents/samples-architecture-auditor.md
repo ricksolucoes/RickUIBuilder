@@ -41,12 +41,12 @@ Quando uma alteração arquitetural modificar responsabilidade, boundary, depend
 
 ## Critérios específicos da Sample Page Base
 
-- `TExampleCommon` deve coordenar somente a infraestrutura comum da terceira camada; header/back, navegação lateral, painel de código e painel de resultado devem permanecer nas units especializadas `.Header`, `.Navigation`, `.CodePanel` e `.ResultPanel`, sem reabsorção monolítica dessas responsabilidades.
+- `TExampleCommon` deve coordenar somente a infraestrutura comum da terceira camada; header/back, navegação lateral, seletor Código/Resultado, painel de código e painel de resultado devem permanecer nas units especializadas `.Header`, `.Navigation`, `.ViewSelector`, `.CodePanel` e `.ResultPanel`, sem reabsorção monolítica dessas responsabilidades.
 - A base não pode conhecer `TSampleComponent`, componente concreto, Factory/Fluent como regra específica, categorias fixas ou catálogo global de exemplos.
 - `src/Examples/Common` é permitido porque contém implementação comum real e coesa; cada helper deve possuir responsabilidade estrutural verificável, sem abstração cosmética. Diretórios futuros por componente/abordagem exigem páginas concretas reais.
 - A geometria da Sample Page deve permanecer estritamente menor que a Home e preservar a sequência definida em `SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`.
 - O retorno local pode usar `Close`; não introduzir Router/Presenter/Coordinator novo enquanto não houver navegação concreta que o justifique.
-- A faixa `Código Delphi` / `Resultado` não deve ganhar semântica de tabs ou alternância sem requisito confirmado.
+- O seletor `Código Delphi` / `Resultado` deve manter exatamente uma view ativa, iniciar em Código Delphi e permanecer responsabilidade da infraestrutura comum; páginas concretas não devem duplicar a alternância.
 
 
 ## Critérios específicos das páginas concretas de Examples

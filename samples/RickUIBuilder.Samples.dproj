@@ -323,6 +323,7 @@
         <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.pas"/>
         <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.Header.pas"/>
         <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.Navigation.pas"/>
+        <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.ViewSelector.pas"/>
         <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.CodePanel.pas"/>
         <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.ResultPanel.pas"/>
         <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.Icons.pas"/>

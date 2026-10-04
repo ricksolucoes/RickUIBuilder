@@ -138,6 +138,7 @@ uses
   RickUIBuilder.Samples.Example.Common in 'src\Examples\Common\RickUIBuilder.Samples.Example.Common.pas',
   RickUIBuilder.Samples.Example.Common.Header in 'src\Examples\Common\RickUIBuilder.Samples.Example.Common.Header.pas',
   RickUIBuilder.Samples.Example.Common.Navigation in 'src\Examples\Common\RickUIBuilder.Samples.Example.Common.Navigation.pas',
+  RickUIBuilder.Samples.Example.Common.ViewSelector in 'src\Examples\Common\RickUIBuilder.Samples.Example.Common.ViewSelector.pas',
   RickUIBuilder.Samples.Example.Common.CodePanel in 'src\Examples\Common\RickUIBuilder.Samples.Example.Common.CodePanel.pas',
   RickUIBuilder.Samples.Example.Common.ResultPanel in 'src\Examples\Common\RickUIBuilder.Samples.Example.Common.ResultPanel.pas',
   RickUIBuilder.Samples.Example.Common.Icons in 'src\Examples\Common\RickUIBuilder.Samples.Example.Common.Icons.pas',

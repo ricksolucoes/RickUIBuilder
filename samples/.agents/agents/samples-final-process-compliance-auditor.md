@@ -46,7 +46,7 @@ Confirmar que todos os agents declarados em `.agents/README.md` existem fisicame
 
 ## Recalculo obrigatório para Sample Page Base
 
-Se qualquer unit de `src/Examples/Common` for afetada, recalcular Architecture, Delphi Code, Documentation, Naming, Toxicity quando houver corpos de método, Contract & Lifetime quando ownership/lifetime for afetado e Build Validation quando `.dpr`/`.dproj` mudarem. Exigir evidência de separação coesa entre orquestração, header, navegação, código, resultado, ícones e estilo; tamanho inferior à Home; sequência do textframe preservada; ausência de conteúdo específico na base e ausência de páginas/samples concretos não requisitados.
+Se qualquer unit de `src/Examples/Common` for afetada, recalcular Architecture, Delphi Code, Documentation, Naming, Toxicity quando houver corpos de método, Contract & Lifetime quando ownership/lifetime for afetado e Build Validation quando `.dpr`/`.dproj` mudarem. Exigir evidência de separação coesa entre orquestração, header, navegação, seletor de view, código, resultado, ícones e estilo; tamanho inferior à Home; sequência do textframe preservada; seletor Código/Resultado com views mutuamente exclusivas e Código inicial; ausência de conteúdo específico na base e ausência de páginas/samples concretos não requisitados.
 
 
 Ao recalcular o Delphi Code gate para qualquer `.pas`, confirmar que a evidência cobre explicitamente `TTextAlign` → `FMX.Types` e `TBrushKind` → `FMX.Graphics`; dependência transitiva não satisfaz o processo.

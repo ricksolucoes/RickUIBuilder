@@ -8,8 +8,8 @@
 {                                                                              }
 {  Funcionalidade                                                              }
 {  --------------                                                              }
-{  Materializa o título Resultado, a superfície visual e o host onde as páginas }
-{  derivadas criam os controles reais de cada sample.                            }
+{  Materializa o título Resultado, a superfície visual aprovada e o host onde  }
+{  as páginas derivadas criam os controles reais de cada sample.               }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
@@ -20,7 +20,8 @@
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
-{  - TExampleCommon cria o painel e expõe seu Host às páginas derivadas.         }
+{  - TExampleCommon cria o painel e expõe seu Host às páginas derivadas.        }
+{  - TExampleCommon controla sua visibilidade conforme o seletor comum.         }
 {  - Clear remove os filhos visuais antes de um novo resultado.                }
 {                                                                              }
 {  Ownership / lifetime                                                        }
@@ -31,7 +32,8 @@
 {  Restrições e responsabilidades                                              }
 {  -----------------------------                                               }
 {  - Não cria controles de sample nem conhece Factory/Fluent Builder.          }
-{  - Não afirma ausência de leaks; apenas executa a limpeza visual definida.   }
+{  - Não controla a seleção Código Delphi/Resultado.                           }
+{  - TTextAlign exige FMX.Types e TBrushKind exige FMX.Graphics explicitamente.}
 {                                                                              }
 {  Manutenção                                                                  }
 {  ----------                                                                  }
@@ -82,7 +84,7 @@ end;
 
 procedure TExampleResultPanel.ConfigureLayout;
 begin
-  SetBounds(0, _EXAMPLE_PAGE_RESULT_PANEL_TOP_, _EXAMPLE_PAGE_MAIN_WIDTH_,
+  SetBounds(0, _EXAMPLE_PAGE_VIEW_CONTENT_TOP_, _EXAMPLE_PAGE_MAIN_WIDTH_,
     _EXAMPLE_PAGE_RESULT_PANEL_HEIGHT_);
 end;
 
@@ -112,15 +114,17 @@ begin
   LSurface.SetBounds(0, _EXAMPLE_PAGE_RESULT_SURFACE_TOP_,
     _EXAMPLE_PAGE_MAIN_WIDTH_, _EXAMPLE_PAGE_RESULT_HEIGHT_);
   LSurface.Fill.Kind := TBrushKind.Solid;
-  LSurface.Fill.Color := _EXAMPLE_PAGE_SURFACE_BACKGROUND_;
+  LSurface.Fill.Color := _EXAMPLE_PAGE_RESULT_BACKGROUND_;
   LSurface.Stroke.Kind := TBrushKind.Solid;
-  LSurface.Stroke.Color := _EXAMPLE_PAGE_BORDER_;
+  LSurface.Stroke.Color := _EXAMPLE_PAGE_RESULT_BORDER_;
   LSurface.XRadius := 6;
   LSurface.YRadius := 6;
+
   FHost := TLayout.Create(LSurface);
   FHost.Parent := LSurface;
-  FHost.SetBounds(8, 8, _EXAMPLE_PAGE_MAIN_WIDTH_ - 16,
-    _EXAMPLE_PAGE_RESULT_HEIGHT_ - 16);
+  FHost.SetBounds(_EXAMPLE_PAGE_RESULT_PADDING_, _EXAMPLE_PAGE_RESULT_PADDING_,
+    _EXAMPLE_PAGE_MAIN_WIDTH_ - (_EXAMPLE_PAGE_RESULT_PADDING_ * 2),
+    _EXAMPLE_PAGE_RESULT_HEIGHT_ - (_EXAMPLE_PAGE_RESULT_PADDING_ * 2));
 end;
 
 procedure TExampleResultPanel.Clear;

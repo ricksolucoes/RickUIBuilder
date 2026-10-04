@@ -29,7 +29,7 @@ Para cada `.pas` criado ou modificado, confirmar que o arquivo inicia com cabeç
 
 ## Critérios específicos da Sample Page Base
 
-Ao auditar a Sample Page Base, confirmar `FMX.Graphics` explícito em toda unit que usa `TBrushKind` e `FMX.Types` explícito em toda unit que usa `TTextAlign`, formulário borderless, dimensões menores que a Home, `TScrollBox`/`TVertScrollBox` usados somente como infraestrutura comum e `ResultHost` disponível para derivadas. A base não pode conter execução específica de componente/abordagem; destinos concretos pertencem às derivadas requisitadas. Confirmar também que `TExampleCommon` coordena `.Header`, `.Navigation`, `.CodePanel` e `.ResultPanel` em vez de concentrar a construção integral desses blocos. A faixa `Código Delphi` / `Resultado` deve permanecer não interativa enquanto esse comportamento não estiver especificado.
+Ao auditar a Sample Page Base, confirmar `FMX.Graphics` explícito em toda unit que usa `TBrushKind` e `FMX.Types` explícito em toda unit que usa `TTextAlign`, formulário borderless, dimensões menores que a Home, `TScrollBox`/`TVertScrollBox` usados somente como infraestrutura comum e `ResultHost` disponível para derivadas. A base não pode conter execução específica de componente/abordagem; destinos concretos pertencem às derivadas requisitadas. Confirmar também que `TExampleCommon` coordena `.Header`, `.Navigation`, `.ViewSelector`, `.CodePanel` e `.ResultPanel` em vez de concentrar a construção integral desses blocos. Verificar que `TExampleViewSelector` mantém a seleção e que `TExampleCommon` torna CodePanel/ResultPanel mutuamente exclusivos, iniciando em Código Delphi.
 
 
 ## Critérios específicos de página concreta de examples

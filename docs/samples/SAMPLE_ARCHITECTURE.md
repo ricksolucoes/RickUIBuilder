@@ -85,7 +85,7 @@ A seta de retorno da `TComponentCommon` fecha a janela modal atual. O retorno n�
 
 ## Sample Page Base e primeiro destino concreto
 
-A terceira camada do Samples possui uma base visual/comportamental coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A construção visual comum permanece separada em units coesas de header, navegação, painel de código e painel de resultado, além de ícones e estilo.
+A terceira camada do Samples possui uma base visual/comportamental coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A construção visual comum permanece separada em units coesas de header, navegação, seletor de visualização, painel de código e painel de resultado, além de ícones e estilo.
 
 O primeiro destino concreto implementado é **Text / Label - Factory**:
 
@@ -111,15 +111,16 @@ A base continua responsável somente pela infraestrutura comum:
 
 - `TExampleCommon`: formulário FMX borderless, composição das regiões e API protegida para derivadas;
 - `TExampleHeader`: header/back com contexto do componente pai;
-- `TExampleNavigation` / `TExampleNavigationItem`: navegação lateral rolável e estado visual selecionado;
-- `TExampleCodePanel`: faixa visual `Código Delphi` / `Resultado` e superfície de código com scroll;
+- `TExampleNavigation` / `TExampleNavigationItem`: navegação lateral rolável e estado visual selecionado com indicador lateral azul;
+- `TExampleViewSelector`: seleção funcional e mutuamente exclusiva entre `Código Delphi` e `Resultado`;
+- `TExampleCodePanel`: superfície de código com scroll, sem responsabilidade de tabs;
 - `TExampleResultPanel`: superfície de resultado, `ResultHost` e limpeza do resultado anterior.
 
 `TExampleCommon` não conhece `TSampleComponent`, componentes concretos, regras específicas de Factory/Fluent, categorias fixas ou catálogo global de exemplos. A page concreta define sua navegação e delega conteúdo e execução às units específicas.
 
 Ao selecionar um exemplo em Text / Label - Factory, a page seleciona visualmente o item, atualiza título/descrição/snippet, chama `ClearResult` e executa o mesmo exemplo no `ResultHost`. O código exibido e o resultado executado representam a mesma configuração.
 
-A geometria da Sample Page permanece `620 × 510`, estritamente menor que a Home de `644 × 534`. A faixa `Código Delphi` / `Resultado` continua deliberadamente não interativa: não existem tabs ou alternância porque essa semântica não foi definida.
+A geometria da Sample Page permanece `620 × 510`, estritamente menor que a Home de `644 × 534`. `Código Delphi` e `Resultado` agora funcionam como duas views mutuamente exclusivas: a página inicia em `Código Delphi`; ao selecionar `Resultado`, o painel de código é ocultado e somente o painel de resultado fica visível, e o inverso ocorre ao retornar para `Código Delphi`.
 
 A especificação visual e os textframes normativos dessa camada estão em `docs/samples/SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`.
 
@@ -191,6 +192,7 @@ samples/
         │   ├── RickUIBuilder.Samples.Example.Common.pas
         │   ├── RickUIBuilder.Samples.Example.Common.Header.pas
         │   ├── RickUIBuilder.Samples.Example.Common.Navigation.pas
+        │   ├── RickUIBuilder.Samples.Example.Common.ViewSelector.pas
         │   ├── RickUIBuilder.Samples.Example.Common.CodePanel.pas
         │   ├── RickUIBuilder.Samples.Example.Common.ResultPanel.pas
         │   ├── RickUIBuilder.Samples.Example.Common.Icons.pas
@@ -225,7 +227,7 @@ A geometria de Factory e informação é renderizada por fill; Fluent Builder us
 
 `Ver exemplos` permanece sem `HitTest` e sem callback quando o destino não existe. No estado atual, somente `Text / Label → Factory` recebe callback e `crHandPoint`, porque `TExampleTextLabelFactory` é um destino real.
 
-A Sample Page Base usa geometria e paleta próprias em `RickUIBuilder.Samples.Example.Common.Style`, vetor de retorno em `.Icons` e controles estruturais separados em `.Header`, `.Navigation`, `.CodePanel` e `.ResultPanel`. `TExampleCommon` apenas os coordena. A página possui client de `620 × 510`, é borderless e permanece menor que a Home. A sequência visual segue o textframe normativo: header → identidade → navegação/conteúdo → identificação do exemplo → faixa visual → código → resultado.
+A Sample Page Base usa geometria e paleta próprias em `RickUIBuilder.Samples.Example.Common.Style`, vetor de retorno em `.Icons` e controles estruturais separados em `.Header`, `.Navigation`, `.ViewSelector`, `.CodePanel` e `.ResultPanel`. `TExampleCommon` apenas os coordena. A página possui client de `620 × 510`, é borderless e permanece menor que a Home. A sequência visual segue o textframe normativo: header → identidade → navegação/conteúdo → identificação do exemplo → seletor `Código Delphi`/`Resultado` → uma única view ativa. O estado selecionado da navegação usa fundo azul-claro e indicador vertical azul; o painel de resultado usa a superfície clara e borda suave definidas pela referência aprovada.
 
 ## Encoding
 

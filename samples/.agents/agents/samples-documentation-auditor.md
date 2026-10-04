@@ -35,7 +35,7 @@ Quando a família de Component Pages for alterada, confirmar que `docs/samples` 
 
 ## Coerência documental da Sample Page Base
 
-Quando a Sample Page Base for criada ou alterada, confrontar `SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`, `SAMPLE_ARCHITECTURE.md`, `SAMPLE_DECISIONS.md` e `SAMPLE_FUTURE_WORK.md` com todas as units de `src/Examples/Common`: `.Common`, `.Header`, `.Navigation`, `.CodePanel`, `.ResultPanel`, `.Style` e `.Icons`. A documentação deve distinguir claramente a base comum, páginas concretas implementadas e destinos ainda futuros, registrar a separação real de responsabilidades e as dimensões vigentes e não declarar semântica de tabs para `Código Delphi` / `Resultado` enquanto ela não existir no código.
+Quando a Sample Page Base for criada ou alterada, confrontar `SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`, `SAMPLE_ARCHITECTURE.md`, `SAMPLE_DECISIONS.md` e `SAMPLE_FUTURE_WORK.md` com todas as units de `src/Examples/Common`: `.Common`, `.Header`, `.Navigation`, `.ViewSelector`, `.CodePanel`, `.ResultPanel`, `.Style` e `.Icons`. A documentação deve distinguir claramente a base comum, páginas concretas implementadas e destinos ainda futuros, registrar a separação real de responsabilidades e as dimensões vigentes e documentar `Código Delphi` / `Resultado` como views mutuamente exclusivas quando essa alternância existir no código, sem manter a descrição antiga de faixa apenas visual.
 
 
 ## Coerência documental de Examples concretos

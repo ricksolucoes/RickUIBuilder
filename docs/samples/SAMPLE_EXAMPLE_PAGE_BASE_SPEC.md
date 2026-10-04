@@ -6,7 +6,7 @@
 
 Este documento fixa a intenção visual, a sequência estrutural, os limites de responsabilidade e o comportamento da base das páginas de exemplos do `RickUIBuilder.Samples`.
 
-A implementação comum é coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A família é dividida por responsabilidade em units próprias para header, navegação, painel de código, painel de resultado, ícones e estilo. A primeira derivada real é `TExampleTextLabelFactory`; os demais destinos permanecem futuros.
+A implementação comum é coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A família é dividida por responsabilidade em units próprias para header, navegação, seletor de visualização, painel de código, painel de resultado, ícones e estilo. A primeira derivada real é `TExampleTextLabelFactory`; os demais destinos permanecem futuros.
 
 ## Papel na navegação
 
@@ -64,8 +64,10 @@ src/Examples/Common/
 ├── RickUIBuilder.Samples.Example.Common.Navigation.pas
 │   ├── TExampleNavigation: sidebar rolável e seleção visual
 │   └── TExampleNavigationItem: item visual reutilizável
+├── RickUIBuilder.Samples.Example.Common.ViewSelector.pas
+│   └── TExampleViewSelector: alternância funcional Código Delphi/Resultado
 ├── RickUIBuilder.Samples.Example.Common.CodePanel.pas
-│   └── TExampleCodePanel: faixa Código Delphi/Resultado e superfície de código
+│   └── TExampleCodePanel: superfície rolável de código
 ├── RickUIBuilder.Samples.Example.Common.ResultPanel.pas
 │   └── TExampleResultPanel: título, superfície e ResultHost
 ├── RickUIBuilder.Samples.Example.Common.Icons.pas
@@ -74,7 +76,7 @@ src/Examples/Common/
     └── geometria e paleta compartilhadas
 ```
 
-Essa separação é estrutural e não cria regras específicas de componente. `TExampleCommon` coordena os controles acima; não reimplementa internamente header, navegação, painel de código ou painel de resultado.
+Essa separação é estrutural e não cria regras específicas de componente. `TExampleCommon` coordena os controles acima; não reimplementa internamente header, navegação, seletor, painel de código ou painel de resultado.
 
 A base implementada expõe pontos de extensão protegidos para as derivadas:
 
@@ -90,7 +92,7 @@ ResultHost
 
 Esses pontos de extensão não materializam componente ou abordagem. `AddNavigationItem` cria somente o item visual; a derivada associa sua ação. `SelectNavigationItem` controla apenas o estado visual selecionado. `ResultHost` é o container dos controles reais e `ClearResult` remove seus filhos visuais antes da substituição do exemplo.
 
-A faixa `Código Delphi` / `Resultado` permanece com `HitTest` desabilitado e não implementa tabs.
+`Código Delphi` e `Resultado` são opções clicáveis coordenadas por `TExampleViewSelector`. Exatamente uma view fica ativa: `Código Delphi` é o estado inicial; selecionar `Resultado` oculta o código e exibe somente o painel de resultado, e selecionar `Código Delphi` executa a alternância inversa.
 
 ## Primeira página concreta — Text / Label - Factory
 
@@ -125,7 +127,7 @@ Ao trocar a seleção, a page executa a sequência `SelectNavigationItem → Set
 
 ## Textframe normativo da tela-base
 
-O textframe abaixo fixa **ordem, agrupamento e hierarquia**. O Design System pode ajustar tokens visuais compatíveis, mas não deve mover, remover ou reordenar os blocos sem nova decisão explícita.
+O textframe abaixo fixa **ordem, agrupamento e hierarquia**. O Design System pode ajustar tokens visuais compatíveis, mas não deve mover, remover ou reordenar os blocos sem nova decisão explícita. Código e resultado nunca aparecem simultaneamente na mesma view.
 
 ```text
 ┌────────────────────────────────────────────────────────────────────┐
@@ -144,21 +146,41 @@ O textframe abaixo fixa **ordem, agrupamento e hierarquia**. O Design System pod
 │  ...              │                                                │
 │                   │  ┌──────────────────────────────────────────┐  │
 │                   │  │                                          │  │
-│                   │  │  superfície de código/conteúdo          │  │
-│                   │  │  correspondente ao exemplo selecionado  │  │
-│                   │  │                                          │  │
-│                   │  └──────────────────────────────────────────┘  │
-│                   │                                                │
-│                   │  Resultado                                     │
-│                   │  ┌──────────────────────────────────────────┐  │
-│                   │  │                                          │  │
-│                   │  │  host para execução/preview do sample    │  │
-│                   │  │  criado pela página derivada             │  │
+│                   │  │  VIEW ATIVA                              │  │
+│                   │  │  Código OU Resultado                     │  │
 │                   │  │                                          │  │
 │                   │  └──────────────────────────────────────────┘  │
 │                   │                                                │
 └───────────────────┴────────────────────────────────────────────────┘
 ```
+
+### Estado `Código Delphi`
+
+```text
+[ Código Delphi ] [ Resultado ]
+
+┌──────────────────────────────────────────────────┐
+│ código Delphi do exemplo selecionado             │
+│ ...                                              │
+└──────────────────────────────────────────────────┘
+```
+
+Nesta view, o painel `Resultado` fica oculto.
+
+### Estado `Resultado`
+
+```text
+[ Código Delphi ] [ Resultado ]
+
+Resultado
+┌──────────────────────────────────────────────────┐
+│                                                  │
+│       controle(s) criado(s) pelo sample          │
+│                                                  │
+└──────────────────────────────────────────────────┘
+```
+
+Nesta view, o painel de código fica oculto.
 
 ## Sequência visual obrigatória
 
@@ -179,16 +201,14 @@ A ordem vertical/hierárquica é:
         ↓
 6. Descrição do exemplo
         ↓
-7. Faixa visual Código Delphi / Resultado
+7. Seletor Código Delphi / Resultado
         ↓
-8. Superfície de código/conteúdo
-        ↓
-9. Título Resultado
-        ↓
-10. Host de execução/preview
+8. Uma única view ativa
+        ├── Código Delphi → superfície de código
+        └── Resultado → título Resultado + host de execução/preview
 ```
 
-Essa sequência é parte do contrato de UX da família e não pode ser reinterpretada automaticamente pelo Design System.
+Essa sequência é parte do contrato de UX da família. O Design System não pode voltar a exibir código e resultado simultaneamente sem nova decisão explícita.
 
 ## Header e retorno
 
@@ -266,7 +286,8 @@ Textframe:
 Comportamento comum esperado:
 
 - possuir exatamente um item selecionado quando houver exemplos;
-- fornecer estado visual distinto para o item selecionado;
+- fornecer estado visual distinto para o item selecionado: fundo azul-claro, texto azul e indicador vertical azul à esquerda;
+- o estado selecionado não depende de bold para comunicar seleção;
 - ao trocar a seleção, atualizar a área principal para o exemplo correspondente;
 - permitir quantidade variável de itens;
 - quando a quantidade exceder a área disponível, a solução deve preservar a largura/posição da coluna e tratar o overflow sem aumentar a janela acima da Home.
@@ -286,19 +307,26 @@ A página derivada fornece esses textos. A base apenas garante posicionamento, t
 
 O título e a descrição devem corresponder ao mesmo exemplo selecionado na navegação lateral.
 
-## Faixa `Código Delphi` / `Resultado`
+## Seletor `Código Delphi` / `Resultado`
 
-A referência visual contém a seguinte faixa:
+A referência visual define duas opções adjacentes:
 
 ```text
 [ Código Delphi ] [ Resultado ]
 ```
 
-Nesta etapa, somente sua **posição e presença visual** estão especificadas.
+O seletor é funcional e obedece às seguintes regras:
 
-A semântica de clique/alternância entre `Código Delphi` e `Resultado` é **Não confirmada**. A primeira página concreta não adiciona tabs; a implementação da base continua sem troca de conteúdo ou duplicação de estado.
+- exatamente uma opção fica selecionada;
+- `Código Delphi` é a seleção inicial ao abrir a página;
+- a opção selecionada usa fundo azul-claro e texto azul, preservando a referência visual;
+- selecionar `Código Delphi` exibe somente `TExampleCodePanel` e oculta `TExampleResultPanel`;
+- selecionar `Resultado` exibe somente `TExampleResultPanel` e oculta `TExampleCodePanel`;
+- a alternância de view não troca o exemplo selecionado e não cria um segundo estado do sample;
+- o resultado pode ser preparado quando o exemplo muda, mesmo enquanto a view de código estiver ativa; ao abrir `Resultado`, deve ser exibido o resultado correspondente ao mesmo exemplo;
+- a responsabilidade de alternância pertence à infraestrutura comum, não às páginas concretas.
 
-Até essa definição, o textframe deve preservar a região para que o Design System não elimine nem reposicione o elemento.
+`TExampleViewSelector` materializa e mantém a seleção. `TExampleCommon` responde à mudança tornando os painéis mutuamente exclusivos.
 
 ## Superfície de código
 
@@ -325,7 +353,7 @@ Regras planejadas:
 
 ## Área `Resultado`
 
-A região inferior da área principal é o host de execução/preview:
+Quando a opção `Resultado` está selecionada, a área principal apresenta o título e o host de execução/preview:
 
 ```text
 Resultado
@@ -336,7 +364,7 @@ Resultado
 └──────────────────────────────────────────────────┘
 ```
 
-A base fornece somente o host visual e o boundary de apresentação. A página derivada é responsável por:
+A superfície de resultado usa fundo claro próprio, borda suave e cantos arredondados conforme a referência aprovada. A base fornece somente o host visual e o boundary de apresentação. A página derivada é responsável por:
 
 - criar os controles reais do exemplo;
 - usar a abordagem correta, Factory ou Fluent Builder;
@@ -355,6 +383,7 @@ A Sample Page Base pode conhecer:
 - regiões de identidade;
 - layout navegação lateral + conteúdo;
 - estado visual de seleção;
+- seletor funcional entre código e resultado;
 - hosts de código e resultado;
 - cores, espaçamentos e tipografia comuns;
 - comportamento estrutural necessário para trocar o exemplo visível.
@@ -434,20 +463,16 @@ Este textframe ilustra uma futura derivada sem declarar implementação atual:
 │ Exemplos completos│                                                │
 │                   │ ┌────────────────────────────────────────────┐ │
 │                   │ │ código Delphi do exemplo                  │ │
-│                   │ └────────────────────────────────────────────┘ │
-│                   │                                                │
-│                   │ Resultado                                      │
-│                   │ ┌────────────────────────────────────────────┐ │
-│                   │ │          [ controle executado ]           │ │
+│                   │ │ (view Código Delphi ativa)                │ │
 │                   │ └────────────────────────────────────────────┘ │
 └───────────────────┴────────────────────────────────────────────────┘
 ```
 
-Os itens do menu são somente os fornecidos pela referência visual. Sua validade como cobertura da API de Button deverá ser verificada quando a página concreta for realmente implementada.
+Os itens do menu são somente os fornecidos pela referência visual. Sua validade como cobertura da API de Button deverá ser verificada quando a página concreta for realmente implementada. Na view `Resultado`, esse mesmo espaço passa a exibir somente o título `Resultado` e a superfície executável, nunca simultaneamente ao código.
 
 ## Critérios de aderência da implementação da base
 
-A primeira implementação deve ser considerada aderente a esta especificação somente se, no mínimo:
+A implementação atual da base deve ser considerada aderente a esta especificação somente se, no mínimo:
 
 - conter apenas a infraestrutura comum da Sample Page Base;
 - permanecer menor que a Home em largura e altura;
@@ -456,10 +481,10 @@ A primeira implementação deve ser considerada aderente a esta especificação 
 - permitir retorno à Component Page de origem;
 - separar navegação lateral da área principal;
 - reservar título/descrição do exemplo;
-- preservar a faixa visual `Código Delphi` / `Resultado` sem inventar comportamento ainda não confirmado;
+- implementar `Código Delphi` / `Resultado` como seletor funcional com views mutuamente exclusivas;
+- iniciar em `Código Delphi`;
 - possuir superfície de código e host de resultado distintos;
 - não conter conteúdo específico de componente/abordagem;
-- não conter páginas concretas ou samples reais nesta etapa;
 - não centralizar catálogo global de exemplos;
 - não alterar Home ou Component Pages além do necessário para uma integração explicitamente autorizada em etapa posterior.
 
@@ -468,9 +493,8 @@ A primeira implementação deve ser considerada aderente a esta especificação 
 Continuam fora do escopo até nova autorização:
 
 - páginas concretas `Button - Factory`, `Button - Fluent Builder` e equivalentes;
-- implementação dos menus definitivos de cada componente;
-- snippets reais de API;
-- criação/execução real dos controles de sample;
-- interatividade de `Ver exemplos` nas Component Pages;
-- definição funcional da faixa `Código Delphi` / `Resultado`;
+- implementação dos menus definitivos dos destinos ainda não implementados;
+- snippets reais de API para destinos ainda não implementados;
+- criação/execução real dos controles dos samples ainda não implementados;
+- interatividade de `Ver exemplos` nas Component Pages que ainda não possuem destino real;
 - Composition nessa navegação.

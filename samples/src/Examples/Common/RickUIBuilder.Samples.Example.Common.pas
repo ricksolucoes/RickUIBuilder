@@ -5,13 +5,13 @@
 {  Finalidade                                                                  }
 {  ----------                                                                  }
 {  Orquestrar a infraestrutura comum das páginas concretas de exemplos do      }
-{  RickUIBuilder.Samples.                                                       }
+{  RickUIBuilder.Samples.                                                      }
 {                                                                              }
 {  Funcionalidade                                                              }
 {  --------------                                                              }
 {  Configura a janela FMX borderless menor que a Home, compõe header,          }
-{  identidade, navegação lateral, painel de código e resultado e expõe API     }
-{  protegida para as classes derivadas.                                        }
+{  identidade, navegação lateral, seletor Código Delphi/Resultado e a view     }
+{  principal, expondo operações protegidas para as páginas derivadas.          }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
@@ -21,25 +21,22 @@
 {      Materializa o header e a ação visual de retorno.                        }
 {  - RickUIBuilder.Samples.Example.Common.Navigation                           }
 {      Materializa a navegação lateral e seu estado visual selecionado.        }
+{  - RickUIBuilder.Samples.Example.Common.ViewSelector                         }
+{      Materializa e controla a seleção visual Código Delphi/Resultado.        }
 {  - RickUIBuilder.Samples.Example.Common.CodePanel                            }
-{      Materializa a faixa Código Delphi/Resultado e a superfície de código.   }
+{      Materializa exclusivamente a superfície rolável de código.              }
 {  - RickUIBuilder.Samples.Example.Common.ResultPanel                          }
-{      Materializa o host destinado ao resultado executável.                   }
+{      Materializa exclusivamente a superfície e o host do resultado.          }
 {  - RickUIBuilder.Samples.Example.Common.Style                                }
-{      Fornece dimensões, espaçamentos e paleta desta família.                 }
-{                                                                              }
-{  Dependências técnicas FMX                                                   }
-{  -------------------------                                                   }
-{  - FMX.Types fornece TTextAlign e deve permanecer explícito no uses sempre  }
-{    que esse tipo for utilizado.                                              }
-{  - FMX.Graphics fornece TBrushKind e deve permanecer explícito no uses       }
-{    sempre que esse tipo for utilizado.                                       }
+{      Fornece dimensões, espaçamentos e paleta específicos desta família.     }
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
-{  - Páginas concretas herdam TExampleCommon.                                 }
+{  - Páginas concretas herdam TExampleCommon.                                  }
 {  - A derivada define categorias, conteúdo, snippet e execução; a base apenas }
 {    coordena os controles estruturais comuns.                                 }
+{  - Código Delphi e Resultado são views mutuamente exclusivas; a seleção      }
+{    ocorre na base sem alterar o conteúdo fornecido pela derivada.            }
 {  - Back fecha somente a modal atual.                                         }
 {                                                                              }
 {  Ownership / lifetime                                                        }
@@ -52,7 +49,8 @@
 {  -----------------------------                                               }
 {  - Não conhece conteúdo específico de componente ou abordagem.               }
 {  - Não contém catálogo global de exemplos ou case/if por componente.         }
-{  - A faixa Código Delphi/Resultado permanece somente visual.                 }
+{  - A base controla somente qual view estrutural fica visível.                }
+{  - TTextAlign exige FMX.Types e TBrushKind exige FMX.Graphics explicitamente.}
 {                                                                              }
 {  Manutenção                                                                  }
 {  ----------                                                                  }
@@ -72,6 +70,7 @@ uses
   FMX.Objects,
   RickUIBuilder.Samples.Example.Common.Header,
   RickUIBuilder.Samples.Example.Common.Navigation,
+  RickUIBuilder.Samples.Example.Common.ViewSelector,
   RickUIBuilder.Samples.Example.Common.CodePanel,
   RickUIBuilder.Samples.Example.Common.ResultPanel;
 
@@ -86,6 +85,7 @@ type
     FContentHost: TLayout;
     FExampleTitle: TText;
     FExampleDescription: TText;
+    FViewSelector: TExampleViewSelector;
     FCodePanel: TExampleCodePanel;
     FResultPanel: TExampleResultPanel;
     procedure ConfigureForm;
@@ -100,8 +100,11 @@ type
     procedure BuildExampleIdentity;
     procedure AddExampleTitle;
     procedure AddExampleDescription;
+    procedure BuildViewSelector;
     procedure BuildCodePanel;
     procedure BuildResultPanel;
+    procedure ViewSelectionChanged(ASender: TObject);
+    procedure ApplySelectedView;
     procedure BackRequested(ASender: TObject);
     function GetResultHost: TLayout;
   strict protected
@@ -120,10 +123,8 @@ implementation
 
 uses
   System.UITypes,
-
   FMX.Types,
   FMX.Graphics,
-
   RickUIBuilder.Samples.App.Typography,
   RickUIBuilder.Samples.Example.Common.Style;
 
@@ -223,8 +224,10 @@ begin
   FContentHost.SetBounds(_EXAMPLE_PAGE_NAV_WIDTH_ + _EXAMPLE_PAGE_BODY_GAP_, 0,
     _EXAMPLE_PAGE_MAIN_WIDTH_, _EXAMPLE_PAGE_BODY_HEIGHT_);
   BuildExampleIdentity;
+  BuildViewSelector;
   BuildCodePanel;
   BuildResultPanel;
+  ApplySelectedView;
 end;
 
 procedure TExampleCommon.BuildExampleIdentity;
@@ -261,6 +264,16 @@ begin
   FExampleDescription.HitTest := False;
 end;
 
+procedure TExampleCommon.BuildViewSelector;
+var
+  LViewSelector: TExampleViewSelector;
+begin
+  LViewSelector := TExampleViewSelector.Create(FContentHost);
+  LViewSelector.Parent := FContentHost;
+  LViewSelector.OnChange := ViewSelectionChanged;
+  FViewSelector := LViewSelector;
+end;
+
 procedure TExampleCommon.BuildCodePanel;
 var
   LCodePanel: TExampleCodePanel;
@@ -277,6 +290,17 @@ begin
   LResultPanel := TExampleResultPanel.Create(FContentHost);
   LResultPanel.Parent := FContentHost;
   FResultPanel := LResultPanel;
+end;
+
+procedure TExampleCommon.ViewSelectionChanged(ASender: TObject);
+begin
+  ApplySelectedView;
+end;
+
+procedure TExampleCommon.ApplySelectedView;
+begin
+  FCodePanel.Visible := FViewSelector.SelectedView = TExampleView.CodeView;
+  FResultPanel.Visible := FViewSelector.SelectedView = TExampleView.ResultView;
 end;
 
 procedure TExampleCommon.ConfigurePage(const AParentTitle, ATitle,

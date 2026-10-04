@@ -9,7 +9,8 @@
 {  Funcionalidade                                                              }
 {  --------------                                                              }
 {  Materializa a superfície lateral, o scroll vertical, os itens de navegação  }
-{  e o estado visual do item atualmente selecionado.                           }
+{  e o estado visual aprovado do item atualmente selecionado, incluindo        }
+{  fundo azul-claro e indicador vertical azul à esquerda.                      }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
@@ -21,7 +22,7 @@
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
 {  - TExampleCommon cria TExampleNavigation e delega AddItem/SelectItem.       }
-{  - A página derivada associa a ação do item retornado por AddItem.             }
+{  - A página derivada associa a ação do item retornado por AddItem.           }
 {                                                                              }
 {  Ownership / lifetime                                                        }
 {  --------------------                                                        }
@@ -32,6 +33,7 @@
 {  -----------------------------                                               }
 {  - Não conhece categorias fixas nem significado funcional dos itens.         }
 {  - Selecionar um item altera somente seu estado visual.                      }
+{  - TTextAlign exige FMX.Types e TBrushKind exige FMX.Graphics explicitamente.}
 {                                                                              }
 {  Manutenção                                                                  }
 {  ----------                                                                  }
@@ -53,8 +55,10 @@ type
   /// <summary>Item visual reutilizável da navegação lateral.</summary>
   TExampleNavigationItem = class(TRectangle)
   strict private
+    FSelectionIndicator: TRectangle;
     FLabel: TText;
     procedure ConfigureSurface;
+    procedure BuildSelectionIndicator;
     procedure BuildLabel;
   public
     constructor Create(AOwner: TComponent); override;
@@ -91,6 +95,7 @@ constructor TExampleNavigationItem.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   ConfigureSurface;
+  BuildSelectionIndicator;
   BuildLabel;
 end;
 
@@ -102,6 +107,19 @@ begin
   XRadius := _EXAMPLE_PAGE_NAV_ITEM_RADIUS_;
   YRadius := _EXAMPLE_PAGE_NAV_ITEM_RADIUS_;
   Cursor := crHandPoint;
+end;
+
+procedure TExampleNavigationItem.BuildSelectionIndicator;
+begin
+  FSelectionIndicator := TRectangle.Create(Self);
+  FSelectionIndicator.Parent := Self;
+  FSelectionIndicator.SetBounds(0, _EXAMPLE_PAGE_NAV_INDICATOR_TOP_,
+    _EXAMPLE_PAGE_NAV_INDICATOR_WIDTH_, _EXAMPLE_PAGE_NAV_INDICATOR_HEIGHT_);
+  FSelectionIndicator.Fill.Kind := TBrushKind.Solid;
+  FSelectionIndicator.Fill.Color := _EXAMPLE_PAGE_PRIMARY_;
+  FSelectionIndicator.Stroke.Kind := TBrushKind.None;
+  FSelectionIndicator.HitTest := False;
+  FSelectionIndicator.Visible := False;
 end;
 
 procedure TExampleNavigationItem.BuildLabel;
@@ -128,11 +146,11 @@ begin
   Fill.Color := _EXAMPLE_PAGE_SURFACE_BACKGROUND_;
   FLabel.TextSettings.FontColor := _EXAMPLE_PAGE_TEXT_SECONDARY_;
   FLabel.TextSettings.Font.Style := [];
+  FSelectionIndicator.Visible := ASelected;
   if not ASelected then
     Exit;
   Fill.Color := _EXAMPLE_PAGE_NAV_SELECTED_BACKGROUND_;
   FLabel.TextSettings.FontColor := _EXAMPLE_PAGE_PRIMARY_;
-  FLabel.TextSettings.Font.Style := [TFontStyle.fsBold];
 end;
 
 { TExampleNavigation }
