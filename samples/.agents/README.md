@@ -53,9 +53,11 @@ Auditores especializados não devem receber conclusões de outros auditores nem 
 
 O auditor final de processo recebe o manifesto, mas não confia na seleção do Orchestrator: recalcula os gates obrigatórios a partir da solicitação e do artefato final.
 
-## Regras obrigatórias para estrutura e UI da Home
+## Regras obrigatórias para estrutura e UI do Samples
 
-Os agentes aplicáveis devem tratar como critérios objetivos: units internas explicitamente incluídas no `.dpr` e `.dproj`; ausência do próprio `samples/src` no Search Path; organização física por responsabilidade (`App`, `Home`, `Components/Common`); header alinhado a `Top/Left/Right` do client sem margem externa; e cards dimensionados para o conteúdo sem reduzir a tipografia aprovada.
+Os agentes aplicáveis devem tratar como critérios objetivos: units internas explicitamente incluídas no `.dpr` e `.dproj`; ausência do próprio `samples/src` no Search Path; organização física por responsabilidade (`App`, `Home`, `Components/Common` e diretórios concretos por componente quando houver unit real); header da Home alinhado ao client sem margem externa; e cards dimensionados para o conteúdo sem reduzir a tipografia aprovada.
+
+Para Component Pages, `RickUIBuilder.Samples.ComponentPage` deve permanecer base comum de layout/comportamento, sem conteúdo centralizado dos seis componentes e sem dependência de `Home.Style`. Cada componente navegável possui page concreta derivada. A página é intermediária: Factory/Fluent são divisões visuais e seus samples/destinos continuam fora do escopo até implementação explícita. O formulário deve ser borderless, o retorno deve fechar a modal e nenhum texto/card/painel pode sofrer clipping.
 
 ## Cabeçalho estrutural das units Delphi
 

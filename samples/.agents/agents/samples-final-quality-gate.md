@@ -35,3 +35,6 @@ Quando `.pas` for criado/modificado, `PASS` exige evidência do Naming Auditor. 
 
 ## Higiene da entrega
 Em pacote/release, reprovar presença de `__history/`, `__recovery/`, `.identcache` ou `.dproj.local` sem necessidade explícita e comprovada. Verificar recursos de build como `.res` pela referência real no projeto, sem remoção automática.
+
+## Gate específico das Component Pages
+Quando aplicável, `PASS` exige evidência de que: a base `TComponentPage` não centraliza conteúdo dos seis componentes; cada componente navegável possui page concreta derivada; Components não depende de `Home.Style`; o formulário é borderless; o retorno fecha a modal sem alterar o fluxo global; subtítulo, cards e painel informativo possuem espaço suficiente sem reduzir tipografia; Edit não apresenta Factory inexistente; e nenhuma página/sample Factory/Fluent foi antecipada sem requisito.

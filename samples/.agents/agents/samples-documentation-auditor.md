@@ -29,3 +29,6 @@ Auditar individualmente toda unit `.pas` criada ou modificada. O cabeçalho supe
 - Confirmar que decisões numeradas permanecem rastreáveis e sem identificadores duplicados.
 - Não usar `__history/`, `__recovery/`, `.identcache` ou `.dproj.local` como fonte para documentar o estado oficial do Samples.
 - Quando a política de entrega for documentada, distinguir artefatos locais/temporários de recursos realmente necessários ao build, como `.res` quando referenciado pelo projeto.
+
+## Coerência documental das Component Pages
+Quando a família de Component Pages for alterada, confirmar que `docs/samples` distingue a base comum das pages concretas, documenta apenas abordagens realmente suportadas, mantém páginas/samples Factory/Fluent como futuros enquanto não existirem e não descreve `Home.Style` como dependência de Components se o código final não a utilizar.

@@ -203,8 +203,8 @@ var
 begin
   LTitle := TText.Create(AParent);
   LTitle.Parent := AParent;
-  LTitle.SetBounds(42, 0, 140, _HOME_TOP_BAR_HEIGHT_);
-  LTitle.Text := 'Componentes';
+  LTitle.SetBounds(42, 0, 240, _HOME_TOP_BAR_HEIGHT_);
+  LTitle.Text := 'Rick.UIBuilder - Samples';
   LTitle.TextSettings.Font.Size := _FONT_SIZE_NAVIGATION_;
   LTitle.TextSettings.Font.Style := [TFontStyle.fsBold];
   LTitle.TextSettings.FontColor := _HOME_TEXT_PRIMARY_;

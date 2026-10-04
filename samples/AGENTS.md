@@ -52,7 +52,7 @@ Consulte `.agents/README.md` para aplicabilidade, responsabilidades e formato do
 
 ## Regras estruturais obrigatórias do Samples
 
-1. As units internas do Samples devem estar fisicamente organizadas por responsabilidade em `src/App`, `src/Home` e `src/Components/Common` enquanto essas responsabilidades existirem. Não criar diretórios de componentes sem units reais que os justifiquem.
+1. As units internas do Samples devem estar fisicamente organizadas por responsabilidade. `src/App`, `src/Home` e `src/Components/Common` concentram responsabilidades compartilhadas; diretórios `src/Components/<Componente>` são permitidos somente quando possuírem units concretas daquele componente. Não criar diretórios antecipados sem implementação real.
 2. Toda unit interna usada pelo executável deve estar explicitamente registrada no projeto (`.dpr` com `in` e `.dproj` com `DCCReference`). O Search Path não pode ser usado para mascarar unit interna ausente do projeto.
 3. `DCC_UnitSearchPath` não deve conter `src` nem subpastas internas do próprio Samples. Ele pode conter somente dependências externas realmente necessárias, como `..\src` da biblioteca Rick.UIBuilder, além do Search Path herdado.
 4. O header da Home deve ocupar toda a largura do client, alinhado ao topo, sem margem externa lateral ou superior. Respiro visual pertence ao conteúdo abaixo do header.
@@ -62,3 +62,7 @@ Consulte `.agents/README.md` para aplicabilidade, responsabilidades e formato do
 8. Toda alteração de código Delphi exige `Samples Naming Auditor`; alterações que possam afetar corpos de métodos exigem também `Samples Toxicity Auditor`. Interfaces, GUIDs, reference counting, ownership ou lifetime exigem `Samples Contract & Lifetime Auditor`.
 9. Os arquivos declarados no catálogo de agents devem existir fisicamente em `.agents/agents/`. Catálogo e arquivos de agentes divergentes constituem falha de governança.
 10. Artefatos locais/temporários da IDE, como `__history/`, `__recovery/`, `.identcache` e `.dproj.local`, não são fonte arquitetural nem documental e não devem integrar pacote de entrega sem necessidade explícita e comprovada. Arquivos necessários ao build, como `.res`, não são classificados como temporários apenas pela extensão.
+
+11. `RickUIBuilder.Samples.ComponentPage` é a base comum das páginas intermediárias de componente. Conteúdo específico de Text/Label, Button, Badge, Divider, ComboBox e Edit deve permanecer nas respectivas pages derivadas; a base não deve centralizar arrays/configurações desses seis componentes nem depender de `Home.Style`.
+12. As Component Pages atuais são somente a divisão visual para Factory e Fluent Builder. Não criar páginas, samples, callbacks vazios ou destinos fictícios de Factory/Fluent sem requisito explícito de etapa posterior.
+13. Component Pages devem permanecer borderless, com header no topo, retorno funcional fechando a modal e geometria suficiente para subtítulo, cards e painel informativo sem clipping e sem redução da tipografia aprovada.

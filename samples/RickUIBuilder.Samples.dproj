@@ -311,7 +311,15 @@
         <DCCReference Include="src\Home\RickUIBuilder.Samples.Home.Presenter.Intf.pas"/>
         <DCCReference Include="src\Home\RickUIBuilder.Samples.Home.Presenter.pas"/>
         <DCCReference Include="src\Home\RickUIBuilder.Samples.Home.Style.pas"/>
-        <DCCReference Include="src\Components\Common\RickUIBuilder.Samples.ComponentPage.pas"/>
+        <DCCReference Include="src\Components\Common\RickUIBuilder.Samples.Component.Common.pas"/>
+        <DCCReference Include="src\Components\Common\RickUIBuilder.Samples.Component.Common.Icons.pas"/>
+        <DCCReference Include="src\Components\TextLabel\RickUIBuilder.Samples.Component.TextLabel.pas"/>
+        <DCCReference Include="src\Components\Button\RickUIBuilder.Samples.Component.Button.pas"/>
+        <DCCReference Include="src\Components\Badge\RickUIBuilder.Samples.Component.Badge.pas"/>
+        <DCCReference Include="src\Components\Divider\RickUIBuilder.Samples.Component.Divider.pas"/>
+        <DCCReference Include="src\Components\ComboBox\RickUIBuilder.Samples.Component.ComboBox.pas"/>
+        <DCCReference Include="src\Components\Edit\RickUIBuilder.Samples.Component.Edit.pas"/>
+        <DCCReference Include="src\Components\Common\RickUIBuilder.Samples.Component.Common.Style.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -353,7 +361,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Win32\Debug\RickUIBuilder.Samples.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="..\APP\Debug\RickUIBuilder.Samples.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>RickUIBuilder.Samples.exe</RemoteName>
                         <Overwrite>true</Overwrite>

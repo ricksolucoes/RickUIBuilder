@@ -1,115 +1,143 @@
-# Especificação visual da Component Page
+# Especificação da Component Page
 
 ## Status
 
-**Especificação aprovada para a próxima etapa de implementação.**
+**Estrutura implementada no código-fonte atual do Samples.**
 
-Este documento descreve o layout-alvo das páginas de componente do `RickUIBuilder.Samples`. Ele **não declara que o layout abaixo já está implementado**. O estado atual do código continua sendo a autoridade para comportamento existente; esta especificação orienta a próxima alteração da `TComponentPage`.
+Este documento descreve a página intermediária de componente e suas seis implementações concretas. Ele documenta a estrutura e a geometria presentes no código. Compilação Delphi e validação visual em runtime dependem de execução real do ambiente e não são inferidas por esta documentação.
 
-A referência visual aprovada é a imagem fornecida para a página `Button`. A imagem orienta hierarquia, proporção, alinhamento, densidade e aparência. Textos técnicos e capacidades vêm da API pública e da documentação real do Rick.UIBuilder, não de afirmações funcionais presentes na imagem.
+## Papel da página
 
-## Escopo desta etapa
-
-A próxima implementação deve ajustar somente a página intermediária de componente, mantendo a Home já concluída.
-
-O Samples continuará com estas telas/estados navegáveis:
+A Component Page é somente o ponto intermediário entre a Home e as futuras páginas que conterão os samples de cada abordagem.
 
 ```text
 Home
-├── Text / Label ──┐
-├── Button ────────┤
-├── Badge ─────────┤
-├── Divider ───────┼──► TComponentPage
-├── ComboBox ──────┤
-└── Edit ──────────┘
+  │
+  ▼
+Component Page do componente
+  │
+  ├── Factory
+  │      └── página futura com samples Factory
+  │
+  └── Fluent Builder
+         └── página futura com samples Fluent Builder
 ```
 
-`TComponentPage` continua sendo uma única página reutilizável. O componente selecionado define título, subtítulo, texto informativo e disponibilidade das abordagens.
+Nesta etapa não existem páginas de destino Factory/Fluent, samples demonstrativos nem callbacks fictícios. `Ver exemplos` é somente parte do layout visual.
 
-As telas específicas de exemplos de `Factory` e `Fluent Builder` **não fazem parte desta etapa** e continuam registradas como trabalho futuro.
+## Arquitetura da família de páginas
 
-## Hierarquia visual comum
-
-A página segue quatro zonas, de cima para baixo:
+A infraestrutura comum reside em `RickUIBuilder.Samples.ComponentPage.pas`.
 
 ```text
-┌──────────────────────────────────────────────────────────┐
-│  ←   Componentes                                         │  Navegação
-├──────────────────────────────────────────────────────────┤
-│                                                          │
-│   Título do componente                                   │  Identidade
-│   Subtítulo contextual                                   │
-│                                                          │
-│   ┌───────────────────────┐  ┌───────────────────────┐   │
-│   │       abordagem       │  │       abordagem       │   │  Abordagens
-│   └───────────────────────┘  └───────────────────────┘   │
-│                                                          │
-│   ┌──────────────────────────────────────────────────┐   │
-│   │  ⓘ   Sobre este componente                      │   │  Contexto
-│   │      Texto técnico curto e específico.           │   │
-│   └──────────────────────────────────────────────────┘   │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
+TComponentPage
+      ▲
+      ├── TTextLabelComponentPage
+      ├── TButtonComponentPage
+      ├── TBadgeComponentPage
+      ├── TDividerComponentPage
+      ├── TComboBoxComponentPage
+      └── TEditComponentPage
 ```
 
-A imagem de referência possui aproximadamente `430 × 395 px`. Essa dimensão é uma referência visual do screenshot e **não deve ser tratada automaticamente como `ClientWidth`/`ClientHeight` do `TForm`**. A implementação deve reproduzir as proporções e o espaçamento observados sem depender de borda de janela ou escala externa do screenshot.
+A classe-base é abstrata e não conhece `TSampleComponent`. Ela define somente formulário, header, retorno, geometria, cards e painel informativo compartilhados.
 
-## Navegação superior
+Cada página derivada decide explicitamente:
 
-O header/breadcrumb possui:
+- título;
+- subtítulo;
+- texto de `Sobre este componente`;
+- presença de Factory;
+- presença/posição de Fluent Builder.
 
-- seta de retorno à esquerda;
-- texto `Componentes`;
-- separador inferior sutil;
-- superfície visual coerente com a Home;
-- área de hit adequada quando a ação de retorno estiver implementada;
-- `crHandPoint` somente quando existir ação real.
+Não existe array central de títulos/subtítulos/descrições dos seis componentes e não existe `SupportsFactory` na classe-base.
 
-O retorno atual da página continua ocorrendo pelo fechamento modal. A adoção de uma ação explícita de Back deve respeitar a decisão de navegação vigente no momento da implementação.
+## Geometria comum
+
+A implementação atual usa:
+
+| Elemento | Valor |
+|---|---:|
+| ClientWidth | `500` |
+| ClientHeight | `500` |
+| Header | `40` |
+| Margem horizontal de conteúdo | `24` |
+| Largura útil | `452` |
+| Card | `220 × 188` |
+| Gap entre cards | `12` |
+| Top dos cards | `152` |
+| Top do painel de informação | `356` |
+| Altura do painel de informação | `126` |
+
+O formulário usa `TFmxFormBorderStyle.None`, seguindo o mesmo princípio visual da Home: não existe title bar nativa acima do header do Samples.
+
+A geometria foi ampliada em relação à primeira tentativa para acomodar os maiores subtítulos e textos informativos atuais sem reduzir a tipografia.
+
+## Header e retorno
+
+```text
+┌────────────────────────────────────────────────────────────┐
+│  ←   Componentes                                           │
+├────────────────────────────────────────────────────────────┤
+```
+
+A seta possui uma área clicável maior que o SVG, cursor `crHandPoint` e feedback de hover. O clique executa `Close` na modal atual. O SVG interno usa `HitTest := False`.
+
+O retorno mantém o fluxo existente:
+
+```text
+TComponentPage.Close
+        ↓
+ShowModal retorna
+        ↓
+TSampleApplicationCoordinator libera a página
+        ↓
+Home volta a ficar ativa
+```
 
 ## Identidade do componente
 
-Abaixo do header:
+Abaixo do header, a página derivada adiciona:
 
-- título com o nome público do componente;
-- subtítulo curto, em uma linha quando houver espaço;
-- título usa `_FONT_SIZE_PAGE_TITLE_`;
-- subtítulo usa `_FONT_SIZE_PAGE_SUBTITLE_`;
-- o conteúdo é alinhado à esquerda, como na referência visual.
+- título com `_FONT_SIZE_PAGE_TITLE_ = 24`;
+- subtítulo com `_FONT_SIZE_PAGE_SUBTITLE_ = 14`;
+- alinhamento à esquerda;
+- quebra de linha habilitada no subtítulo;
+- área vertical suficiente para duas linhas sem invadir os cards.
 
 ## Cards de abordagem
 
-Quando `Factory` e `Fluent Builder` estiverem disponíveis, os dois cards aparecem lado a lado com mesma largura e altura.
-
-Cada card possui:
-
-1. ícone vetorial centralizado;
-2. título da abordagem;
-3. descrição curta;
-4. ação `Ver exemplos` na parte inferior;
-5. chevron vetorial à direita da ação.
-
-Textos fixos:
+Quando Factory e Fluent Builder estão disponíveis:
 
 ```text
-Factory
-Criação direta
-do componente.
-Ver exemplos
+┌──────────────────────┐  ┌──────────────────────┐
+│      [Factory]       │  │       [Link]         │
+│       Factory        │  │   Fluent Builder     │
+│   Criação direta     │  │    API encadeada     │
+│   do componente.     │  │  para configuração.  │
+│  [ Ver exemplos  › ] │  │  [ Ver exemplos  › ] │
+└──────────────────────┘  └──────────────────────┘
 ```
+
+Quando somente Fluent Builder existe, como no Edit:
 
 ```text
-Fluent Builder
-API encadeada
-para configuração.
-Ver exemplos
+              ┌──────────────────────┐
+              │       [Link]         │
+              │   Fluent Builder     │
+              │    API encadeada     │
+              │  para configuração.  │
+              │  [ Ver exemplos  › ] │
+              └──────────────────────┘
 ```
 
-A legenda `Ver exemplos` deve permanecer visualmente centralizada independentemente do chevron.
+O card único é centralizado. Não existe placeholder de Factory.
 
-### Assets obrigatórios
+`Ver exemplos` permanece com `HitTest := False` e sem callback enquanto os destinos reais não existirem.
 
-A geometria dos assets fornecidos deve ser preservada; não substituir por emoji, caractere Unicode ou desenho aproximado.
+## Assets vetoriais
+
+Os paths da família de páginas ficam em `RickUIBuilder.Samples.ComponentPage.Icons`.
 
 | Uso | Asset fornecido |
 |---|---|
@@ -117,32 +145,24 @@ A geometria dos assets fornecidos deve ser preservada; não substituir por emoji
 | Fluent Builder | `link-03-svgrepo-com.svg` |
 | Informação | `info_48dp_E3E3E3_FILL0_wght400_GRAD0_opsz48.svg` |
 
-Os três arquivos foram fornecidos junto à solicitação desta etapa. O caminho definitivo deles dentro do repositório **não está confirmado nesta documentação** e deve ser validado quando forem incorporados à implementação; não presumir uma pasta de assets inexistente.
-
-O asset de Factory é baseado em `fill`; o asset de Fluent Builder é baseado em `stroke`; o asset de informação é baseado em `fill`. A implementação FMX deve preservar essa diferença ao converter/renderizar a geometria em `TPath`.
-
-As cores finais dos três ícones devem seguir a referência visual: Factory em destaque violeta, Fluent Builder em destaque verde e informação em azul. Os valores ARGB exatos ainda **não estão definidos como contrato** nesta especificação; não inventar valores sem derivação/decisão na implementação.
-
-O chevron da ação deve continuar vetorial. A geometria já aprovada para `arrow_forward_ios` pode ser reutilizada, desde que isso não crie dependência arquitetural indevida entre a página de componente e a Home.
+A geometria do Factory e do ícone de informação é renderizada por fill. O Fluent Builder preserva o desenho baseado em stroke.
 
 ## Painel “Sobre este componente”
 
-O painel inferior possui:
+```text
+┌────────────────────────────────────────────────────────────┐
+│  ⓘ  Sobre este componente                                  │
+│                                                            │
+│     Texto técnico da página concreta, com quebra de linha  │
+│     e altura reservada para o maior conteúdo atual.        │
+└────────────────────────────────────────────────────────────┘
+```
 
-- superfície azul muito clara;
-- borda sutil e cantos arredondados;
-- ícone de informação à esquerda;
-- título `Sobre este componente` em destaque;
-- texto técnico curto abaixo do título;
-- conteúdo suficiente para duas ou três linhas sem clipping.
-
-O texto do painel deve descrever a implementação real do componente. Não copiar afirmações técnicas da imagem quando divergirem do código.
-
-**Exemplo importante:** a referência visual do Button menciona `TButton`, mas a implementação atual do Rick.UIBuilder materializa o Button como composição de `TRectangle + TLabel`. Portanto, `TButton` não deve aparecer no texto final dessa página enquanto o código continuar assim.
+O painel possui área de texto de `74` unidades de altura dentro de um container de `126`, evitando o corte observado na primeira versão.
 
 ## Tipografia
 
-Manter a escala já aprovada no Samples:
+A família reutiliza `RickUIBuilder.Samples.App.Typography`:
 
 | Papel | Token | Tamanho |
 |---|---|---:|
@@ -153,332 +173,147 @@ Manter a escala já aprovada no Samples:
 | Ação | `_FONT_SIZE_ACTION_` | 14 |
 | Navegação | `_FONT_SIZE_NAVIGATION_` | 13 |
 
-A geometria deve acomodar a tipografia. Não reduzir fonte para compensar falta de espaço.
+A geometria deve acomodar essa escala. Não reduzir fonte para mascarar clipping.
 
-## Conteúdo por tela
-
-Os textos abaixo são derivados da API/documentação atual do projeto e constituem o conteúdo-alvo da próxima implementação.
+## Conteúdo das seis páginas
 
 ### Text / Label
 
-**Título**
+**Classe:** `TTextLabelComponentPage`
 
-`Text / Label`
+**Subtítulo:** `Crie e configure textos FireMonkey com Rick.UIBuilder.`
 
-**Subtítulo**
+**Abordagens:** Factory + Fluent Builder.
 
-`Crie e configure textos FireMonkey com Rick.UIBuilder.`
-
-**Abordagens**
-
-- Factory
-- Fluent Builder
-
-**Sobre este componente**
-
-`Text / Label cria TLabel em runtime. A Factory cobre a configuração textual básica e o Fluent Builder complementa a configuração visual e de layout.`
-
-**Textframe**
+**Sobre:** `Text / Label cria TLabel em runtime. A Factory cobre a configuração textual básica e o Fluent Builder complementa a configuração visual e de layout.`
 
 ```text
-┌──────────────────────────────────────────────────────────┐
-│  ←   Componentes                                         │
-├──────────────────────────────────────────────────────────┤
-│                                                          │
-│   Text / Label                                           │
-│   Crie e configure textos FireMonkey com Rick.UIBuilder. │
-│                                                          │
-│   ┌───────────────────────┐  ┌───────────────────────┐   │
-│   │       [Factory]       │  │        [Link]         │   │
-│   │        Factory        │  │    Fluent Builder     │   │
-│   │     Criação direta    │  │     API encadeada     │   │
-│   │     do componente.    │  │    para configuração. │   │
-│   │   [ Ver exemplos  › ] │  │   [ Ver exemplos  › ] │   │
-│   └───────────────────────┘  └───────────────────────┘   │
-│                                                          │
-│   ┌──────────────────────────────────────────────────┐   │
-│   │  [Info]  Sobre este componente                  │   │
-│   │  Text / Label cria TLabel em runtime...          │   │
-│   └──────────────────────────────────────────────────┘   │
-└──────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────┐
+│  ←   Componentes                                           │
+├────────────────────────────────────────────────────────────┤
+│                                                            │
+│  Text / Label                                              │
+│  Crie e configure textos FireMonkey com Rick.UIBuilder.    │
+│                                                            │
+│  ┌────────────────────┐  ┌────────────────────┐            │
+│  │      Factory       │  │   Fluent Builder   │            │
+│  │  Ver exemplos  ›   │  │  Ver exemplos  ›   │            │
+│  └────────────────────┘  └────────────────────┘            │
+│                                                            │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │ ⓘ Sobre este componente                             │  │
+│  │ Text / Label cria TLabel em runtime...               │  │
+│  └──────────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────────┘
 ```
 
 ### Button
 
-**Título**
+**Classe:** `TButtonComponentPage`
 
-`Button`
+**Subtítulo:** `Crie e configure botões FireMonkey com Rick.UIBuilder.`
 
-**Subtítulo**
+**Abordagens:** Factory + Fluent Builder.
 
-`Crie e configure botões FireMonkey com Rick.UIBuilder.`
+**Sobre:** `Button é composto por TRectangle + TLabel. A Factory materializa a estrutura visual e o Fluent Builder acrescenta configuração e comportamento de hover.`
 
-**Abordagens**
-
-- Factory
-- Fluent Builder
-
-**Sobre este componente**
-
-`Button é composto por TRectangle + TLabel. A Factory materializa a estrutura visual e o Fluent Builder acrescenta configuração e comportamento de hover.`
-
-**Textframe**
-
-```text
-┌──────────────────────────────────────────────────────────┐
-│  ←   Componentes                                         │
-├──────────────────────────────────────────────────────────┤
-│                                                          │
-│   Button                                                 │
-│   Crie e configure botões FireMonkey com Rick.UIBuilder. │
-│                                                          │
-│   ┌───────────────────────┐  ┌───────────────────────┐   │
-│   │       [Factory]       │  │        [Link]         │   │
-│   │        Factory        │  │    Fluent Builder     │   │
-│   │     Criação direta    │  │     API encadeada     │   │
-│   │     do componente.    │  │    para configuração. │   │
-│   │   [ Ver exemplos  › ] │  │   [ Ver exemplos  › ] │   │
-│   └───────────────────────┘  └───────────────────────┘   │
-│                                                          │
-│   ┌──────────────────────────────────────────────────┐   │
-│   │  [Info]  Sobre este componente                  │   │
-│   │  Button é composto por TRectangle + TLabel...    │   │
-│   └──────────────────────────────────────────────────┘   │
-└──────────────────────────────────────────────────────────┘
-```
+A referência visual original mencionava `TButton`, mas a implementação real do Rick.UIBuilder materializa o Button como `TRectangle + TLabel`; a página preserva a verdade técnica do código.
 
 ### Badge
 
-**Título**
+**Classe:** `TBadgeComponentPage`
 
-`Badge`
+**Subtítulo:** `Crie badges compostos e configure sua apresentação com Rick.UIBuilder.`
 
-**Subtítulo**
+**Abordagens:** Factory + Fluent Builder.
 
-`Crie badges compostos e configure sua apresentação com Rick.UIBuilder.`
-
-**Abordagens**
-
-- Factory
-- Fluent Builder
-
-**Sobre este componente**
-
-`Badge combina TRectangle + TLabel e pode ser criado pela Factory ou configurado pelo Fluent Builder, incluindo as opções visuais próprias do componente.`
-
-**Textframe**
-
-```text
-┌──────────────────────────────────────────────────────────┐
-│  ←   Componentes                                         │
-├──────────────────────────────────────────────────────────┤
-│                                                          │
-│   Badge                                                  │
-│   Crie badges compostos e configure sua apresentação     │
-│   com Rick.UIBuilder.                                    │
-│                                                          │
-│   ┌───────────────────────┐  ┌───────────────────────┐   │
-│   │       [Factory]       │  │        [Link]         │   │
-│   │        Factory        │  │    Fluent Builder     │   │
-│   │     Criação direta    │  │     API encadeada     │   │
-│   │     do componente.    │  │    para configuração. │   │
-│   │   [ Ver exemplos  › ] │  │   [ Ver exemplos  › ] │   │
-│   └───────────────────────┘  └───────────────────────┘   │
-│                                                          │
-│   ┌──────────────────────────────────────────────────┐   │
-│   │  [Info]  Sobre este componente                  │   │
-│   │  Badge é materializado como TRectangle + TLabel. │   │
-│   └──────────────────────────────────────────────────┘   │
-└──────────────────────────────────────────────────────────┘
-```
+**Sobre:** `Badge combina TRectangle + TLabel e pode ser criado pela Factory ou configurado pelo Fluent Builder, incluindo as opções visuais próprias do componente.`
 
 ### Divider
 
-**Título**
+**Classe:** `TDividerComponentPage`
 
-`Divider`
+**Subtítulo:** `Crie separadores horizontais ou verticais com Rick.UIBuilder.`
 
-**Subtítulo**
+**Abordagens:** Factory + Fluent Builder.
 
-`Crie separadores horizontais ou verticais com Rick.UIBuilder.`
-
-**Abordagens**
-
-- Factory
-- Fluent Builder
-
-**Sobre este componente**
-
-`Divider usa TRectangle como separador horizontal ou vertical e pode ser criado pela Factory ou configurado pelo Fluent Builder.`
-
-**Textframe**
-
-```text
-┌──────────────────────────────────────────────────────────┐
-│  ←   Componentes                                         │
-├──────────────────────────────────────────────────────────┤
-│                                                          │
-│   Divider                                                │
-│   Crie separadores horizontais ou verticais com          │
-│   Rick.UIBuilder.                                        │
-│                                                          │
-│   ┌───────────────────────┐  ┌───────────────────────┐   │
-│   │       [Factory]       │  │        [Link]         │   │
-│   │        Factory        │  │    Fluent Builder     │   │
-│   │     Criação direta    │  │     API encadeada     │   │
-│   │     do componente.    │  │    para configuração. │   │
-│   │   [ Ver exemplos  › ] │  │   [ Ver exemplos  › ] │   │
-│   └───────────────────────┘  └───────────────────────┘   │
-│                                                          │
-│   ┌──────────────────────────────────────────────────┐   │
-│   │  [Info]  Sobre este componente                  │   │
-│   │  Divider usa TRectangle como separador...        │   │
-│   └──────────────────────────────────────────────────┘   │
-└──────────────────────────────────────────────────────────┘
-```
+**Sobre:** `Divider usa TRectangle como separador horizontal ou vertical e pode ser criado pela Factory ou configurado pelo Fluent Builder.`
 
 ### ComboBox
 
-**Título**
+**Classe:** `TComboBoxComponentPage`
 
-`ComboBox`
+**Subtítulo:** `Crie seleções FireMonkey configuráveis com Rick.UIBuilder.`
 
-**Subtítulo**
+**Abordagens:** Factory + Fluent Builder.
 
-`Crie seleções FireMonkey configuráveis com Rick.UIBuilder.`
-
-**Abordagens**
-
-- Factory
-- Fluent Builder
-
-**Sobre este componente**
-
-`ComboBox possui suporte à Factory e ao Fluent Builder. O Builder concentra configuração, itens e modos de apresentação, com superfícies de seleção materializadas quando necessárias.`
-
-**Textframe**
-
-```text
-┌──────────────────────────────────────────────────────────┐
-│  ←   Componentes                                         │
-├──────────────────────────────────────────────────────────┤
-│                                                          │
-│   ComboBox                                               │
-│   Crie seleções FireMonkey configuráveis com             │
-│   Rick.UIBuilder.                                        │
-│                                                          │
-│   ┌───────────────────────┐  ┌───────────────────────┐   │
-│   │       [Factory]       │  │        [Link]         │   │
-│   │        Factory        │  │    Fluent Builder     │   │
-│   │     Criação direta    │  │     API encadeada     │   │
-│   │     do componente.    │  │    para configuração. │   │
-│   │   [ Ver exemplos  › ] │  │   [ Ver exemplos  › ] │   │
-│   └───────────────────────┘  └───────────────────────┘   │
-│                                                          │
-│   ┌──────────────────────────────────────────────────┐   │
-│   │  [Info]  Sobre este componente                  │   │
-│   │  ComboBox possui Factory e Fluent Builder...     │   │
-│   └──────────────────────────────────────────────────┘   │
-└──────────────────────────────────────────────────────────┘
-```
+**Sobre:** `ComboBox possui suporte à Factory e ao Fluent Builder. O Builder concentra configuração, itens e modos de apresentação, com superfícies de seleção materializadas quando necessárias.`
 
 ### Edit
 
-**Título**
+**Classe:** `TEditComponentPage`
 
-`Edit`
+**Subtítulo:** `Crie campos de texto de uma linha em runtime com Rick.UIBuilder.`
 
-**Subtítulo**
+**Abordagens:** somente Fluent Builder.
 
-`Crie campos de texto de uma linha em runtime com Rick.UIBuilder.`
-
-**Abordagens**
-
-- Fluent Builder
-
-`Factory` não deve ser exibida enquanto `TRickUIBuilderFactory` não expuser `CreateEdit`.
-
-**Sobre este componente**
-
-`Edit é o builder de entrada de texto de uma linha do Rick.UIBuilder. No estado atual da API, ele está disponível pelo Fluent Builder e não possui Factory.CreateEdit.`
-
-**Textframe**
+**Sobre:** `Edit é o builder de entrada de texto de uma linha do Rick.UIBuilder. No estado atual da API, ele está disponível pelo Fluent Builder e não possui Factory.CreateEdit.`
 
 ```text
-┌──────────────────────────────────────────────────────────┐
-│  ←   Componentes                                         │
-├──────────────────────────────────────────────────────────┤
-│                                                          │
-│   Edit                                                   │
-│   Crie campos de texto de uma linha em runtime com       │
-│   Rick.UIBuilder.                                        │
-│                                                          │
-│                ┌───────────────────────┐                 │
-│                │        [Link]         │                 │
-│                │    Fluent Builder     │                 │
-│                │     API encadeada     │                 │
-│                │    para configuração. │                 │
-│                │   [ Ver exemplos  › ] │                 │
-│                └───────────────────────┘                 │
-│                                                          │
-│   ┌──────────────────────────────────────────────────┐   │
-│   │  [Info]  Sobre este componente                  │   │
-│   │  Edit é o builder de entrada de texto de uma linha...│   │
-│   └──────────────────────────────────────────────────┘   │
-└──────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────┐
+│  ←   Componentes                                           │
+├────────────────────────────────────────────────────────────┤
+│                                                            │
+│  Edit                                                      │
+│  Crie campos de texto de uma linha em runtime com          │
+│  Rick.UIBuilder.                                           │
+│                                                            │
+│                 ┌────────────────────┐                     │
+│                 │   Fluent Builder   │                     │
+│                 │  Ver exemplos  ›   │                     │
+│                 └────────────────────┘                     │
+│                                                            │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │ ⓘ Sobre este componente                             │  │
+│  │ Edit é o builder de entrada de texto...              │  │
+│  └──────────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────────┘
 ```
 
-O único card do Edit deve ser centralizado. Não deixar espaço vazio equivalente ao card Factory e não criar Factory desabilitada ou fictícia.
+## Limites de responsabilidade
 
-## Interatividade e estado de implementação
+`TComponentPage` pode conhecer:
 
-A referência visual mostra `Ver exemplos` como botão de ação. A governança do Samples exige que aparência interativa corresponda a uma ação real.
+- regras visuais comuns da família;
+- geometria;
+- cores locais;
+- header e retorno;
+- construção comum de cards e painel informativo.
 
-Consequentemente:
+`TComponentPage` não pode conhecer:
 
-- esta especificação define a **aparência-alvo final** dos cards;
-- enquanto as telas de exemplos Factory/Fluent não existirem, não declarar na documentação de estado atual que esses botões já navegam;
-- uma implementação intermediária não deve criar navegação falsa, callback vazio ou destino fictício apenas para satisfazer a aparência;
-- quando as páginas de exemplos forem implementadas, `Ver exemplos` deve se tornar a ação real de navegação correspondente.
+- `TSampleComponent`;
+- arrays com conteúdo dos seis componentes;
+- regra específica `Edit não possui Factory`;
+- páginas futuras Factory/Fluent;
+- samples futuros.
 
-Se a próxima tarefa limitar-se estritamente à reprodução visual antes das páginas de exemplo, o comportamento da ação deve ser decidido explicitamente antes de concluir a implementação para não violar a regra de interatividade real.
+Cada página concreta pode conhecer somente o conteúdo e as abordagens do seu próprio componente.
 
-## Responsabilidades da `TComponentPage`
+## Critérios de aceitação
 
-A página continua responsável por:
+A implementação deve manter simultaneamente:
 
-- receber `TSampleComponent`;
-- selecionar conteúdo correspondente ao componente;
-- exibir somente abordagens realmente suportadas;
-- construir o layout da página;
-- não alterar nem simular a API pública do Rick.UIBuilder.
-
-A decisão de navegação para futuras páginas Factory/Fluent deve continuar fora da View quando for implementada, preservando a separação já adotada no Samples.
-
-## Critérios de aceitação visual da próxima implementação
-
-A implementação desta especificação estará visualmente aderente quando, no mínimo:
-
-- o header/breadcrumb seguir a hierarquia da referência;
-- título e subtítulo estiverem alinhados à esquerda;
-- Factory e Fluent aparecerem lado a lado para `Text / Label`, `Button`, `Badge`, `Divider` e `ComboBox`;
-- `Edit` apresentar somente Fluent Builder, centralizado;
-- os três SVGs fornecidos forem utilizados nas funções corretas;
-- cards mantiverem título, descrição e área de ação sem clipping;
-- `Ver exemplos` mantiver legenda centralizada e chevron vetorial;
-- o painel `Sobre este componente` estiver presente em todas as seis variações;
-- o texto técnico do painel corresponder à implementação real de cada componente;
-- a escala tipográfica compartilhada for preservada;
-- nenhum elemento visual indicar comportamento inexistente como se estivesse implementado.
-
-## Fora do escopo desta especificação
-
-Não estão definidos aqui:
-
-- layout das telas de exemplos Factory;
-- layout das telas de exemplos Fluent Builder;
-- conteúdo de exemplos de código;
-- posição futura de Composition na navegação;
-- mudanças na API pública do Rick.UIBuilder;
-- criação de `Factory.CreateEdit`;
-- valores ARGB exatos dos novos acentos violeta/verde quando não existirem tokens aprovados.
+- ausência de barra nativa do sistema;
+- header no topo e em toda a largura do client;
+- retorno clicável fechando a modal;
+- subtítulos completos sem sobreposição;
+- cards sem clipping;
+- painel informativo sem cortar linhas;
+- tipografia aprovada preservada;
+- Factory ausente no Edit sem espaço vazio;
+- nenhuma dependência de Components para `Home.Style`;
+- uma unit concreta por componente herdando de `TComponentPage`;
+- `.dpr` e `.dproj` contendo explicitamente todas as units;
+- nenhum `samples/src` no Search Path;
+- nenhuma página futura Factory/Fluent criada nesta etapa.

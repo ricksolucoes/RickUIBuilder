@@ -101,11 +101,11 @@ Todo agent declarado em `samples/.agents/README.md` deve possuir arquivo corresp
 
 ### DEC-024 — Component Page adota a referência visual aprovada
 
-A próxima evolução da `TComponentPage` deve seguir a referência visual fornecida para `Button` como modelo de hierarquia, proporção, alinhamento e densidade. O detalhamento implementável fica em `SAMPLE_COMPONENT_PAGE_SPEC.md`, explicitamente marcado como especificação futura até a alteração correspondente chegar ao código.
+A família de páginas de componente segue a referência visual fornecida para `Button` como modelo de hierarquia, proporção, alinhamento e densidade, sem copiar afirmações técnicas que contradigam o código real.
 
-### DEC-025 — Uma página comum possui seis variações de conteúdo
+### DEC-025 — Modelo parametrizado único foi substituído por herança explícita
 
-`TComponentPage` permanece uma única página reutilizável. `Text / Label`, `Button`, `Badge`, `Divider` e `ComboBox` apresentam Factory e Fluent Builder; `Edit` apresenta somente Fluent Builder enquanto `Factory.CreateEdit` não existir. O card único do Edit é centralizado, sem placeholder de Factory.
+A decisão anterior de representar os seis componentes como estados parametrizados dentro de uma única `TComponentPage` foi substituída. `TComponentPage` agora é uma base abstrata comum, e cada componente possui uma página concreta derivada. Conteúdo específico não fica centralizado em arrays ou `case/if` na classe-base.
 
 ### DEC-026 — Assets oficiais da Component Page são os SVGs fornecidos
 
@@ -115,14 +115,30 @@ A página usa `factory_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.svg` para Factory,
 
 Textos técnicos da imagem não são copiados quando divergirem da implementação. Em particular, o Button atual não é documentado como `TButton`: sua implementação é composta por `TRectangle + TLabel`. Títulos, subtítulos e texto de `Sobre este componente` são derivados da API/documentação real do componente.
 
-### DEC-028 — Ação visual exige destino real
+### DEC-028 — `Ver exemplos` não possui destino fictício
 
-`Ver exemplos` representa a ação futura para abrir exemplos de Factory ou Fluent Builder. A aparência de ação não autoriza callback vazio, navegação fictícia ou tela inexistente. A interatividade deve ser habilitada quando houver destino real; qualquer etapa intermediária exclusivamente visual precisa decidir explicitamente o comportamento antes da entrega.
+`Ver exemplos` representa a ação futura para abrir exemplos de Factory ou Fluent Builder. Enquanto essas páginas não existirem, o elemento permanece somente visual, sem callback vazio, `crHandPoint` ou navegação fictícia.
 
 ### DEC-029 — Tipografia é preservada na Component Page
 
 A Component Page reutiliza a escala semântica de `App.Typography`: 24 para título, 14 para subtítulo, 16 para título de card, 14 para corpo, 14 para ação e 13 para navegação. Geometria e espaçamento devem acomodar esses tokens sem redução de fonte para mascarar clipping.
 
-### DEC-030 — O painel “Sobre este componente” é obrigatório nas seis variações
+### DEC-030 — O painel “Sobre este componente” é obrigatório nas seis páginas
 
-Cada estado da `TComponentPage` possui painel informativo inferior com ícone oficial, título `Sobre este componente` e texto curto baseado no comportamento real do componente. O painel não deve antecipar APIs inexistentes nem simplificar detalhes de modo a produzir afirmação tecnicamente falsa.
+Cada página concreta possui painel informativo inferior com ícone oficial, título `Sobre este componente` e texto curto baseado no comportamento real do componente. O painel não deve antecipar APIs inexistentes nem simplificar detalhes de modo a produzir afirmação tecnicamente falsa.
+
+### DEC-031 — Cada componente possui uma página concreta
+
+`Text / Label`, `Button`, `Badge`, `Divider`, `ComboBox` e `Edit` possuem classes próprias herdando de `TComponentPage`. A classe-base concentra somente layout e comportamento comum; cada derivada decide seu conteúdo e quais abordagens aparecem.
+
+### DEC-032 — Component Page é somente a divisão para Factory e Fluent Builder
+
+As páginas concretas atuais são intermediárias. Elas não contêm os samples finais de Factory/Fluent Builder e não criam as páginas posteriores. Esses destinos serão implementados em etapa futura.
+
+### DEC-033 — Component Page é borderless e o retorno fecha a modal
+
+A família de páginas utiliza `TFmxFormBorderStyle.None`, seguindo o padrão visual da Home. A seta superior esquerda possui hit area própria e fecha a janela modal atual; o Coordinator continua responsável por liberar a instância após `ShowModal`.
+
+### DEC-034 — Components não depende de `Home.Style`
+
+A base `TComponentPage` mantém sua própria geometria e paleta local e reutiliza somente a tipografia global de `App.Typography`. A feature de Components não deve depender de `RickUIBuilder.Samples.Home.Style`.

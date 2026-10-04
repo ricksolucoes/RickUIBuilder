@@ -33,8 +33,10 @@ Tabela com gate, aplicabilidade, estado, evidência e relação com o artefato f
 ## Proibições
 Não implementar, não corrigir, não modificar artefatos, não exigir gate sem aplicabilidade real e não expor cadeia de pensamento.
 
-## Recalculo obrigatório para estrutura e Home
-Se o artefato final alterar estrutura de `src`, `.dpr`, `.dproj`, Search Path, header ou cards, recalcular como obrigatórios os gates correspondentes. A evidência de processo deve demonstrar verificação explícita de inclusão das units no projeto, ausência de Search Path interno, coerência dos caminhos físicos e validação da geometria final da Home; não aceitar um `PASS` anterior que não tenha verificado esses pontos.
+## Recalculo obrigatório para estrutura e UI
+Se o artefato final alterar estrutura de `src`, `.dpr`, `.dproj`, Search Path, header ou cards, recalcular como obrigatórios os gates correspondentes. A evidência de processo deve demonstrar verificação explícita de inclusão das units no projeto, ausência de Search Path interno, coerência dos caminhos físicos e validação da geometria final das Views afetadas; não aceitar um `PASS` anterior que não tenha verificado esses pontos.
+
+Se Component Pages forem afetadas, recalcular Architecture, Delphi Code, Documentation, Naming, Toxicity quando houver corpos de método e Build Validation quando o projeto for alterado. Exigir evidência da base comum desacoplada de `Home.Style`, pages concretas por componente, formulário borderless, retorno funcional da modal, ausência de clipping e ausência de páginas Factory/Fluent antecipadas.
 
 ## Recalculo obrigatório para documentação de unit
 Se houver `.pas` criado ou modificado, recalcular como obrigatórios Delphi Code Auditor, Documentation Auditor e Naming Auditor e exigir evidência específica da auditoria dos cabeçalhos estruturais e nomenclatura. Se a alteração puder afetar corpo de método, recalcular Toxicity Auditor. Se interfaces, GUIDs, reference counting, ownership ou lifetime forem aplicáveis, recalcular Contract & Lifetime Auditor. Um `PASS` genérico sem evidência desses gates especializados não comprova o processo.

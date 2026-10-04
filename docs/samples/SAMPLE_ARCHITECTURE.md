@@ -2,37 +2,66 @@
 
 ## Objetivo
 
-O Samples é um catálogo navegável da API pública atual do Rick.UIBuilder. A organização é **component-first**: a Home apresenta componentes e cada página de componente apresenta somente as formas de criação realmente suportadas.
+O Samples é um catálogo navegável da API pública atual do Rick.UIBuilder. A organização é **component-first**: a Home apresenta componentes e cada componente possui uma página intermediária própria para apresentar as formas de criação realmente suportadas.
 
 ## Fluxo atual
 
 ```text
 Home
-├── Text / Label
-├── Button
-├── Badge
-├── Divider
-├── ComboBox
-└── Edit
-       │
-       └── Component Page
-            ├── Factory        [quando suportado]
-            └── Fluent Builder
+├── Text / Label ──► TTextLabelComponentPage
+├── Button ─────────► TButtonComponentPage
+├── Badge ──────────► TBadgeComponentPage
+├── Divider ────────► TDividerComponentPage
+├── ComboBox ───────► TComboBoxComponentPage
+└── Edit ───────────► TEditComponentPage
+                         │
+                         └── herda TComponentPage
+                              ├── Factory        [quando suportado]
+                              └── Fluent Builder
 ```
 
 `Edit` não apresenta Factory porque a API pública analisada não expõe `Factory.CreateEdit`. Essa ausência descreve somente o estado atual da API.
 
-Composition continua sendo uma abordagem pública do Rick.UIBuilder, mas não foi adicionada às páginas de componente nesta implementação. Sua apresentação no Samples permanece trabalho futuro até existir uma decisão específica de UX/navegação.
+As opções `Factory` e `Fluent Builder` são, nesta etapa, divisões visuais da página intermediária. As páginas posteriores que conterão os samples de cada abordagem **ainda não existem**. Por isso, `Ver exemplos` permanece visual e não possui callback ou destino fictício.
 
-## Próxima evolução aprovada da Component Page
+Composition continua sendo uma abordagem pública do Rick.UIBuilder, mas não foi adicionada às páginas de componente. Sua apresentação no Samples permanece trabalho futuro até existir decisão específica de UX/navegação.
 
-O modelo visual aprovado para a próxima alteração da `TComponentPage` está especificado em [`SAMPLE_COMPONENT_PAGE_SPEC.md`](SAMPLE_COMPONENT_PAGE_SPEC.md). A especificação cobre as seis variações (`Text / Label`, `Button`, `Badge`, `Divider`, `ComboBox` e `Edit`), os assets de Factory/Fluent/informação, o painel `Sobre este componente`, a assimetria do `Edit` e os critérios de aceitação visual.
+## Base e páginas concretas de componente
 
-Essa especificação é **alvo de implementação**, não descrição do estado já existente. Enquanto o código atual não for alterado e validado, a seção **Fluxo atual** acima continua representando o comportamento implementado.
+`RickUIBuilder.Samples.ComponentPage` é uma classe-base abstrata responsável somente pela infraestrutura visual comum:
 
-## Boundary da Home
+- formulário FMX borderless;
+- dimensões e superfície da janela;
+- header superior;
+- ação de retorno;
+- geometria compartilhada de título/subtítulo;
+- cards Factory/Fluent Builder;
+- ação visual `Ver exemplos`;
+- painel `Sobre este componente`;
+- cores e espaçamentos específicos desta família de páginas.
 
-A Home é uma View FMX. Suas responsabilidades são apresentação, layout, estados visuais e captura de intenção. Ela não executa comandos de aplicação.
+A base **não conhece `TSampleComponent`**, não contém arrays de configuração dos seis componentes e não decide se um componente suporta Factory.
+
+Cada componente possui uma página concreta que herda de `TComponentPage` e define apenas seu conteúdo e as abordagens que aparecem:
+
+```text
+TComponentPage
+      ▲
+      ├── TTextLabelComponentPage
+      ├── TButtonComponentPage
+      ├── TBadgeComponentPage
+      ├── TDividerComponentPage
+      ├── TComboBoxComponentPage
+      └── TEditComponentPage
+```
+
+As páginas de Text / Label, Button, Badge, Divider e ComboBox adicionam Factory e Fluent Builder. `TEditComponentPage` adiciona somente Fluent Builder e usa a variante centralizada do card.
+
+Os SVGs compartilhados da família de páginas ficam em `RickUIBuilder.Samples.ComponentPage.Icons`. Geometria e regras de layout permanecem na classe-base `TComponentPage`.
+
+## Navegação e retorno
+
+A Home continua capturando somente a intenção de abrir um `TSampleComponent`:
 
 ```text
 TPageSamplesHome
@@ -45,23 +74,34 @@ THomePresenter
       │
       ▼
 TSampleApplicationCoordinator
+      │
+      ▼
+página concreta do componente
 ```
+
+O `TSampleApplicationCoordinator` resolve `TSampleComponent` para a classe concreta correspondente, cria a página sem Owner, executa `ShowModal` e libera a instância no `finally`.
+
+A seta de retorno da `TComponentPage` fecha a janela modal atual. O retorno não cria Router, Presenter adicional ou nova camada de navegação: ao fechar a modal, o fluxo retorna ao Coordinator e a Home volta a ficar ativa.
+
+## Boundary da Home
+
+A Home é uma View FMX. Suas responsabilidades são apresentação, layout, estados visuais e captura de intenção. Ela não executa comandos de aplicação.
 
 `IHomePresenter` contém apenas funções e representa as intenções `Close` e `OpenComponent`. `THomePresenter` não conhece controles FMX nem mantém referência à View.
 
-O `TSampleApplicationCoordinator` executa o fluxo global: encerramento da aplicação e abertura da página correspondente ao componente. Não contém detalhes visuais da Home.
+O `TSampleApplicationCoordinator` executa o fluxo global: encerramento da aplicação e abertura da página concreta correspondente ao componente. Ele não contém detalhes visuais da Home nem das Component Pages.
 
 ## Composition Root e lifetime
 
 `TSampleApplication`, em `RickUIBuilder.Samples.App.Bootstrap`, é o Composition Root. Ele cria o Coordinator, o Presenter e a Home.
 
-- `TSampleApplication` possui o Coordinator e a Home durante `Application.Run`.
+- `TSampleApplication` possui o Coordinator e a Home durante `Application.Run`;
 - a Home mantém `IHomePresenter` por reference counting;
-- `THomePresenter` mantém uma referência não-owning ao Coordinator;
+- `THomePresenter` mantém referência não-owning ao Coordinator;
 - o Presenter não referencia a Home;
-- a Home é destruída antes do Coordinator.
-
-Esse desenho evita ciclo View ↔ Presenter e não introduz reference counting no Coordinator.
+- a Home é destruída antes do Coordinator;
+- o Coordinator cria e libera cada Component Page modal;
+- uma Component Page não possui Presenter, Coordinator ou Home.
 
 ## Contratos
 
@@ -89,25 +129,46 @@ samples/
     │   ├── RickUIBuilder.Samples.Home.Presenter.pas
     │   └── RickUIBuilder.Samples.Home.Style.pas
     └── Components/
-        └── Common/
-            └── RickUIBuilder.Samples.ComponentPage.pas
+        ├── Common/
+        │   ├── RickUIBuilder.Samples.ComponentPage.pas
+        │   └── RickUIBuilder.Samples.ComponentPage.Icons.pas
+        ├── TextLabel/
+        │   └── RickUIBuilder.Samples.ComponentPage.TextLabel.pas
+        ├── Button/
+        │   └── RickUIBuilder.Samples.ComponentPage.Button.pas
+        ├── Badge/
+        │   └── RickUIBuilder.Samples.ComponentPage.Badge.pas
+        ├── Divider/
+        │   └── RickUIBuilder.Samples.ComponentPage.Divider.pas
+        ├── ComboBox/
+        │   └── RickUIBuilder.Samples.ComponentPage.ComboBox.pas
+        └── Edit/
+            └── RickUIBuilder.Samples.ComponentPage.Edit.pas
 ```
 
-A estrutura física acompanha responsabilidades que já existem. Não são criadas pastas `Label`, `Button`, `Badge`, `Divider`, `ComboBox` ou `Edit` enquanto não existirem units específicas que as justifiquem.
+Diretórios específicos de componentes existem porque agora possuem units concretas. Não criar novos diretórios antecipadamente sem implementação real que os justifique.
 
-Todas as units internas do Samples são incorporadas explicitamente ao `.dpr` e ao `.dproj`. O `DCC_UnitSearchPath` não contém o próprio `samples/src`; o caminho de busca fica reservado à dependência externa `..\src` da biblioteca Rick.UIBuilder e ao Search Path herdado.
+Todas as units internas do Samples são incorporadas explicitamente ao `.dpr` e ao `.dproj`. O `DCC_UnitSearchPath` não contém o próprio `samples/src`; o caminho de busca permanece reservado à dependência externa `..\src` da biblioteca Rick.UIBuilder e ao Search Path herdado.
 
 ## Design visual
 
 A Home mantém geometria e cores específicas em `Home.Style`. A escala tipográfica semanticamente reutilizável permanece em `App.Typography`.
 
-O header é filho direto do formulário, usa alinhamento superior e ocupa toda a largura do client, sem margem externa superior ou lateral. O respiro pertence ao conteúdo abaixo do header. O header possui superfície discretamente diferente do body.
+A família `ComponentPage` não depende de `Home.Style`. Sua geometria e sua paleta local são definidas pela própria base `TComponentPage`, evitando acoplamento de uma feature de Components com uma unit específica da Home.
 
-Controles efetivamente clicáveis usam `crHandPoint`. O fechamento possui área de hit maior que o SVG e feedback de hover. Na Home, os botões `Ver exemplos` são clicáveis porque a navegação para a página de componente está implementada. Isso não implica que a ação `Ver exemplos` da futura Component Page já possua destino; esse comportamento permanece separado em `SAMPLE_COMPONENT_PAGE_SPEC.md` e `SAMPLE_FUTURE_WORK.md`.
+A Component Page atual usa client de `500 × 500`, formulário `TFmxFormBorderStyle.None` e header de `40` unidades alinhado ao topo. O conteúdo possui área suficiente para os maiores subtítulos e textos informativos atuais sem reduzir a escala tipográfica aprovada.
 
-Os cards preservam a escala tipográfica aprovada e possuem geometria suficiente para título, descrição e ação sem recorte ou sobreposição.
+O header possui área clicável de retorno maior que o SVG, `crHandPoint` e feedback de hover. O SVG interno não captura o evento.
 
-Os SVGs oficiais fornecidos são usados como `TPath`; não há substituição por caracteres textuais.
+Os cards preservam os SVGs oficiais fornecidos:
+
+- Factory: `factory_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.svg`;
+- Fluent Builder: `link-03-svgrepo-com.svg`;
+- informação: `info_48dp_E3E3E3_FILL0_wght400_GRAD0_opsz48.svg`.
+
+A geometria de Factory e informação é renderizada por fill; Fluent Builder usa stroke, seguindo os assets originais.
+
+`Ver exemplos` permanece sem `HitTest` e sem callback enquanto as páginas de destino não existirem.
 
 ## Encoding
 
@@ -115,11 +176,9 @@ As units Delphi modificadas que contêm texto em português são distribuídas e
 
 ## Documentação estrutural das units
 
-As units Delphi do Samples começam com um cabeçalho estrutural que descreve o papel real da unit no estado final do código. Ele identifica finalidade, funcionalidade, dependências internas relevantes, colaboração/fluxo e restrições; ownership e lifetime são registrados quando fizerem parte da responsabilidade da unit.
+As units Delphi do Samples começam com cabeçalho estrutural que descreve o papel real da unit no estado final do código. Ele identifica finalidade, funcionalidade, dependências internas relevantes, colaboração/fluxo e restrições; ownership e lifetime são registrados quando fizerem parte da responsabilidade da unit.
 
 Esse cabeçalho é uma orientação local para desenvolvedores e IA. Ele não é fonte superior ao código: os auditores devem confrontá-lo com `interface`, `implementation`, `uses` e consumidores reais. Alterações que modifiquem responsabilidade, dependências, fluxo ou lifetime exigem atualização simultânea do cabeçalho.
-
-
 
 ## Governança de auditoria Delphi
 

@@ -22,7 +22,7 @@ Parecer de outro auditor, aprovação anterior, justificativa persuasiva do impl
 `PASS`, `FAIL`, `NOT_APPLICABLE` ou `BLOCKED`, sempre com ocorrências e evidências. Não modificar arquivos.
 
 ## Critérios estruturais obrigatórios do Samples
-- Confirmar que a organização física de `src` acompanha responsabilidades reais: `App`, `Home` e `Components/Common`, sem diretórios antecipados sem implementação.
+- Confirmar que a organização física de `src` acompanha responsabilidades reais: `App`, `Home`, `Components/Common` e diretórios concretos de componentes somente quando existirem units reais, sem diretórios antecipados.
 - Reprovar quando o Search Path interno for usado para ocultar units do Samples que não estejam incorporadas ao projeto.
 - Confirmar que a estrutura física, namespaces e responsabilidades permanecem coerentes entre si.
 - Para a Home, confirmar que o header pertence ao client da View e ocupa toda a largura no topo, sem respiro externo; o respiro começa no conteúdo.
@@ -30,3 +30,11 @@ Parecer de outro auditor, aprovação anterior, justificativa persuasiva do impl
 
 ## Coerência arquitetural dos cabeçalhos
 Quando uma alteração arquitetural modificar responsabilidade, boundary, dependência, fluxo ou ownership/lifetime de uma unit, verificar também se o cabeçalho estrutural superior foi atualizado para refletir o estado final. Divergência arquitetural entre cabeçalho e código resulta em `FAIL`.
+
+## Critérios específicos das Component Pages
+- `TComponentPage` deve concentrar somente infraestrutura visual comum e não conhecer `TSampleComponent`, arrays de conteúdo dos seis componentes ou regras específicas como a ausência de Factory no Edit.
+- Cada componente navegável deve possuir page concreta derivada da base quando essa arquitetura estiver vigente.
+- `Components` não deve depender de `RickUIBuilder.Samples.Home.Style`; reutilização compartilhada deve ocorrer somente por dependência realmente comum, como `App.Typography`.
+- O Coordinator pode resolver `TSampleComponent` para a classe concreta, mas não deve conter layout ou conteúdo visual.
+- Component Pages são intermediárias; reprovar criação antecipada de páginas/samples Factory ou Fluent sem requisito explícito.
+- O retorno local da modal não deve introduzir Router, Presenter ou abstração artificial quando `Close` satisfizer o fluxo existente.

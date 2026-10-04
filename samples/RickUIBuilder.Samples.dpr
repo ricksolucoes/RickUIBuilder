@@ -31,8 +31,11 @@
 {      e estilo específico.                                                    }
 {                                                                              }
 {  - src\Components\Common                                                     }
-{      Contém infraestrutura visual compartilhada pelas páginas de             }
+{      Contém a base visual e os ícones compartilhados pelas páginas de        }
 {      componentes.                                                            }
+{                                                                              }
+{  - src\Components\<Componente>                                               }
+{      Contém a página intermediária concreta de cada componente navegável.    }
 {                                                                              }
 {  Dependências principais                                                     }
 {  -----------------------                                                     }
@@ -97,10 +100,8 @@ program RickUIBuilder.Samples;
 uses
   FMX.Forms,
   FMX.Types,
-
   System.SysUtils,
   System.StartUpCopy,
-
   RickUIBuilder.Samples.App.Bootstrap in 'src\App\RickUIBuilder.Samples.App.Bootstrap.pas',
   RickUIBuilder.Samples.App.Coordinator in 'src\App\RickUIBuilder.Samples.App.Coordinator.pas',
   RickUIBuilder.Samples.App.Types in 'src\App\RickUIBuilder.Samples.App.Types.pas',
@@ -111,7 +112,15 @@ uses
   RickUIBuilder.Samples.Home.Presenter.Intf in 'src\Home\RickUIBuilder.Samples.Home.Presenter.Intf.pas',
   RickUIBuilder.Samples.Home.Presenter in 'src\Home\RickUIBuilder.Samples.Home.Presenter.pas',
   RickUIBuilder.Samples.Home.Style in 'src\Home\RickUIBuilder.Samples.Home.Style.pas',
-  RickUIBuilder.Samples.ComponentPage in 'src\Components\Common\RickUIBuilder.Samples.ComponentPage.pas';
+  RickUIBuilder.Samples.Component.Common in 'src\Components\Common\RickUIBuilder.Samples.Component.Common.pas',
+  RickUIBuilder.Samples.Component.Common.Icons in 'src\Components\Common\RickUIBuilder.Samples.Component.Common.Icons.pas',
+  RickUIBuilder.Samples.Component.TextLabel in 'src\Components\TextLabel\RickUIBuilder.Samples.Component.TextLabel.pas',
+  RickUIBuilder.Samples.Component.Button in 'src\Components\Button\RickUIBuilder.Samples.Component.Button.pas',
+  RickUIBuilder.Samples.Component.Badge in 'src\Components\Badge\RickUIBuilder.Samples.Component.Badge.pas',
+  RickUIBuilder.Samples.Component.Divider in 'src\Components\Divider\RickUIBuilder.Samples.Component.Divider.pas',
+  RickUIBuilder.Samples.Component.ComboBox in 'src\Components\ComboBox\RickUIBuilder.Samples.Component.ComboBox.pas',
+  RickUIBuilder.Samples.Component.Edit in 'src\Components\Edit\RickUIBuilder.Samples.Component.Edit.pas',
+  RickUIBuilder.Samples.Component.Common.Style in 'src\Components\Common\RickUIBuilder.Samples.Component.Common.Style.pas';
 
 {$R *.res}
 
