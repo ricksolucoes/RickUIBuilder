@@ -1,4 +1,5 @@
-﻿{******************************************************************************}
+﻿{ Esta unit implementa a Component Page de Text / Label, apresentando Factory e Fluent Builder e encaminhando cada clique por callback non-owning para os destinos reais coordenados externamente. }
+{******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.Component.TextLabel                                   }
 {                                                                              }
@@ -8,9 +9,9 @@
 {                                                                              }
 {  Funcionalidade                                                              }
 {  --------------                                                              }
-{  Define identidade, informação e abordagens de Text / Label. O card Factory  }
-{  encaminha uma intenção de navegação quando OnFactoryExamples foi conectado;}
-{  Fluent Builder permanece somente visual enquanto seu destino não existe.    }
+{  Define identidade, informação e as abordagens Factory e Fluent Builder.     }
+{  Cada card encaminha somente uma intenção de navegação quando o callback     }
+{  correspondente foi conectado pelo Coordinator.                             }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
@@ -19,21 +20,21 @@
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
-{  - O Coordinator cria esta page, conecta OnFactoryExamples e chama ShowModal.}
-{  - O clique Factory é capturado por FactoryExamplesRequested e apenas        }
-{    encaminhado ao callback externo; a page não cria seu destino.             }
+{  - O Coordinator cria esta page, conecta Factory/Fluent e chama ShowModal.   }
+{  - Os cliques são encaminhados aos callbacks externos; esta page não cria    }
+{    diretamente nenhuma Sample Page.                                          }
 {  - O retorno para a Home permanece implementado pela classe-base.            }
 {                                                                              }
 {  Ownership / lifetime                                                        }
 {  --------------------                                                        }
-{  - OnFactoryExamples é referência de evento non-owning para o Coordinator.  }
-{  - A page não possui Coordinator nem a Sample Page de destino.               }
+{  - OnFactoryExamples e OnFluentExamples são eventos non-owning para o        }
+{    Coordinator, cujo lifetime é superior durante a navegação.                }
+{  - A page não possui Coordinator nem as Sample Pages de destino.             }
 {                                                                              }
 {  Restrições e responsabilidades                                              }
 {  -----------------------------                                               }
-{  - Não implementa samples Factory; somente emite a intenção de abertura.     }
-{  - Não implementa destino Fluent Builder nesta etapa.                        }
-{  - Não conhece TExampleTextLabelFactory diretamente.                         }
+{  - Não implementa os samples Factory ou Fluent; somente emite intenções.     }
+{  - Não conhece TExampleTextLabelFactory ou TExampleTextLabelFluent.          }
 {                                                                              }
 {  Manutenção                                                                  }
 {  ----------                                                                  }
@@ -55,12 +56,16 @@ type
   TComponentTextLabel = class(TComponentCommon)
   strict private
     FOnFactoryExamples: TNotifyEvent;
+    FOnFluentExamples: TNotifyEvent;
     procedure FactoryExamplesRequested(ASender: TObject);
+    procedure FluentExamplesRequested(ASender: TObject);
   public
     /// <summary>Cria a página com o conteúdo específico de Text / Label.</summary>
     constructor Create(AOwner: TComponent); override;
     property OnFactoryExamples: TNotifyEvent read FOnFactoryExamples
       write FOnFactoryExamples;
+    property OnFluentExamples: TNotifyEvent read FOnFluentExamples
+      write FOnFluentExamples;
   end;
 
 implementation
@@ -75,7 +80,7 @@ begin
   inherited Create(AOwner);
   AddIdentity(_TITLE_, _SUBTITLE_);
   AddFactoryApproach(FactoryExamplesRequested);
-  AddFluentApproach;
+  AddFluentApproach(FluentExamplesRequested);
   AddInfoPanel(_INFO_);
 end;
 
@@ -83,6 +88,12 @@ procedure TComponentTextLabel.FactoryExamplesRequested(ASender: TObject);
 begin
   if Assigned(FOnFactoryExamples) then
     FOnFactoryExamples(ASender);
+end;
+
+procedure TComponentTextLabel.FluentExamplesRequested(ASender: TObject);
+begin
+  if Assigned(FOnFluentExamples) then
+    FOnFluentExamples(ASender);
 end;
 
 end.

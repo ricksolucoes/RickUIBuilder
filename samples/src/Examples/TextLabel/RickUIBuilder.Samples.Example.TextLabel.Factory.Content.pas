@@ -1,4 +1,4 @@
-﻿{ Esta unit mantém o conteúdo didático dos exemplos Text / Label - Factory, associando cada TTextLabelFactoryExample compartilhado a caption, título, descrição e snippet comentado coerentes com a execução real. }
+﻿{ Esta unit mantém o conteúdo didático dos exemplos Text / Label - Factory, associando cada TTextLabelFactoryExample a caption, título, descrição e snippet coerentes com a execução real e mantendo o exemplo Completo com todos os campos públicos de TRickUIBuilderTextConfig. }
 {******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.Example.TextLabel.Factory.Content                     }
@@ -34,6 +34,7 @@
 {  - Não declara o enum dos exemplos, não executa Factory e não cria controles.}
 {  - Os snippets devem permanecer coerentes com a execução real do Runner.     }
 {  - Comentários didáticos devem ser curtos, padronizados e úteis à leitura.   }
+{  - O exemplo Completo deve atribuir todos os campos públicos do record.      }
 {                                                                              }
 {  Manutenção                                                                  }
 {  ----------                                                                  }

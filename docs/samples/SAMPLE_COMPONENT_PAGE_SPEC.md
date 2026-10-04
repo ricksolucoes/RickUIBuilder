@@ -8,7 +8,7 @@ Este documento descreve a página intermediária de componente e suas seis imple
 
 ## Papel da página
 
-A Component Page é o ponto intermediário entre a Home e as páginas de samples de cada abordagem. No estado atual, somente Text / Label → Factory possui destino concreto implementado.
+A Component Page é o ponto intermediário entre a Home e as páginas de samples de cada abordagem. No estado atual, Text / Label possui destinos concretos para Factory e Fluent Builder.
 
 ```text
 Home
@@ -21,10 +21,11 @@ Component Page do componente
   │      └── demais componentes → futuro
   │
   └── Fluent Builder
-         └── páginas futuras
+         ├── Text / Label → TExampleTextLabelFluent [implementado]
+         └── demais componentes → futuro
 ```
 
-Callbacks só existem quando há destino real. `Text / Label → Factory` já navega para sua Sample Page concreta; Fluent Builder de Text / Label e as abordagens dos demais componentes permanecem somente visuais.
+Callbacks só existem quando há destino real. `Text / Label → Factory` e `Text / Label → Fluent Builder` navegam para suas Sample Pages concretas; as abordagens dos demais componentes permanecem somente visuais.
 
 ## Arquitetura da família de páginas
 
@@ -134,7 +135,7 @@ Quando somente Fluent Builder existe, como no Edit:
 
 O card único é centralizado. Não existe placeholder de Factory.
 
-`Ver exemplos` permanece com `HitTest := False` e sem callback enquanto o destino real não existir. Quando existe destino, como em `Text / Label → Factory`, a ação recebe `HitTest := True`, `crHandPoint` e callback real.
+`Ver exemplos` permanece com `HitTest := False` e sem callback enquanto o destino real não existir. Quando existe destino, como nas duas abordagens de Text / Label, a ação recebe `HitTest := True`, `crHandPoint` e callback real.
 
 ## Assets vetoriais
 
@@ -323,4 +324,4 @@ A implementação deve manter simultaneamente:
 - uma unit concreta por componente herdando de `TComponentCommon`;
 - `.dpr` e `.dproj` contendo explicitamente todas as units;
 - nenhum `samples/src` no Search Path;
-- nenhum callback habilitado para destino inexistente; Text / Label - Factory é a única navegação concreta desta etapa.
+- nenhum callback habilitado para destino inexistente; Text / Label possui navegação concreta para Factory e Fluent Builder nesta etapa.

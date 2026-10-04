@@ -2,11 +2,11 @@
 
 ## Status
 
-**Sample Page Base implementada e primeira página concreta disponível: Text / Label - Factory.**
+**Sample Page Base implementada e duas páginas concretas disponíveis: Text / Label - Factory e Text / Label - Fluent Builder.**
 
 Este documento fixa a intenção visual, a sequência estrutural, os limites de responsabilidade e o comportamento da base das páginas de exemplos do `RickUIBuilder.Samples`.
 
-A implementação comum é coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A família é dividida por responsabilidade em units próprias para header, navegação, seletor de visualização, painel de código, painel de resultado, ícones e estilo. A primeira derivada real é `TExampleTextLabelFactory`; os demais destinos permanecem futuros.
+A implementação comum é coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A família é dividida por responsabilidade em units próprias para header, navegação, seletor de visualização, painel de código, painel de resultado, ícones e estilo. As derivadas reais atuais são `TExampleTextLabelFactory` e `TExampleTextLabelFluent`; os demais destinos permanecem futuros.
 
 ## Papel na navegação
 
@@ -33,7 +33,7 @@ Factory             Fluent Builder
        SAMPLE PAGE BASE
 ```
 
-A Component Page continua sendo somente o divisor entre abordagens. A Sample Page concreta é onde os samples reais são apresentados e executados; Text / Label - Factory é o primeiro exemplo desse fluxo.
+A Component Page continua sendo somente o divisor entre abordagens. A Sample Page concreta é onde os samples reais são apresentados e executados; Text / Label possui hoje destinos concretos para Factory e Fluent Builder.
 
 ## Regra de tamanho
 
@@ -78,7 +78,7 @@ src/Examples/Common/
 
 Essa separação é estrutural e não cria regras específicas de componente. `TExampleCommon` coordena os controles acima; não reimplementa internamente header, navegação, seletor, painel de código ou painel de resultado.
 
-`RickUIBuilder.Samples.App.Types` fornece atualmente os enums compartilhados usados por esta camada: `TExampleView` representa a seleção `Código Delphi`/`Resultado` e `TTextLabelFactoryExample` identifica os exemplos concretos de Text / Label - Factory. O seletor, a page concreta, o conteúdo e o Runner consomem esses tipos; `Factory.Content` mantém apenas textos/snippets e não declara o enum dos exemplos.
+`RickUIBuilder.Samples.App.Types` fornece atualmente os enums compartilhados usados por esta camada: `TExampleView` representa a seleção `Código Delphi`/`Resultado`, `TTextLabelFactoryExample` identifica os exemplos de Text / Label - Factory e `TTextLabelFluentExample` identifica os exemplos de Text / Label - Fluent Builder. O seletor, a page concreta, o conteúdo e o Runner consomem esses tipos; `Factory.Content` mantém apenas textos/snippets e não declara o enum dos exemplos.
 
 A base implementada expõe pontos de extensão protegidos para as derivadas:
 
@@ -126,6 +126,32 @@ Cobertura atual da API pública Factory de Text / Label:
 Ao trocar a seleção, a page executa a sequência `SelectNavigationItem → SetExampleIdentity → SetCodeText → ClearResult → Runner.Render`. O Runner usa `ResultHost` como Owner e Parent do `TLabel`, mantendo o resultado dentro da árvore visual que será limpa antes da próxima execução.
 
 `TTextAlign` utilizado pelos exemplos de alinhamento exige `FMX.Types` explicitamente no `uses`; `TAlphaColors` exige `System.UITypes`. Essa dependência é parte do gate Delphi do Samples.
+
+## Página concreta — Text / Label - Fluent Builder
+
+A implementação Fluent reutiliza a mesma base e preserva a separação entre coordenação, conteúdo e execução:
+
+```text
+src/Examples/TextLabel/
+├── RickUIBuilder.Samples.Example.TextLabel.Fluent.pas
+├── RickUIBuilder.Samples.Example.TextLabel.Fluent.Content.pas
+└── RickUIBuilder.Samples.Example.TextLabel.Fluent.Runner.pas
+```
+
+Cobertura da API pública `TRickUIBuilder.Label_` / `IRickUIBuilderLabel`:
+
+| Exemplo | Cobertura |
+|---|---|
+| `Básico` | `Label_`, `Text`, `Build` |
+| `Geometria` | `Position`, `Size` |
+| `Layout` | `Anchors`, `Margin`, `Padding`; spacings com Left/Top/Right/Bottom explícitos |
+| `Tipografia` | `FontFamily`, `FontSize`, `FontColor`, `Bold`, `Italic` |
+| `Alinhamento` | `Align`, `VerticalAlign` |
+| `Fluxo de texto` | `WordWrap`, `Trimming` |
+| `Estado` | `Opacity`, `Visible`, `HitTest`, `Tag` |
+| `Completo` | todos os métodos públicos configuráveis de `IRickUIBuilderLabel`, incluindo `Build`; `Margin` e `Padding` usam `TRickUIBuilderSpacing.Create` com os quatro lados explícitos |
+
+O exemplo `Completo` é deliberadamente exaustivo. Para Factory, `Completo` continua atribuindo todos os campos públicos de `TRickUIBuilderTextConfig`; para Fluent Builder, chama todos os métodos públicos configuráveis de `IRickUIBuilderLabel`. Se a API ou um record público usado por esses exemplos ganhar nova opção configurável, o snippet, o Runner e esta matriz devem ser atualizados em conjunto.
 
 ## Textframe normativo da tela-base
 

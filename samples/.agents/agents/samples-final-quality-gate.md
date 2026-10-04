@@ -51,3 +51,7 @@ Quando aplicável, `PASS` exige evidência de que a page herda da base sem dupli
 
 Quando aplicável, `PASS` exige evidência de que `TExampleCodePanel` mantém snippet read-only e selecionável, cópia integral por clipboard com feedback visual temporário após sucesso, superfície de leitura coerente com a paleta escura, ausência de canvas fixa usada apenas para forçar scroll e barras condicionadas ao overflow do controle de texto. Snippets concretos devem possuir comentários `//` curtos e padronizados que expliquem intenção e apontem a aba Resultado sem causar scroll vertical somente pela explicação. `TExampleResultPanel` deve preencher toda a altura útil da view, preservar `ResultHost` como container estável e impedir que derivadas o liberem/substituam; `ClearResult`/`Clear` remove somente os filhos materializados.
 
+
+## Cobertura exaustiva de exemplos completos
+
+Quando uma página concreta de examples possuir item `Completo`, reprovar se snippet e Runner não cobrirem toda a API pública configurável da abordagem ou se records públicos usados pelo exemplo omitirem campos/opções relevantes. Para `TRickUIBuilderSpacing`, exigir Left, Top, Right e Bottom explicitamente.

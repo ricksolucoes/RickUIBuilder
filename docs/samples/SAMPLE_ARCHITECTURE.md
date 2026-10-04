@@ -22,7 +22,7 @@ Home
 
 `Edit` não apresenta Factory porque a API pública analisada não expõe `Factory.CreateEdit`. Essa ausência descreve somente o estado atual da API.
 
-A primeira navegação concreta da terceira camada existe para **Text / Label → Factory**. O card Factory de `TComponentTextLabel` emite uma intenção ao Coordinator, que abre `TExampleTextLabelFactory`. O card Fluent Builder de Text / Label e todos os cards de abordagem dos demais componentes permanecem somente visuais enquanto seus destinos não existirem.
+A terceira camada possui hoje dois destinos concretos para Text / Label. Os cards Factory e Fluent Builder de `TComponentTextLabel` emitem intenções separadas ao Coordinator, que abre `TExampleTextLabelFactory` ou `TExampleTextLabelFluent`. Os cards de abordagem dos demais componentes permanecem somente visuais enquanto seus destinos não existirem.
 
 Composition continua sendo uma abordagem pública do Rick.UIBuilder, mas não foi adicionada às páginas de componente. Sua apresentação no Samples permanece trabalho futuro até existir decisão específica de UX/navegação.
 
@@ -83,11 +83,11 @@ O `TSampleApplicationCoordinator` resolve `TSampleComponent` para a classe concr
 
 A seta de retorno da `TComponentCommon` fecha a janela modal atual. O retorno não cria Router, Presenter adicional ou nova camada de navegação: ao fechar a modal, o fluxo retorna ao Coordinator e a Home volta a ficar ativa.
 
-## Sample Page Base e primeiro destino concreto
+## Sample Page Base e destinos concretos de Text / Label
 
 A terceira camada do Samples possui uma base visual/comportamental coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A construção visual comum permanece separada em units coesas de header, navegação, seletor de visualização, painel de código e painel de resultado, além de ícones e estilo.
 
-O primeiro destino concreto implementado é **Text / Label - Factory**:
+Os destinos concretos atualmente implementados para Text / Label são **Factory** e **Fluent Builder**:
 
 ```text
 Home
@@ -96,18 +96,25 @@ TComponentTextLabel
   ├── Factory ─────────► TExampleTextLabelFactory
   │                           ▲
   │                           └── herda TExampleCommon
-  └── Fluent Builder ──► ainda não implementado
+  └── Fluent Builder ──► TExampleTextLabelFluent
+                              ▲
+                              └── herda TExampleCommon
 ```
 
-A implementação específica fica separada por responsabilidade:
+A implementação específica fica separada por responsabilidade em cada abordagem:
 
-- `RickUIBuilder.Samples.Example.TextLabel.Factory`: page concreta e coordenação da seleção;
-- `RickUIBuilder.Samples.Example.TextLabel.Factory.Content`: captions, títulos, descrições e snippets;
-- `RickUIBuilder.Samples.Example.TextLabel.Factory.Runner`: execução real de `TRickUIBuilderFactory.CreateText` no `ResultHost`.
+- `RickUIBuilder.Samples.Example.TextLabel.Factory`: page concreta e coordenação Factory;
+- `RickUIBuilder.Samples.Example.TextLabel.Factory.Content`: conteúdo/snippets Factory;
+- `RickUIBuilder.Samples.Example.TextLabel.Factory.Runner`: execução de `TRickUIBuilderFactory.CreateText`;
+- `RickUIBuilder.Samples.Example.TextLabel.Fluent`: page concreta e coordenação Fluent;
+- `RickUIBuilder.Samples.Example.TextLabel.Fluent.Content`: conteúdo/snippets Fluent;
+- `RickUIBuilder.Samples.Example.TextLabel.Fluent.Runner`: execução por `TRickUIBuilder.Label_`.
 
-A página demonstra cinco exemplos: `Básico`, `Geometria`, `Tipografia`, `Alinhamento` e `Completo`. Em conjunto, eles cobrem a criação via `CreateText`, o texto informado e todos os campos públicos atuais de `TRickUIBuilderTextConfig`: `Left`, `Top`, `Width`, `Height`, `FontSize`, `FontColor`, `HorizontalAlign` e `Bold`.
+Factory demonstra cinco exemplos: `Básico`, `Geometria`, `Tipografia`, `Alinhamento` e `Completo`. Em conjunto, eles cobrem `CreateText` e todos os campos públicos atuais de `TRickUIBuilderTextConfig`: `Left`, `Top`, `Width`, `Height`, `FontSize`, `FontColor`, `HorizontalAlign` e `Bold`. O exemplo `Completo` atribui explicitamente todos esses campos.
 
-Os tipos compartilhados usados por essa terceira camada ficam atualmente em `RickUIBuilder.Samples.App.Types`: `TExampleView` identifica a view `Código Delphi`/`Resultado` ativa e `TTextLabelFactoryExample` identifica os cinco exemplos de Text / Label - Factory. `Factory.Content` e `Factory.Runner` consomem esse enum compartilhado; o conteúdo textual não declara mais o identificador dos exemplos.
+Fluent Builder demonstra oito exemplos: `Básico`, `Geometria`, `Layout`, `Tipografia`, `Alinhamento`, `Fluxo de texto`, `Estado` e `Completo`. Em conjunto, cobrem `Text`, `Position`, `Size`, `Anchors`, `Margin`, `Padding`, `FontFamily`, `FontSize`, `FontColor`, `Bold`, `Italic`, `Align`, `VerticalAlign`, `WordWrap`, `Trimming`, `Opacity`, `Visible`, `HitTest`, `Tag` e `Build`. O exemplo `Completo` chama todos esses métodos e usa `TRickUIBuilderSpacing.Create` com os quatro lados explícitos nos records passados a `Margin` e `Padding`.
+
+Os tipos compartilhados usados por essa terceira camada ficam em `RickUIBuilder.Samples.App.Types`: `TExampleView` identifica a view `Código Delphi`/`Resultado`, `TTextLabelFactoryExample` identifica os cinco exemplos Factory e `TTextLabelFluentExample` identifica os oito exemplos Fluent. Pages, Contents e Runners consomem os enums correspondentes sem redeclará-los.
 
 A base continua responsável somente pela infraestrutura comum:
 
@@ -120,7 +127,7 @@ A base continua responsável somente pela infraestrutura comum:
 
 `TExampleCommon` não conhece `TSampleComponent`, componentes concretos, regras específicas de Factory/Fluent, categorias fixas ou catálogo global de exemplos. A page concreta define sua navegação e delega conteúdo e execução às units específicas.
 
-Ao selecionar um exemplo em Text / Label - Factory, a page seleciona visualmente o item, atualiza título/descrição/snippet, chama `ClearResult` e executa o mesmo exemplo no `ResultHost`. O código exibido e o resultado executado representam a mesma configuração.
+Ao selecionar um exemplo em Text / Label - Factory ou Text / Label - Fluent Builder, a page seleciona visualmente o item, atualiza título/descrição/snippet, chama `ClearResult` e executa o mesmo exemplo no `ResultHost`. O código exibido e o resultado executado representam a mesma configuração.
 
 A geometria da Sample Page permanece `620 × 510`, estritamente menor que a Home de `644 × 534`. `Código Delphi` e `Resultado` funcionam como duas views mutuamente exclusivas: a página inicia em `Código Delphi`; ao selecionar `Resultado`, o painel de código é ocultado e somente o painel de resultado fica visível, e o inverso ocorre ao retornar para `Código Delphi`. A view de código permite seleção/cópia e scroll apenas quando houver overflow; a view de resultado preenche toda a área útil abaixo do seletor, enquanto o controle do sample preserva sua própria geometria dentro de `ResultHost`.
 
@@ -144,7 +151,7 @@ O `TSampleApplicationCoordinator` executa o fluxo global: encerramento da aplica
 - o Presenter não referencia a Home;
 - a Home é destruída antes do Coordinator;
 - o Coordinator cria e libera cada Component Page modal;
-- para Text / Label - Factory, o Coordinator também cria e libera a Sample Page modal;
+- para Text / Label, o Coordinator também cria e libera as Sample Pages Factory e Fluent Builder modais;
 - uma Component Page não possui Presenter, Coordinator ou Home; o callback de navegação é non-owning.
 
 ## Contratos
@@ -208,10 +215,13 @@ samples/
         └── TextLabel/
             ├── RickUIBuilder.Samples.Example.TextLabel.Factory.pas
             ├── RickUIBuilder.Samples.Example.TextLabel.Factory.Content.pas
-            └── RickUIBuilder.Samples.Example.TextLabel.Factory.Runner.pas
+            ├── RickUIBuilder.Samples.Example.TextLabel.Factory.Runner.pas
+            ├── RickUIBuilder.Samples.Example.TextLabel.Fluent.pas
+            ├── RickUIBuilder.Samples.Example.TextLabel.Fluent.Content.pas
+            └── RickUIBuilder.Samples.Example.TextLabel.Fluent.Runner.pas
 ```
 
-Diretórios específicos de componentes existem porque possuem units concretas. `src/Examples/Common` contém a base comum; `src/Examples/TextLabel` existe porque a primeira página concreta Factory foi implementada. Novos diretórios de exemplos só podem ser criados quando houver implementação real correspondente.
+Diretórios específicos de componentes existem porque possuem units concretas. `src/Examples/Common` contém a base comum; `src/Examples/TextLabel` existe porque as páginas concretas Factory e Fluent Builder de Text / Label foram implementadas. Novos diretórios de exemplos só podem ser criados quando houver implementação real correspondente.
 
 Todas as units internas do Samples são incorporadas explicitamente ao `.dpr` e ao `.dproj`. O `DCC_UnitSearchPath` não contém o próprio `samples/src`; o caminho de busca permanece reservado à dependência externa `..\src` da biblioteca Rick.UIBuilder e ao Search Path herdado.
 
@@ -233,7 +243,7 @@ Os cards preservam os SVGs oficiais fornecidos:
 
 A geometria de Factory e informação é renderizada por fill; Fluent Builder usa stroke, seguindo os assets originais.
 
-`Ver exemplos` permanece sem `HitTest` e sem callback quando o destino não existe. No estado atual, somente `Text / Label → Factory` recebe callback e `crHandPoint`, porque `TExampleTextLabelFactory` é um destino real.
+`Ver exemplos` permanece sem `HitTest` e sem callback quando o destino não existe. No estado atual, `Text / Label → Factory` e `Text / Label → Fluent Builder` recebem callback e `crHandPoint`, porque `TExampleTextLabelFactory` e `TExampleTextLabelFluent` são destinos reais.
 
 A Sample Page Base usa geometria e paleta próprias em `RickUIBuilder.Samples.Example.Common.Style`, vetor de retorno em `.Icons` e controles estruturais separados em `.Header`, `.Navigation`, `.View.Selector`, `.Code.Panel` e `.Result.Panel`. `TExampleCommon` apenas os coordena. A página possui client de `620 × 510`, é borderless e permanece menor que a Home. A sequência visual segue o textframe normativo: header → identidade → navegação/conteúdo → identificação do exemplo → seletor `Código Delphi`/`Resultado` → uma única view ativa. O estado selecionado da navegação usa fundo azul-claro e indicador vertical azul; o `CodePanel` usa `TMemo` read-only/selecionável com ação `Copiar código`; o `ResultPanel` preenche toda a área restante da view e mantém `ResultHost` como container estável owned pela própria superfície.
 

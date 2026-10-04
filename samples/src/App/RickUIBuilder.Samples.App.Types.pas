@@ -1,4 +1,4 @@
-﻿{ Esta unit centraliza os enums compartilhados pelo Samples, identificando componentes navegáveis, os exemplos atuais de Text / Label - Factory e a view Código/Resultado ativa na Sample Page Base. }
+﻿{ Esta unit centraliza os enums compartilhados pelo Samples, identificando componentes navegáveis, os exemplos atuais de Text / Label nas abordagens Factory e Fluent Builder e a view Código/Resultado ativa na Sample Page Base. }
 {******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.App.Types                                             }
@@ -11,10 +11,11 @@
 {  Funcionalidade                                                              }
 {  --------------                                                              }
 {  - TSampleComponent identifica os seis componentes navegáveis da Home.       }
-{  - TTextLabelFactoryExample identifica os cinco exemplos atuais da página    }
-{    concreta Text / Label - Factory.                                          }
-{  - TExampleView identifica qual view estrutural da Sample Page Base está     }
-{    ativa: Código Delphi ou Resultado.                                        }
+{  - TTextLabelFactoryExample identifica os cinco exemplos da página           }
+{    Text / Label - Factory.                                                   }
+{  - TTextLabelFluentExample identifica os oito exemplos da página             }
+{    Text / Label - Fluent Builder.                                            }
+{  - TExampleView identifica a view Código Delphi ou Resultado ativa.          }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
@@ -23,9 +24,8 @@
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
 {  - Home, Presenter e Coordinator transportam TSampleComponent na navegação.  }
-{  - TextLabel.Factory, Factory.Content e Factory.Runner compartilham           }
-{    TTextLabelFactoryExample para manter seleção, conteúdo e execução         }
-{    sincronizados.                                                            }
+{  - As páginas Factory e Fluent de Text / Label compartilham seus enums com   }
+{    as respectivas units Content e Runner.                                    }
 {  - Example.Common e Example.Common.View.Selector usam TExampleView para      }
 {    coordenar a alternância Código Delphi/Resultado.                          }
 {                                                                              }
@@ -50,6 +50,10 @@ interface
 type
   /// <summary>Identifica os exemplos da página Text / Label - Factory.</summary>
   TTextLabelFactoryExample = (Basic, Geometry, Typography, Alignment, Complete);
+
+  /// <summary>Identifica os exemplos da página Text / Label - Fluent Builder.</summary>
+  TTextLabelFluentExample = (Basic, Geometry, Layout, Typography, Alignment,
+    TextFlow, State, Complete);
 
   /// <summary>Identifica os componentes navegáveis apresentados pelo Samples.</summary>
   TSampleComponent = (TextLabel, Button, Badge, Divider, ComboBox, Edit);

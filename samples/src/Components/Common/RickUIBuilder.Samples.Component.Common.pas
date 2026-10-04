@@ -1,4 +1,5 @@
-﻿{******************************************************************************}
+﻿{ Esta unit implementa a base visual das Component Pages, centralizando formulário borderless, header, cards Factory/Fluent com callbacks somente para destinos reais e painel informativo, sem conhecer conteúdo específico de componente. }
+{******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.Component.Common                                      }
 {                                                                              }
@@ -135,8 +136,10 @@ type
     procedure AddFactoryApproach; overload;
     /// <summary>Adiciona o card Factory ligado a um destino real.</summary>
     procedure AddFactoryApproach(const AOnClick: TNotifyEvent); overload;
-    /// <summary>Adiciona o card Fluent Builder na posição direita padrão.</summary>
-    procedure AddFluentApproach;
+    /// <summary>Adiciona o card Fluent Builder sem destino navegável.</summary>
+    procedure AddFluentApproach; overload;
+    /// <summary>Adiciona o card Fluent Builder ligado a um destino real.</summary>
+    procedure AddFluentApproach(const AOnClick: TNotifyEvent); overload;
     /// <summary>Adiciona o card Fluent Builder centralizado.</summary>
     procedure AddCenteredFluentApproach;
     /// <summary>Adiciona o painel Sobre este componente.</summary>
@@ -310,13 +313,20 @@ begin
 end;
 
 procedure TComponentCommon.AddFluentApproach;
+begin
+  AddFluentApproach(nil);
+end;
+
+procedure TComponentCommon.AddFluentApproach(const AOnClick: TNotifyEvent);
 var
+  LAction: TRectangle;
   LLeft: Single;
 begin
   LLeft := _COMPONENT_PAGE_CONTENT_LEFT_ + _COMPONENT_PAGE_CARD_WIDTH_ +
     _COMPONENT_PAGE_CARD_GAP_;
-  AddApproach('Fluent Builder', _FLUENT_DESCRIPTION_, _COMPONENT_PAGE_ICON_FLUENT_,
-    _COMPONENT_PAGE_FLUENT_ACCENT_, LLeft, True);
+  LAction := AddApproach('Fluent Builder', _FLUENT_DESCRIPTION_,
+    _COMPONENT_PAGE_ICON_FLUENT_, _COMPONENT_PAGE_FLUENT_ACCENT_, LLeft, True);
+  EnableExamplesAction(LAction, AOnClick);
 end;
 
 procedure TComponentCommon.AddCenteredFluentApproach;

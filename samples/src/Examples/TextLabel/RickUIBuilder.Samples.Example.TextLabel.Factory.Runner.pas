@@ -1,4 +1,4 @@
-﻿{ Esta unit executa os exemplos Text / Label - Factory no ResultHost, usando TTextLabelFactoryExample compartilhado para materializar via TRickUIBuilderFactory.CreateText exatamente a configuração apresentada pelo snippet selecionado. }
+﻿{ Esta unit executa os exemplos Text / Label - Factory no ResultHost via TRickUIBuilderFactory.CreateText, mantendo o exemplo Completo sincronizado com todos os campos públicos de TRickUIBuilderTextConfig. }
 {******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.Example.TextLabel.Factory.Runner                      }
@@ -38,6 +38,7 @@
 {  - Não cria navegação, não define textos da página e não conhece Fluent.     }
 {  - TTextAlign exige FMX.Types explicitamente no uses desta unit.             }
 {  - TAlphaColors exige System.UITypes explicitamente no uses desta unit.      }
+{  - O exemplo Completo deve atribuir todos os campos públicos do record.      }
 {                                                                              }
 {  Manutenção                                                                  }
 {  ----------                                                                  }

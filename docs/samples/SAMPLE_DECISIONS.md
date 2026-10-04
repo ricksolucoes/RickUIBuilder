@@ -117,7 +117,7 @@ Textos técnicos da imagem não são copiados quando divergirem da implementaç�
 
 ### DEC-028 — `Ver exemplos` não possui destino fictício
 
-`Ver exemplos` representa a ação para abrir uma Sample Page de Factory ou Fluent Builder. A ação só recebe callback, `crHandPoint` e hit testing quando o destino correspondente realmente existe. No estado atual, `Text / Label → Factory` é o primeiro destino concreto; os demais permanecem somente visuais até sua implementação.
+`Ver exemplos` representa a ação para abrir uma Sample Page de Factory ou Fluent Builder. A ação só recebe callback, `crHandPoint` e hit testing quando o destino correspondente realmente existe. No estado atual, `Text / Label → Factory` e `Text / Label → Fluent Builder` possuem destinos concretos; as abordagens dos demais componentes permanecem somente visuais até sua implementação.
 
 ### DEC-029 — Tipografia é preservada na Component Page
 
@@ -161,7 +161,7 @@ A Sample Page Base fornece apenas infraestrutura comum. A página derivada de ca
 
 ### DEC-039 — Back da Sample Page retorna à Component Page de origem
 
-O header de cada página de exemplos preserva o contexto do componente pai. No primeiro destino concreto, `Text / Label - Factory` exibe `Text / Label` no header e o retorno encerra somente essa página, devolvendo o usuário à Component Page; a Component Page continua responsável por retornar à Home.
+O header de cada página de exemplos preserva o contexto do componente pai. As páginas `Text / Label - Factory` e `Text / Label - Fluent Builder` exibem `Text / Label` no header e o retorno encerra somente a Sample Page atual, devolvendo o usuário à Component Page; a Component Page continua responsável por retornar à Home.
 
 ### DEC-040 — Cobertura de exemplos deriva da API pública real
 
@@ -185,7 +185,7 @@ A implementação comum fica em `samples/src/Examples/Common`. `TExampleCommon` 
 
 ### DEC-045 — Navegação só é habilitada para destino real e permanece coordenada fora da View
 
-`TComponentTextLabel` captura o clique de Factory e emite `OnFactoryExamples`; não cria a Sample Page. `TSampleApplicationCoordinator` conecta esse callback, cria `TExampleTextLabelFactory` sem Owner, executa `ShowModal` e libera a instância em `finally`. Os demais cards sem destino continuam sem callback e sem `HitTest`.
+`TComponentTextLabel` captura separadamente os cliques Factory e Fluent Builder e emite `OnFactoryExamples` / `OnFluentExamples`; não cria Sample Pages. `TSampleApplicationCoordinator` conecta os dois callbacks, cria `TExampleTextLabelFactory` ou `TExampleTextLabelFluent` sem Owner, executa `ShowModal` e libera a instância em `finally`. Cards dos demais componentes sem destino continuam sem callback e sem `HitTest`.
 
 ### DEC-046 — Dependências FMX de símbolos visuais devem ser explícitas
 
@@ -216,7 +216,7 @@ O item ativo da navegação lateral usa fundo azul-claro, texto azul e indicador
 
 ### DEC-052 — Tipos compartilhados da navegação de examples ficam em App.Types
 
-O código vigente centraliza `TSampleComponent`, `TTextLabelFactoryExample` e `TExampleView` em `RickUIBuilder.Samples.App.Types`. `TTextLabelFactoryExample` é compartilhado por `TextLabel.Factory`, `Factory.Content` e `Factory.Runner`; `TExampleView` é compartilhado por `TExampleCommon` e `TExampleViewSelector`. As units de conteúdo não declaram esses enums.
+O código vigente centraliza `TSampleComponent`, `TTextLabelFactoryExample`, `TTextLabelFluentExample` e `TExampleView` em `RickUIBuilder.Samples.App.Types`. Os enums Factory/Fluent são compartilhados por suas respectivas pages, Contents e Runners; `TExampleView` é compartilhado por `TExampleCommon` e `TExampleViewSelector`. As units de conteúdo não declaram esses enums.
 
 ### DEC-053 — Units estruturais de examples usam namespaces físicos segmentados
 
@@ -225,3 +225,12 @@ As units comuns de seletor, código e resultado usam os nomes físicos e declara
 ### DEC-054 — O executável Samples aceita `-nodx` antes da inicialização FMX
 
 `RickUIBuilder.Samples.dpr` aceita o parâmetro opcional `-nodx`. Quando detectado por `FindCmdLineSwitch`, o ponto de entrada define `FMX.Types.GlobalUseDX := False` antes de `Application.Initialize`; sem o parâmetro, o comportamento gráfico padrão do FireMonkey é preservado. Essa opção pertence ao bootstrap do executável e não altera os contratos de navegação ou as páginas do Samples.
+
+
+### DEC-055 — Text / Label - Fluent Builder é o segundo destino concreto de examples
+
+`TExampleTextLabelFluent` herda de `TExampleCommon` e separa coordenação (`Fluent`), conteúdo/snippets (`Fluent.Content`) e execução (`Fluent.Runner`). A página cobre a API pública configurável exposta por `TRickUIBuilder.Label_` / `IRickUIBuilderLabel`, enquanto a Component Page apenas emite a intenção e o Coordinator controla criação, `ShowModal` e liberação.
+
+### DEC-056 — Exemplos `Completo` são exaustivos para a configuração pública
+
+Em cada abordagem concreta, o item `Completo` funciona como referência exaustiva da configuração pública atual. Em Factory, todo campo público do record de configuração usado pelo método deve ser atribuído explicitamente; para Text / Label isso significa todos os campos de `TRickUIBuilderTextConfig`. Em Fluent Builder, todos os métodos públicos configuráveis da interface devem ser chamados; records auxiliares usados na cadeia devem ter todas as opções/campos relevantes explicitados. Para `TRickUIBuilderSpacing`, Left, Top, Right e Bottom são informados por `Create`. Expansão futura da API invalida a cobertura até que snippet, Runner e documentação sejam atualizados.

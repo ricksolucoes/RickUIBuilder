@@ -349,6 +349,9 @@
         <DCCReference Include="src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Factory.pas"/>
         <DCCReference Include="src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Factory.Content.pas"/>
         <DCCReference Include="src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Factory.Runner.pas"/>
+        <DCCReference Include="src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Fluent.pas"/>
+        <DCCReference Include="src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Fluent.Content.pas"/>
+        <DCCReference Include="src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Fluent.Runner.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

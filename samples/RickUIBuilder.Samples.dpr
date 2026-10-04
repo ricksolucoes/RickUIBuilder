@@ -42,8 +42,8 @@
 {      navegação, código e resultado, além de ícones e tokens visuais.         }
 {                                                                              }
 {  - src\Examples\TextLabel                                                  }
-{      Contém a primeira página concreta de sample: Text / Label - Factory,    }
-{      além de conteúdo e execução específicos dessa abordagem.                }
+{      Contém as páginas concretas Text / Label - Factory e Fluent Builder,    }
+{      além de conteúdo e execução específicos de cada abordagem.              }
 {                                                                              }
 {  Dependências principais                                                     }
 {  -----------------------                                                     }
@@ -145,7 +145,10 @@ uses
   RickUIBuilder.Samples.Example.Common.Style in 'src\Examples\Common\RickUIBuilder.Samples.Example.Common.Style.pas',
   RickUIBuilder.Samples.Example.TextLabel.Factory in 'src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Factory.pas',
   RickUIBuilder.Samples.Example.TextLabel.Factory.Content in 'src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Factory.Content.pas',
-  RickUIBuilder.Samples.Example.TextLabel.Factory.Runner in 'src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Factory.Runner.pas';
+  RickUIBuilder.Samples.Example.TextLabel.Factory.Runner in 'src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Factory.Runner.pas',
+  RickUIBuilder.Samples.Example.TextLabel.Fluent in 'src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Fluent.pas',
+  RickUIBuilder.Samples.Example.TextLabel.Fluent.Content in 'src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Fluent.Content.pas',
+  RickUIBuilder.Samples.Example.TextLabel.Fluent.Runner in 'src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Fluent.Runner.pas';
 
 {$R *.res}
 
