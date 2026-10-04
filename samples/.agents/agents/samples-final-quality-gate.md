@@ -38,3 +38,7 @@ Em pacote/release, reprovar presença de `__history/`, `__recovery/`, `.identcac
 
 ## Gate específico das Component Pages
 Quando aplicável, `PASS` exige evidência de que: a base `TComponentCommon` não centraliza conteúdo dos seis componentes; cada componente navegável possui page concreta derivada; Components não depende de `Home.Style`; o formulário é borderless; o retorno fecha a modal sem alterar o fluxo global; subtítulo, cards e painel informativo possuem espaço suficiente sem reduzir tipografia; Edit não apresenta Factory inexistente; e nenhuma página/sample Factory/Fluent foi antecipada sem requisito.
+
+## Gate específico da Sample Page Base
+
+Quando aplicável, `PASS` exige evidência de que `TExampleCommon` permanece menor que a Home, borderless, aderente à sequência normativa do textframe, sem conteúdo específico de componente/abordagem, sem páginas concretas ou samples antecipados e sem comportamento inventado para `Código Delphi` / `Resultado`. Deve haver separação efetiva entre `.Common`, `.Header`, `.Navigation`, `.CodePanel`, `.ResultPanel`, `.Style` e `.Icons`, com todas as units explicitamente registradas no `.dpr` e `.dproj`; ownership do `ResultHost`/limpeza deve ser coerente com o código final.

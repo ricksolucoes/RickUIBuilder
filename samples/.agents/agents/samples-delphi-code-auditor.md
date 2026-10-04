@@ -25,3 +25,7 @@ Ao auditar reorganização estrutural, verificar que as units internas referenci
 
 ## Cabeçalho estrutural obrigatório
 Para cada `.pas` criado ou modificado, confirmar que o arquivo inicia com cabeçalho documental estrutural antes da declaração `unit`. O cabeçalho deve refletir a implementação final e, quando aplicável, informar finalidade, funcionalidade, responsabilidades, dependências internas e sua função, fluxo/colaboração, ownership/lifetime e restrições. Reprovar comentário genérico, desatualizado, copiado mecanicamente ou incompatível com `uses`, contratos e implementação. O cabeçalho orienta a IA, mas não substitui a inspeção do código.
+
+## Critérios específicos da Sample Page Base
+
+Ao auditar a Sample Page Base, confirmar `FMX.Graphics` explícito em toda unit que usa `TBrushKind`, formulário borderless, dimensões menores que a Home, `TScrollBox`/`TVertScrollBox` usados somente como infraestrutura comum, `ResultHost` disponível para derivadas sem execução específica e ausência de callbacks ou destinos concretos de Factory/Fluent. Confirmar também que `TExampleCommon` coordena `.Header`, `.Navigation`, `.CodePanel` e `.ResultPanel` em vez de concentrar a construção integral desses blocos. A faixa `Código Delphi` / `Resultado` deve permanecer não interativa enquanto esse comportamento não estiver especificado.

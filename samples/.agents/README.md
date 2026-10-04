@@ -72,3 +72,7 @@ O catálogo desta página deve corresponder aos arquivos físicos em `.agents/ag
 ## Higiene de artefatos de entrega
 
 `__history/`, `__recovery/`, `.identcache` e `.dproj.local` são artefatos locais/temporários da IDE para fins desta governança: não servem como evidência arquitetural ou documental e não devem integrar o pacote de entrega sem necessidade explícita e comprovada. Recursos necessários ao build, como `.res`, devem ser avaliados pelo Build Validation Auditor e não removidos mecanicamente.
+
+## Regras obrigatórias para Sample Page Base
+
+`RickUIBuilder.Samples.Example.Common` (`TExampleCommon`) coordena a base visual da terceira camada de navegação do Samples. A estrutura física comum fica em `src/Examples/Common` e separa header, navegação, painel de código e painel de resultado em units próprias, além de `.Style` e `.Icons`; não concentrar novamente essas responsabilidades em `TExampleCommon`. Diretórios concretos de exemplos não devem ser criados antes de existirem páginas reais. A base deve permanecer menor que a Home, borderless, sem conhecimento de componentes/abordagens e sem catálogo global de exemplos. A faixa `Código Delphi` / `Resultado` permanece visual enquanto sua semântica não estiver confirmada. Páginas derivadas futuras serão responsáveis por categorias, código exibido e execução real.

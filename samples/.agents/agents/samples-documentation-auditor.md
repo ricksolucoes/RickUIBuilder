@@ -32,3 +32,7 @@ Auditar individualmente toda unit `.pas` criada ou modificada. O cabeçalho supe
 
 ## Coerência documental das Component Pages
 Quando a família de Component Pages for alterada, confirmar que `docs/samples` distingue a base comum das pages concretas, documenta apenas abordagens realmente suportadas, mantém páginas/samples Factory/Fluent como futuros enquanto não existirem e não descreve `Home.Style` como dependência de Components se o código final não a utilizar.
+
+## Coerência documental da Sample Page Base
+
+Quando a Sample Page Base for criada ou alterada, confrontar `SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`, `SAMPLE_ARCHITECTURE.md`, `SAMPLE_DECISIONS.md` e `SAMPLE_FUTURE_WORK.md` com todas as units de `src/Examples/Common`: `.Common`, `.Header`, `.Navigation`, `.CodePanel`, `.ResultPanel`, `.Style` e `.Icons`. A documentação deve distinguir claramente a base implementada das páginas concretas/samples ainda futuros, registrar a separação real de responsabilidades e as dimensões vigentes e não declarar semântica de tabs para `Código Delphi` / `Resultado` enquanto ela não existir no código.

@@ -320,6 +320,13 @@
         <DCCReference Include="src\Components\ComboBox\RickUIBuilder.Samples.Component.ComboBox.pas"/>
         <DCCReference Include="src\Components\Edit\RickUIBuilder.Samples.Component.Edit.pas"/>
         <DCCReference Include="src\Components\Common\RickUIBuilder.Samples.Component.Common.Style.pas"/>
+        <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.pas"/>
+        <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.Header.pas"/>
+        <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.Navigation.pas"/>
+        <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.CodePanel.pas"/>
+        <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.ResultPanel.pas"/>
+        <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.Icons.pas"/>
+        <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.Style.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

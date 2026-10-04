@@ -36,3 +36,7 @@ Em tarefas de pacote/release, exigir Build Validation Auditor e Final Quality Ga
 
 ## Regra específica para Component Pages
 Quando a tarefa alterar `RickUIBuilder.Samples.Component.Common` ou páginas concretas de componente, exigir Architecture Auditor, Delphi Code Auditor, Naming, Toxicity quando houver corpos de método, Documentation Auditor e Build Validation quando `.dpr`/`.dproj` forem afetados. Verificar explicitamente: base sem conteúdo centralizado dos seis componentes; page concreta por componente; ausência de `Home.Style` em Components; formulário borderless; retorno fechando a modal; ausência de destinos Factory/Fluent fictícios; e geometria sem clipping.
+
+## Regra específica para Sample Page Base
+
+Quando a tarefa criar ou alterar qualquer unit de `src/Examples/Common`, exigir Architecture Auditor, Delphi Code Auditor, Documentation Auditor, Naming Auditor, Toxicity Auditor quando houver corpos de método, Contract & Lifetime quando ownership/lifetime do `ResultHost` ou de controles derivados estiver no escopo, e Build Validation quando `.dpr`/`.dproj` forem alterados. Verificar explicitamente: `TExampleCommon` como orquestrador e não arquivo monolítico; responsabilidades de header, navegação, código e resultado separadas em units coesas; janela menor que a Home; sequência do textframe preservada; ausência de conteúdo específico de componente/abordagem; `Código Delphi`/`Resultado` sem comportamento inventado; nenhuma página concreta/sample real antecipada; e registro explícito das novas units no projeto.

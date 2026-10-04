@@ -38,3 +38,12 @@ Quando uma alteração arquitetural modificar responsabilidade, boundary, depend
 - O Coordinator pode resolver `TSampleComponent` para a classe concreta, mas não deve conter layout ou conteúdo visual.
 - Component Pages são intermediárias; reprovar criação antecipada de páginas/samples Factory ou Fluent sem requisito explícito.
 - O retorno local da modal não deve introduzir Router, Presenter ou abstração artificial quando `Close` satisfizer o fluxo existente.
+
+## Critérios específicos da Sample Page Base
+
+- `TExampleCommon` deve coordenar somente a infraestrutura comum da terceira camada; header/back, navegação lateral, painel de código e painel de resultado devem permanecer nas units especializadas `.Header`, `.Navigation`, `.CodePanel` e `.ResultPanel`, sem reabsorção monolítica dessas responsabilidades.
+- A base não pode conhecer `TSampleComponent`, componente concreto, Factory/Fluent como regra específica, categorias fixas ou catálogo global de exemplos.
+- `src/Examples/Common` é permitido porque contém implementação comum real e coesa; cada helper deve possuir responsabilidade estrutural verificável, sem abstração cosmética. Diretórios futuros por componente/abordagem exigem páginas concretas reais.
+- A geometria da Sample Page deve permanecer estritamente menor que a Home e preservar a sequência definida em `SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`.
+- O retorno local pode usar `Close`; não introduzir Router/Presenter/Coordinator novo enquanto não houver navegação concreta que o justifique.
+- A faixa `Código Delphi` / `Resultado` não deve ganhar semântica de tabs ou alternância sem requisito confirmado.

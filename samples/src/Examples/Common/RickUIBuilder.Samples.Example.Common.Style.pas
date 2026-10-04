@@ -1,0 +1,101 @@
+﻿{******************************************************************************}
+{                                                                              }
+{  RickUIBuilder.Samples.Example.Common.Style                                  }
+{                                                                              }
+{  Finalidade                                                                  }
+{  ----------                                                                  }
+{  Centralizar tokens visuais e geometria compartilhados pela base das páginas }
+{  de exemplos do Samples.                                                     }
+{                                                                              }
+{  Funcionalidade                                                              }
+{  --------------                                                              }
+{  Define dimensões da janela, header, identidade, corpo, navegação lateral,   }
+{  painel de código, resultado e paleta visual da Sample Page Base.            }
+{                                                                              }
+{  Dependências do projeto                                                     }
+{  -----------------------                                                     }
+{  - Não possui dependências internas do projeto.                              }
+{                                                                              }
+{  Fluxo / colaboração                                                         }
+{  -------------------                                                         }
+{  - As units Example.Common e seus controles estruturais consomem estes       }
+{    tokens para manter uma geometria única na família de páginas.             }
+{                                                                              }
+{  Restrições e responsabilidades                                              }
+{  -----------------------------                                               }
+{  - A janela deve permanecer estritamente menor que a Home de 644 x 534.      }
+{  - Tipografia compartilhada permanece em RickUIBuilder.Samples.App.Typography.}
+{  - Esta unit não contém conteúdo específico de componente ou abordagem.      }
+{                                                                              }
+{  Manutenção                                                                  }
+{  ----------                                                                  }
+{  Este cabeçalho deve ser atualizado quando geometria, paleta, dependências   }
+{  ou restrições desta unit mudarem.                                           }
+{                                                                              }
+{******************************************************************************}
+
+unit RickUIBuilder.Samples.Example.Common.Style;
+
+interface
+
+const
+  _EXAMPLE_PAGE_WIDTH_ = 620;
+  _EXAMPLE_PAGE_HEIGHT_ = 510;
+  _EXAMPLE_PAGE_TOP_BAR_HEIGHT_ = 40;
+
+  _EXAMPLE_PAGE_CONTENT_LEFT_ = 16;
+  _EXAMPLE_PAGE_CONTENT_WIDTH_ = 588;
+  _EXAMPLE_PAGE_TITLE_TOP_ = 52;
+  _EXAMPLE_PAGE_TITLE_HEIGHT_ = 30;
+  _EXAMPLE_PAGE_SUBTITLE_TOP_ = 84;
+  _EXAMPLE_PAGE_SUBTITLE_HEIGHT_ = 30;
+
+  _EXAMPLE_PAGE_BODY_TOP_ = 124;
+  _EXAMPLE_PAGE_BODY_HEIGHT_ = 370;
+  _EXAMPLE_PAGE_NAV_WIDTH_ = 142;
+  _EXAMPLE_PAGE_BODY_GAP_ = 14;
+  _EXAMPLE_PAGE_MAIN_WIDTH_ = 432;
+
+  _EXAMPLE_PAGE_NAV_PADDING_ = 6;
+  _EXAMPLE_PAGE_NAV_ITEM_WIDTH_ = 130;
+  _EXAMPLE_PAGE_NAV_ITEM_HEIGHT_ = 32;
+  _EXAMPLE_PAGE_NAV_ITEM_GAP_ = 4;
+  _EXAMPLE_PAGE_NAV_ITEM_RADIUS_ = 4;
+
+  _EXAMPLE_PAGE_EXAMPLE_TITLE_TOP_ = 0;
+  _EXAMPLE_PAGE_EXAMPLE_TITLE_HEIGHT_ = 24;
+  _EXAMPLE_PAGE_EXAMPLE_DESCRIPTION_TOP_ = 24;
+  _EXAMPLE_PAGE_EXAMPLE_DESCRIPTION_HEIGHT_ = 30;
+
+  _EXAMPLE_PAGE_CODE_PANEL_TOP_ = 58;
+  _EXAMPLE_PAGE_CODE_PANEL_HEIGHT_ = 192;
+  _EXAMPLE_PAGE_SELECTOR_HEIGHT_ = 30;
+  _EXAMPLE_PAGE_CODE_SURFACE_TOP_ = 34;
+  _EXAMPLE_PAGE_CODE_HEIGHT_ = 158;
+  _EXAMPLE_PAGE_CODE_CANVAS_WIDTH_ = 820;
+  _EXAMPLE_PAGE_CODE_CANVAS_HEIGHT_ = 600;
+  _EXAMPLE_PAGE_CODE_PADDING_ = 10;
+  _EXAMPLE_PAGE_CODE_FONT_SIZE_ = 12;
+  _EXAMPLE_PAGE_CODE_FONT_FAMILY_ = 'Consolas';
+
+  _EXAMPLE_PAGE_RESULT_PANEL_TOP_ = 258;
+  _EXAMPLE_PAGE_RESULT_PANEL_HEIGHT_ = 112;
+  _EXAMPLE_PAGE_RESULT_TITLE_HEIGHT_ = 24;
+  _EXAMPLE_PAGE_RESULT_SURFACE_TOP_ = 28;
+  _EXAMPLE_PAGE_RESULT_HEIGHT_ = 84;
+
+  _EXAMPLE_PAGE_BACKGROUND_ = $FFFAFCFE;
+  _EXAMPLE_PAGE_TOP_BAR_BACKGROUND_ = $FFF5F8FB;
+  _EXAMPLE_PAGE_SURFACE_BACKGROUND_ = $FFFBFCFD;
+  _EXAMPLE_PAGE_BORDER_ = $FFD7E2EC;
+  _EXAMPLE_PAGE_TEXT_PRIMARY_ = $FF0D1B35;
+  _EXAMPLE_PAGE_TEXT_SECONDARY_ = $FF304A68;
+  _EXAMPLE_PAGE_PRIMARY_ = $FF1677F2;
+  _EXAMPLE_PAGE_BACK_HOVER_ = $FFEAF1F7;
+  _EXAMPLE_PAGE_NAV_SELECTED_BACKGROUND_ = $FFE7F1FA;
+  _EXAMPLE_PAGE_CODE_BACKGROUND_ = $FF111D2E;
+  _EXAMPLE_PAGE_CODE_TEXT_ = $FFDCE6F1;
+
+implementation
+
+end.

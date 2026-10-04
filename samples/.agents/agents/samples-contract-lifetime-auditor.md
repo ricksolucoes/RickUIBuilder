@@ -28,3 +28,7 @@ Enquanto a arquitetura atual existir, verificar `IHomePresenter`, `THomePresente
 
 ## Proibições
 Não modificar arquivos, não inventar lifetime não comprovado e não declarar ausência de leak apenas por análise estática.
+
+## Critério da Sample Page Base
+
+Quando `TExampleCommon`, `TExampleResultPanel` ou futuras derivadas afetarem o resultado executável, verificar que `ResultHost` pertence à árvore visual da página, que `TExampleResultPanel.Clear` é a implementação usada por `ClearResult` para liberar os filhos visuais antes da substituição do exemplo e que nenhuma referência owning/non-owning criada pela derivada produz dupla liberação ou referência pendente. Não presumir ausência de leak sem execução apropriada.

@@ -37,6 +37,11 @@
 {  - src\Components\<Componente>                                               }
 {      Contém a página intermediária concreta de cada componente navegável.    }
 {                                                                              }
+{  - src\Examples\Common                                                     }
+{      Contém a base visual e os controles estruturais comuns de header,       }
+{      navegação, código e resultado, além de ícones e tokens visuais.         }
+{      Nenhuma página concreta de sample é criada nesta etapa.                 }
+{                                                                              }
 {  Dependências principais                                                     }
 {  -----------------------                                                     }
 {  - FMX.Forms                                                                 }
@@ -126,7 +131,14 @@ uses
   RickUIBuilder.Samples.Component.Divider in 'src\Components\Divider\RickUIBuilder.Samples.Component.Divider.pas',
   RickUIBuilder.Samples.Component.ComboBox in 'src\Components\ComboBox\RickUIBuilder.Samples.Component.ComboBox.pas',
   RickUIBuilder.Samples.Component.Edit in 'src\Components\Edit\RickUIBuilder.Samples.Component.Edit.pas',
-  RickUIBuilder.Samples.Component.Common.Style in 'src\Components\Common\RickUIBuilder.Samples.Component.Common.Style.pas';
+  RickUIBuilder.Samples.Component.Common.Style in 'src\Components\Common\RickUIBuilder.Samples.Component.Common.Style.pas',
+  RickUIBuilder.Samples.Example.Common in 'src\Examples\Common\RickUIBuilder.Samples.Example.Common.pas',
+  RickUIBuilder.Samples.Example.Common.Header in 'src\Examples\Common\RickUIBuilder.Samples.Example.Common.Header.pas',
+  RickUIBuilder.Samples.Example.Common.Navigation in 'src\Examples\Common\RickUIBuilder.Samples.Example.Common.Navigation.pas',
+  RickUIBuilder.Samples.Example.Common.CodePanel in 'src\Examples\Common\RickUIBuilder.Samples.Example.Common.CodePanel.pas',
+  RickUIBuilder.Samples.Example.Common.ResultPanel in 'src\Examples\Common\RickUIBuilder.Samples.Example.Common.ResultPanel.pas',
+  RickUIBuilder.Samples.Example.Common.Icons in 'src\Examples\Common\RickUIBuilder.Samples.Example.Common.Icons.pas',
+  RickUIBuilder.Samples.Example.Common.Style in 'src\Examples\Common\RickUIBuilder.Samples.Example.Common.Style.pas';
 
 {$R *.res}
 

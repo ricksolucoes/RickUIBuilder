@@ -43,3 +43,7 @@ Se houver `.pas` criado ou modificado, recalcular como obrigatórios Delphi Code
 
 ## Recalculo obrigatório para catálogo e entrega
 Confirmar que todos os agents declarados em `.agents/README.md` existem fisicamente em `.agents/agents/` e que os obrigatórios para a tarefa estão catalogados. Em pacote/release, recalcular a verificação de higiene: `__history/`, `__recovery/`, `.identcache` e `.dproj.local` não podem integrar a entrega sem necessidade explícita e comprovada; `.res` deve ser decidido pela dependência real do build.
+
+## Recalculo obrigatório para Sample Page Base
+
+Se qualquer unit de `src/Examples/Common` for afetada, recalcular Architecture, Delphi Code, Documentation, Naming, Toxicity quando houver corpos de método, Contract & Lifetime quando ownership/lifetime for afetado e Build Validation quando `.dpr`/`.dproj` mudarem. Exigir evidência de separação coesa entre orquestração, header, navegação, código, resultado, ícones e estilo; tamanho inferior à Home; sequência do textframe preservada; ausência de conteúdo específico e inexistência de páginas/samples concretos antecipados.

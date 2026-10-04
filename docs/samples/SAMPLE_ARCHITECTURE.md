@@ -83,9 +83,9 @@ O `TSampleApplicationCoordinator` resolve `TSampleComponent` para a classe concr
 
 A seta de retorno da `TComponentCommon` fecha a janela modal atual. O retorno não cria Router, Presenter adicional ou nova camada de navegação: ao fechar a modal, o fluxo retorna ao Coordinator e a Home volta a ficar ativa.
 
-## Camada planejada de páginas de exemplos
+## Sample Page Base implementada e páginas concretas futuras
 
-A próxima camada do Samples está **especificada documentalmente, mas ainda não implementada**. Ela será aberta a partir de uma abordagem escolhida na Component Page e servirá como base visual/comportamental para as futuras páginas concretas de exemplos.
+A terceira camada do Samples possui agora uma base visual/comportamental coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A construção visual comum é separada em units coesas de header, navegação, painel de código e painel de resultado, além de ícones e estilo. Ela ainda não é destino navegável porque nenhuma página concreta de exemplo foi criada nesta etapa.
 
 ```text
 Home
@@ -93,16 +93,29 @@ Home
   ▼
 Component Page concreta
   │
-  ├── Factory ───────► futura página de exemplos da abordagem Factory
-  │
-  └── Fluent Builder ► futura página de exemplos da abordagem Fluent Builder
+  ├── Factory ───────► futura página concreta de exemplos Factory
+  │                         ▲
+  └── Fluent Builder ► futura página concreta de exemplos Fluent
+                            ▲
+                            │ herdam no futuro
                             │
-                            └── herda uma Sample Page Base comum
+                       TExampleCommon
 ```
 
-A Sample Page Base não conterá conhecimento específico de Button, Badge, Divider, ComboBox, Edit ou Text / Label. A base fornecerá somente estrutura visual e comportamento comum: header/back, identidade da página, navegação lateral, host de conteúdo, superfície de código e host de resultado. Cada futura página concreta definirá suas categorias, exemplos, código exibido e execução real.
+A base fornece somente a infraestrutura comum da família:
 
-A regra de dimensão desta família é relacional: a página de exemplos deve permanecer **estritamente menor que a Home**. No baseline atual, a Home usa referência de `644 × 534`; os valores finais da Sample Page Base serão definidos na implementação sem violar essa relação e sem recorrer a clipping ou redução de tipografia. Quando o conteúdo exceder a área disponível, o tratamento deve ocorrer dentro das regiões apropriadas da própria página, e não pelo crescimento acima da Home.
+- `TExampleCommon`: formulário FMX borderless, composição das regiões e API protegida para futuras derivadas;
+- `TExampleHeader`: header/back com contexto do componente pai;
+- `TExampleNavigation` / `TExampleNavigationItem`: navegação lateral rolável e estado visual selecionado;
+- identidade da página e do exemplo coordenada pela base;
+- `TExampleCodePanel`: faixa visual `Código Delphi` / `Resultado` e superfície de código com scroll;
+- `TExampleResultPanel`: superfície de resultado, `ResultHost` e limpeza visual anterior.
+
+`TExampleCommon` não conhece `TSampleComponent`, componentes concretos, regras específicas de Factory/Fluent, categorias fixas ou catálogo global de exemplos. As futuras páginas derivadas serão responsáveis por categorias, snippets, execução e controles reais.
+
+A geometria vigente da Sample Page Base é `620 × 510`, estritamente menor que a Home de `644 × 534`. O corpo usa `TVertScrollBox` na navegação lateral e `TScrollBox` na superfície de código para tratar conteúdo maior dentro da própria janela, sem aumentar a página acima da Home nem reduzir a tipografia compartilhada.
+
+A faixa `Código Delphi` / `Resultado` é deliberadamente não interativa no código atual. Ela preserva a intenção visual do mockup, mas não implementa tabs ou alternância porque essa semântica ainda não foi confirmada.
 
 A especificação visual e os textframes normativos dessa camada estão em `docs/samples/SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`.
 
@@ -151,7 +164,7 @@ samples/
     │   ├── RickUIBuilder.Samples.Home.Presenter.Intf.pas
     │   ├── RickUIBuilder.Samples.Home.Presenter.pas
     │   └── RickUIBuilder.Samples.Home.Style.pas
-    └── Components/
+    ├── Components/
         ├── Common/
         │   ├── RickUIBuilder.Samples.Component.Common.pas
         │   ├── RickUIBuilder.Samples.Component.Common.Icons.pas
@@ -168,9 +181,18 @@ samples/
         │   └── RickUIBuilder.Samples.Component.ComboBox.pas
         └── Edit/
             └── RickUIBuilder.Samples.Component.Edit.pas
+    └── Examples/
+        └── Common/
+            ├── RickUIBuilder.Samples.Example.Common.pas
+            ├── RickUIBuilder.Samples.Example.Common.Header.pas
+            ├── RickUIBuilder.Samples.Example.Common.Navigation.pas
+            ├── RickUIBuilder.Samples.Example.Common.CodePanel.pas
+            ├── RickUIBuilder.Samples.Example.Common.ResultPanel.pas
+            ├── RickUIBuilder.Samples.Example.Common.Icons.pas
+            └── RickUIBuilder.Samples.Example.Common.Style.pas
 ```
 
-Diretórios específicos de componentes existem porque agora possuem units concretas. Não criar novos diretórios antecipadamente sem implementação real que os justifique.
+Diretórios específicos de componentes existem porque possuem units concretas. `src/Examples/Common` existe porque a base comum foi implementada; diretórios futuros de exemplos por componente/abordagem não devem ser criados antes de existirem páginas concretas reais.
 
 Todas as units internas do Samples são incorporadas explicitamente ao `.dpr` e ao `.dproj`. O `DCC_UnitSearchPath` não contém o próprio `samples/src`; o caminho de busca permanece reservado à dependência externa `..\src` da biblioteca Rick.UIBuilder e ao Search Path herdado.
 
@@ -193,6 +215,8 @@ Os cards preservam os SVGs oficiais fornecidos:
 A geometria de Factory e informação é renderizada por fill; Fluent Builder usa stroke, seguindo os assets originais.
 
 `Ver exemplos` permanece sem `HitTest` e sem callback enquanto as páginas de destino não existirem.
+
+A Sample Page Base usa geometria e paleta próprias em `RickUIBuilder.Samples.Example.Common.Style`, vetor de retorno em `.Icons` e controles estruturais separados em `.Header`, `.Navigation`, `.CodePanel` e `.ResultPanel`. `TExampleCommon` apenas os coordena. A página possui client de `620 × 510`, é borderless e permanece menor que a Home. A sequência visual segue o textframe normativo: header → identidade → navegação/conteúdo → identificação do exemplo → faixa visual → código → resultado.
 
 ## Encoding
 

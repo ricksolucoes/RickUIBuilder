@@ -2,11 +2,11 @@
 
 ## Status
 
-**Especificação documental para implementação futura. Não implementada no código-fonte atual.**
+**Sample Page Base implementada. Páginas concretas e samples reais permanecem futuros.**
 
-Este documento fixa a intenção visual, a sequência estrutural, os limites de responsabilidade e o comportamento esperado da futura base das páginas de exemplos do `RickUIBuilder.Samples`.
+Este documento fixa a intenção visual, a sequência estrutural, os limites de responsabilidade e o comportamento da base das páginas de exemplos do `RickUIBuilder.Samples`.
 
-Ele não declara a existência de uma classe, unit, tela Factory ou tela Fluent Builder no código atual. Nomes técnicos definitivos da futura unit/classe devem ser definidos somente durante a implementação, respeitando o padrão vigente do projeto.
+A implementação atual é coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A família é dividida por responsabilidade em units próprias para header, navegação, painel de código, painel de resultado, ícones e estilo. Não existem ainda páginas concretas `Button - Factory`, `Button - Fluent Builder` ou equivalentes.
 
 ## Papel na navegação
 
@@ -46,9 +46,51 @@ SamplePage.ClientWidth  < 644
 SamplePage.ClientHeight < 534
 ```
 
-Esses números não são dimensões finais da Sample Page; são somente os limites derivados da Home atual. A implementação futura definirá os tokens exatos depois de validar conteúdo e FMX.
+A implementação atual define `620 × 510`, mantendo simultaneamente `620 < 644` e `510 < 534`.
 
-Se o conteúdo não couber, a solução deve ocorrer dentro das regiões apropriadas da página, por organização ou overflow/scroll quando tecnicamente necessário. Não aumentar a Sample Page acima da Home e não reduzir tipografia para esconder clipping.
+A navegação lateral utiliza `TVertScrollBox` e a superfície de código utiliza `TScrollBox`, mantendo excesso de conteúdo dentro das regiões apropriadas. Não aumentar a Sample Page acima da Home e não reduzir tipografia para esconder clipping.
+
+
+## Implementação atual da base
+
+A infraestrutura comum é separada fisicamente para evitar que a classe-base concentre toda a construção visual:
+
+```text
+src/Examples/Common/
+├── RickUIBuilder.Samples.Example.Common.pas
+│   └── TExampleCommon: orquestra a página e expõe a API protegida
+├── RickUIBuilder.Samples.Example.Common.Header.pas
+│   └── TExampleHeader: header, contexto do pai e ação visual de retorno
+├── RickUIBuilder.Samples.Example.Common.Navigation.pas
+│   ├── TExampleNavigation: sidebar rolável e seleção visual
+│   └── TExampleNavigationItem: item visual reutilizável
+├── RickUIBuilder.Samples.Example.Common.CodePanel.pas
+│   └── TExampleCodePanel: faixa Código Delphi/Resultado e superfície de código
+├── RickUIBuilder.Samples.Example.Common.ResultPanel.pas
+│   └── TExampleResultPanel: título, superfície e ResultHost
+├── RickUIBuilder.Samples.Example.Common.Icons.pas
+│   └── geometria vetorial comum
+└── RickUIBuilder.Samples.Example.Common.Style.pas
+    └── geometria e paleta compartilhadas
+```
+
+Essa separação é estrutural e não cria regras específicas de componente. `TExampleCommon` coordena os controles acima; não reimplementa internamente header, navegação, painel de código ou painel de resultado.
+
+A base implementada expõe pontos de extensão protegidos para futuras derivadas:
+
+```text
+ConfigurePage(parent, title, subtitle)
+AddNavigationItem(caption)
+SelectNavigationItem(item)
+SetExampleIdentity(title, description)
+SetCodeText(code)
+ClearResult
+ResultHost
+```
+
+Esses pontos de extensão não materializam componente ou abordagem. `AddNavigationItem` cria somente o item visual; a futura derivada será responsável por associar sua ação. `SelectNavigationItem` controla apenas o estado visual selecionado. `ResultHost` é o container destinado aos controles reais futuros e `ClearResult` remove seus filhos visuais antes da substituição do exemplo.
+
+A faixa `Código Delphi` / `Resultado` permanece com `HitTest` desabilitado e não implementa tabs.
 
 ## Textframe normativo da tela-base
 
@@ -372,11 +414,11 @@ Este textframe ilustra uma futura derivada sem declarar implementação atual:
 
 Os itens do menu são somente os fornecidos pela referência visual. Sua validade como cobertura da API de Button deverá ser verificada quando a página concreta for realmente implementada.
 
-## Critérios documentais para a futura implementação da base
+## Critérios de aderência da implementação da base
 
 A primeira implementação deve ser considerada aderente a esta especificação somente se, no mínimo:
 
-- criar apenas a infraestrutura comum da Sample Page Base;
+- conter apenas a infraestrutura comum da Sample Page Base;
 - permanecer menor que a Home em largura e altura;
 - preservar a sequência do textframe normativo;
 - manter header com contexto do componente pai;
@@ -386,11 +428,11 @@ A primeira implementação deve ser considerada aderente a esta especificação 
 - preservar a faixa visual `Código Delphi` / `Resultado` sem inventar comportamento ainda não confirmado;
 - possuir superfície de código e host de resultado distintos;
 - não conter conteúdo específico de componente/abordagem;
-- não criar páginas concretas ou samples reais nesta primeira etapa;
+- não conter páginas concretas ou samples reais nesta etapa;
 - não centralizar catálogo global de exemplos;
 - não alterar Home ou Component Pages além do necessário para uma integração explicitamente autorizada em etapa posterior.
 
-## Fora do escopo da primeira implementação
+## Fora do escopo após a implementação da base
 
 Continuam fora do escopo até nova autorização:
 

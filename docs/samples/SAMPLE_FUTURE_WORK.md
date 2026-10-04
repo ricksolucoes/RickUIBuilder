@@ -8,14 +8,14 @@ A API pública possui Composition por meio de `TRickUIBuilder.On(AParent)`. A po
 
 As páginas intermediárias de `Text / Label`, `Button`, `Badge`, `Divider`, `ComboBox` e `Edit` já existem como páginas concretas herdadas de `TComponentCommon`.
 
-A próxima etapa possui agora uma especificação documental em `SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`, mas **nenhuma Sample Page Base ou página concreta de exemplos foi implementada ainda**.
+A Sample Page Base já está implementada e coordenada por `RickUIBuilder.Samples.Example.Common` (`TExampleCommon`). Header, navegação, painel de código e painel de resultado ficam separados em `.Header`, `.Navigation`, `.CodePanel` e `.ResultPanel`; tokens permanecem em `.Style` e o vetor comum de retorno em `.Icons`. **Nenhuma página concreta de exemplos foi implementada ainda**, portanto a base não é destino navegável no fluxo atual.
 
-A evolução prevista é deliberadamente faseada:
+A evolução restante é deliberadamente faseada:
 
-1. implementar e validar somente a Sample Page Base;
-2. manter essa base sem conhecimento de componente ou abordagem específica;
-3. depois criar páginas derivadas concretas por componente/abordagem;
-4. em cada derivada, levantar a API pública vigente e cobrir suas funcionalidades com exemplos reais;
+1. manter `TExampleCommon` sem conhecimento de componente ou abordagem específica;
+2. criar páginas derivadas concretas por componente/abordagem somente quando forem realmente implementadas;
+3. em cada derivada, levantar a API pública vigente e cobrir suas funcionalidades com exemplos reais;
+4. validar ownership/limpeza do `ResultHost` para os controles executados;
 5. somente após existir um destino concreto, conectar `Ver exemplos` da Component Page.
 
 A matriz atualmente esperada pela API conhecida é: Text / Label, Button, Badge, Divider e ComboBox com Factory + Fluent Builder; Edit apenas com Fluent Builder enquanto não existir `Factory.CreateEdit`. Essa matriz deve ser revalidada contra a API real no momento de cada implementação.

@@ -145,11 +145,11 @@ A família de Component Pages mantém geometria e paleta local em `RickUIBuilder
 
 ### DEC-035 — A página de exemplos possui uma base visual própria
 
-A próxima camada de navegação terá uma Sample Page Base própria, distinta da Home e da Component Page. Ela será reutilizada por herança pelas futuras páginas concretas de exemplos, sem centralizar regras específicas de componentes ou abordagens. Esta decisão está especificada, mas ainda não implementada.
+A terceira camada de navegação possui uma Sample Page Base própria, distinta da Home e da Component Page. Ela está implementada como `TExampleCommon` em `RickUIBuilder.Samples.Example.Common` e será reutilizada por herança pelas futuras páginas concretas de exemplos, sem centralizar regras específicas de componentes ou abordagens.
 
 ### DEC-036 — Sample Page permanece menor que a Home
 
-A família de páginas de exemplos deve permanecer estritamente menor que a Home. No baseline atual, a Home usa referência de `644 × 534`; a implementação futura deve escolher dimensões inferiores a esses limites e tratar excesso de conteúdo dentro das regiões apropriadas, sem aumentar a janela acima da Home e sem reduzir tipografia para mascarar clipping.
+A família de páginas de exemplos deve permanecer estritamente menor que a Home. A base implementada usa `620 × 510`, enquanto a Home usa `644 × 534`. Excesso de navegação e código é tratado dentro das regiões roláveis da própria página, sem aumentar a janela acima da Home nem reduzir tipografia para mascarar clipping.
 
 ### DEC-037 — O textframe fixa a sequência estrutural da Sample Page
 
@@ -171,3 +171,10 @@ Quando uma página concreta de exemplos for implementada, sua cobertura deve ser
 
 Elementos presentes no mockup preservam posição, hierarquia e intenção visual, mas comportamentos não confirmados não são inventados. Em especial, a faixa visual `Código Delphi` / `Resultado` é reservada na estrutura; sua semântica de alternância só será implementada quando houver requisito explícito ou confirmação durante a implementação da primeira página concreta.
 
+### DEC-042 — Estrutura física e API protegida da Sample Page Base
+
+A implementação comum fica em `samples/src/Examples/Common`. `TExampleCommon` expõe às futuras derivadas apenas operações protegidas para configurar identidade, adicionar/selecionar itens de navegação, definir o exemplo, preencher o código e acessar/limpar `ResultHost`. Nenhuma página concreta ou sample real faz parte desta decisão.
+
+### DEC-043 — Controles estruturais da Sample Page Base são separados por responsabilidade
+
+`TExampleCommon` não concentra toda a materialização visual. Header, navegação, painel de código e painel de resultado são implementados respectivamente em `RickUIBuilder.Samples.Example.Common.Header`, `.Navigation`, `.CodePanel` e `.ResultPanel`; `.Icons` mantém vetores e `.Style` mantém os tokens visuais. A classe-base coordena esses elementos e preserva a API protegida destinada às futuras páginas derivadas. Essa separação segue o padrão de responsabilidades já usado no Samples e evita transformar a base em um arquivo monolítico.
