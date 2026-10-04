@@ -2,11 +2,11 @@
 
 ## Status
 
-**Sample Page Base implementada e quatro páginas concretas disponíveis: Text / Label - Factory, Text / Label - Fluent Builder, Button - Factory e Button - Fluent Builder.**
+**Sample Page Base implementada e cinco páginas concretas disponíveis: Text / Label - Factory, Text / Label - Fluent Builder, Button - Factory, Button - Fluent Builder e Badge - Factory.**
 
 Este documento fixa a intenção visual, a sequência estrutural, os limites de responsabilidade e o comportamento da base das páginas de exemplos do `RickUIBuilder.Samples`.
 
-A implementação comum é coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A família é dividida por responsabilidade em units próprias para header, navegação, seletor de visualização, painel de código, painel de resultado, ícones e estilo. As derivadas reais atuais são `TExampleTextLabelFactory`, `TExampleTextLabelFluent`, `TExampleButtonFactory` e `TExampleButtonFluent`; os demais destinos permanecem futuros.
+A implementação comum é coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A família é dividida por responsabilidade em units próprias para header, navegação, seletor de visualização, painel de código, painel de resultado, ícones e estilo. As derivadas reais atuais são `TExampleTextLabelFactory`, `TExampleTextLabelFluent`, `TExampleButtonFactory`, `TExampleButtonFluent` e `TExampleBadgeFactory`; os demais destinos permanecem futuros.
 
 ## Papel na navegação
 
@@ -33,7 +33,7 @@ Factory             Fluent Builder
        SAMPLE PAGE BASE
 ```
 
-A Component Page continua sendo somente o divisor entre abordagens. A Sample Page concreta é onde os samples reais são apresentados e executados; Text / Label e Button possuem Factory e Fluent Builder concretos nesta etapa.
+A Component Page continua sendo somente o divisor entre abordagens. A Sample Page concreta é onde os samples reais são apresentados e executados; Text / Label e Button possuem Factory e Fluent Builder concretos e Badge possui Factory concreto nesta etapa.
 
 ## Regra de tamanho
 
@@ -78,7 +78,7 @@ src/Examples/Common/
 
 Essa separação é estrutural e não cria regras específicas de componente. `TExampleCommon` coordena os controles acima; não reimplementa internamente header, navegação, seletor, painel de código ou painel de resultado.
 
-`RickUIBuilder.Samples.App.Types` fornece atualmente os enums compartilhados usados por esta camada: `TExampleView` representa a seleção `Código Delphi`/`Resultado`, `TTextLabelFactoryExample` identifica Text / Label - Factory, `TTextLabelFluentExample` identifica Text / Label - Fluent Builder e `TButtonFactoryExample` identifica Button - Factory e `TButtonFluentExample` identifica Button - Fluent Builder. O seletor, as pages concretas, Contents e Runners consomem esses tipos sem redeclará-los.
+`RickUIBuilder.Samples.App.Types` fornece atualmente os enums compartilhados usados por esta camada: `TExampleView` representa a seleção `Código Delphi`/`Resultado`, `TTextLabelFactoryExample` identifica Text / Label - Factory, `TTextLabelFluentExample` identifica Text / Label - Fluent Builder, `TButtonFactoryExample` identifica Button - Factory, `TButtonFluentExample` identifica Button - Fluent Builder e `TBadgeFactoryExample` identifica Badge - Factory. O seletor, as pages concretas, Contents e Runners consomem esses tipos sem redeclará-los.
 
 A base implementada expõe pontos de extensão protegidos para as derivadas:
 
@@ -151,7 +151,7 @@ Cobertura da API pública `TRickUIBuilder.Label_` / `IRickUIBuilderLabel`:
 | `Estado` | `Opacity`, `Visible`, `HitTest`, `Tag` |
 | `Completo` | todos os métodos públicos configuráveis de `IRickUIBuilderLabel`, incluindo `Build`; `Margin` e `Padding` usam `TRickUIBuilderSpacing.Create` com os quatro lados explícitos |
 
-O exemplo `Completo` é deliberadamente exaustivo. Para Text / Label Factory, atribui todos os campos de `TRickUIBuilderTextConfig`; para Text / Label Fluent, chama todos os métodos configuráveis de `IRickUIBuilderLabel`; para Button Factory, atribui todos os nove campos de `TRickUIBuilderButtonConfig`; para Button Fluent, os dois exemplos completos chamam os 23 métodos configuráveis de `IRickUIBuilderButton`, usando `Build` no direto e `BuildHandle` na variante por interfaces. Se a API ou um record público usado por esses exemplos ganhar nova opção configurável, snippet, Runner e matriz devem ser atualizados em conjunto.
+O exemplo `Completo` é deliberadamente exaustivo. Para Text / Label Factory, atribui todos os campos de `TRickUIBuilderTextConfig`; para Text / Label Fluent, chama todos os métodos configuráveis de `IRickUIBuilderLabel`; para Button Factory, atribui todos os nove campos de `TRickUIBuilderButtonConfig`; para Button Fluent, os dois exemplos completos chamam os 23 métodos configuráveis de `IRickUIBuilderButton`, usando `Build` no direto e `BuildHandle` na variante por interfaces; para Badge Factory, atribui os sete campos públicos de `TRickUIBuilderBadgeConfig`. Se a API ou um record público usado por esses exemplos ganhar nova opção configurável, snippet, Runner e matriz devem ser atualizados em conjunto.
 
 ## Página concreta — Button - Factory
 
@@ -182,6 +182,10 @@ Cobertura da API pública `TRickUIBuilderFactory.CreateButton`:
 ## Página concreta — Button - Fluent Builder
 
 Button Fluent segue `src/Examples/Button/Fluent/` com Page, Content e Runner separados. A página possui doze exemplos: `Básico`, `Interface`, `Geometria`, `Layout`, `Aparência`, `Tipografia`, `Estado`, `Hover`, `Clique`, `Resultado`, `Completo - Direto` e `Completo - Interfaces`. O foco principal é `TRickUIBuilder.Button`/`IRickUIBuilderButton`; `IRickUIBuilderButtonHandle`, `IRickUIBuilderButtonHoverState` e `TRickUIBuilderSpacing` aparecem somente quando necessários à API principal. `Clique` e `Hover` são executáveis. `Completo - Direto` cobre os 23 métodos configuráveis e usa `Build`; `Completo - Interfaces` cobre a mesma configuração mantendo `IRickUIBuilderButton`, usa `BuildHandle` e demonstra também as duas interfaces secundárias do Button.
+
+## Página concreta — Badge - Factory
+
+Badge Factory segue `src/Examples/Badge/Factory/` com Page, Content e Runner separados. A página possui sete exemplos: `Básico`, `Geometria`, `Cores`, `Tipografia`, `Texto interno`, `Construção em etapas` e `Completo`. `CreateBadge` é a operação principal; o exemplo `Texto interno` demonstra o `TRectangle` retornado e `out ATextLabel`, enquanto `Construção em etapas` mostra as APIs públicas auxiliares `CreateBadgeContainer` e `BuildBadgeTextConfig`. `Completo` atribui explicitamente `Left`, `Top`, `Width`, `Height`, `BackgroundColor`, `TextColor` e `FontSize`.
 
 ## Textframe normativo da tela-base
 
@@ -355,7 +359,7 @@ Comportamento comum esperado:
 - permitir quantidade variável de itens;
 - quando a quantidade exceder a área disponível, a solução deve preservar a largura/posição da coluna e tratar o overflow sem aumentar a janela acima da Home.
 
-Cada página derivada é responsável por declarar quais categorias/exemplos existem. Text / Label - Factory usa Básico, Geometria, Tipografia, Alinhamento e Completo; Button - Factory usa Básico, Geometria, Cores, Tipografia, Identificação, Caption interno, Clique e Completo; Button - Fluent Builder usa Básico, Interface, Geometria, Layout, Aparência, Tipografia, Estado, Hover, Clique, Resultado, Completo - Direto e Completo - Interfaces.
+Cada página derivada é responsável por declarar quais categorias/exemplos existem. Text / Label - Factory usa Básico, Geometria, Tipografia, Alinhamento e Completo; Button - Factory usa Básico, Geometria, Cores, Tipografia, Identificação, Caption interno, Clique e Completo; Button - Fluent Builder usa Básico, Interface, Geometria, Layout, Aparência, Tipografia, Estado, Hover, Clique, Resultado, Completo - Direto e Completo - Interfaces; Badge - Factory usa Básico, Geometria, Cores, Tipografia, Texto interno, Construção em etapas e Completo.
 
 ## Conteúdo do exemplo
 
@@ -485,9 +489,9 @@ A matriz conhecida no baseline atual é:
 
 | Componente | Factory | Fluent Builder |
 |---|:---:|:---:|
-| Text / Label | implementado | previsto |
-| Button | previsto | previsto |
-| Badge | previsto | previsto |
+| Text / Label | implementado | implementado |
+| Button | implementado | implementado |
+| Badge | implementado | previsto |
 | Divider | previsto | previsto |
 | ComboBox | previsto | previsto |
 | Edit | não disponível na API atual | previsto |

@@ -8,7 +8,7 @@ Este documento descreve a página intermediária de componente e suas seis imple
 
 ## Papel da página
 
-A Component Page é o ponto intermediário entre a Home e as páginas de samples de cada abordagem. No estado atual, Text / Label e Button possuem destinos concretos para Factory e Fluent Builder.
+A Component Page é o ponto intermediário entre a Home e as páginas de samples de cada abordagem. No estado atual, Text / Label e Button possuem destinos concretos para Factory e Fluent Builder; Badge possui destino concreto para Factory.
 
 ```text
 Home
@@ -27,7 +27,7 @@ Component Page do componente
          └── demais componentes → futuro
 ```
 
-Callbacks só existem quando há destino real. `Text / Label → Factory`, `Text / Label → Fluent Builder`, `Button → Factory` e `Button → Fluent Builder` navegam para suas Sample Pages concretas; as demais abordagens sem destino permanecem somente visuais.
+Callbacks só existem quando há destino real. `Text / Label → Factory`, `Text / Label → Fluent Builder`, `Button → Factory`, `Button → Fluent Builder` e `Badge → Factory` navegam para suas Sample Pages concretas; as demais abordagens sem destino permanecem somente visuais.
 
 ## Arquitetura da família de páginas
 
@@ -137,7 +137,7 @@ Quando somente Fluent Builder existe, como no Edit:
 
 O card único é centralizado. Não existe placeholder de Factory.
 
-`Ver exemplos` permanece com `HitTest := False` e sem callback enquanto o destino real não existir. Quando existe destino, como nas duas abordagens de Text / Label e Button, a ação recebe `HitTest := True`, `crHandPoint` e callback real.
+`Ver exemplos` permanece com `HitTest := False` e sem callback enquanto o destino real não existir. Quando existe destino, como nas duas abordagens de Text / Label e Button e em Badge Factory, a ação recebe `HitTest := True`, `crHandPoint` e callback real.
 
 ## Assets vetoriais
 
@@ -233,6 +233,8 @@ A referência visual original mencionava `TButton`, mas a implementação real d
 
 **Sobre:** `Badge combina TRectangle + TLabel e pode ser criado pela Factory ou configurado pelo Fluent Builder, incluindo as opções visuais próprias do componente.`
 
+Factory possui callback real para `TExampleBadgeFactory`; Fluent Builder permanece somente visual enquanto sua Sample Page não existir.
+
 ### Divider
 
 **Classe:** `TComponentDivider`
@@ -286,7 +288,7 @@ A referência visual original mencionava `TButton`, mas a implementação real d
 
 ## Próxima camada planejada
 
-A ação `Ver exemplos` é conectada individualmente apenas a destinos reais. Text / Label e Button abrem Factory e Fluent Builder; os destinos ainda não implementados permanecem sem callback. A terceira camada é especificada em `SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`.
+A ação `Ver exemplos` é conectada individualmente apenas a destinos reais. Text / Label e Button abrem Factory e Fluent Builder; Badge abre Factory; os destinos ainda não implementados permanecem sem callback. A terceira camada é especificada em `SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`.
 
 A Component Page continua tendo somente a responsabilidade de escolher a abordagem. Ela não deve absorver menu lateral, código Delphi, resultado executável ou qualquer sample real.
 
@@ -306,7 +308,7 @@ A Component Page continua tendo somente a responsabilidade de escolher a abordag
 - arrays com conteúdo dos seis componentes;
 - regra específica `Edit não possui Factory`;
 - páginas Factory/Fluent ainda não implementadas;
-- samples concretos pertencentes à terceira camada, incluindo Text / Label e Button Factory.
+- samples concretos pertencentes à terceira camada, incluindo Text / Label, Button e Badge Factory.
 
 Cada página concreta pode conhecer somente o conteúdo e as abordagens do seu próprio componente.
 
@@ -326,4 +328,4 @@ A implementação deve manter simultaneamente:
 - uma unit concreta por componente herdando de `TComponentCommon`;
 - `.dpr` e `.dproj` contendo explicitamente todas as units;
 - nenhum `samples/src` no Search Path;
-- nenhum callback habilitado para destino inexistente; Text / Label e Button possuem Factory/Fluent concretos nesta etapa.
+- nenhum callback habilitado para destino inexistente; Text / Label e Button possuem Factory/Fluent concretos e Badge possui Factory concreto nesta etapa.

@@ -49,6 +49,9 @@
 {      Contém as páginas concretas Button - Factory e Fluent Builder,           }
 {      separadas fisicamente por abordagem.                                    }
 {                                                                              }
+{  - src\Examples\Badge\Factory                                            }
+{      Contém a página concreta Badge - Factory e suas units Content/Runner.   }
+{                                                                              }
 {  Dependências principais                                                     }
 {  -----------------------                                                     }
 {  - FMX.Forms                                                                 }
@@ -153,6 +156,9 @@ uses
   RickUIBuilder.Samples.Example.Button.Fluent in 'src\Examples\Button\Fluent\RickUIBuilder.Samples.Example.Button.Fluent.pas',
   RickUIBuilder.Samples.Example.Button.Fluent.Content in 'src\Examples\Button\Fluent\RickUIBuilder.Samples.Example.Button.Fluent.Content.pas',
   RickUIBuilder.Samples.Example.Button.Fluent.Runner in 'src\Examples\Button\Fluent\RickUIBuilder.Samples.Example.Button.Fluent.Runner.pas',
+  RickUIBuilder.Samples.Example.Badge.Factory in 'src\Examples\Badge\Factory\RickUIBuilder.Samples.Example.Badge.Factory.pas',
+  RickUIBuilder.Samples.Example.Badge.Factory.Content in 'src\Examples\Badge\Factory\RickUIBuilder.Samples.Example.Badge.Factory.Content.pas',
+  RickUIBuilder.Samples.Example.Badge.Factory.Runner in 'src\Examples\Badge\Factory\RickUIBuilder.Samples.Example.Badge.Factory.Runner.pas',
   RickUIBuilder.Samples.Example.TextLabel.Factory.Content in 'src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.Content.pas',
   RickUIBuilder.Samples.Example.TextLabel.Factory in 'src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.pas',
   RickUIBuilder.Samples.Example.TextLabel.Factory.Runner in 'src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.Runner.pas',

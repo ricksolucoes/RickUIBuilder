@@ -117,7 +117,7 @@ Textos técnicos da imagem não são copiados quando divergirem da implementaç�
 
 ### DEC-028 — `Ver exemplos` não possui destino fictício
 
-`Ver exemplos` representa a ação para abrir uma Sample Page de Factory ou Fluent Builder. A ação só recebe callback, `crHandPoint` e hit testing quando o destino correspondente realmente existe. No estado atual, `Text / Label → Factory`, `Text / Label → Fluent Builder`, `Button → Factory` e `Button → Fluent Builder` possuem destinos concretos; abordagens sem destino permanecem somente visuais até sua implementação.
+`Ver exemplos` representa a ação para abrir uma Sample Page de Factory ou Fluent Builder. A ação só recebe callback, `crHandPoint` e hit testing quando o destino correspondente realmente existe. No estado atual, `Text / Label → Factory`, `Text / Label → Fluent Builder`, `Button → Factory`, `Button → Fluent Builder` e `Badge → Factory` possuem destinos concretos; abordagens sem destino permanecem somente visuais até sua implementação.
 
 ### DEC-029 — Tipografia é preservada na Component Page
 
@@ -185,7 +185,7 @@ A implementação comum fica em `samples/src/Examples/Common`. `TExampleCommon` 
 
 ### DEC-045 — Navegação só é habilitada para destino real e permanece coordenada fora da View
 
-`TComponentTextLabel` e `TComponentButton` capturam separadamente os cliques Factory e Fluent Builder e emitem `OnFactoryExamples` / `OnFluentExamples`. Nenhuma Component Page cria Sample Pages. `TSampleApplicationCoordinator` conecta os callbacks que possuem destino real, cria `TExampleTextLabelFactory`, `TExampleTextLabelFluent`, `TExampleButtonFactory` ou `TExampleButtonFluent` sem Owner, executa `ShowModal` e libera a instância em `finally`. Cards sem destino continuam sem callback e sem `HitTest`.
+`TComponentTextLabel` e `TComponentButton` capturam separadamente os cliques Factory e Fluent Builder; `TComponentBadge` captura Factory. Nenhuma Component Page cria Sample Pages. `TSampleApplicationCoordinator` conecta somente callbacks com destino real, cria `TExampleTextLabelFactory`, `TExampleTextLabelFluent`, `TExampleButtonFactory`, `TExampleButtonFluent` ou `TExampleBadgeFactory` sem Owner, executa `ShowModal` e libera a instância em `finally`. Cards sem destino continuam sem callback e sem `HitTest`.
 
 ### DEC-046 — Dependências FMX de símbolos visuais devem ser explícitas
 
@@ -241,5 +241,8 @@ Em cada abordagem concreta, o item `Completo` funciona como referência exaustiv
 
 ### DEC-058 — Examples concretos são organizados por componente e abordagem
 
-Páginas reais da terceira camada seguem `samples/src/Examples/<Componente>/<Abordagem>`. Text / Label e Button mantêm `Factory/` e `Fluent/`. Diretórios de abordagem sem implementação não são criados. `Button - Factory` mantém o exemplo `Completo` exaustivo para os nove campos públicos de `TRickUIBuilderButtonConfig` e demonstra também as duas sobrecargas públicas de `CreateButton`. `Button - Fluent Builder` mantém dois exemplos completos: um direto e outro por interfaces; ambos cobrem os 23 métodos configuráveis de `IRickUIBuilderButton`.
+Páginas reais da terceira camada seguem `samples/src/Examples/<Componente>/<Abordagem>`. Text / Label e Button mantêm `Factory/` e `Fluent/`; Badge possui `Factory/`. Diretórios de abordagem sem implementação não são criados. `Button - Factory` mantém o exemplo `Completo` exaustivo para os nove campos públicos de `TRickUIBuilderButtonConfig` e demonstra também as duas sobrecargas públicas de `CreateButton`. `Button - Fluent Builder` mantém dois exemplos completos: um direto e outro por interfaces; ambos cobrem os 23 métodos configuráveis de `IRickUIBuilderButton`.
 
+### DEC-059 — Badge - Factory é o quinto destino concreto da Sample Page
+
+`TExampleBadgeFactory` herda de `TExampleCommon` e fica em `src/Examples/Badge/Factory`, separando coordenação (`Factory`), conteúdo/snippets (`Factory.Content`) e execução (`Factory.Runner`). A página possui sete exemplos: Básico, Geometria, Cores, Tipografia, Texto interno, Construção em etapas e Completo. `CreateBadge` permanece a operação principal; as APIs públicas auxiliares `CreateBadgeContainer` e `BuildBadgeTextConfig` aparecem somente no exemplo de construção em etapas. O exemplo `Completo` atribui explicitamente os sete campos públicos de `TRickUIBuilderBadgeConfig`.

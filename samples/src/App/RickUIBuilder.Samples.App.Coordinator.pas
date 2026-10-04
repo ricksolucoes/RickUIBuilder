@@ -1,11 +1,9 @@
-﻿{ Esta unit coordena a abertura, integração e lifetime das Component Pages e Sample Pages concretas do RickUIBuilder.Samples. }
-{******************************************************************************}
+﻿{******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.App.Coordinator                                       }
 {                                                                              }
-{ Esta unit coordena o fluxo e o lifetime das páginas modais do Samples,       }
-{ conectando os destinos reais de Text / Label e Button nas abordagens         }
-{ Factory e Fluent Builder sem habilitar destinos inexistentes.                }
+{ Esta unit coordena a abertura, integração e lifetime das Component Pages e   }
+{ Sample Pages concretas, incluindo Badge - Factory como destino real.         }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
@@ -14,8 +12,8 @@
 {  Funcionalidade                                                              }
 {  --------------                                                              }
 {  Encerra a aplicação, resolve a Component Page concreta e conecta somente    }
-{  intenções que possuem Sample Pages reais: Text / Label Factory/Fluent e     }
-{  Button Factory/Fluent.                                                      }
+{  intenções com Sample Pages reais: Text / Label e Button Factory/Fluent e    }
+{  Badge Factory.                                                              }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
@@ -25,14 +23,12 @@
 {      Fornece TComponentCommon e a metaclasse das Component Pages.            }
 {  - RickUIBuilder.Samples.Component.*                                         }
 {      Fornecem as seis Component Pages concretas.                             }
-{  - RickUIBuilder.Samples.Example.TextLabel.Factory                           }
-{      Fornece o destino concreto Text / Label - Factory.                      }
-{  - RickUIBuilder.Samples.Example.TextLabel.Fluent                            }
-{      Fornece o destino concreto Text / Label - Fluent Builder.               }
-{  - RickUIBuilder.Samples.Example.Button.Factory                              }
-{      Fornece o destino concreto Button - Factory.                            }
-{  - RickUIBuilder.Samples.Example.Button.Fluent                               }
-{      Fornece o destino concreto Button - Fluent Builder.                     }
+{  - RickUIBuilder.Samples.Example.TextLabel.Factory/Fluent                    }
+{      Fornecem os destinos concretos de Text / Label.                         }
+{  - RickUIBuilder.Samples.Example.Button.Factory/Fluent                       }
+{      Fornecem os destinos concretos de Button.                               }
+{  - RickUIBuilder.Samples.Example.Badge.Factory                               }
+{      Fornece o destino concreto Badge - Factory.                             }
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
@@ -79,10 +75,12 @@ type
     procedure TextLabelFluentRequested(ASender: TObject);
     procedure ButtonFactoryRequested(ASender: TObject);
     procedure ButtonFluentRequested(ASender: TObject);
+    procedure BadgeFactoryRequested(ASender: TObject);
     procedure OpenTextLabelFactory;
     procedure OpenTextLabelFluent;
     procedure OpenButtonFactory;
     procedure OpenButtonFluent;
+    procedure OpenBadgeFactory;
   public
     /// <summary>Encerra o loop principal da aplicação.</summary>
     function Close: TSampleApplicationCoordinator;
@@ -101,6 +99,7 @@ uses
   RickUIBuilder.Samples.Component.Divider,
   RickUIBuilder.Samples.Component.ComboBox,
   RickUIBuilder.Samples.Component.TextLabel,
+  RickUIBuilder.Samples.Example.Badge.Factory,
   RickUIBuilder.Samples.Example.Button.Factory,
   RickUIBuilder.Samples.Example.Button.Fluent,
   RickUIBuilder.Samples.Example.TextLabel.Factory,
@@ -150,6 +149,8 @@ begin
         TComponentButton(APage).OnFactoryExamples := ButtonFactoryRequested;
         TComponentButton(APage).OnFluentExamples := ButtonFluentRequested;
       end;
+    TSampleComponent.Badge:
+      TComponentBadge(APage).OnFactoryExamples := BadgeFactoryRequested;
   end;
 end;
 
@@ -175,6 +176,12 @@ procedure TSampleApplicationCoordinator.ButtonFluentRequested(
   ASender: TObject);
 begin
   OpenButtonFluent;
+end;
+
+procedure TSampleApplicationCoordinator.BadgeFactoryRequested(
+  ASender: TObject);
+begin
+  OpenBadgeFactory;
 end;
 
 procedure TSampleApplicationCoordinator.OpenTextLabelFactory;
@@ -218,6 +225,18 @@ var
   LPage: TExampleButtonFluent;
 begin
   LPage := TExampleButtonFluent.Create(nil);
+  try
+    LPage.ShowModal;
+  finally
+    LPage.Free;
+  end;
+end;
+
+procedure TSampleApplicationCoordinator.OpenBadgeFactory;
+var
+  LPage: TExampleBadgeFactory;
+begin
+  LPage := TExampleBadgeFactory.Create(nil);
   try
     LPage.ShowModal;
   finally
