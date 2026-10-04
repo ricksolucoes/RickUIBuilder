@@ -2,9 +2,8 @@
 {                                                                              }
 {  RickUIBuilder.Samples.Component.Badge                                       }
 {                                                                              }
-{ Esta unit implementa a Component Page de Badge, habilitando o destino        }
-{ Factory real por callback non-owning e mantendo Fluent Builder somente       }
-{ visual enquanto sua Sample Page não existir.                                 }
+{ Esta unit implementa a Component Page de Badge e encaminha por callbacks     }
+{ non-owning as intenções para os destinos concretos Factory e Fluent Builder. }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
@@ -13,8 +12,7 @@
 {  Funcionalidade                                                              }
 {  --------------                                                              }
 {  Define identidade, informação e as abordagens Factory e Fluent Builder.     }
-{  Factory encaminha uma intenção de navegação ao Coordinator; Fluent Builder  }
-{  permanece sem callback nesta etapa.                                         }
+{  Cada card encaminha sua intenção de navegação ao Coordinator.               }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
@@ -23,22 +21,21 @@
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
-{  - O Coordinator cria esta page, conecta Factory e chama ShowModal.          }
-{  - O clique em Factory é encaminhado ao callback externo; esta page não cria }
-{    diretamente a Sample Page de destino.                                     }
+{  - O Coordinator cria esta page, conecta Factory/Fluent e chama ShowModal.   }
+{  - Os cliques são encaminhados aos callbacks externos; esta page não cria    }
+{    diretamente as Sample Pages de destino.                                   }
 {  - O retorno para a Home permanece implementado pela classe-base.            }
 {                                                                              }
 {  Ownership / lifetime                                                        }
 {  --------------------                                                        }
-{  - OnFactoryExamples é um evento non-owning para o Coordinator, cujo         }
-{    lifetime é superior durante a navegação.                                  }
-{  - A page não possui Coordinator nem a Sample Page Badge - Factory.          }
+{  - OnFactoryExamples e OnFluentExamples são eventos non-owning para o        }
+{    Coordinator, cujo lifetime é superior durante a navegação.                }
+{  - A page não possui Coordinator nem Sample Pages concretas.                 }
 {                                                                              }
 {  Restrições e responsabilidades                                              }
 {  -----------------------------                                               }
-{  - Não implementa os samples Factory; somente emite a intenção.              }
-{  - Não habilita Fluent Builder sem destino concreto.                         }
-{  - Não conhece TExampleBadgeFactory.                                         }
+{  - Não implementa samples Factory/Fluent; somente emite as intenções.        }
+{  - Não conhece TExampleBadgeFactory nem TExampleBadgeFluent.                 }
 {                                                                              }
 {  Manutenção                                                                  }
 {  ----------                                                                  }
@@ -60,13 +57,18 @@ type
   TComponentBadge = class(TComponentCommon)
   strict private
     FOnFactoryExamples: TNotifyEvent;
+    FOnFluentExamples: TNotifyEvent;
     procedure FactoryExamplesRequested(ASender: TObject);
+    procedure FluentExamplesRequested(ASender: TObject);
   public
     /// <summary>Cria a página com o conteúdo específico de Badge.</summary>
     constructor Create(AOwner: TComponent); override;
     /// <summary>Intenção non-owning para abrir o destino Badge - Factory.</summary>
     property OnFactoryExamples: TNotifyEvent read FOnFactoryExamples
       write FOnFactoryExamples;
+    /// <summary>Intenção non-owning para abrir Badge - Fluent Builder.</summary>
+    property OnFluentExamples: TNotifyEvent read FOnFluentExamples
+      write FOnFluentExamples;
   end;
 
 implementation
@@ -81,7 +83,7 @@ begin
   inherited Create(AOwner);
   AddIdentity(_TITLE_, _SUBTITLE_);
   AddFactoryApproach(FactoryExamplesRequested);
-  AddFluentApproach;
+  AddFluentApproach(FluentExamplesRequested);
   AddInfoPanel(_INFO_);
 end;
 
@@ -89,6 +91,12 @@ procedure TComponentBadge.FactoryExamplesRequested(ASender: TObject);
 begin
   if Assigned(FOnFactoryExamples) then
     FOnFactoryExamples(ASender);
+end;
+
+procedure TComponentBadge.FluentExamplesRequested(ASender: TObject);
+begin
+  if Assigned(FOnFluentExamples) then
+    FOnFluentExamples(ASender);
 end;
 
 end.

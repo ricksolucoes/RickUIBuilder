@@ -18,7 +18,8 @@
 {    Factory e TTextLabelFluentExample os oito exemplos Fluent Builder.        }
 {  - TButtonFactoryExample identifica os oito exemplos Button Factory e        }
 {    TButtonFluentExample os doze exemplos Button Fluent Builder.              }
-{  - TBadgeFactoryExample identifica os sete exemplos Badge - Factory.         }
+{  - TBadgeFactoryExample identifica os sete exemplos Badge - Factory e        }
+{    TBadgeFluentExample os onze exemplos Badge Fluent Builder.                }
 {  - TExampleView identifica a view Código Delphi ou Resultado ativa.          }
 {                                                                              }
 {  Dependências do projeto                                                     }
@@ -71,6 +72,11 @@ type
   /// <summary>Identifica os exemplos da página Badge - Factory.</summary>
   TBadgeFactoryExample = (Basic, Geometry, Colors, Typography, TextAccess,
     StepByStep, Complete);
+
+  /// <summary>Identifica os exemplos da página Badge - Fluent Builder.</summary>
+  TBadgeFluentExample = (Basic, InterfaceUsage, Geometry, Shape, Layout,
+    Appearance, Typography, State, ResultAccess, CompleteDirect,
+    CompleteInterfaces);
 
   /// <summary>Identifica os componentes navegáveis apresentados pelo Samples.</summary>
   TSampleComponent = (TextLabel, Button, Badge, Divider, ComboBox, Edit);

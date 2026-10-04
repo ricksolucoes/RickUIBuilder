@@ -3,7 +3,7 @@
 {  RickUIBuilder.Samples.App.Coordinator                                       }
 {                                                                              }
 { Esta unit coordena a abertura, integração e lifetime das Component Pages e   }
-{ Sample Pages concretas, incluindo Badge - Factory como destino real.         }
+{ Sample Pages concretas, incluindo Badge Factory/Fluent como destinos reais.  }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
@@ -12,8 +12,8 @@
 {  Funcionalidade                                                              }
 {  --------------                                                              }
 {  Encerra a aplicação, resolve a Component Page concreta e conecta somente    }
-{  intenções com Sample Pages reais: Text / Label e Button Factory/Fluent e    }
-{  Badge Factory.                                                              }
+{  intenções com Sample Pages reais de Text / Label, Button e Badge nas        }
+{  abordagens Factory e Fluent Builder.                                        }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
@@ -27,8 +27,8 @@
 {      Fornecem os destinos concretos de Text / Label.                         }
 {  - RickUIBuilder.Samples.Example.Button.Factory/Fluent                       }
 {      Fornecem os destinos concretos de Button.                               }
-{  - RickUIBuilder.Samples.Example.Badge.Factory                               }
-{      Fornece o destino concreto Badge - Factory.                             }
+{  - RickUIBuilder.Samples.Example.Badge.Factory/Fluent                        }
+{      Fornecem os destinos concretos de Badge.                                }
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
@@ -76,11 +76,13 @@ type
     procedure ButtonFactoryRequested(ASender: TObject);
     procedure ButtonFluentRequested(ASender: TObject);
     procedure BadgeFactoryRequested(ASender: TObject);
+    procedure BadgeFluentRequested(ASender: TObject);
     procedure OpenTextLabelFactory;
     procedure OpenTextLabelFluent;
     procedure OpenButtonFactory;
     procedure OpenButtonFluent;
     procedure OpenBadgeFactory;
+    procedure OpenBadgeFluent;
   public
     /// <summary>Encerra o loop principal da aplicação.</summary>
     function Close: TSampleApplicationCoordinator;
@@ -100,6 +102,7 @@ uses
   RickUIBuilder.Samples.Component.ComboBox,
   RickUIBuilder.Samples.Component.TextLabel,
   RickUIBuilder.Samples.Example.Badge.Factory,
+  RickUIBuilder.Samples.Example.Badge.Fluent,
   RickUIBuilder.Samples.Example.Button.Factory,
   RickUIBuilder.Samples.Example.Button.Fluent,
   RickUIBuilder.Samples.Example.TextLabel.Factory,
@@ -150,7 +153,10 @@ begin
         TComponentButton(APage).OnFluentExamples := ButtonFluentRequested;
       end;
     TSampleComponent.Badge:
-      TComponentBadge(APage).OnFactoryExamples := BadgeFactoryRequested;
+      begin
+        TComponentBadge(APage).OnFactoryExamples := BadgeFactoryRequested;
+        TComponentBadge(APage).OnFluentExamples := BadgeFluentRequested;
+      end;
   end;
 end;
 
@@ -182,6 +188,12 @@ procedure TSampleApplicationCoordinator.BadgeFactoryRequested(
   ASender: TObject);
 begin
   OpenBadgeFactory;
+end;
+
+procedure TSampleApplicationCoordinator.BadgeFluentRequested(
+  ASender: TObject);
+begin
+  OpenBadgeFluent;
 end;
 
 procedure TSampleApplicationCoordinator.OpenTextLabelFactory;
@@ -237,6 +249,18 @@ var
   LPage: TExampleBadgeFactory;
 begin
   LPage := TExampleBadgeFactory.Create(nil);
+  try
+    LPage.ShowModal;
+  finally
+    LPage.Free;
+  end;
+end;
+
+procedure TSampleApplicationCoordinator.OpenBadgeFluent;
+var
+  LPage: TExampleBadgeFluent;
+begin
+  LPage := TExampleBadgeFluent.Create(nil);
   try
     LPage.ShowModal;
   finally

@@ -355,6 +355,9 @@
         <DCCReference Include="src\Examples\Badge\Factory\RickUIBuilder.Samples.Example.Badge.Factory.pas"/>
         <DCCReference Include="src\Examples\Badge\Factory\RickUIBuilder.Samples.Example.Badge.Factory.Content.pas"/>
         <DCCReference Include="src\Examples\Badge\Factory\RickUIBuilder.Samples.Example.Badge.Factory.Runner.pas"/>
+        <DCCReference Include="src\Examples\Badge\Fluent\RickUIBuilder.Samples.Example.Badge.Fluent.pas"/>
+        <DCCReference Include="src\Examples\Badge\Fluent\RickUIBuilder.Samples.Example.Badge.Fluent.Content.pas"/>
+        <DCCReference Include="src\Examples\Badge\Fluent\RickUIBuilder.Samples.Example.Badge.Fluent.Runner.pas"/>
         <DCCReference Include="src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.Content.pas"/>
         <DCCReference Include="src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.pas"/>
         <DCCReference Include="src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.Runner.pas"/>
