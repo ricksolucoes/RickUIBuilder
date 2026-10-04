@@ -39,7 +39,7 @@ Se o artefato final alterar estrutura de `src`, `.dpr`, `.dproj`, Search Path, h
 Se Component Pages forem afetadas, recalcular Architecture, Delphi Code, Documentation, Naming, Toxicity quando houver corpos de método e Build Validation quando o projeto for alterado. Exigir evidência da base comum desacoplada de `Home.Style`, pages concretas por componente, formulário borderless, retorno funcional da modal, ausência de clipping e ausência de callbacks para destinos inexistentes e coerência dos destinos realmente implementados.
 
 ## Recalculo obrigatório para documentação de unit
-Se houver `.pas` criado ou modificado, recalcular como obrigatórios Delphi Code Auditor, Documentation Auditor e Naming Auditor e exigir evidência específica da auditoria dos cabeçalhos estruturais e nomenclatura. Se a alteração puder afetar corpo de método, recalcular Toxicity Auditor. Se interfaces, GUIDs, reference counting, ownership ou lifetime forem aplicáveis, recalcular Contract & Lifetime Auditor. Um `PASS` genérico sem evidência desses gates especializados não comprova o processo.
+Se houver `.pas` criado ou modificado, recalcular como obrigatórios Delphi Code Auditor, Documentation Auditor e Naming Auditor e exigir evidência específica de que a primeira linha física explica a responsabilidade concreta da unit, além da auditoria dos cabeçalhos estruturais e nomenclatura. Se a alteração puder afetar corpo de método, recalcular Toxicity Auditor. Se interfaces, GUIDs, reference counting, ownership ou lifetime forem aplicáveis, recalcular Contract & Lifetime Auditor. Um `PASS` genérico sem evidência desses gates especializados não comprova o processo.
 
 ## Recalculo obrigatório para catálogo e entrega
 Confirmar que todos os agents declarados em `.agents/README.md` existem fisicamente em `.agents/agents/` e que os obrigatórios para a tarefa estão catalogados. Em pacote/release, recalcular a verificação de higiene: `__history/`, `__recovery/`, `.identcache` e `.dproj.local` não podem integrar a entrega sem necessidade explícita e comprovada; `.res` deve ser decidido pela dependência real do build.
@@ -54,3 +54,7 @@ Ao recalcular o Delphi Code gate para qualquer `.pas`, confirmar que a evidênci
 ## Recalculo obrigatório para Examples concretos
 
 Se `src/Examples/<Componente>` for criado/modificado, recalcular Architecture, Delphi Code, Documentation, Naming, Toxicity, Contract & Lifetime quando houver resultado executável/ownership e Build Validation quando o projeto mudar. Exigir evidência de cobertura da API pública real, sincronismo snippet ↔ Runner, limpeza do resultado e separação de responsabilidades.
+## Recalculo obrigatório para CodePanel/ResultPanel
+
+Se `.CodePanel` ou `.ResultPanel` forem afetados, recalcular Architecture, Delphi Code, Documentation, Naming e Toxicity; acrescentar Contract & Lifetime quando `ResultHost`/ownership mudar. Exigir evidência de snippet read-only/selecionável, cópia integral via serviço de clipboard com feedback visual após sucesso, superfície de código integrada à paleta escura, scroll dependente do overflow real, comentários `//` didáticos curtos quando conteúdo concreto for tocado, preenchimento integral da view de resultado e estabilidade do `ResultHost` entre materializações.
+

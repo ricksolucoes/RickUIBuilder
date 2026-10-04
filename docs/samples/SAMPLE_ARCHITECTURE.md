@@ -113,14 +113,14 @@ A base continua responsável somente pela infraestrutura comum:
 - `TExampleHeader`: header/back com contexto do componente pai;
 - `TExampleNavigation` / `TExampleNavigationItem`: navegação lateral rolável e estado visual selecionado com indicador lateral azul;
 - `TExampleViewSelector`: seleção funcional e mutuamente exclusiva entre `Código Delphi` e `Resultado`;
-- `TExampleCodePanel`: superfície de código com scroll, sem responsabilidade de tabs;
-- `TExampleResultPanel`: superfície de resultado, `ResultHost` e limpeza do resultado anterior.
+- `TExampleCodePanel`: superfície read-only baseada em `TMemo`, com seleção parcial/total, cópia integral via clipboard e scroll determinado pelo overflow real, sem responsabilidade de tabs;
+- `TExampleResultPanel`: superfície de resultado que ocupa toda a altura útil da view, `ResultHost` estável e limpeza apenas dos filhos do resultado anterior.
 
 `TExampleCommon` não conhece `TSampleComponent`, componentes concretos, regras específicas de Factory/Fluent, categorias fixas ou catálogo global de exemplos. A page concreta define sua navegação e delega conteúdo e execução às units específicas.
 
 Ao selecionar um exemplo em Text / Label - Factory, a page seleciona visualmente o item, atualiza título/descrição/snippet, chama `ClearResult` e executa o mesmo exemplo no `ResultHost`. O código exibido e o resultado executado representam a mesma configuração.
 
-A geometria da Sample Page permanece `620 × 510`, estritamente menor que a Home de `644 × 534`. `Código Delphi` e `Resultado` agora funcionam como duas views mutuamente exclusivas: a página inicia em `Código Delphi`; ao selecionar `Resultado`, o painel de código é ocultado e somente o painel de resultado fica visível, e o inverso ocorre ao retornar para `Código Delphi`.
+A geometria da Sample Page permanece `620 × 510`, estritamente menor que a Home de `644 × 534`. `Código Delphi` e `Resultado` funcionam como duas views mutuamente exclusivas: a página inicia em `Código Delphi`; ao selecionar `Resultado`, o painel de código é ocultado e somente o painel de resultado fica visível, e o inverso ocorre ao retornar para `Código Delphi`. A view de código permite seleção/cópia e scroll apenas quando houver overflow; a view de resultado preenche toda a área útil abaixo do seletor, enquanto o controle do sample preserva sua própria geometria dentro de `ResultHost`.
 
 A especificação visual e os textframes normativos dessa camada estão em `docs/samples/SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`.
 
@@ -227,7 +227,7 @@ A geometria de Factory e informação é renderizada por fill; Fluent Builder us
 
 `Ver exemplos` permanece sem `HitTest` e sem callback quando o destino não existe. No estado atual, somente `Text / Label → Factory` recebe callback e `crHandPoint`, porque `TExampleTextLabelFactory` é um destino real.
 
-A Sample Page Base usa geometria e paleta próprias em `RickUIBuilder.Samples.Example.Common.Style`, vetor de retorno em `.Icons` e controles estruturais separados em `.Header`, `.Navigation`, `.ViewSelector`, `.CodePanel` e `.ResultPanel`. `TExampleCommon` apenas os coordena. A página possui client de `620 × 510`, é borderless e permanece menor que a Home. A sequência visual segue o textframe normativo: header → identidade → navegação/conteúdo → identificação do exemplo → seletor `Código Delphi`/`Resultado` → uma única view ativa. O estado selecionado da navegação usa fundo azul-claro e indicador vertical azul; o painel de resultado usa a superfície clara e borda suave definidas pela referência aprovada.
+A Sample Page Base usa geometria e paleta próprias em `RickUIBuilder.Samples.Example.Common.Style`, vetor de retorno em `.Icons` e controles estruturais separados em `.Header`, `.Navigation`, `.ViewSelector`, `.CodePanel` e `.ResultPanel`. `TExampleCommon` apenas os coordena. A página possui client de `620 × 510`, é borderless e permanece menor que a Home. A sequência visual segue o textframe normativo: header → identidade → navegação/conteúdo → identificação do exemplo → seletor `Código Delphi`/`Resultado` → uma única view ativa. O estado selecionado da navegação usa fundo azul-claro e indicador vertical azul; o `CodePanel` usa `TMemo` read-only/selecionável com ação `Copiar código`; o `ResultPanel` preenche toda a área restante da view e mantém `ResultHost` como container estável owned pela própria superfície.
 
 ## Encoding
 

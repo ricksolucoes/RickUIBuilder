@@ -48,7 +48,7 @@ SamplePage.ClientHeight < 534
 
 A implementação atual define `620 × 510`, mantendo simultaneamente `620 < 644` e `510 < 534`.
 
-A navegação lateral utiliza `TVertScrollBox` e a superfície de código utiliza `TScrollBox`, mantendo excesso de conteúdo dentro das regiões apropriadas. Não aumentar a Sample Page acima da Home e não reduzir tipografia para esconder clipping.
+A navegação lateral utiliza `TVertScrollBox`. A superfície de código utiliza `TMemo` read-only e selecionável, com `WordWrap = False` e scrollbars em comportamento AutoHide: a rolagem pertence ao overflow real do conteúdo, sem canvas artificialmente maior que o viewport. Não aumentar a Sample Page acima da Home e não reduzir tipografia para esconder clipping.
 
 
 ## Implementação atual da base
@@ -67,7 +67,7 @@ src/Examples/Common/
 ├── RickUIBuilder.Samples.Example.Common.ViewSelector.pas
 │   └── TExampleViewSelector: alternância funcional Código Delphi/Resultado
 ├── RickUIBuilder.Samples.Example.Common.CodePanel.pas
-│   └── TExampleCodePanel: superfície rolável de código
+│   └── TExampleCodePanel: código read-only/selecionável, scroll sob demanda e cópia integral
 ├── RickUIBuilder.Samples.Example.Common.ResultPanel.pas
 │   └── TExampleResultPanel: título, superfície e ResultHost
 ├── RickUIBuilder.Samples.Example.Common.Icons.pas
@@ -90,7 +90,7 @@ ClearResult
 ResultHost
 ```
 
-Esses pontos de extensão não materializam componente ou abordagem. `AddNavigationItem` cria somente o item visual; a derivada associa sua ação. `SelectNavigationItem` controla apenas o estado visual selecionado. `ResultHost` é o container dos controles reais e `ClearResult` remove seus filhos visuais antes da substituição do exemplo.
+Esses pontos de extensão não materializam componente ou abordagem. `AddNavigationItem` cria somente o item visual; a derivada associa sua ação. `SelectNavigationItem` controla apenas o estado visual selecionado. `ResultHost` é o container estável, owned por `TExampleResultPanel`, onde a derivada anexa os controles reais do resultado; a derivada não deve liberar nem substituir esse host. `ClearResult` remove somente os filhos visuais antes da substituição do exemplo, preservando a infraestrutura para a próxima materialização.
 
 `Código Delphi` e `Resultado` são opções clicáveis coordenadas por `TExampleViewSelector`. Exatamente uma view fica ativa: `Código Delphi` é o estado inicial; selecionar `Resultado` oculta o código e exibe somente o painel de resultado, e selecionar `Código Delphi` executa a alternância inversa.
 
@@ -160,12 +160,13 @@ O textframe abaixo fixa **ordem, agrupamento e hierarquia**. O Design System pod
 [ Código Delphi ] [ Resultado ]
 
 ┌──────────────────────────────────────────────────┐
+│                               [ Copiar código ]  │
 │ código Delphi do exemplo selecionado             │
 │ ...                                              │
 └──────────────────────────────────────────────────┘
 ```
 
-Nesta view, o painel `Resultado` fica oculto.
+Nesta view, o painel `Resultado` fica oculto. O snippet é read-only, permite seleção parcial ou total e cópia pelo mecanismo normal da plataforma; a ação `Copiar código` copia o conteúdo completo e, após sucesso, apresenta feedback visual temporário `Copiado` antes de retornar ao estado normal. O `TMemo` deve permanecer visualmente integrado à superfície escura, com fonte monoespaçada clara e seleção legível; fundo branco proveniente do estilo padrão não faz parte do layout aprovado. As barras de rolagem aparecem somente quando o conteúdo ultrapassa o viewport do `TMemo`.
 
 ### Estado `Resultado`
 
@@ -175,12 +176,16 @@ Nesta view, o painel `Resultado` fica oculto.
 Resultado
 ┌──────────────────────────────────────────────────┐
 │                                                  │
+│                                                  │
 │       controle(s) criado(s) pelo sample          │
+│             dentro do ResultHost                 │
+│                                                  │
+│                                                  │
 │                                                  │
 └──────────────────────────────────────────────────┘
 ```
 
-Nesta view, o painel de código fica oculto.
+Nesta view, o painel de código fica oculto. A superfície de resultado ocupa toda a área útil restante abaixo do seletor; o controle do sample preserva sua própria geometria e não é esticado apenas porque o host cresceu.
 
 ## Sequência visual obrigatória
 
@@ -342,14 +347,18 @@ A base reserva uma superfície visual para código Delphi:
 └──────────────────────────────────────────────────┘
 ```
 
-Regras planejadas:
+Regras implementadas:
 
 - aparência de editor/bloco de código distinta do restante da página;
-- fonte monoespaçada;
+- `TMemo` read-only com fonte monoespaçada e `WordWrap = False`;
+- seleção parcial, seleção total e cópia normal da seleção permanecem disponíveis;
+- a ação `Copiar código` envia o snippet completo ao clipboard da plataforma e informa `Copiado` temporariamente após sucesso;
+- o memo utiliza fundo escuro integrado à superfície, texto monoespaçado claro e seleção visível;
+- scrollbars ficam em AutoHide e dependem do overflow real, sem canvas fixa maior que o viewport;
 - conteúdo fornecido pela página derivada;
 - o código apresentado deve representar a mesma operação executada no resultado;
 - não inventar APIs para preencher exemplos;
-- syntax highlighting pode ser considerado na implementação, mas sua técnica não está definida neste documento.
+- syntax highlighting continua fora do escopo atual.
 
 ## Área `Resultado`
 
@@ -364,7 +373,7 @@ Resultado
 └──────────────────────────────────────────────────┘
 ```
 
-A superfície de resultado usa fundo claro próprio, borda suave e cantos arredondados conforme a referência aprovada. A base fornece somente o host visual e o boundary de apresentação. A página derivada é responsável por:
+A superfície de resultado usa fundo claro próprio, borda suave e cantos arredondados conforme a referência aprovada e preenche toda a altura útil restante da view ativa. `ResultHost` fica dentro dessa superfície e também ocupa sua área interna descontado o padding. A base fornece o host visual e o boundary de apresentação; crescer o host não altera automaticamente o tamanho do controle criado pelo sample. A página derivada é responsável por:
 
 - criar os controles reais do exemplo;
 - usar a abordagem correta, Factory ou Fluent Builder;
@@ -372,7 +381,7 @@ A superfície de resultado usa fundo claro próprio, borda suave e cantos arredo
 - substituir/limpar o conteúdo anterior quando outro exemplo for selecionado;
 - não deixar controles residuais de um exemplo anterior.
 
-A estratégia Delphi concreta de ownership/limpeza deve ser confirmada na implementação contra o código FMX final; este documento fixa o resultado esperado, não inventa uma implementação de lifetime.
+O contrato de ownership vigente é explícito: `TExampleResultPanel` owns a superfície, a superfície owns `ResultHost` e `ResultHost` owns os controles visuais materializados. A derivada usa o host como Parent, não o libera nem substitui, e chama `ClearResult` antes da próxima materialização; `ClearResult` libera somente os filhos do host.
 
 ## Responsabilidade da Sample Page Base
 

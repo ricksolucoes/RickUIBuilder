@@ -31,7 +31,7 @@ Não modificar arquivos, não inventar lifetime não comprovado e não declarar 
 
 ## Critério da Sample Page Base
 
-Quando `TExampleCommon`, `TExampleResultPanel` ou futuras derivadas afetarem o resultado executável, verificar que `ResultHost` pertence à árvore visual da página, que `TExampleResultPanel.Clear` é a implementação usada por `ClearResult` para liberar os filhos visuais antes da substituição do exemplo e que nenhuma referência owning/non-owning criada pela derivada produz dupla liberação ou referência pendente. Não presumir ausência de leak sem execução apropriada.
+Quando `TExampleCommon`, `TExampleResultPanel` ou futuras derivadas afetarem o resultado executável, verificar que `ResultHost` pertence à árvore visual da página e permanece estável durante a vida do painel; derivadas podem usá-lo como Parent/Owner quando a API executada exigir, mas não podem liberar ou substituir o próprio host. Confirmar que `TExampleResultPanel.Clear` é a implementação usada por `ClearResult` para liberar somente os filhos visuais antes da substituição do exemplo e que nenhuma referência owning/non-owning criada pela derivada produz dupla liberação ou referência pendente. Não presumir ausência de leak sem execução apropriada.
 
 
 ## Critério de navegação para Examples concretos

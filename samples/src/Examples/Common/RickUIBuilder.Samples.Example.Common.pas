@@ -1,4 +1,5 @@
-﻿{******************************************************************************}
+﻿{ Esta unit orquestra a Sample Page Base, alterna as views Código/Resultado e expõe o ResultHost sem assumir conteúdo ou execução específica das páginas derivadas. }
+{******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.Example.Common                                        }
 {                                                                              }
@@ -42,7 +43,8 @@
 {  Ownership / lifetime                                                        }
 {  --------------------                                                        }
 {  - Controles estruturais são owned pela page ou por sua árvore visual.       }
-{  - ResultHost pertence a TExampleResultPanel; ClearResult libera seus filhos.}
+{  - ResultHost pertence a TExampleResultPanel; derivadas apenas anexam controles   }
+{    ao host e ClearResult libera esses filhos sem substituir a infraestrutura.  }
 {  - A base não possui Coordinator, Presenter ou Component Page.               }
 {                                                                              }
 {  Restrições e responsabilidades                                              }
@@ -114,6 +116,15 @@ type
     procedure SetExampleIdentity(const ATitle, ADescription: string);
     procedure SetCodeText(const ACode: string);
     procedure ClearResult;
+    /// <summary>
+    /// Container estável fornecido por TExampleResultPanel para que a página
+    /// derivada materialize os controles do resultado executável atual.
+    /// </summary>
+    /// <remarks>
+    /// A derivada pode usar este layout como Parent dos controles do sample,
+    /// mas não deve liberá-lo ou substituí-lo. ClearResult remove apenas os
+    /// filhos antes da próxima materialização.
+    /// </remarks>
     property ResultHost: TLayout read GetResultHost;
   public
     constructor Create(AOwner: TComponent); reintroduce; virtual;

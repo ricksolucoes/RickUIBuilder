@@ -28,7 +28,7 @@ Quando aplicável, a aprovação final exige evidência de que: todas as units i
 A evidência de inclusão no `.dproj` deve verificar especificamente um `DCCReference` para cada unit interna do Samples.
 
 ## Gate documental das units
-Quando houver `.pas` criado ou modificado, `PASS` exige evidência de que cada unit possui cabeçalho estrutural superior verdadeiro e atualizado, e que Delphi Code Auditor e Documentation Auditor confrontaram esse cabeçalho com a implementação e dependências finais.
+Quando houver `.pas` criado ou modificado, `PASS` exige evidência de que a primeira linha física explica a responsabilidade concreta da unit e que cada unit possui cabeçalho estrutural superior verdadeiro e atualizado; Delphi Code Auditor e Documentation Auditor devem confrontar ambos com a implementação e dependências finais.
 
 ## Gates especializados obrigatórios
 Quando `.pas` for criado/modificado, `PASS` exige evidência do Naming Auditor. Quando a alteração puder afetar corpo de método, exige evidência do Toxicity Auditor, com distinção explícita entre avaliação estática e `Toxicity` real. Quando interfaces, GUIDs, reference counting, ownership ou lifetime forem aplicáveis, exige evidência do Contract & Lifetime Auditor. Nenhum desses gates pode ser presumido a partir do `PASS` de outro auditor.
@@ -47,3 +47,7 @@ Quando aplicável, `PASS` exige evidência de que `TExampleCommon` permanece men
 ## Gate específico de Examples concretos
 
 Quando aplicável, `PASS` exige evidência de que a page herda da base sem duplicá-la, a cobertura decorre da API pública real, snippet e execução representam o mesmo exemplo, `ClearResult` antecede a substituição do resultado, ownership é coerente e o Coordinator controla abertura/liberação da modal quando essa arquitetura estiver vigente. Para Text / Label - Factory, exigir cobertura de todos os campos públicos atuais de `TRickUIBuilderTextConfig`. Em qualquer `.pas` do escopo, o gate Delphi deve comprovar `FMX.Types` explícito quando houver `TTextAlign` e `FMX.Graphics` explícito quando houver `TBrushKind`.
+## Gate específico de CodePanel/ResultPanel
+
+Quando aplicável, `PASS` exige evidência de que `TExampleCodePanel` mantém snippet read-only e selecionável, cópia integral por clipboard com feedback visual temporário após sucesso, superfície de leitura coerente com a paleta escura, ausência de canvas fixa usada apenas para forçar scroll e barras condicionadas ao overflow do controle de texto. Snippets concretos devem possuir comentários `//` curtos e padronizados que expliquem intenção e apontem a aba Resultado sem causar scroll vertical somente pela explicação. `TExampleResultPanel` deve preencher toda a altura útil da view, preservar `ResultHost` como container estável e impedir que derivadas o liberem/substituam; `ClearResult`/`Clear` remove somente os filhos materializados.
+

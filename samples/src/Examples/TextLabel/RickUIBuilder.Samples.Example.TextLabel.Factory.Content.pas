@@ -1,16 +1,20 @@
-﻿{******************************************************************************}
+﻿{ Esta unit mantém o conteúdo didático dos exemplos Text / Label - Factory, incluindo captions, descrições e snippets comentados que explicam objetivamente a configuração executada e orientam o usuário a conferir o resultado na aba Resultado. }
+{******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.Example.TextLabel.Factory.Content                     }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
-{  Centralizar exclusivamente o conteúdo textual dos exemplos Factory de      }
+{  Centralizar exclusivamente o conteúdo textual dos exemplos Factory de       }
 {  Text / Label exibidos pela página concreta do Samples.                      }
 {                                                                              }
 {  Funcionalidade                                                              }
 {  --------------                                                              }
 {  Declara os exemplos disponíveis e fornece caption de navegação, título,     }
-{  descrição e snippet Delphi correspondente a cada exemplo.                   }
+{  descrição e snippet Delphi correspondente a cada exemplo. Cada snippet      }
+{  começa com comentários curtos em `//` que explicam a intenção e indicam     }
+{  que o controle materializado deve ser conferido na aba Resultado, evitando  }
+{  documentação extensa que force scroll vertical por si só.                   }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
@@ -26,6 +30,7 @@
 {  - Contém somente conteúdo de Text / Label na abordagem Factory.             }
 {  - Não executa Factory, não cria controles e não conhece outras páginas.     }
 {  - Os snippets devem permanecer coerentes com a execução real do Runner.     }
+{  - Comentários didáticos devem ser curtos, padronizados e úteis à leitura.   }
 {                                                                              }
 {  Manutenção                                                                  }
 {  ----------                                                                  }
@@ -78,6 +83,8 @@ const
     'Combina todas as opções públicas de TRickUIBuilderTextConfig.');
 
   _CODES_: array[TTextLabelFactoryExample] of string = (
+    '// Cria um TLabel usando os valores padrão da configuração.'#13#10 +
+    '// ResultHost hospeda o controle exibido na aba Resultado.'#13#10 +
     'var'#13#10 +
     '  LConfig: TRickUIBuilderTextConfig;'#13#10 +
     'begin'#13#10 +
@@ -86,6 +93,8 @@ const
     '    ResultHost, ResultHost, ''Texto básico'', LConfig);'#13#10 +
     'end;',
 
+    '// Define posição e tamanho antes de materializar o TLabel.'#13#10 +
+    '// ResultHost hospeda o controle exibido na aba Resultado.'#13#10 +
     'var'#13#10 +
     '  LConfig: TRickUIBuilderTextConfig;'#13#10 +
     'begin'#13#10 +
@@ -98,7 +107,8 @@ const
     '    ResultHost, ResultHost, ''Posição e tamanho'', LConfig);'#13#10 +
     'end;',
 
-    '// TAlphaColors exige System.UITypes no uses.'#13#10 +
+    '// Ajusta tipografia; TAlphaColors requer System.UITypes.'#13#10 +
+    '// ResultHost hospeda o controle exibido na aba Resultado.'#13#10 +
     'var'#13#10 +
     '  LConfig: TRickUIBuilderTextConfig;'#13#10 +
     'begin'#13#10 +
@@ -114,7 +124,8 @@ const
     '    ResultHost, ResultHost, ''Texto em destaque'', LConfig);'#13#10 +
     'end;',
 
-    '// TTextAlign exige FMX.Types no uses.'#13#10 +
+    '// Centraliza o texto; TTextAlign requer FMX.Types.'#13#10 +
+    '// ResultHost hospeda o controle exibido na aba Resultado.'#13#10 +
     'var'#13#10 +
     '  LConfig: TRickUIBuilderTextConfig;'#13#10 +
     'begin'#13#10 +
@@ -128,7 +139,8 @@ const
     '    ResultHost, ResultHost, ''Texto centralizado'', LConfig);'#13#10 +
     'end;',
 
-    '// TAlphaColors exige System.UITypes e TTextAlign exige FMX.Types.'#13#10 +
+    '// Combina todas as opções; usa System.UITypes e FMX.Types.'#13#10 +
+    '// ResultHost hospeda o controle exibido na aba Resultado.'#13#10 +
     'var'#13#10 +
     '  LConfig: TRickUIBuilderTextConfig;'#13#10 +
     'begin'#13#10 +

@@ -81,7 +81,7 @@ Quando o conteúdo dos cards exigir mais espaço, largura e altura devem ser aju
 
 ### DEC-020 — Cabeçalho estrutural obrigatório nas units do Samples
 
-Toda unit `.pas` criada ou modificada no Samples deve iniciar com um cabeçalho documental estrutural, produzido a partir da implementação final. O cabeçalho serve como mapa local para manutenção humana e para análise por IA, mas nunca substitui a leitura do código.
+Toda unit `.pas` criada ou modificada no Samples deve iniciar, já na primeira linha física, com uma explicação objetiva e suficientemente detalhada da responsabilidade concreta daquela unit; em seguida mantém o cabeçalho documental estrutural produzido a partir da implementação final. O cabeçalho serve como mapa local para manutenção humana e para análise por IA, mas nunca substitui a leitura do código.
 
 O cabeçalho deve registrar, quando aplicável: finalidade, funcionalidade existente, responsabilidades, dependências internas do projeto e o motivo de cada dependência, fluxo/colaboração com outras units, ownership/lifetime e restrições arquiteturais. Se uma alteração mudar qualquer uma dessas informações, o cabeçalho deve ser atualizado na mesma execução. Comentário genérico, copiado mecanicamente ou divergente do código reprova a documentação.
 
@@ -200,3 +200,16 @@ O requisito atual confirma a semântica do seletor `Código Delphi` / `Resultado
 ### DEC-048 — Estado selecionado e superfície de resultado seguem a referência aprovada
 
 O item ativo da navegação lateral usa fundo azul-claro, texto azul e indicador vertical azul à esquerda, sem depender de bold para comunicar seleção. A superfície de resultado usa fundo claro próprio, borda suave e cantos arredondados conforme a referência visual. Esses tokens pertencem a `RickUIBuilder.Samples.Example.Common.Style`; a navegação e o painel de resultado apenas os materializam.
+
+### DEC-049 — Superfície de código é selecionável, copiável e rola somente por overflow
+
+`TExampleCodePanel` utiliza `TMemo` read-only com `WordWrap = False`, permite seleção parcial/total e cópia normal da seleção, além da ação explícita `Copiar código` para o snippet completo. A rolagem depende do overflow real do memo em modo AutoHide; não se usa canvas fixa maior que o viewport apenas para forçar barras.
+
+### DEC-050 — Resultado ocupa toda a área útil e `ResultHost` permanece estável
+
+`TExampleResultPanel` ocupa toda a altura útil da view abaixo do seletor. Sua superfície owns `ResultHost`, que permanece estável durante a vida da página; derivadas usam o host como Parent dos controles do sample, não o liberam nem o substituem. `ClearResult` libera somente os filhos antes da próxima materialização. A expansão do host não estica automaticamente o controle produzido pelo sample.
+
+
+### DEC-051 — CodePanel fornece feedback de cópia, leitura escura e snippets didáticos compactos
+
+`TExampleCodePanel` mantém o `TMemo` read-only/selecionável integrado à paleta escura da superfície de código, em vez de aceitar o fundo branco do estilo padrão. A ação `Copiar código` altera temporariamente seu estado visual para `Copiado` somente após a escrita bem-sucedida no clipboard e retorna automaticamente ao estado normal. Snippets concretos começam com comentários `//` curtos e padronizados que explicam a intenção do exemplo e orientam a conferência na aba `Resultado`; comentários não devem ser verbosos a ponto de criar scroll vertical apenas pela documentação.

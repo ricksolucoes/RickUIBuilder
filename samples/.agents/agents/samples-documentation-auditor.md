@@ -21,7 +21,7 @@ Estado oficial + divergências Código ↔ Documentação. Não modificar arquiv
 Quando houver reorganização de `src`, alteração de `.dpr`/`.dproj`/Search Path ou ajuste estrutural da Home, confirmar que `docs/samples` descreve os caminhos físicos finais, a inclusão explícita das units no projeto, a proibição de Search Path interno, o header sem respiro externo e a política de preservar tipografia ao ajustar cards. Documentação divergente do artefato final resulta em `FAIL`.
 
 ## Cabeçalhos das units
-Auditar individualmente toda unit `.pas` criada ou modificada. O cabeçalho superior deve ser derivado do código final e explicar o que a unit faz, sua responsabilidade, dependências internas relevantes e por que existem, fluxo/colaboração e, quando relevante, ownership/lifetime e restrições arquiteturais. Confrontar o texto com `interface`, `implementation`, `uses` e consumidores reais. Ausência, informação futura tratada como existente ou divergência Código ↔ Cabeçalho resulta em `FAIL`.
+Auditar individualmente toda unit `.pas` criada ou modificada. A primeira linha física deve resumir de forma objetiva e suficientemente detalhada a responsabilidade concreta da unit. O cabeçalho superior subsequente deve ser derivado do código final e explicar o que a unit faz, sua responsabilidade, dependências internas relevantes e por que existem, fluxo/colaboração e, quando relevante, ownership/lifetime e restrições arquiteturais. Confrontar o texto com `interface`, `implementation`, `uses` e consumidores reais. Ausência, informação futura tratada como existente ou divergência Código ↔ Cabeçalho resulta em `FAIL`.
 
 ## Coerência da governança documentada
 - Confirmar que `samples/.agents/README.md` cataloga exatamente os agents existentes em `samples/.agents/agents/`.
@@ -41,3 +41,7 @@ Quando a Sample Page Base for criada ou alterada, confrontar `SAMPLE_EXAMPLE_PAG
 ## Coerência documental de Examples concretos
 
 Quando existir página concreta, confrontar categorias, snippets e matriz de cobertura com a API pública real e o Runner. Para Text / Label - Factory, a documentação deve cobrir `CreateText` e os campos `Left`, `Top`, `Width`, `Height`, `FontSize`, `FontColor`, `HorizontalAlign` e `Bold`, sem atribuir opções exclusivas do Fluent Builder à Factory.
+## Coerência documental da superfície de código/resultado
+
+Quando `CodePanel` ou `ResultPanel` forem alterados, a documentação deve registrar seleção/cópia read-only, scroll orientado pelo overflow real, ação de cópia integral com feedback visual temporário após sucesso, superfície de leitura integrada à paleta escura e o contrato de `ResultHost` (container estável, owned pelo ResultPanel, reutilizado entre exemplos e não liberado/substituído pelas derivadas). A view `Resultado` deve ser descrita como ocupando toda a área útil restante abaixo do seletor quando essa geometria existir no código final. Em examples concretos, a documentação deve registrar o padrão de comentários `//` curtos que explica intenção e aponta a aba Resultado sem inflar artificialmente a altura do snippet.
+
