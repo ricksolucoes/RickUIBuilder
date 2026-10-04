@@ -45,8 +45,9 @@
 {      Contém as páginas concretas Text / Label - Factory e Fluent Builder,    }
 {      separadas fisicamente por abordagem.                                    }
 {                                                                              }
-{  - src\Examples\Button\Factory                                             }
-{      Contém a página concreta Button - Factory, seu conteúdo e Runner.        }
+{  - src\Examples\Button\<Abordagem>                                         }
+{      Contém as páginas concretas Button - Factory e Fluent Builder,           }
+{      separadas fisicamente por abordagem.                                    }
 {                                                                              }
 {  Dependências principais                                                     }
 {  -----------------------                                                     }
@@ -149,6 +150,9 @@ uses
   RickUIBuilder.Samples.Example.Button.Factory in 'src\Examples\Button\Factory\RickUIBuilder.Samples.Example.Button.Factory.pas',
   RickUIBuilder.Samples.Example.Button.Factory.Content in 'src\Examples\Button\Factory\RickUIBuilder.Samples.Example.Button.Factory.Content.pas',
   RickUIBuilder.Samples.Example.Button.Factory.Runner in 'src\Examples\Button\Factory\RickUIBuilder.Samples.Example.Button.Factory.Runner.pas',
+  RickUIBuilder.Samples.Example.Button.Fluent in 'src\Examples\Button\Fluent\RickUIBuilder.Samples.Example.Button.Fluent.pas',
+  RickUIBuilder.Samples.Example.Button.Fluent.Content in 'src\Examples\Button\Fluent\RickUIBuilder.Samples.Example.Button.Fluent.Content.pas',
+  RickUIBuilder.Samples.Example.Button.Fluent.Runner in 'src\Examples\Button\Fluent\RickUIBuilder.Samples.Example.Button.Fluent.Runner.pas',
   RickUIBuilder.Samples.Example.TextLabel.Factory.Content in 'src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.Content.pas',
   RickUIBuilder.Samples.Example.TextLabel.Factory in 'src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.pas',
   RickUIBuilder.Samples.Example.TextLabel.Factory.Runner in 'src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.Runner.pas',

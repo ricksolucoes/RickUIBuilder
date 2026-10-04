@@ -1,7 +1,11 @@
-﻿{ Esta unit centraliza o conteúdo textual de Button - Factory, documentando oito exemplos sincronizados com o Runner, incluindo clique funcional e um Completo que atribui explicitamente todos os campos públicos de TRickUIBuilderButtonConfig. }
-{******************************************************************************}
+﻿{******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.Example.Button.Factory.Content                        }
+{                                                                              }
+{ Esta unit centraliza o conteúdo textual de Button - Factory, documentando    }
+{ oito exemplos sincronizados com o Runner, incluindo clique funcional e um    }
+{ Completo que atribui explicitamente todos os campos públicos de              }
+{ TRickUIBuilderButtonConfig.                                                  }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
@@ -28,8 +32,8 @@
 {  -----------------------------                                               }
 {  - Contém somente conteúdo de Button na abordagem Factory.                   }
 {  - Não executa Factory, não cria controles e não conhece Fluent Builder.     }
-{  - OnClick é demonstrado como evento do TRectangle retornado, não como campo  }
-{    de TRickUIBuilderButtonConfig.                                             }
+{  - OnClick é demonstrado como evento do TRectangle retornado, não como campo }
+{    de TRickUIBuilderButtonConfig.                                            }
 {  - O exemplo Completo atribui todos os nove campos públicos do record.       }
 {                                                                              }
 {  Manutenção                                                                  }

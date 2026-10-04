@@ -117,7 +117,7 @@ Textos técnicos da imagem não são copiados quando divergirem da implementaç�
 
 ### DEC-028 — `Ver exemplos` não possui destino fictício
 
-`Ver exemplos` representa a ação para abrir uma Sample Page de Factory ou Fluent Builder. A ação só recebe callback, `crHandPoint` e hit testing quando o destino correspondente realmente existe. No estado atual, `Text / Label → Factory`, `Text / Label → Fluent Builder` e `Button → Factory` possuem destinos concretos; Button Fluent Builder e as abordagens sem destino permanecem somente visuais até sua implementação.
+`Ver exemplos` representa a ação para abrir uma Sample Page de Factory ou Fluent Builder. A ação só recebe callback, `crHandPoint` e hit testing quando o destino correspondente realmente existe. No estado atual, `Text / Label → Factory`, `Text / Label → Fluent Builder`, `Button → Factory` e `Button → Fluent Builder` possuem destinos concretos; abordagens sem destino permanecem somente visuais até sua implementação.
 
 ### DEC-029 — Tipografia é preservada na Component Page
 
@@ -185,7 +185,7 @@ A implementação comum fica em `samples/src/Examples/Common`. `TExampleCommon` 
 
 ### DEC-045 — Navegação só é habilitada para destino real e permanece coordenada fora da View
 
-`TComponentTextLabel` captura separadamente os cliques Factory e Fluent Builder e emite `OnFactoryExamples` / `OnFluentExamples`; `TComponentButton` emite somente `OnFactoryExamples`. Nenhuma Component Page cria Sample Pages. `TSampleApplicationCoordinator` conecta os callbacks que possuem destino real, cria `TExampleTextLabelFactory`, `TExampleTextLabelFluent` ou `TExampleButtonFactory` sem Owner, executa `ShowModal` e libera a instância em `finally`. Cards sem destino continuam sem callback e sem `HitTest`.
+`TComponentTextLabel` e `TComponentButton` capturam separadamente os cliques Factory e Fluent Builder e emitem `OnFactoryExamples` / `OnFluentExamples`. Nenhuma Component Page cria Sample Pages. `TSampleApplicationCoordinator` conecta os callbacks que possuem destino real, cria `TExampleTextLabelFactory`, `TExampleTextLabelFluent`, `TExampleButtonFactory` ou `TExampleButtonFluent` sem Owner, executa `ShowModal` e libera a instância em `finally`. Cards sem destino continuam sem callback e sem `HitTest`.
 
 ### DEC-046 — Dependências FMX de símbolos visuais devem ser explícitas
 
@@ -241,5 +241,5 @@ Em cada abordagem concreta, o item `Completo` funciona como referência exaustiv
 
 ### DEC-058 — Examples concretos são organizados por componente e abordagem
 
-Páginas reais da terceira camada seguem `samples/src/Examples/<Componente>/<Abordagem>`. Text / Label mantém `Factory/` e `Fluent/`; Button possui somente `Factory/` nesta etapa. Diretórios de abordagem sem implementação não são criados. `Button - Factory` mantém o exemplo `Completo` exaustivo para os nove campos públicos de `TRickUIBuilderButtonConfig` e demonstra também as duas sobrecargas públicas de `CreateButton` ao longo da página.
+Páginas reais da terceira camada seguem `samples/src/Examples/<Componente>/<Abordagem>`. Text / Label e Button mantêm `Factory/` e `Fluent/`. Diretórios de abordagem sem implementação não são criados. `Button - Factory` mantém o exemplo `Completo` exaustivo para os nove campos públicos de `TRickUIBuilderButtonConfig` e demonstra também as duas sobrecargas públicas de `CreateButton`. `Button - Fluent Builder` mantém dois exemplos completos: um direto e outro por interfaces; ambos cobrem os 23 métodos configuráveis de `IRickUIBuilderButton`.
 

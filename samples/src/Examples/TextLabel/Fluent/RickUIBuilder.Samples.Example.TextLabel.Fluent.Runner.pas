@@ -125,62 +125,108 @@ class procedure TTextLabelFluentRunner.RenderBasic(const AHost: TLayout);
 begin
   TRickUIBuilder.Label_
     .Text('Texto básico')
-    .Build(AHost);
+      .Build(AHost);
 end;
 
 class procedure TTextLabelFluentRunner.RenderGeometry(const AHost: TLayout);
 begin
-  TRickUIBuilder.Label_
-    .Text('Posição e tamanho')
-    .Position(20, 16)
-    .Size(260, 36)
-    .Build(AHost);
+  TRickUIBuilder
+    .Label_
+      .Size(260, 36)
+      .Position(20, 16)
+        .Text('Posição e tamanho')
+          .Build(AHost);
 end;
 
 class procedure TTextLabelFluentRunner.RenderLayout(const AHost: TLayout);
 begin
-  TRickUIBuilder.Label_.Text('Layout configurado').Position(16, 12).Size(300, 48)
-    .Anchors([TAnchorKind.akLeft, TAnchorKind.akTop])
-    .Margin(TRickUIBuilderSpacing.Create(8, 6, 4, 2))
-    .Padding(TRickUIBuilderSpacing.Create(10, 4, 6, 2)).Build(AHost);
+  TRickUIBuilder
+    .Label_
+      .Text('Layout configurado')
+        .Size(300, 48)
+        .Position(16, 12)
+          .Anchors([TAnchorKind.akLeft, TAnchorKind.akTop])
+          .Margin(TRickUIBuilderSpacing.Create(8, 6, 4, 2))
+          .Padding(TRickUIBuilderSpacing.Create(10, 4, 6, 2))
+            .Build(AHost);
 end;
 
 class procedure TTextLabelFluentRunner.RenderTypography(const AHost: TLayout);
 begin
-  TRickUIBuilder.Label_.Text('Tipografia fluente').Position(16, 12).Size(320, 44)
-    .FontFamily('Segoe UI').FontSize(18).FontColor(TAlphaColors.Blue)
-    .Bold(True).Italic(True).Build(AHost);
+  TRickUIBuilder
+    .Label_
+      .Text('Tipografia fluente')
+        .Size(320, 44)
+        .Position(16, 12)
+          .FontFamily('Segoe UI')
+          .FontSize(18)
+          .FontColor(TAlphaColors.Blue)
+          .Bold(True)
+          .Italic(True)
+            .Build(AHost);
 end;
 
 class procedure TTextLabelFluentRunner.RenderAlignment(const AHost: TLayout);
 begin
-  TRickUIBuilder.Label_.Text('Texto centralizado').Position(16, 12).Size(320, 56)
-    .Align(TTextAlign.Center).VerticalAlign(TTextAlign.Center).Build(AHost);
+  TRickUIBuilder
+    .Label_
+      .Text('Texto centralizado')
+        .Size(320, 56)
+        .Position(16, 12)
+          .Align(TTextAlign.Center)
+          .VerticalAlign(TTextAlign.Center)
+            .Build(AHost);
 end;
 
 class procedure TTextLabelFluentRunner.RenderTextFlow(const AHost: TLayout);
 begin
-  TRickUIBuilder.Label_.Text('Texto longo com quebra automática de linha.')
-    .Position(16, 8).Size(260, 64).WordWrap(True)
-    .Trimming(TTextTrimming.None).Build(AHost);
+  TRickUIBuilder
+    .Label_
+      .Text('Texto longo com quebra automática de linha.')
+        .Size(260, 64)
+        .Position(16, 8)
+          .WordWrap(True)
+          .Trimming(TTextTrimming.None)
+            .Build(AHost);
 end;
 
 class procedure TTextLabelFluentRunner.RenderState(const AHost: TLayout);
 begin
-  TRickUIBuilder.Label_.Text('Estado configurado').Position(16, 12).Size(300, 40)
-    .Opacity(0.70).Visible(True).HitTest(False).Tag(501).Build(AHost);
+  TRickUIBuilder
+    .Label_
+      .Text('Estado configurado')
+        .Size(300, 40)
+        .Position(16, 12)
+          .Opacity(0.70)
+          .Visible(True)
+          .HitTest(False)
+          .Tag(501)
+            .Build(AHost);
 end;
 
 class procedure TTextLabelFluentRunner.RenderComplete(const AHost: TLayout);
 begin
-  TRickUIBuilder.Label_.Text('Configuração completa').Position(20, 12).Size(340, 72)
-    .Anchors([TAnchorKind.akLeft, TAnchorKind.akTop])
-    .Margin(TRickUIBuilderSpacing.Create(12, 8, 4, 2))
-    .Padding(TRickUIBuilderSpacing.Create(8, 4, 6, 2))
-    .FontFamily('Segoe UI').FontSize(16).FontColor(TAlphaColors.Green)
-    .Bold(True).Italic(True).Align(TTextAlign.Center).VerticalAlign(TTextAlign.Center)
-    .WordWrap(True).Trimming(TTextTrimming.None).Opacity(0.90)
-    .Visible(True).HitTest(False).Tag(1001).Build(AHost);
+  TRickUIBuilder
+    .Label_
+      .Text('Configuração completa')
+        .Size(340, 72)
+        .Position(20, 12)
+          .Anchors([TAnchorKind.akLeft, TAnchorKind.akTop])
+          .Margin(TRickUIBuilderSpacing.Create(12, 8, 4, 2))
+          .Padding(TRickUIBuilderSpacing.Create(8, 4, 6, 2))
+            .FontFamily('Segoe UI').FontSize(16)
+            .FontColor(TAlphaColors.Green)
+            .Bold(True)
+            .Italic(True)
+              .Align(TTextAlign.Center)
+              .VerticalAlign(TTextAlign.Center)
+                .WordWrap(True)
+                .Trimming(TTextTrimming.None)
+                .Opacity(0.90)
+                .Visible(True)
+                .HitTest(False)
+                .Tag(1001)
+                  .Build(AHost);
 end;
 
 end.

@@ -1,7 +1,10 @@
-﻿{ Esta unit executa os oito exemplos Button - Factory no ResultHost, incluindo feedback real de clique e um exemplo Completo que materializa todos os campos públicos atuais de TRickUIBuilderButtonConfig. }
-{******************************************************************************}
+﻿{******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.Example.Button.Factory.Runner                         }
+{                                                                              }
+{ Esta unit executa os oito exemplos Button - Factory no ResultHost,           }
+{ incluindo feedback real de clique e um exemplo Completo que materializa      }
+{ todos os campos públicos atuais de TRickUIBuilderButtonConfig.               }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }

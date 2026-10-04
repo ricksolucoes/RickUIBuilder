@@ -1,37 +1,38 @@
 ﻿{******************************************************************************}
 {                                                                              }
-{  RickUIBuilder.Samples.Example.Button.Factory                                }
+{  RickUIBuilder.Samples.Example.Button.Fluent                                 }
 {                                                                              }
-{ Esta unit coordena a página concreta Button - Factory, criando a navegação   }
-{ dos oito exemplos, sincronizando título/descrição/snippet e delegando ao     }
-{ Runner a materialização e a interação real no ResultHost.                    }
+{ Esta unit coordena a página Button - Fluent Builder, mantendo navegação,     }
+{ conteúdo e execução separados e delegando ao Runner a materialização dos     }
+{ doze exemplos no ResultHost.                                                 }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
-{  Implementar a página concreta de exemplos do componente Button usando a     }
-{  abordagem Factory.                                                          }
+{  Implementar a página concreta de exemplos de Button usando a abordagem      }
+{  Fluent Builder da API pública Rick.UIBuilder.                               }
 {                                                                              }
 {  Funcionalidade                                                              }
 {  --------------                                                              }
-{  Configura a Sample Page Base, cria a navegação dos exemplos Factory,        }
-{  sincroniza conteúdo e solicita a execução real no ResultHost.               }
+{  Configura a Sample Page Base, cria a navegação dos exemplos Fluent,         }
+{  sincroniza título/descrição/snippet e solicita a execução real no           }
+{  ResultHost por meio de TRickUIBuilder.Button.                               }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
 {  - RickUIBuilder.Samples.App.Types                                           }
-{      Fornece TButtonFactoryExample compartilhado com Content e Runner.       }
+{      Fornece TButtonFluentExample compartilhado com Content e Runner.        }
 {  - RickUIBuilder.Samples.Example.Common                                      }
 {      Fornece TExampleCommon e a infraestrutura visual compartilhada.         }
 {  - RickUIBuilder.Samples.Example.Common.Navigation                           }
 {      Fornece TExampleNavigationItem retornado pela API protegida da base.    }
-{  - RickUIBuilder.Samples.Example.Button.Factory.Content                      }
+{  - RickUIBuilder.Samples.Example.Button.Fluent.Content                       }
 {      Fornece captions, títulos, descrições e snippets dos exemplos.          }
-{  - RickUIBuilder.Samples.Example.Button.Factory.Runner                       }
-{      Executa TRickUIBuilderFactory.CreateButton e a interação de clique.     }
+{  - RickUIBuilder.Samples.Example.Button.Fluent.Runner                        }
+{      Executa a API Fluent real no ResultHost.                                }
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
-{  - O Coordinator cria esta página quando Button solicita Factory.            }
+{  - O Coordinator cria esta página quando Button solicita Fluent Builder.     }
 {  - A seleção lateral atualiza estado visual, conteúdo e resultado executável.}
 {  - Back é herdado da base e fecha somente esta modal.                        }
 {                                                                              }
@@ -39,13 +40,16 @@
 {  --------------------                                                        }
 {  - O Coordinator cria a página sem Owner e a libera após ShowModal.          }
 {  - Os itens de navegação pertencem à árvore visual da base.                  }
-{  - Os resultados são owned por ResultHost e substituídos via ClearResult.    }
+{  - Os controles visuais são materializados diretamente no ResultHost.        }
+{  - A página mantém uma instância do Runner durante todo o lifetime da modal. }
+{  - O Runner é liberado após a árvore visual, preservando handlers até o fim. }
 {                                                                              }
 {  Restrições e responsabilidades                                              }
 {  -----------------------------                                               }
-{  - Esta page conhece somente Button na abordagem Factory.                    }
-{  - Não contém implementação Fluent Builder nem exemplos de outro componente. }
+{  - Esta page conhece somente Button na abordagem Fluent Builder.             }
+{  - Não contém implementação Factory nem exemplos de outro componente.        }
 {  - Conteúdo textual e execução permanecem separados em units próprias.       }
+{  - O Runner recebe os eventos dos exemplos sem depender de TComponent.       }
 {                                                                              }
 {  Manutenção                                                                  }
 {  ----------                                                                  }
@@ -54,94 +58,99 @@
 {                                                                              }
 {******************************************************************************}
 
-unit RickUIBuilder.Samples.Example.Button.Factory;
+unit RickUIBuilder.Samples.Example.Button.Fluent;
 
 interface
 
 uses
   System.Classes,
-
   RickUIBuilder.Samples.App.Types,
-
   RickUIBuilder.Samples.Example.Common,
   RickUIBuilder.Samples.Example.Common.Navigation,
-  RickUIBuilder.Samples.Example.Button.Factory.Content;
+  RickUIBuilder.Samples.Example.Button.Fluent.Content,
+  RickUIBuilder.Samples.Example.Button.Fluent.Runner;
 
 type
-  /// <summary>Página concreta de exemplos Factory de Button.</summary>
-  TExampleButtonFactory = class(TExampleCommon)
+  /// <summary>Página concreta de exemplos Fluent Builder de Button.</summary>
+  TExampleButtonFluent = class(TExampleCommon)
   strict private
+    FRunner: TButtonFluentRunner;
     function BuildNavigation: TExampleNavigationItem;
-    function AddExampleItem(
-      const AExample: TButtonFactoryExample): TExampleNavigationItem;
+    function AddExampleItem(const AExample: TButtonFluentExample): TExampleNavigationItem;
     procedure NavigationRequested(ASender: TObject);
-    procedure ShowExample(const AExample: TButtonFactoryExample;
+    procedure ShowExample(const AExample: TButtonFluentExample;
       const AItem: TExampleNavigationItem);
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
   end;
 
 implementation
 
-uses
-  RickUIBuilder.Samples.Example.Button.Factory.Runner;
-
 const
   _PARENT_TITLE_ = 'Button';
-  _PAGE_TITLE_ = 'Button - Factory';
-  _PAGE_SUBTITLE_ = 'Criação direta de TRectangle + TLabel com TRickUIBuilderFactory.CreateButton.';
+  _PAGE_TITLE_ = 'Button - Fluent Builder';
+  _PAGE_SUBTITLE_ = 'Criação encadeada de Button com TRickUIBuilder.Button.';
 
-constructor TExampleButtonFactory.Create(AOwner: TComponent);
+constructor TExampleButtonFluent.Create(AOwner: TComponent);
 var
   LInitialItem: TExampleNavigationItem;
 begin
   inherited Create(AOwner);
+  FRunner := TButtonFluentRunner.Create;
   ConfigurePage(_PARENT_TITLE_, _PAGE_TITLE_, _PAGE_SUBTITLE_);
   LInitialItem := BuildNavigation;
-  ShowExample(TButtonFactoryExample.Basic, LInitialItem);
+  ShowExample(TButtonFluentExample.Basic, LInitialItem);
 end;
 
-function TExampleButtonFactory.BuildNavigation: TExampleNavigationItem;
+
+destructor TExampleButtonFluent.Destroy;
+begin
+  inherited Destroy;
+  FRunner.Free;
+end;
+
+function TExampleButtonFluent.BuildNavigation: TExampleNavigationItem;
 var
-  LExample: TButtonFactoryExample;
+  LExample: TButtonFluentExample;
 begin
   Result := nil;
-  for LExample := Low(TButtonFactoryExample) to High(TButtonFactoryExample) do
+  for LExample := Low(TButtonFluentExample) to High(TButtonFluentExample) do
   begin
-    if LExample = TButtonFactoryExample.Basic then
+    if LExample = TButtonFluentExample.Basic then
       Result := AddExampleItem(LExample)
     else
       AddExampleItem(LExample);
   end;
 end;
 
-function TExampleButtonFactory.AddExampleItem(
-  const AExample: TButtonFactoryExample): TExampleNavigationItem;
+function TExampleButtonFluent.AddExampleItem(
+  const AExample: TButtonFluentExample): TExampleNavigationItem;
 begin
-  Result := AddNavigationItem(TButtonFactoryContent.Caption(AExample));
+  Result := AddNavigationItem(TButtonFluentContent.Caption(AExample));
   Result.Tag := Ord(AExample);
   Result.OnClick := NavigationRequested;
 end;
 
-procedure TExampleButtonFactory.NavigationRequested(ASender: TObject);
+procedure TExampleButtonFluent.NavigationRequested(ASender: TObject);
 var
   LItem: TExampleNavigationItem;
-  LExample: TButtonFactoryExample;
+  LExample: TButtonFluentExample;
 begin
   LItem := ASender as TExampleNavigationItem;
-  LExample := TButtonFactoryExample(LItem.Tag);
+  LExample := TButtonFluentExample(LItem.Tag);
   ShowExample(LExample, LItem);
 end;
 
-procedure TExampleButtonFactory.ShowExample(
-  const AExample: TButtonFactoryExample; const AItem: TExampleNavigationItem);
+procedure TExampleButtonFluent.ShowExample(
+  const AExample: TButtonFluentExample; const AItem: TExampleNavigationItem);
 begin
   SelectNavigationItem(AItem);
-  SetExampleIdentity(TButtonFactoryContent.Title(AExample),
-    TButtonFactoryContent.Description(AExample));
-  SetCodeText(TButtonFactoryContent.Code(AExample));
+  SetExampleIdentity(TButtonFluentContent.Title(AExample),
+    TButtonFluentContent.Description(AExample));
+  SetCodeText(TButtonFluentContent.Code(AExample));
   ClearResult;
-  TButtonFactoryRunner.Render(AExample, ResultHost);
+  FRunner.Render(AExample, ResultHost);
 end;
 
 end.

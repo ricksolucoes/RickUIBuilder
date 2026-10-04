@@ -1,10 +1,11 @@
-﻿{******************************************************************************}
+﻿{ Esta unit centraliza os enums compartilhados pela navegação e pelas páginas de exemplos do RickUIBuilder.Samples, incluindo Button Factory e Fluent Builder. }
+{******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.App.Types                                             }
 {                                                                              }
 { Esta unit centraliza os enums compartilhados pelo Samples, identificando     }
 { componentes navegáveis, os exemplos concretos de Text / Label e              }
-{ Button - Factory e a view Código/Resultado ativa na Sample Page Base.        }
+{ Button - Factory/Fluent e a view Código/Resultado ativa na Sample Page Base. }
 {                                                                               }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
@@ -20,6 +21,8 @@
 {    Text / Label - Fluent Builder.                                            }
 {  - TButtonFactoryExample identifica os oito exemplos da página               }
 {    Button - Factory.                                                         }
+{  - TButtonFluentExample identifica os doze exemplos da página                }
+{    Button - Fluent Builder.                                                  }
 {  - TExampleView identifica a view Código Delphi ou Resultado ativa.          }
 {                                                                              }
 {  Dependências do projeto                                                     }
@@ -63,6 +66,11 @@ type
   /// <summary>Identifica os exemplos da página Button - Factory.</summary>
   TButtonFactoryExample = (Basic, Geometry, Colors, Typography, Identification,
     CaptionAccess, Click, Complete);
+
+  /// <summary>Identifica os exemplos da página Button - Fluent Builder.</summary>
+  TButtonFluentExample = (Basic, InterfaceUsage, Geometry, Layout, Appearance,
+    Typography, State, Hover, Click, ResultAccess, CompleteDirect,
+    CompleteInterfaces);
 
   /// <summary>Identifica os componentes navegáveis apresentados pelo Samples.</summary>
   TSampleComponent = (TextLabel, Button, Badge, Divider, ComboBox, Edit);

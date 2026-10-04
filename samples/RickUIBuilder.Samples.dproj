@@ -349,6 +349,9 @@
         <DCCReference Include="src\Examples\Button\Factory\RickUIBuilder.Samples.Example.Button.Factory.pas"/>
         <DCCReference Include="src\Examples\Button\Factory\RickUIBuilder.Samples.Example.Button.Factory.Content.pas"/>
         <DCCReference Include="src\Examples\Button\Factory\RickUIBuilder.Samples.Example.Button.Factory.Runner.pas"/>
+        <DCCReference Include="src\Examples\Button\Fluent\RickUIBuilder.Samples.Example.Button.Fluent.pas"/>
+        <DCCReference Include="src\Examples\Button\Fluent\RickUIBuilder.Samples.Example.Button.Fluent.Content.pas"/>
+        <DCCReference Include="src\Examples\Button\Fluent\RickUIBuilder.Samples.Example.Button.Fluent.Runner.pas"/>
         <DCCReference Include="src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.Content.pas"/>
         <DCCReference Include="src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.pas"/>
         <DCCReference Include="src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.Runner.pas"/>

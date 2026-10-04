@@ -22,7 +22,7 @@ Home
 
 `Edit` não apresenta Factory porque a API pública analisada não expõe `Factory.CreateEdit`. Essa ausência descreve somente o estado atual da API.
 
-A terceira camada possui hoje três destinos concretos: Text / Label - Factory, Text / Label - Fluent Builder e Button - Factory. `TComponentTextLabel` emite as duas intenções ao Coordinator; `TComponentButton` emite somente Factory. Button Fluent Builder e as abordagens sem página concreta permanecem somente visuais.
+A terceira camada possui hoje quatro destinos concretos: Text / Label - Factory, Text / Label - Fluent Builder, Button - Factory e Button - Fluent Builder. `TComponentTextLabel` e `TComponentButton` emitem as intenções Factory/Fluent ao Coordinator; abordagens sem página concreta permanecem somente visuais.
 
 Composition continua sendo uma abordagem pública do Rick.UIBuilder, mas não foi adicionada às páginas de componente. Sua apresentação no Samples permanece trabalho futuro até existir decisão específica de UX/navegação.
 
@@ -87,7 +87,7 @@ A seta de retorno da `TComponentCommon` fecha a janela modal atual. O retorno n�
 
 A terceira camada do Samples possui uma base visual/comportamental coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A construção visual comum permanece separada em units coesas de header, navegação, seletor de visualização, painel de código e painel de resultado, além de ícones e estilo.
 
-Os destinos concretos atualmente implementados são Text / Label **Factory + Fluent Builder** e Button **Factory**:
+Os destinos concretos atualmente implementados são Text / Label **Factory + Fluent Builder** e Button **Factory + Fluent Builder**:
 
 ```text
 Home
@@ -101,7 +101,10 @@ TComponentTextLabel
                               └── herda TExampleCommon
 
 TComponentButton
-  └── Factory ─────────► TExampleButtonFactory
+  ├── Factory ─────────► TExampleButtonFactory
+  │                          ▲
+  │                          └── herda TExampleCommon
+  └── Fluent Builder ──► TExampleButtonFluent
                              ▲
                              └── herda TExampleCommon
 ```
@@ -116,7 +119,10 @@ A implementação específica fica separada por responsabilidade em cada abordag
 - `RickUIBuilder.Samples.Example.TextLabel.Fluent.Runner`: execução por `TRickUIBuilder.Label_`;
 - `RickUIBuilder.Samples.Example.Button.Factory`: page concreta e coordenação Button Factory;
 - `RickUIBuilder.Samples.Example.Button.Factory.Content`: conteúdo/snippets Button Factory;
-- `RickUIBuilder.Samples.Example.Button.Factory.Runner`: execução de `TRickUIBuilderFactory.CreateButton` e feedback real de clique.
+- `RickUIBuilder.Samples.Example.Button.Factory.Runner`: execução de `TRickUIBuilderFactory.CreateButton` e feedback real de clique;
+- `RickUIBuilder.Samples.Example.Button.Fluent`: page concreta e coordenação Button Fluent;
+- `RickUIBuilder.Samples.Example.Button.Fluent.Content`: conteúdo/snippets Button Fluent;
+- `RickUIBuilder.Samples.Example.Button.Fluent.Runner`: execução de `TRickUIBuilder.Button`, incluindo Hover, Clique e os exemplos completos direto/por interfaces.
 
 Factory demonstra cinco exemplos: `Básico`, `Geometria`, `Tipografia`, `Alinhamento` e `Completo`. Em conjunto, eles cobrem `CreateText` e todos os campos públicos atuais de `TRickUIBuilderTextConfig`: `Left`, `Top`, `Width`, `Height`, `FontSize`, `FontColor`, `HorizontalAlign` e `Bold`. O exemplo `Completo` atribui explicitamente todos esses campos.
 
@@ -124,7 +130,9 @@ Fluent Builder demonstra oito exemplos: `Básico`, `Geometria`, `Layout`, `Tipog
 
 Button Factory demonstra oito exemplos: `Básico`, `Geometria`, `Cores`, `Tipografia`, `Identificação`, `Caption interno`, `Clique` e `Completo`. Em conjunto, cobrem as duas sobrecargas de `CreateButton`, `ACaption`, retorno `TRectangle`, `out ATextLabel` e os nove campos públicos de `TRickUIBuilderButtonConfig`: `Left`, `Top`, `Width`, `Height`, `FillColor`, `BorderColor`, `TextColor`, `Tag` e `FontSize`. `Clique` configura `OnClick` no `TRectangle` retornado e altera sua cor como feedback real; `OnClick` não é documentado como campo do record. `Completo` atribui explicitamente os nove campos.
 
-Os tipos compartilhados usados por essa terceira camada ficam em `RickUIBuilder.Samples.App.Types`: `TExampleView` identifica a view `Código Delphi`/`Resultado`, `TTextLabelFactoryExample` identifica os cinco exemplos Text / Label Factory, `TTextLabelFluentExample` os oito exemplos Text / Label Fluent e `TButtonFactoryExample` os oito exemplos Button Factory. Pages, Contents e Runners consomem os enums correspondentes sem redeclará-los.
+Button Fluent demonstra doze exemplos: `Básico`, `Interface`, `Geometria`, `Layout`, `Aparência`, `Tipografia`, `Estado`, `Hover`, `Clique`, `Resultado`, `Completo - Direto` e `Completo - Interfaces`. Os dois completos cobrem os 23 métodos configuráveis de `IRickUIBuilderButton`; o direto finaliza com `Build`, enquanto a variante por interfaces mantém `IRickUIBuilderButton`, usa `BuildHandle` e demonstra também `IRickUIBuilderButtonHandle` e `IRickUIBuilderButtonHoverState`.
+
+Os tipos compartilhados usados por essa terceira camada ficam em `RickUIBuilder.Samples.App.Types`: `TExampleView` identifica a view `Código Delphi`/`Resultado`, `TTextLabelFactoryExample` identifica os cinco exemplos Text / Label Factory, `TTextLabelFluentExample` os oito exemplos Text / Label Fluent e `TButtonFactoryExample` os oito exemplos Button Factory e `TButtonFluentExample` os doze exemplos Button Fluent. Pages, Contents e Runners consomem os enums correspondentes sem redeclará-los.
 
 A base continua responsável somente pela infraestrutura comum:
 
@@ -162,7 +170,7 @@ O `TSampleApplicationCoordinator` executa o fluxo global: encerramento da aplica
 - a Home é destruída antes do Coordinator;
 - o Coordinator cria e libera cada Component Page modal;
 - para Text / Label, o Coordinator cria e libera as Sample Pages Factory e Fluent Builder modais;
-- para Button, o Coordinator cria e libera somente a Sample Page Factory; Fluent Builder permanece sem destino nesta etapa;
+- para Button, o Coordinator cria e libera as Sample Pages Factory e Fluent Builder modais;
 - uma Component Page não possui Presenter, Coordinator ou Home; o callback de navegação é non-owning.
 
 ## Contratos
@@ -233,13 +241,17 @@ samples/
         │       ├── RickUIBuilder.Samples.Example.TextLabel.Fluent.Content.pas
         │       └── RickUIBuilder.Samples.Example.TextLabel.Fluent.Runner.pas
         └── Button/
-            └── Factory/
-                ├── RickUIBuilder.Samples.Example.Button.Factory.pas
-                ├── RickUIBuilder.Samples.Example.Button.Factory.Content.pas
-                └── RickUIBuilder.Samples.Example.Button.Factory.Runner.pas
+            ├── Factory/
+            │   ├── RickUIBuilder.Samples.Example.Button.Factory.pas
+            │   ├── RickUIBuilder.Samples.Example.Button.Factory.Content.pas
+            │   └── RickUIBuilder.Samples.Example.Button.Factory.Runner.pas
+            └── Fluent/
+                ├── RickUIBuilder.Samples.Example.Button.Fluent.pas
+                ├── RickUIBuilder.Samples.Example.Button.Fluent.Content.pas
+                └── RickUIBuilder.Samples.Example.Button.Fluent.Runner.pas
 ```
 
-Diretórios específicos existem somente quando possuem units concretas. `src/Examples/Common` contém a base comum; páginas reais seguem `src/Examples/<Componente>/<Abordagem>`. Hoje existem `TextLabel/Factory`, `TextLabel/Fluent` e `Button/Factory`; nenhum diretório de abordagem deve ser criado antecipadamente.
+Diretórios específicos existem somente quando possuem units concretas. `src/Examples/Common` contém a base comum; páginas reais seguem `src/Examples/<Componente>/<Abordagem>`. Hoje existem `TextLabel/Factory`, `TextLabel/Fluent`, `Button/Factory` e `Button/Fluent`; nenhum diretório de abordagem deve ser criado antecipadamente.
 
 Todas as units internas do Samples são incorporadas explicitamente ao `.dpr` e ao `.dproj`. O `DCC_UnitSearchPath` não contém o próprio `samples/src`; o caminho de busca permanece reservado à dependência externa `..\src` da biblioteca Rick.UIBuilder e ao Search Path herdado.
 
@@ -261,7 +273,7 @@ Os cards preservam os SVGs oficiais fornecidos:
 
 A geometria de Factory e informação é renderizada por fill; Fluent Builder usa stroke, seguindo os assets originais.
 
-`Ver exemplos` permanece sem `HitTest` e sem callback quando o destino não existe. No estado atual, `Text / Label → Factory`, `Text / Label → Fluent Builder` e `Button → Factory` recebem callback e `crHandPoint`; Button Fluent Builder continua visual sem callback.
+`Ver exemplos` permanece sem `HitTest` e sem callback quando o destino não existe. No estado atual, `Text / Label → Factory`, `Text / Label → Fluent Builder`, `Button → Factory` e `Button → Fluent Builder` recebem callback e `crHandPoint`; destinos ainda sem Sample Page permanecem não clicáveis.
 
 A Sample Page Base usa geometria e paleta próprias em `RickUIBuilder.Samples.Example.Common.Style`, vetor de retorno em `.Icons` e controles estruturais separados em `.Header`, `.Navigation`, `.View.Selector`, `.Code.Panel` e `.Result.Panel`. `TExampleCommon` apenas os coordena. A página possui client de `620 × 510`, é borderless e permanece menor que a Home. A sequência visual segue o textframe normativo: header → identidade → navegação/conteúdo → identificação do exemplo → seletor `Código Delphi`/`Resultado` → uma única view ativa. O estado selecionado da navegação usa fundo azul-claro e indicador vertical azul; o `CodePanel` usa `TMemo` read-only/selecionável com ação `Copiar código`; o `ResultPanel` preenche toda a área restante da view e mantém `ResultHost` como container estável owned pela própria superfície.
 

@@ -36,7 +36,7 @@ Quando uma alteração arquitetural modificar responsabilidade, boundary, depend
 - Cada componente navegável deve possuir page concreta derivada da base quando essa arquitetura estiver vigente.
 - `Components` não deve depender de `RickUIBuilder.Samples.Home.Style`; reutilização compartilhada deve ocorrer somente por dependência realmente comum, como `App.Typography`.
 - O Coordinator pode resolver `TSampleComponent` para a classe concreta, mas não deve conter layout ou conteúdo visual.
-- Component Pages são intermediárias; destinos Factory/Fluent só podem existir quando houver requisito explícito e implementação real. `Text / Label → Factory`, `Text / Label → Fluent Builder` e `Button → Factory` são os destinos concretos atuais.
+- Component Pages são intermediárias; destinos Factory/Fluent só podem existir quando houver requisito explícito e implementação real. `Text / Label → Factory`, `Text / Label → Fluent Builder`, `Button → Factory` e `Button → Fluent Builder` são os destinos concretos atuais.
 - O retorno local da modal não deve introduzir Router, Presenter ou abstração artificial quando `Close` satisfizer o fluxo existente.
 
 ## Critérios específicos da Sample Page Base
@@ -53,6 +53,6 @@ Quando uma alteração arquitetural modificar responsabilidade, boundary, depend
 
 - A derivada deve herdar de `TExampleCommon` sem copiar header, sidebar, painel de código ou `ResultHost`.
 - Conteúdo de uma abordagem não pode contaminar `Examples/Common` nem páginas de outros componentes.
-- Quando a página acumular conteúdo textual e execução real, manter essas responsabilidades separadas em units coesas; Text / Label usa `Factory/` e `Fluent/`, e Button Factory usa `Button/Factory/`, preservando page, Content e Runner em cada abordagem.
+- Quando a página acumular conteúdo textual e execução real, manter essas responsabilidades separadas em units coesas; Text / Label e Button usam `Factory/` e `Fluent/`, preservando Page, Content e Runner em cada abordagem.
 - Coordinator pode conhecer o destino concreto para navegação e lifetime, mas não snippets, configuração Factory ou controles de resultado.
 - Component Page deve emitir intenção/callback; não deve criar diretamente a Sample Page quando a arquitetura coordenada estiver vigente.
