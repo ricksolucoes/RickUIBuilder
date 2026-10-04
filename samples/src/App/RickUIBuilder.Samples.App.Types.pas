@@ -20,7 +20,8 @@
 {    TButtonFluentExample os doze exemplos Button Fluent Builder.              }
 {  - TBadgeFactoryExample identifica os sete exemplos Badge - Factory e        }
 {    TBadgeFluentExample os onze exemplos Badge Fluent Builder.                }
-{  - TDividerFactoryExample identifica os quatro exemplos Divider - Factory.   }
+{  - TDividerFactoryExample identifica os quatro exemplos Divider - Factory e  }
+{    TDividerFluentExample os nove exemplos Divider Fluent Builder.            }
 {  - TExampleView identifica a view Código Delphi ou Resultado ativa.          }
 {                                                                              }
 {  Dependências do projeto                                                     }
@@ -81,6 +82,10 @@ type
 
   /// <summary>Identifica os exemplos da página Divider - Factory.</summary>
   TDividerFactoryExample = (Basic, Geometry, Color, Complete);
+
+  /// <summary>Identifica os exemplos da página Divider - Fluent Builder.</summary>
+  TDividerFluentExample = (Basic, InterfaceUsage, Geometry, Orientation, Layout,
+    Appearance, State, CompleteDirect, CompleteInterfaces);
 
   /// <summary>Identifica os componentes navegáveis apresentados pelo Samples.</summary>
   TSampleComponent = (TextLabel, Button, Badge, Divider, ComboBox, Edit);

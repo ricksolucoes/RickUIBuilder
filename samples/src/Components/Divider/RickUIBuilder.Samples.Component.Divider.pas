@@ -2,8 +2,8 @@
 {                                                                              }
 {  RickUIBuilder.Samples.Component.Divider                                     }
 {                                                                              }
-{ Esta unit implementa a Component Page de Divider e encaminha por callback    }
-{ non-owning a intenção Factory para o destino concreto existente.             }
+{ Esta unit implementa a Component Page de Divider e encaminha por callbacks   }
+{ non-owning as intenções Factory e Fluent Builder para seus destinos reais.   }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
@@ -11,8 +11,8 @@
 {                                                                              }
 {  Funcionalidade                                                              }
 {  --------------                                                              }
-{  Define identidade, informação e as abordagens Factory e Fluent Builder.     }
-{  Somente Factory encaminha intenção de navegação nesta etapa.                }
+{  Define identidade, informação e as abordagens Factory e Fluent Builder,     }
+{  encaminhando cada ação para o callback correspondente.                      }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
@@ -21,23 +21,22 @@
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
-{  - O Coordinator cria esta page, conecta Factory e chama ShowModal.          }
-{  - O clique Factory é encaminhado ao callback externo; esta page não cria    }
-{    diretamente a Sample Page de destino.                                     }
-{  - Fluent Builder permanece somente visual até existir destino concreto.     }
+{  - O Coordinator cria esta page, conecta Factory/Fluent e chama ShowModal.   }
+{  - Os cliques são encaminhados aos callbacks externos; esta page não cria    }
+{    diretamente as Sample Pages de destino.                                   }
 {  - O retorno para a Home permanece implementado pela classe-base.            }
 {                                                                              }
 {  Ownership / lifetime                                                        }
 {  --------------------                                                        }
-{  - OnFactoryExamples é evento non-owning para o Coordinator, cujo lifetime   }
-{    é superior durante a navegação.                                           }
-{  - A page não possui Coordinator nem Sample Page concreta.                   }
+{  - OnFactoryExamples e OnFluentExamples são eventos non-owning para o        }
+{    Coordinator, cujo lifetime é superior durante a navegação.                }
+{  - A page não possui Coordinator nem Sample Pages concretas.                 }
 {                                                                              }
 {  Restrições e responsabilidades                                              }
 {  -----------------------------                                               }
-{  - Não implementa samples Factory/Fluent; somente emite a intenção Factory.  }
-{  - Não conhece TExampleDividerFactory.                                       }
-{  - Não habilita callback Fluent enquanto esse destino não existir.           }
+{  - Não implementa samples Factory/Fluent; somente emite intenções.           }
+{  - Não conhece TExampleDividerFactory nem TExampleDividerFluent.             }
+{  - Não cria rotas, registry ou abstrações adicionais de navegação.           }
 {                                                                              }
 {  Manutenção                                                                  }
 {  ----------                                                                  }
@@ -59,13 +58,18 @@ type
   TComponentDivider = class(TComponentCommon)
   strict private
     FOnFactoryExamples: TNotifyEvent;
+    FOnFluentExamples: TNotifyEvent;
     procedure FactoryExamplesRequested(ASender: TObject);
+    procedure FluentExamplesRequested(ASender: TObject);
   public
     /// <summary>Cria a página com o conteúdo específico de Divider.</summary>
     constructor Create(AOwner: TComponent); override;
     /// <summary>Intenção non-owning para abrir o destino Divider - Factory.</summary>
     property OnFactoryExamples: TNotifyEvent read FOnFactoryExamples
       write FOnFactoryExamples;
+    /// <summary>Intenção non-owning para abrir Divider - Fluent Builder.</summary>
+    property OnFluentExamples: TNotifyEvent read FOnFluentExamples
+      write FOnFluentExamples;
   end;
 
 implementation
@@ -80,7 +84,7 @@ begin
   inherited Create(AOwner);
   AddIdentity(_TITLE_, _SUBTITLE_);
   AddFactoryApproach(FactoryExamplesRequested);
-  AddFluentApproach;
+  AddFluentApproach(FluentExamplesRequested);
   AddInfoPanel(_INFO_);
 end;
 
@@ -88,6 +92,12 @@ procedure TComponentDivider.FactoryExamplesRequested(ASender: TObject);
 begin
   if Assigned(FOnFactoryExamples) then
     FOnFactoryExamples(ASender);
+end;
+
+procedure TComponentDivider.FluentExamplesRequested(ASender: TObject);
+begin
+  if Assigned(FOnFluentExamples) then
+    FOnFluentExamples(ASender);
 end;
 
 end.

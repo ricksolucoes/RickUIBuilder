@@ -1,4 +1,4 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{F7E2CAB1-B26C-43ED-975B-717FEE65C95B}</ProjectGuid>
         <ProjectVersion>20.3</ProjectVersion>
@@ -361,6 +361,9 @@
         <DCCReference Include="src\Examples\Divider\Factory\RickUIBuilder.Samples.Example.Divider.Factory.pas"/>
         <DCCReference Include="src\Examples\Divider\Factory\RickUIBuilder.Samples.Example.Divider.Factory.Content.pas"/>
         <DCCReference Include="src\Examples\Divider\Factory\RickUIBuilder.Samples.Example.Divider.Factory.Runner.pas"/>
+        <DCCReference Include="src\Examples\Divider\Fluent\RickUIBuilder.Samples.Example.Divider.Fluent.pas"/>
+        <DCCReference Include="src\Examples\Divider\Fluent\RickUIBuilder.Samples.Example.Divider.Fluent.Content.pas"/>
+        <DCCReference Include="src\Examples\Divider\Fluent\RickUIBuilder.Samples.Example.Divider.Fluent.Runner.pas"/>
         <DCCReference Include="src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.Content.pas"/>
         <DCCReference Include="src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.pas"/>
         <DCCReference Include="src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.Runner.pas"/>

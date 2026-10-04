@@ -3,7 +3,7 @@
 {  RickUIBuilder.Samples.App.Coordinator                                       }
 {                                                                              }
 { Esta unit coordena a abertura, integração e lifetime das Component Pages e   }
-{ Sample Pages concretas, incluindo Divider Factory como destino real.         }
+{ Sample Pages concretas, incluindo Divider Factory/Fluent como destinos reais.         }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
@@ -12,8 +12,8 @@
 {  Funcionalidade                                                              }
 {  --------------                                                              }
 {  Encerra a aplicação, resolve a Component Page concreta e conecta somente    }
-{  intenções com Sample Pages reais de Text / Label, Button e Badge nas        }
-{  abordagens Factory/Fluent e Divider na abordagem Factory.                  }
+{  intenções com Sample Pages reais de Text / Label, Button, Badge e Divider    }
+{  nas abordagens Factory e Fluent Builder.                                    }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
@@ -29,8 +29,8 @@
 {      Fornecem os destinos concretos de Button.                               }
 {  - RickUIBuilder.Samples.Example.Badge.Factory/Fluent                        }
 {      Fornecem os destinos concretos de Badge.                                }
-{  - RickUIBuilder.Samples.Example.Divider.Factory                             }
-{      Fornece o destino concreto de Divider - Factory.                        }
+{  - RickUIBuilder.Samples.Example.Divider.Factory/Fluent                      }
+{      Fornecem os destinos concretos de Divider.                              }
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
@@ -80,6 +80,7 @@ type
     procedure BadgeFactoryRequested(ASender: TObject);
     procedure BadgeFluentRequested(ASender: TObject);
     procedure DividerFactoryRequested(ASender: TObject);
+    procedure DividerFluentRequested(ASender: TObject);
     procedure OpenTextLabelFactory;
     procedure OpenTextLabelFluent;
     procedure OpenButtonFactory;
@@ -87,6 +88,7 @@ type
     procedure OpenBadgeFactory;
     procedure OpenBadgeFluent;
     procedure OpenDividerFactory;
+    procedure OpenDividerFluent;
   public
     /// <summary>Encerra o loop principal da aplicação.</summary>
     function Close: TSampleApplicationCoordinator;
@@ -110,6 +112,7 @@ uses
   RickUIBuilder.Samples.Example.Button.Factory,
   RickUIBuilder.Samples.Example.Button.Fluent,
   RickUIBuilder.Samples.Example.Divider.Factory,
+  RickUIBuilder.Samples.Example.Divider.Fluent,
   RickUIBuilder.Samples.Example.TextLabel.Factory,
   RickUIBuilder.Samples.Example.TextLabel.Fluent;
 
@@ -163,7 +166,10 @@ begin
         TComponentBadge(APage).OnFluentExamples := BadgeFluentRequested;
       end;
     TSampleComponent.Divider:
-      TComponentDivider(APage).OnFactoryExamples := DividerFactoryRequested;
+      begin
+        TComponentDivider(APage).OnFactoryExamples := DividerFactoryRequested;
+        TComponentDivider(APage).OnFluentExamples := DividerFluentRequested;
+      end;
   end;
 end;
 
@@ -207,6 +213,12 @@ procedure TSampleApplicationCoordinator.DividerFactoryRequested(
   ASender: TObject);
 begin
   OpenDividerFactory;
+end;
+
+procedure TSampleApplicationCoordinator.DividerFluentRequested(
+  ASender: TObject);
+begin
+  OpenDividerFluent;
 end;
 
 procedure TSampleApplicationCoordinator.OpenTextLabelFactory;
@@ -286,6 +298,18 @@ var
   LPage: TExampleDividerFactory;
 begin
   LPage := TExampleDividerFactory.Create(nil);
+  try
+    LPage.ShowModal;
+  finally
+    LPage.Free;
+  end;
+end;
+
+procedure TSampleApplicationCoordinator.OpenDividerFluent;
+var
+  LPage: TExampleDividerFluent;
+begin
+  LPage := TExampleDividerFluent.Create(nil);
   try
     LPage.ShowModal;
   finally

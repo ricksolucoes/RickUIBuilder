@@ -1,4 +1,4 @@
-﻿# Arquitetura do RickUIBuilder.Samples
+# Arquitetura do RickUIBuilder.Samples
 
 ## Objetivo
 
@@ -22,7 +22,7 @@ Home
 
 `Edit` não apresenta Factory porque a API pública analisada não expõe `Factory.CreateEdit`. Essa ausência descreve somente o estado atual da API.
 
-A terceira camada possui hoje sete destinos concretos: Text / Label - Factory, Text / Label - Fluent Builder, Button - Factory, Button - Fluent Builder, Badge - Factory, Badge - Fluent Builder e Divider - Factory. `TComponentTextLabel`, `TComponentButton`, `TComponentBadge` e `TComponentDivider` emitem ao Coordinator somente as intenções que possuem destino real; abordagens sem página concreta permanecem somente visuais.
+A terceira camada possui hoje oito destinos concretos: Text / Label - Factory, Text / Label - Fluent Builder, Button - Factory, Button - Fluent Builder, Badge - Factory, Badge - Fluent Builder, Divider - Factory e Divider - Fluent Builder. `TComponentTextLabel`, `TComponentButton`, `TComponentBadge` e `TComponentDivider` emitem ao Coordinator somente as intenções que possuem destino real; abordagens sem página concreta permanecem somente visuais.
 
 Composition continua sendo uma abordagem pública do Rick.UIBuilder, mas não foi adicionada às páginas de componente. Sua apresentação no Samples permanece trabalho futuro até existir decisão específica de UX/navegação.
 
@@ -87,7 +87,7 @@ A seta de retorno da `TComponentCommon` fecha a janela modal atual. O retorno n�
 
 A terceira camada do Samples possui uma base visual/comportamental coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A construção visual comum permanece separada em units coesas de header, navegação, seletor de visualização, painel de código e painel de resultado, além de ícones e estilo.
 
-Os destinos concretos atualmente implementados são Text / Label, Button e Badge com **Factory + Fluent Builder**, além de Divider com **Factory**:
+Os destinos concretos atualmente implementados são Text / Label, Button, Badge e Divider com **Factory + Fluent Builder**:
 
 ```text
 Home
@@ -121,7 +121,9 @@ TComponentDivider
   ├── Factory ─────────► TExampleDividerFactory
   │                           ▲
   │                           └── herda TExampleCommon
-  └── Fluent Builder    [sem destino concreto]
+  └── Fluent Builder ──► TExampleDividerFluent
+                              ▲
+                              └── herda TExampleCommon
 ```
 
 A implementação específica fica separada por responsabilidade em cada abordagem:
@@ -308,7 +310,7 @@ Os cards preservam os SVGs oficiais fornecidos:
 
 A geometria de Factory e informação é renderizada por fill; Fluent Builder usa stroke, seguindo os assets originais.
 
-`Ver exemplos` permanece sem `HitTest` e sem callback quando o destino não existe. No estado atual, `Text / Label → Factory`, `Text / Label → Fluent Builder`, `Button → Factory`, `Button → Fluent Builder`, `Badge → Factory`, `Badge → Fluent Builder` e `Divider → Factory` recebem callback e `crHandPoint`; destinos ainda sem Sample Page permanecem não clicáveis.
+`Ver exemplos` permanece sem `HitTest` e sem callback quando o destino não existe. No estado atual, `Text / Label → Factory`, `Text / Label → Fluent Builder`, `Button → Factory`, `Button → Fluent Builder`, `Badge → Factory`, `Badge → Fluent Builder`, `Divider → Factory` e `Divider → Fluent Builder` recebem callback e `crHandPoint`; destinos ainda sem Sample Page permanecem não clicáveis.
 
 A Sample Page Base usa geometria e paleta próprias em `RickUIBuilder.Samples.Example.Common.Style`, vetor de retorno em `.Icons` e controles estruturais separados em `.Header`, `.Navigation`, `.View.Selector`, `.Code.Panel` e `.Result.Panel`. `TExampleCommon` apenas os coordena. A página possui client de `620 × 510`, é borderless e permanece menor que a Home. A sequência visual segue o textframe normativo: header → identidade → navegação/conteúdo → identificação do exemplo → seletor `Código Delphi`/`Resultado` → uma única view ativa. O estado selecionado da navegação usa fundo azul-claro e indicador vertical azul; o `CodePanel` usa `TMemo` read-only/selecionável com ação `Copiar código`; o `ResultPanel` preenche toda a área restante da view e mantém `ResultHost` como container estável owned pela própria superfície.
 

@@ -1,4 +1,4 @@
-﻿# Decisões do RickUIBuilder.Samples
+# Decisões do RickUIBuilder.Samples
 
 ## Decisões consolidadas
 
@@ -185,7 +185,7 @@ A implementação comum fica em `samples/src/Examples/Common`. `TExampleCommon` 
 
 ### DEC-045 — Navegação só é habilitada para destino real e permanece coordenada fora da View
 
-`TComponentTextLabel` e `TComponentButton` capturam separadamente os cliques Factory e Fluent Builder; `TComponentBadge` captura Factory e Fluent Builder; `TComponentDivider` captura somente Factory. Nenhuma Component Page cria Sample Pages. `TSampleApplicationCoordinator` conecta somente callbacks com destino real, cria `TExampleTextLabelFactory`, `TExampleTextLabelFluent`, `TExampleButtonFactory`, `TExampleButtonFluent`, `TExampleBadgeFactory`, `TExampleBadgeFluent` ou `TExampleDividerFactory` sem Owner, executa `ShowModal` e libera a instância em `finally`. Cards sem destino continuam sem callback e sem `HitTest`.
+`TComponentTextLabel`, `TComponentButton`, `TComponentBadge` e `TComponentDivider` capturam separadamente os cliques Factory e Fluent Builder. Nenhuma Component Page cria Sample Pages. `TSampleApplicationCoordinator` conecta somente callbacks com destino real, cria `TExampleTextLabelFactory`, `TExampleTextLabelFluent`, `TExampleButtonFactory`, `TExampleButtonFluent`, `TExampleBadgeFactory`, `TExampleBadgeFluent`, `TExampleDividerFactory` ou `TExampleDividerFluent` sem Owner, executa `ShowModal` e libera a instância em `finally`. Cards sem destino continuam sem callback e sem `HitTest`.
 
 ### DEC-046 — Dependências FMX de símbolos visuais devem ser explícitas
 
@@ -241,7 +241,7 @@ Em cada abordagem concreta, o item `Completo` funciona como referência exaustiv
 
 ### DEC-058 — Examples concretos são organizados por componente e abordagem
 
-Páginas reais da terceira camada seguem `samples/src/Examples/<Componente>/<Abordagem>`. Text / Label, Button e Badge mantêm `Factory/` e `Fluent/`; Divider mantém `Factory/` nesta etapa. Diretórios de abordagem sem implementação não são criados. `Button - Factory` mantém o exemplo `Completo` exaustivo para os nove campos públicos de `TRickUIBuilderButtonConfig` e demonstra também as duas sobrecargas públicas de `CreateButton`. `Button - Fluent Builder` mantém dois exemplos completos: um direto e outro por interfaces; ambos cobrem os 23 métodos configuráveis de `IRickUIBuilderButton`.
+Páginas reais da terceira camada seguem `samples/src/Examples/<Componente>/<Abordagem>`. Text / Label, Button, Badge e Divider mantêm `Factory/` e `Fluent/`. Diretórios de abordagem sem implementação não são criados. `Button - Factory` mantém o exemplo `Completo` exaustivo para os nove campos públicos de `TRickUIBuilderButtonConfig` e demonstra também as duas sobrecargas públicas de `CreateButton`. `Button - Fluent Builder` mantém dois exemplos completos: um direto e outro por interfaces; ambos cobrem os 23 métodos configuráveis de `IRickUIBuilderButton`.
 
 ### DEC-059 — Badge - Factory é o quinto destino concreto da Sample Page
 
@@ -253,4 +253,9 @@ Páginas reais da terceira camada seguem `samples/src/Examples/<Componente>/<Abo
 
 ### DEC-061 — Divider - Factory é o sétimo destino concreto da Sample Page
 
-`TExampleDividerFactory` herda de `TExampleCommon` e fica em `src/Examples/Divider/Factory`, separando coordenação (`Factory`), conteúdo/snippets (`Factory.Content`) e execução (`Factory.Runner`). A página possui quatro exemplos: Básico, Geometria, Cor e Completo. `CreateDivider` permanece a operação Factory documentada; o exemplo `Completo` atribui explicitamente `Left`, `Top`, `Width` e `Color` de `TRickUIBuilderDividerConfig`. A Component Page habilita somente Factory, mantendo Fluent Builder sem callback até existir destino concreto.
+`TExampleDividerFactory` herda de `TExampleCommon` e fica em `src/Examples/Divider/Factory`, separando coordenação (`Factory`), conteúdo/snippets (`Factory.Content`) e execução (`Factory.Runner`). A página possui quatro exemplos: Básico, Geometria, Cor e Completo. `CreateDivider` permanece a operação Factory documentada; o exemplo `Completo` atribui explicitamente `Left`, `Top`, `Width` e `Color` de `TRickUIBuilderDividerConfig`. A Component Page habilita Factory e Fluent Builder somente quando seus destinos concretos existem.
+
+
+### DEC-062 — Divider - Fluent Builder é o oitavo destino concreto da Sample Page
+
+`TExampleDividerFluent` herda de `TExampleCommon` e fica em `src/Examples/Divider/Fluent`, separando coordenação (`Fluent`), conteúdo/snippets (`Fluent.Content`) e execução (`Fluent.Runner`). A página possui nove exemplos: Básico, Interface, Geometria, Orientação, Layout, Aparência, Estado, Completo - Direto e Completo - Interfaces. `IRickUIBuilderDivider` é a API principal documentada; `TOrientation` e `TRickUIBuilderSpacing` aparecem apenas como tipos auxiliares dos métodos públicos. Os dois exemplos completos cobrem os oito métodos configuráveis, e a Component Page encaminha Factory e Fluent Builder por callbacks distintos ao Coordinator.

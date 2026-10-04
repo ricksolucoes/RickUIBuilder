@@ -1,12 +1,12 @@
-﻿# Especificação da Sample Page Base
+# Especificação da Sample Page Base
 
 ## Status
 
-**Sample Page Base implementada e sete páginas concretas disponíveis: Text / Label - Factory, Text / Label - Fluent Builder, Button - Factory, Button - Fluent Builder, Badge - Factory, Badge - Fluent Builder e Divider - Factory.**
+**Sample Page Base implementada e oito páginas concretas disponíveis: Text / Label - Factory, Text / Label - Fluent Builder, Button - Factory, Button - Fluent Builder, Badge - Factory, Badge - Fluent Builder, Divider - Factory e Divider - Fluent Builder.**
 
 Este documento fixa a intenção visual, a sequência estrutural, os limites de responsabilidade e o comportamento da base das páginas de exemplos do `RickUIBuilder.Samples`.
 
-A implementação comum é coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A família é dividida por responsabilidade em units próprias para header, navegação, seletor de visualização, painel de código, painel de resultado, ícones e estilo. As derivadas reais atuais são `TExampleTextLabelFactory`, `TExampleTextLabelFluent`, `TExampleButtonFactory`, `TExampleButtonFluent`, `TExampleBadgeFactory`, `TExampleBadgeFluent` e `TExampleDividerFactory`; os demais destinos permanecem futuros.
+A implementação comum é coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A família é dividida por responsabilidade em units próprias para header, navegação, seletor de visualização, painel de código, painel de resultado, ícones e estilo. As derivadas reais atuais são `TExampleTextLabelFactory`, `TExampleTextLabelFluent`, `TExampleButtonFactory`, `TExampleButtonFluent`, `TExampleBadgeFactory`, `TExampleBadgeFluent`, `TExampleDividerFactory` e `TExampleDividerFluent`; os demais destinos permanecem futuros.
 
 ## Papel na navegação
 
@@ -33,7 +33,7 @@ Factory             Fluent Builder
        SAMPLE PAGE BASE
 ```
 
-A Component Page continua sendo somente o divisor entre abordagens. A Sample Page concreta é onde os samples reais são apresentados e executados; Text / Label, Button e Badge possuem Factory e Fluent Builder concretos, enquanto Divider possui Factory concreto nesta etapa.
+A Component Page continua sendo somente o divisor entre abordagens. A Sample Page concreta é onde os samples reais são apresentados e executados; Text / Label, Button, Badge e Divider possuem Factory e Fluent Builder concretos.
 
 ## Regra de tamanho
 
@@ -78,7 +78,7 @@ src/Examples/Common/
 
 Essa separação é estrutural e não cria regras específicas de componente. `TExampleCommon` coordena os controles acima; não reimplementa internamente header, navegação, seletor, painel de código ou painel de resultado.
 
-`RickUIBuilder.Samples.App.Types` fornece atualmente os enums compartilhados usados por esta camada: `TExampleView` representa a seleção `Código Delphi`/`Resultado`, `TTextLabelFactoryExample` identifica Text / Label - Factory, `TTextLabelFluentExample` identifica Text / Label - Fluent Builder, `TButtonFactoryExample` identifica Button - Factory, `TButtonFluentExample` identifica Button - Fluent Builder, `TBadgeFactoryExample` identifica Badge - Factory, `TBadgeFluentExample` identifica Badge - Fluent Builder e `TDividerFactoryExample` identifica Divider - Factory. O seletor, as pages concretas, Contents e Runners consomem esses tipos sem redeclará-los.
+`RickUIBuilder.Samples.App.Types` fornece atualmente os enums compartilhados usados por esta camada: `TExampleView` representa a seleção `Código Delphi`/`Resultado`, `TTextLabelFactoryExample` identifica Text / Label - Factory, `TTextLabelFluentExample` identifica Text / Label - Fluent Builder, `TButtonFactoryExample` identifica Button - Factory, `TButtonFluentExample` identifica Button - Fluent Builder, `TBadgeFactoryExample` identifica Badge - Factory, `TBadgeFluentExample` identifica Badge - Fluent Builder, `TDividerFactoryExample` identifica Divider - Factory e `TDividerFluentExample` identifica Divider - Fluent Builder. O seletor, as pages concretas, Contents e Runners consomem esses tipos sem redeclará-los.
 
 A base implementada expõe pontos de extensão protegidos para as derivadas:
 
@@ -151,7 +151,7 @@ Cobertura da API pública `TRickUIBuilder.Label_` / `IRickUIBuilderLabel`:
 | `Estado` | `Opacity`, `Visible`, `HitTest`, `Tag` |
 | `Completo` | todos os métodos públicos configuráveis de `IRickUIBuilderLabel`, incluindo `Build`; `Margin` e `Padding` usam `TRickUIBuilderSpacing.Create` com os quatro lados explícitos |
 
-O exemplo `Completo` é deliberadamente exaustivo. Para Text / Label Factory, atribui todos os campos de `TRickUIBuilderTextConfig`; para Text / Label Fluent, chama todos os métodos configuráveis de `IRickUIBuilderLabel`; para Button Factory, atribui todos os nove campos de `TRickUIBuilderButtonConfig`; para Button Fluent, os dois exemplos completos chamam os 23 métodos configuráveis de `IRickUIBuilderButton`, usando `Build` no direto e `BuildHandle` na variante por interfaces; para Badge Factory, atribui os sete campos públicos de `TRickUIBuilderBadgeConfig`; para Badge Fluent, os dois exemplos completos chamam os quinze métodos configuráveis de `IRickUIBuilderBadge`, usando `IRickUIBuilderBadgeHandle` na variante por interfaces; para Divider Factory, atribui os quatro campos públicos de `TRickUIBuilderDividerConfig`. Se a API ou um record público usado por esses exemplos ganhar nova opção configurável, snippet, Runner e matriz devem ser atualizados em conjunto.
+O exemplo `Completo` é deliberadamente exaustivo. Para Text / Label Factory, atribui todos os campos de `TRickUIBuilderTextConfig`; para Text / Label Fluent, chama todos os métodos configuráveis de `IRickUIBuilderLabel`; para Button Factory, atribui todos os nove campos de `TRickUIBuilderButtonConfig`; para Button Fluent, os dois exemplos completos chamam os 23 métodos configuráveis de `IRickUIBuilderButton`, usando `Build` no direto e `BuildHandle` na variante por interfaces; para Badge Factory, atribui os sete campos públicos de `TRickUIBuilderBadgeConfig`; para Badge Fluent, os dois exemplos completos chamam os quinze métodos configuráveis de `IRickUIBuilderBadge`, usando `IRickUIBuilderBadgeHandle` na variante por interfaces; para Divider Factory, atribui os quatro campos públicos de `TRickUIBuilderDividerConfig`; para Divider Fluent, os dois exemplos completos chamam os oito métodos configuráveis de `IRickUIBuilderDivider`. Se a API ou um record público usado por esses exemplos ganhar nova opção configurável, snippet, Runner e matriz devem ser atualizados em conjunto.
 
 ## Página concreta — Button - Factory
 
@@ -194,6 +194,10 @@ Badge Fluent segue `src/Examples/Badge/Fluent/` com Page, Content e Runner separ
 ## Página concreta — Divider - Factory
 
 Divider Factory segue `src/Examples/Divider/Factory/` com Page, Content e Runner separados. A página possui quatro exemplos: `Básico`, `Geometria`, `Cor` e `Completo`. `CreateDivider` é a operação principal; `Geometria` demonstra `Left`, `Top` e `Width`, `Cor` demonstra `Color`, e `Completo` atribui explicitamente os quatro campos públicos de `TRickUIBuilderDividerConfig`. A altura fixa de 1 px, `HitTest = False` e ausência de Stroke pertencem ao comportamento da Factory e não são apresentados como opções configuráveis do record.
+
+## Página concreta — Divider - Fluent Builder
+
+Divider Fluent segue `src/Examples/Divider/Fluent/` com Page, Content e Runner separados. A página possui nove exemplos: `Básico`, `Interface`, `Geometria`, `Orientação`, `Layout`, `Aparência`, `Estado`, `Completo - Direto` e `Completo - Interfaces`. O foco principal é `TRickUIBuilder.Divider`/`IRickUIBuilderDivider`; `TOrientation` e `TRickUIBuilderSpacing` aparecem somente quando exigidos pela API principal. `Orientação` demonstra separadamente Horizontal e Vertical, preservando `Width` como comprimento lógico. Os dois completos cobrem `Position`, `Width`, `Thickness`, `Orientation`, `Margin`, `Color`, `Opacity` e `Visible`.
 
 ## Textframe normativo da tela-base
 
@@ -367,7 +371,7 @@ Comportamento comum esperado:
 - permitir quantidade variável de itens;
 - quando a quantidade exceder a área disponível, a solução deve preservar a largura/posição da coluna e tratar o overflow sem aumentar a janela acima da Home.
 
-Cada página derivada é responsável por declarar quais categorias/exemplos existem. Text / Label - Factory usa Básico, Geometria, Tipografia, Alinhamento e Completo; Button - Factory usa Básico, Geometria, Cores, Tipografia, Identificação, Caption interno, Clique e Completo; Button - Fluent Builder usa Básico, Interface, Geometria, Layout, Aparência, Tipografia, Estado, Hover, Clique, Resultado, Completo - Direto e Completo - Interfaces; Badge - Factory usa Básico, Geometria, Cores, Tipografia, Texto interno, Construção em etapas e Completo; Badge - Fluent Builder usa Básico, Interface, Geometria, Forma, Layout, Aparência, Tipografia, Estado, Resultado, Completo - Direto e Completo - Interfaces; Divider - Factory usa Básico, Geometria, Cor e Completo.
+Cada página derivada é responsável por declarar quais categorias/exemplos existem. Text / Label - Factory usa Básico, Geometria, Tipografia, Alinhamento e Completo; Button - Factory usa Básico, Geometria, Cores, Tipografia, Identificação, Caption interno, Clique e Completo; Button - Fluent Builder usa Básico, Interface, Geometria, Layout, Aparência, Tipografia, Estado, Hover, Clique, Resultado, Completo - Direto e Completo - Interfaces; Badge - Factory usa Básico, Geometria, Cores, Tipografia, Texto interno, Construção em etapas e Completo; Badge - Fluent Builder usa Básico, Interface, Geometria, Forma, Layout, Aparência, Tipografia, Estado, Resultado, Completo - Direto e Completo - Interfaces; Divider - Factory usa Básico, Geometria, Cor e Completo; Divider - Fluent Builder usa Básico, Interface, Geometria, Orientação, Layout, Aparência, Estado, Completo - Direto e Completo - Interfaces.
 
 ## Conteúdo do exemplo
 
