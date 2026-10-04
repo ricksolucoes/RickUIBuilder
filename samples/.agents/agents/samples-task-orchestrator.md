@@ -1,4 +1,4 @@
-# Samples Task Orchestrator
+﻿# Samples Task Orchestrator
 
 ## Missão
 Determinar o processo mínimo e suficiente para uma tarefa do `samples/` antes de alterações.
@@ -39,4 +39,13 @@ Quando a tarefa alterar `RickUIBuilder.Samples.Component.Common` ou páginas con
 
 ## Regra específica para Sample Page Base
 
-Quando a tarefa criar ou alterar qualquer unit de `src/Examples/Common`, exigir Architecture Auditor, Delphi Code Auditor, Documentation Auditor, Naming Auditor, Toxicity Auditor quando houver corpos de método, Contract & Lifetime quando ownership/lifetime do `ResultHost` ou de controles derivados estiver no escopo, e Build Validation quando `.dpr`/`.dproj` forem alterados. Verificar explicitamente: `TExampleCommon` como orquestrador e não arquivo monolítico; responsabilidades de header, navegação, código e resultado separadas em units coesas; janela menor que a Home; sequência do textframe preservada; ausência de conteúdo específico de componente/abordagem; `Código Delphi`/`Resultado` sem comportamento inventado; nenhuma página concreta/sample real antecipada; e registro explícito das novas units no projeto.
+Quando a tarefa criar ou alterar qualquer unit de `src/Examples/Common`, exigir Architecture Auditor, Delphi Code Auditor, Documentation Auditor, Naming Auditor, Toxicity Auditor quando houver corpos de método, Contract & Lifetime quando ownership/lifetime do `ResultHost` ou de controles derivados estiver no escopo, e Build Validation quando `.dpr`/`.dproj` forem alterados. Verificar explicitamente: `TExampleCommon` como orquestrador e não arquivo monolítico; responsabilidades de header, navegação, código e resultado separadas em units coesas; janela menor que a Home; sequência do textframe preservada; ausência de conteúdo específico na base; `Código Delphi`/`Resultado` sem comportamento inventado; páginas concretas somente quando requisitadas e registradas explicitamente no projeto.
+
+
+## Regra específica para páginas concretas de Examples
+
+Quando uma tarefa implementar `src/Examples/<Componente>`, exigir Architecture, Delphi Code, Documentation, Naming, Toxicity, Contract & Lifetime quando o `ResultHost`/ownership for utilizado e Build Validation quando `.dpr`/`.dproj` mudarem. Verificar cobertura da API pública da abordagem, sincronismo entre snippet e execução, `ClearResult` antes da nova materialização, ausência de catálogo global e separação proporcional entre page, conteúdo e execução.
+
+## Dependências FMX obrigatórias
+
+Em qualquer `.pas` modificado, registrar no gate Delphi: uso de `TTextAlign` exige `FMX.Types`; uso de `TBrushKind` exige `FMX.Graphics`. Não aceitar símbolo disponível apenas por dependência transitiva.

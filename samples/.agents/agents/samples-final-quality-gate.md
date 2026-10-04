@@ -1,4 +1,4 @@
-# Samples Final Quality Gate
+﻿# Samples Final Quality Gate
 
 ## Missão
 Avaliar independentemente a qualidade do resultado final do Samples. Não audita se o processo completo foi executado; isso pertence ao Process Compliance Auditor.
@@ -37,8 +37,13 @@ Quando `.pas` for criado/modificado, `PASS` exige evidência do Naming Auditor. 
 Em pacote/release, reprovar presença de `__history/`, `__recovery/`, `.identcache` ou `.dproj.local` sem necessidade explícita e comprovada. Verificar recursos de build como `.res` pela referência real no projeto, sem remoção automática.
 
 ## Gate específico das Component Pages
-Quando aplicável, `PASS` exige evidência de que: a base `TComponentCommon` não centraliza conteúdo dos seis componentes; cada componente navegável possui page concreta derivada; Components não depende de `Home.Style`; o formulário é borderless; o retorno fecha a modal sem alterar o fluxo global; subtítulo, cards e painel informativo possuem espaço suficiente sem reduzir tipografia; Edit não apresenta Factory inexistente; e nenhuma página/sample Factory/Fluent foi antecipada sem requisito.
+Quando aplicável, `PASS` exige evidência de que: a base `TComponentCommon` não centraliza conteúdo dos seis componentes; cada componente navegável possui page concreta derivada; Components não depende de `Home.Style`; o formulário é borderless; o retorno fecha a modal sem alterar o fluxo global; subtítulo, cards e painel informativo possuem espaço suficiente sem reduzir tipografia; Edit não apresenta Factory inexistente; e somente destinos Factory/Fluent realmente implementados e requisitados possuem callback.
 
 ## Gate específico da Sample Page Base
 
-Quando aplicável, `PASS` exige evidência de que `TExampleCommon` permanece menor que a Home, borderless, aderente à sequência normativa do textframe, sem conteúdo específico de componente/abordagem, sem páginas concretas ou samples antecipados e sem comportamento inventado para `Código Delphi` / `Resultado`. Deve haver separação efetiva entre `.Common`, `.Header`, `.Navigation`, `.CodePanel`, `.ResultPanel`, `.Style` e `.Icons`, com todas as units explicitamente registradas no `.dpr` e `.dproj`; ownership do `ResultHost`/limpeza deve ser coerente com o código final.
+Quando aplicável, `PASS` exige evidência de que `TExampleCommon` permanece menor que a Home, borderless, aderente à sequência normativa do textframe, sem conteúdo específico de componente/abordagem, sem conteúdo específico na base e sem comportamento inventado para `Código Delphi` / `Resultado`. Páginas concretas requisitadas são permitidas somente fora de `Examples/Common`. Deve haver separação efetiva entre `.Common`, `.Header`, `.Navigation`, `.CodePanel`, `.ResultPanel`, `.Style` e `.Icons`, com todas as units explicitamente registradas no `.dpr` e `.dproj`; ownership do `ResultHost`/limpeza deve ser coerente com o código final.
+
+
+## Gate específico de Examples concretos
+
+Quando aplicável, `PASS` exige evidência de que a page herda da base sem duplicá-la, a cobertura decorre da API pública real, snippet e execução representam o mesmo exemplo, `ClearResult` antecede a substituição do resultado, ownership é coerente e o Coordinator controla abertura/liberação da modal quando essa arquitetura estiver vigente. Para Text / Label - Factory, exigir cobertura de todos os campos públicos atuais de `TRickUIBuilderTextConfig`. Em qualquer `.pas` do escopo, o gate Delphi deve comprovar `FMX.Types` explícito quando houver `TTextAlign` e `FMX.Graphics` explícito quando houver `TBrushKind`.

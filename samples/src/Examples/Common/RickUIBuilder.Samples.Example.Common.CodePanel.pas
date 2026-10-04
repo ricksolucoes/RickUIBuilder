@@ -9,7 +9,7 @@
 {  Funcionalidade                                                              }
 {  --------------                                                              }
 {  Materializa os indicadores visuais Código Delphi/Resultado e o bloco        }
-{  rolável de código monoespaçado preenchido pelas futuras páginas derivadas.  }
+{  rolável de código monoespaçado preenchido pelas páginas derivadas.          }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
@@ -21,7 +21,12 @@
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
 {  - TExampleCommon cria este painel dentro da área principal.                 }
-{  - Futuras derivadas preenchem o snippet por SetCodeText.                    }
+{  - As páginas derivadas preenchem o snippet por SetCodeText.                 }
+{                                                                              }
+{  Ownership / lifetime                                                        }
+{  --------------------                                                        }
+{  - O painel e seus controles internos pertencem à árvore visual da base.     }
+{  - O texto exibido fica no TText interno e é substituído por SetCodeText.    }
 {                                                                              }
 {  Restrições e responsabilidades                                              }
 {  -----------------------------                                               }

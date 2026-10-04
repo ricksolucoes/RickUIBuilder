@@ -1,4 +1,4 @@
-# Arquitetura do RickUIBuilder.Samples
+﻿# Arquitetura do RickUIBuilder.Samples
 
 ## Objetivo
 
@@ -22,7 +22,7 @@ Home
 
 `Edit` não apresenta Factory porque a API pública analisada não expõe `Factory.CreateEdit`. Essa ausência descreve somente o estado atual da API.
 
-As opções `Factory` e `Fluent Builder` são, nesta etapa, divisões visuais da página intermediária. As páginas posteriores que conterão os samples de cada abordagem **ainda não existem**. Por isso, `Ver exemplos` permanece visual e não possui callback ou destino fictício.
+A primeira navegação concreta da terceira camada existe para **Text / Label → Factory**. O card Factory de `TComponentTextLabel` emite uma intenção ao Coordinator, que abre `TExampleTextLabelFactory`. O card Fluent Builder de Text / Label e todos os cards de abordagem dos demais componentes permanecem somente visuais enquanto seus destinos não existirem.
 
 Composition continua sendo uma abordagem pública do Rick.UIBuilder, mas não foi adicionada às páginas de componente. Sua apresentação no Samples permanece trabalho futuro até existir decisão específica de UX/navegação.
 
@@ -40,7 +40,7 @@ Composition continua sendo uma abordagem pública do Rick.UIBuilder, mas não fo
 - painel `Sobre este componente`;
 - cores e espaçamentos específicos desta família de páginas.
 
-A base **não conhece `TSampleComponent`**, não contém arrays de configuração dos seis componentes e não decide se um componente suporta Factory.
+A base **não conhece `TSampleComponent`**, não contém arrays de configuração dos seis componentes e não decide se um componente suporta Factory. Ela apenas permite que uma page concreta forneça callback para `Ver exemplos` quando o destino correspondente já existir.
 
 Cada componente possui uma página concreta que herda de `TComponentCommon` e define apenas seu conteúdo e as abordagens que aparecem:
 
@@ -83,39 +83,43 @@ O `TSampleApplicationCoordinator` resolve `TSampleComponent` para a classe concr
 
 A seta de retorno da `TComponentCommon` fecha a janela modal atual. O retorno não cria Router, Presenter adicional ou nova camada de navegação: ao fechar a modal, o fluxo retorna ao Coordinator e a Home volta a ficar ativa.
 
-## Sample Page Base implementada e páginas concretas futuras
+## Sample Page Base e primeiro destino concreto
 
-A terceira camada do Samples possui agora uma base visual/comportamental coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A construção visual comum é separada em units coesas de header, navegação, painel de código e painel de resultado, além de ícones e estilo. Ela ainda não é destino navegável porque nenhuma página concreta de exemplo foi criada nesta etapa.
+A terceira camada do Samples possui uma base visual/comportamental coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A construção visual comum permanece separada em units coesas de header, navegação, painel de código e painel de resultado, além de ícones e estilo.
+
+O primeiro destino concreto implementado é **Text / Label - Factory**:
 
 ```text
 Home
-  │
-  ▼
-Component Page concreta
-  │
-  ├── Factory ───────► futura página concreta de exemplos Factory
-  │                         ▲
-  └── Fluent Builder ► futura página concreta de exemplos Fluent
-                            ▲
-                            │ herdam no futuro
-                            │
-                       TExampleCommon
+  ↓
+TComponentTextLabel
+  ├── Factory ─────────► TExampleTextLabelFactory
+  │                           ▲
+  │                           └── herda TExampleCommon
+  └── Fluent Builder ──► ainda não implementado
 ```
 
-A base fornece somente a infraestrutura comum da família:
+A implementação específica fica separada por responsabilidade:
 
-- `TExampleCommon`: formulário FMX borderless, composição das regiões e API protegida para futuras derivadas;
+- `RickUIBuilder.Samples.Example.TextLabel.Factory`: page concreta e coordenação da seleção;
+- `RickUIBuilder.Samples.Example.TextLabel.Factory.Content`: captions, títulos, descrições e snippets;
+- `RickUIBuilder.Samples.Example.TextLabel.Factory.Runner`: execução real de `TRickUIBuilderFactory.CreateText` no `ResultHost`.
+
+A página demonstra cinco exemplos: `Básico`, `Geometria`, `Tipografia`, `Alinhamento` e `Completo`. Em conjunto, eles cobrem a criação via `CreateText`, o texto informado e todos os campos públicos atuais de `TRickUIBuilderTextConfig`: `Left`, `Top`, `Width`, `Height`, `FontSize`, `FontColor`, `HorizontalAlign` e `Bold`.
+
+A base continua responsável somente pela infraestrutura comum:
+
+- `TExampleCommon`: formulário FMX borderless, composição das regiões e API protegida para derivadas;
 - `TExampleHeader`: header/back com contexto do componente pai;
 - `TExampleNavigation` / `TExampleNavigationItem`: navegação lateral rolável e estado visual selecionado;
-- identidade da página e do exemplo coordenada pela base;
 - `TExampleCodePanel`: faixa visual `Código Delphi` / `Resultado` e superfície de código com scroll;
-- `TExampleResultPanel`: superfície de resultado, `ResultHost` e limpeza visual anterior.
+- `TExampleResultPanel`: superfície de resultado, `ResultHost` e limpeza do resultado anterior.
 
-`TExampleCommon` não conhece `TSampleComponent`, componentes concretos, regras específicas de Factory/Fluent, categorias fixas ou catálogo global de exemplos. As futuras páginas derivadas serão responsáveis por categorias, snippets, execução e controles reais.
+`TExampleCommon` não conhece `TSampleComponent`, componentes concretos, regras específicas de Factory/Fluent, categorias fixas ou catálogo global de exemplos. A page concreta define sua navegação e delega conteúdo e execução às units específicas.
 
-A geometria vigente da Sample Page Base é `620 × 510`, estritamente menor que a Home de `644 × 534`. O corpo usa `TVertScrollBox` na navegação lateral e `TScrollBox` na superfície de código para tratar conteúdo maior dentro da própria janela, sem aumentar a página acima da Home nem reduzir a tipografia compartilhada.
+Ao selecionar um exemplo em Text / Label - Factory, a page seleciona visualmente o item, atualiza título/descrição/snippet, chama `ClearResult` e executa o mesmo exemplo no `ResultHost`. O código exibido e o resultado executado representam a mesma configuração.
 
-A faixa `Código Delphi` / `Resultado` é deliberadamente não interativa no código atual. Ela preserva a intenção visual do mockup, mas não implementa tabs ou alternância porque essa semântica ainda não foi confirmada.
+A geometria da Sample Page permanece `620 × 510`, estritamente menor que a Home de `644 × 534`. A faixa `Código Delphi` / `Resultado` continua deliberadamente não interativa: não existem tabs ou alternância porque essa semântica não foi definida.
 
 A especificação visual e os textframes normativos dessa camada estão em `docs/samples/SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`.
 
@@ -137,7 +141,8 @@ O `TSampleApplicationCoordinator` executa o fluxo global: encerramento da aplica
 - o Presenter não referencia a Home;
 - a Home é destruída antes do Coordinator;
 - o Coordinator cria e libera cada Component Page modal;
-- uma Component Page não possui Presenter, Coordinator ou Home.
+- para Text / Label - Factory, o Coordinator também cria e libera a Sample Page modal;
+- uma Component Page não possui Presenter, Coordinator ou Home; o callback de navegação é non-owning.
 
 ## Contratos
 
@@ -182,17 +187,21 @@ samples/
         └── Edit/
             └── RickUIBuilder.Samples.Component.Edit.pas
     └── Examples/
-        └── Common/
-            ├── RickUIBuilder.Samples.Example.Common.pas
-            ├── RickUIBuilder.Samples.Example.Common.Header.pas
-            ├── RickUIBuilder.Samples.Example.Common.Navigation.pas
-            ├── RickUIBuilder.Samples.Example.Common.CodePanel.pas
-            ├── RickUIBuilder.Samples.Example.Common.ResultPanel.pas
-            ├── RickUIBuilder.Samples.Example.Common.Icons.pas
-            └── RickUIBuilder.Samples.Example.Common.Style.pas
+        ├── Common/
+        │   ├── RickUIBuilder.Samples.Example.Common.pas
+        │   ├── RickUIBuilder.Samples.Example.Common.Header.pas
+        │   ├── RickUIBuilder.Samples.Example.Common.Navigation.pas
+        │   ├── RickUIBuilder.Samples.Example.Common.CodePanel.pas
+        │   ├── RickUIBuilder.Samples.Example.Common.ResultPanel.pas
+        │   ├── RickUIBuilder.Samples.Example.Common.Icons.pas
+        │   └── RickUIBuilder.Samples.Example.Common.Style.pas
+        └── TextLabel/
+            ├── RickUIBuilder.Samples.Example.TextLabel.Factory.pas
+            ├── RickUIBuilder.Samples.Example.TextLabel.Factory.Content.pas
+            └── RickUIBuilder.Samples.Example.TextLabel.Factory.Runner.pas
 ```
 
-Diretórios específicos de componentes existem porque possuem units concretas. `src/Examples/Common` existe porque a base comum foi implementada; diretórios futuros de exemplos por componente/abordagem não devem ser criados antes de existirem páginas concretas reais.
+Diretórios específicos de componentes existem porque possuem units concretas. `src/Examples/Common` contém a base comum; `src/Examples/TextLabel` existe porque a primeira página concreta Factory foi implementada. Novos diretórios de exemplos só podem ser criados quando houver implementação real correspondente.
 
 Todas as units internas do Samples são incorporadas explicitamente ao `.dpr` e ao `.dproj`. O `DCC_UnitSearchPath` não contém o próprio `samples/src`; o caminho de busca permanece reservado à dependência externa `..\src` da biblioteca Rick.UIBuilder e ao Search Path herdado.
 
@@ -214,7 +223,7 @@ Os cards preservam os SVGs oficiais fornecidos:
 
 A geometria de Factory e informação é renderizada por fill; Fluent Builder usa stroke, seguindo os assets originais.
 
-`Ver exemplos` permanece sem `HitTest` e sem callback enquanto as páginas de destino não existirem.
+`Ver exemplos` permanece sem `HitTest` e sem callback quando o destino não existe. No estado atual, somente `Text / Label → Factory` recebe callback e `crHandPoint`, porque `TExampleTextLabelFactory` é um destino real.
 
 A Sample Page Base usa geometria e paleta próprias em `RickUIBuilder.Samples.Example.Common.Style`, vetor de retorno em `.Icons` e controles estruturais separados em `.Header`, `.Navigation`, `.CodePanel` e `.ResultPanel`. `TExampleCommon` apenas os coordena. A página possui client de `620 × 510`, é borderless e permanece menor que a Home. A sequência visual segue o textframe normativo: header → identidade → navegação/conteúdo → identificação do exemplo → faixa visual → código → resultado.
 

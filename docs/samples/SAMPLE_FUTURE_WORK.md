@@ -1,4 +1,4 @@
-# Trabalho futuro do RickUIBuilder.Samples
+﻿# Trabalho futuro do RickUIBuilder.Samples
 
 ## Composition
 
@@ -8,7 +8,7 @@ A API pública possui Composition por meio de `TRickUIBuilder.On(AParent)`. A po
 
 As páginas intermediárias de `Text / Label`, `Button`, `Badge`, `Divider`, `ComboBox` e `Edit` já existem como páginas concretas herdadas de `TComponentCommon`.
 
-A Sample Page Base já está implementada e coordenada por `RickUIBuilder.Samples.Example.Common` (`TExampleCommon`). Header, navegação, painel de código e painel de resultado ficam separados em `.Header`, `.Navigation`, `.CodePanel` e `.ResultPanel`; tokens permanecem em `.Style` e o vetor comum de retorno em `.Icons`. **Nenhuma página concreta de exemplos foi implementada ainda**, portanto a base não é destino navegável no fluxo atual.
+A Sample Page Base já está implementada e coordenada por `RickUIBuilder.Samples.Example.Common` (`TExampleCommon`). Header, navegação, painel de código e painel de resultado ficam separados em `.Header`, `.Navigation`, `.CodePanel` e `.ResultPanel`; tokens permanecem em `.Style` e o vetor comum de retorno em `.Icons`. **Text / Label - Factory é a primeira página concreta implementada**; os demais destinos continuam futuros.
 
 A evolução restante é deliberadamente faseada:
 
@@ -22,7 +22,7 @@ A matriz atualmente esperada pela API conhecida é: Text / Label, Button, Badge,
 
 ## `Ver exemplos`
 
-Na implementação atual, `Ver exemplos` é somente visual e permanece com `HitTest := False`. Essa decisão evita comunicar uma navegação inexistente como funcionalidade pronta.
+Na implementação atual, somente `Text / Label → Factory` possui destino real e ação clicável. Todo `Ver exemplos` sem destino permanece visual com `HitTest := False`, evitando comunicar navegação inexistente como funcionalidade pronta.
 
 A interatividade deve ser habilitada somente quando a página de destino correspondente existir.
 
@@ -34,10 +34,10 @@ Se a API mudar, revisar novamente o contrato público antes de alterar o Samples
 
 ## Samples reais por componente
 
-Os controles e demonstrações reais de uso do Rick.UIBuilder pertencem às futuras páginas Factory/Fluent Builder, e não às páginas intermediárias implementadas nesta etapa.
+Os controles e demonstrações reais pertencem às páginas concretas Factory/Fluent Builder, e não às Component Pages intermediárias. `Text / Label - Factory` já materializa resultados reais; os demais componentes/abordagens continuam futuros.
 
-Nenhum sample real deve ser adicionado à `TComponentCommon` base somente para antecipar esse trabalho futuro.
+Nenhum sample real deve ser adicionado à `TComponentCommon` ou `TExampleCommon`: conteúdo e execução permanecem nas derivadas concretas.
 
 ## Testes do Samples
 
-Não existem testes automatizados específicos do projeto `samples/` nesta etapa. Quando a navegação para as páginas de exemplos e os comportamentos associados forem implementados, avaliar testes do Coordinator e das regras de navegação sem acoplamento desnecessário a controles FMX.
+Não existem testes automatizados específicos do projeto `samples/` nesta etapa. Como a navegação Text / Label → Factory e a substituição de resultados já foram implementadas, permanece como trabalho futuro avaliar testes do Coordinator, da seleção de exemplos e das regras de navegação sem acoplamento desnecessário a controles FMX.

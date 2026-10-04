@@ -10,45 +10,50 @@
 {  Funcionalidade                                                              }
 {  --------------                                                              }
 {  Configura um formulário FMX borderless, cria o header com retorno, aplica   }
-{  estilo e geometria comuns e oferece operações protegidas para que páginas   }
-{  concretas adicionem identidade, Factory, Fluent Builder e informação.       }
+{  estilo/geometria comuns e materializa os cards Factory/Fluent. Um card só   }
+{  se torna clicável quando a página concreta fornece callback para destino    }
+{  realmente implementado.                                                     }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
 {  - RickUIBuilder.Samples.App.Typography                                      }
 {      Fornece a escala tipográfica compartilhada pelo Samples.                }
-{                                                                              }
 {  - RickUIBuilder.Samples.Component.Common.Icons                              }
 {      Fornece as geometrias vetoriais usadas pelos controles comuns.          }
-{                                                                              }
 {  - RickUIBuilder.Samples.Component.Common.Style                              }
 {      Fornece dimensões, espaçamentos e cores da família de páginas.          }
 {                                                                              }
+{  Dependências técnicas FMX                                                   }
+{  -------------------------                                                   }
+{  - FMX.Types fornece TTextAlign, TAlignLayout e crHandPoint.                 }
+{  - FMX.Graphics fornece TBrushKind. Essas units devem permanecer explícitas  }
+{    no uses sempre que os respectivos tipos forem utilizados.                }
+{                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
-{  - As páginas concretas de Text / Label, Button, Badge, Divider, ComboBox e  }
-{    Edit herdam desta classe e adicionam apenas conteúdo/capacidades próprios.}
-{  - TSampleApplicationCoordinator cria a página concreta e a exibe modalmente.}
-{  - O retorno fecha a janela modal; o Coordinator mantém o ownership e libera }
-{    a instância após ShowModal.                                               }
+{  - Pages concretas de componente herdam desta classe e fornecem conteúdo e   }
+{    capacidades próprios.                                                     }
+{  - TSampleApplicationCoordinator cria a page concreta e a exibe modalmente.  }
+{  - Pages com destino real podem encaminhar um TNotifyEvent ao card comum.    }
+{  - O retorno fecha a modal; o Coordinator mantém ownership da instância.     }
 {                                                                              }
 {  Ownership / lifetime                                                        }
 {  --------------------                                                        }
-{  - A página não possui Coordinator, Presenter ou Home.                       }
-{  - Os controles visuais são owned pelo formulário ou por seus parents.       }
-{  - A instância modal é owned/liberada pelo Coordinator.                      }
+{  - A base não possui Coordinator, Presenter ou Home.                         }
+{  - Controles visuais são owned pelo formulário ou por sua árvore visual.     }
+{  - A instância modal é owned/liberada pelo Coordinator.                     }
 {                                                                              }
 {  Restrições e responsabilidades                                              }
 {  -----------------------------                                               }
-{  - Não conhece TSampleComponent nem decide conteúdo de componentes.          }
+{  - Não conhece TSampleComponent nem decide conteúdo específico.              }
 {  - Não depende de Home.Style.                                                }
-{  - Não cria páginas futuras de samples Factory/Fluent Builder.               }
-{  - Ver exemplos permanece somente visual enquanto os destinos não existirem. }
+{  - Não cria Sample Pages concretas.                                          }
+{  - Callbacks só são ligados quando o destino real existe.                    }
 {                                                                              }
 {  Manutenção                                                                  }
 {  ----------                                                                  }
-{  Este cabeçalho deve ser atualizado quando responsabilidade, dependências,   }
-{  fluxo, ownership/lifetime ou restrições desta unit mudarem.                 }
+{  Atualizar este cabeçalho quando responsabilidade, dependências, fluxo,      }
+{  ownership/lifetime ou restrições desta unit mudarem.                        }
 {                                                                              }
 {******************************************************************************}
 
@@ -83,8 +88,9 @@ type
     /// <summary>Adiciona o subtítulo da página concreta.</summary>
     procedure AddSubtitle(const ASubtitle: string);
     /// <summary>Cria um card visual de abordagem.</summary>
-    procedure AddApproach(const ACaption, ADescription, AIconData: string;
-      const AAccent: TAlphaColor; const ALeft: Single; const AStrokedIcon: Boolean);
+    function AddApproach(const ACaption, ADescription, AIconData: string;
+      const AAccent: TAlphaColor; const ALeft: Single;
+      const AStrokedIcon: Boolean): TRectangle;
     /// <summary>Configura a superfície visual de um card.</summary>
     procedure ConfigureApproachSurface(const ASurface: TRectangle;
       const ALeft: Single);
@@ -100,9 +106,12 @@ type
     procedure AddApproachDescription(const ASurface: TRectangle;
       const ADescription: string);
     /// <summary>Adiciona a ação visual Ver exemplos.</summary>
-    procedure AddExamplesAction(const ASurface: TRectangle);
+    function AddExamplesAction(const ASurface: TRectangle): TRectangle;
     /// <summary>Configura a superfície visual da ação ainda sem destino.</summary>
     procedure ConfigureExamplesAction(const AAction: TRectangle);
+    /// <summary>Conecta callback somente quando o destino real existe.</summary>
+    procedure EnableExamplesAction(const AAction: TRectangle;
+      const AOnClick: TNotifyEvent);
     /// <summary>Adiciona a legenda da ação.</summary>
     procedure AddExamplesActionText(const AAction: TRectangle);
     /// <summary>Adiciona o chevron vetorial da ação.</summary>
@@ -122,8 +131,10 @@ type
   strict protected
     /// <summary>Adiciona título e subtítulo específicos da página derivada.</summary>
     procedure AddIdentity(const ATitle, ASubtitle: string);
-    /// <summary>Adiciona o card Factory na posição esquerda padrão.</summary>
-    procedure AddFactoryApproach;
+    /// <summary>Adiciona o card Factory sem destino navegável.</summary>
+    procedure AddFactoryApproach; overload;
+    /// <summary>Adiciona o card Factory ligado a um destino real.</summary>
+    procedure AddFactoryApproach(const AOnClick: TNotifyEvent); overload;
     /// <summary>Adiciona o card Fluent Builder na posição direita padrão.</summary>
     procedure AddFluentApproach;
     /// <summary>Adiciona o card Fluent Builder centralizado.</summary>
@@ -285,8 +296,17 @@ end;
 
 procedure TComponentCommon.AddFactoryApproach;
 begin
-  AddApproach('Factory', _FACTORY_DESCRIPTION_, _COMPONENT_PAGE_ICON_FACTORY_,
-    _COMPONENT_PAGE_FACTORY_ACCENT_, _COMPONENT_PAGE_CONTENT_LEFT_, False);
+  AddFactoryApproach(nil);
+end;
+
+procedure TComponentCommon.AddFactoryApproach(const AOnClick: TNotifyEvent);
+var
+  LAction: TRectangle;
+begin
+  LAction := AddApproach('Factory', _FACTORY_DESCRIPTION_,
+    _COMPONENT_PAGE_ICON_FACTORY_, _COMPONENT_PAGE_FACTORY_ACCENT_,
+    _COMPONENT_PAGE_CONTENT_LEFT_, False);
+  EnableExamplesAction(LAction, AOnClick);
 end;
 
 procedure TComponentCommon.AddFluentApproach;
@@ -308,9 +328,9 @@ begin
     _COMPONENT_PAGE_FLUENT_ACCENT_, LLeft, True);
 end;
 
-procedure TComponentCommon.AddApproach(const ACaption, ADescription,
+function TComponentCommon.AddApproach(const ACaption, ADescription,
   AIconData: string; const AAccent: TAlphaColor; const ALeft: Single;
-  const AStrokedIcon: Boolean);
+  const AStrokedIcon: Boolean): TRectangle;
 var
   LSurface: TRectangle;
 begin
@@ -320,7 +340,7 @@ begin
   AddApproachIcon(LSurface, AIconData, AAccent, AStrokedIcon);
   AddApproachTitle(LSurface, ACaption);
   AddApproachDescription(LSurface, ADescription);
-  AddExamplesAction(LSurface);
+  Result := AddExamplesAction(LSurface);
 end;
 
 procedure TComponentCommon.ConfigureApproachSurface(const ASurface: TRectangle;
@@ -402,15 +422,14 @@ begin
   LDescription.HitTest := False;
 end;
 
-procedure TComponentCommon.AddExamplesAction(const ASurface: TRectangle);
-var
-  LAction: TRectangle;
+function TComponentCommon.AddExamplesAction(
+  const ASurface: TRectangle): TRectangle;
 begin
-  LAction := TRectangle.Create(ASurface);
-  LAction.Parent := ASurface;
-  ConfigureExamplesAction(LAction);
-  AddExamplesActionText(LAction);
-  AddActionChevron(LAction);
+  Result := TRectangle.Create(ASurface);
+  Result.Parent := ASurface;
+  ConfigureExamplesAction(Result);
+  AddExamplesActionText(Result);
+  AddActionChevron(Result);
 end;
 
 procedure TComponentCommon.ConfigureExamplesAction(const AAction: TRectangle);
@@ -422,6 +441,16 @@ begin
   AAction.XRadius := 6;
   AAction.YRadius := 6;
   AAction.HitTest := False;
+end;
+
+procedure TComponentCommon.EnableExamplesAction(const AAction: TRectangle;
+  const AOnClick: TNotifyEvent);
+begin
+  if not Assigned(AOnClick) then
+    Exit;
+  AAction.HitTest := True;
+  AAction.Cursor := crHandPoint;
+  AAction.OnClick := AOnClick;
 end;
 
 procedure TComponentCommon.AddExamplesActionText(const AAction: TRectangle);

@@ -4,14 +4,14 @@
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
-{  Orquestrar a infraestrutura comum das futuras páginas concretas de exemplos }
-{  do RickUIBuilder.Samples.                                                   }
+{  Orquestrar a infraestrutura comum das páginas concretas de exemplos do      }
+{  RickUIBuilder.Samples.                                                       }
 {                                                                              }
 {  Funcionalidade                                                              }
 {  --------------                                                              }
 {  Configura a janela FMX borderless menor que a Home, compõe header,          }
-{  identidade, navegação lateral e área principal e expõe operações protegidas }
-{  para que futuras derivadas preencham conteúdo sem duplicar a estrutura.     }
+{  identidade, navegação lateral, painel de código e resultado e expõe API     }
+{  protegida para as classes derivadas.                                        }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
@@ -24,37 +24,40 @@
 {  - RickUIBuilder.Samples.Example.Common.CodePanel                            }
 {      Materializa a faixa Código Delphi/Resultado e a superfície de código.   }
 {  - RickUIBuilder.Samples.Example.Common.ResultPanel                          }
-{      Materializa o host destinado ao resultado executável futuro.            }
+{      Materializa o host destinado ao resultado executável.                   }
 {  - RickUIBuilder.Samples.Example.Common.Style                                }
-{      Fornece dimensões, espaçamentos e paleta específicos desta família.     }
+{      Fornece dimensões, espaçamentos e paleta desta família.                 }
+{                                                                              }
+{  Dependências técnicas FMX                                                   }
+{  -------------------------                                                   }
+{  - FMX.Types fornece TTextAlign e deve permanecer explícito no uses sempre  }
+{    que esse tipo for utilizado.                                              }
+{  - FMX.Graphics fornece TBrushKind e deve permanecer explícito no uses       }
+{    sempre que esse tipo for utilizado.                                       }
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
-{  - Futuras páginas concretas herdarão TExampleCommon.                        }
-{  - A derivada define componente/abordagem, categorias, exemplo, código e     }
-{    execução; a base apenas coordena os controles estruturais comuns.         }
-{  - Back fecha apenas a modal atual quando a integração futura utilizar o     }
-{    fluxo modal previsto pela arquitetura do Samples.                         }
+{  - Páginas concretas herdam TExampleCommon.                                 }
+{  - A derivada define categorias, conteúdo, snippet e execução; a base apenas }
+{    coordena os controles estruturais comuns.                                 }
+{  - Back fecha somente a modal atual.                                         }
 {                                                                              }
 {  Ownership / lifetime                                                        }
 {  --------------------                                                        }
-{  - Os controles estruturais são owned pela página ou por sua árvore visual.  }
-{  - ResultHost pertence a TExampleResultPanel; ClearResult libera seus filhos }
-{    visuais antes da substituição por um novo exemplo.                        }
+{  - Controles estruturais são owned pela page ou por sua árvore visual.       }
+{  - ResultHost pertence a TExampleResultPanel; ClearResult libera seus filhos.}
 {  - A base não possui Coordinator, Presenter ou Component Page.               }
 {                                                                              }
 {  Restrições e responsabilidades                                              }
 {  -----------------------------                                               }
-{  - Não conhece Button, Badge, Divider, ComboBox, Edit ou Text / Label.       }
-{  - Não conhece Factory ou Fluent Builder como regra de execução específica.  }
+{  - Não conhece conteúdo específico de componente ou abordagem.               }
 {  - Não contém catálogo global de exemplos ou case/if por componente.         }
-{  - A faixa Código Delphi/Resultado é somente visual nesta etapa.             }
-{  - Nenhuma página concreta ou sample real é criada por esta unit.            }
+{  - A faixa Código Delphi/Resultado permanece somente visual.                 }
 {                                                                              }
 {  Manutenção                                                                  }
 {  ----------                                                                  }
-{  Este cabeçalho deve ser atualizado quando responsabilidade, dependências,   }
-{  fluxo, ownership/lifetime ou restrições desta unit mudarem.                 }
+{  Atualizar este cabeçalho quando responsabilidade, dependências, fluxo,      }
+{  ownership/lifetime ou restrições desta unit mudarem.                        }
 {                                                                              }
 {******************************************************************************}
 
@@ -73,7 +76,7 @@ uses
   RickUIBuilder.Samples.Example.Common.ResultPanel;
 
 type
-  /// <summary>Base visual comum das futuras páginas concretas de exemplos.</summary>
+  /// <summary>Base visual comum das páginas concretas de exemplos.</summary>
   TExampleCommon = class abstract(TForm)
   strict private
     FHeader: TExampleHeader;
@@ -117,7 +120,10 @@ implementation
 
 uses
   System.UITypes,
+
+  FMX.Types,
   FMX.Graphics,
+
   RickUIBuilder.Samples.App.Typography,
   RickUIBuilder.Samples.Example.Common.Style;
 

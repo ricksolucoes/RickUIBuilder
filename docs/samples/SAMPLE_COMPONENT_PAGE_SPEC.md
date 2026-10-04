@@ -1,4 +1,4 @@
-# Especificação da Component Page
+﻿# Especificação da Component Page
 
 ## Status
 
@@ -8,7 +8,7 @@ Este documento descreve a página intermediária de componente e suas seis imple
 
 ## Papel da página
 
-A Component Page é somente o ponto intermediário entre a Home e as futuras páginas que conterão os samples de cada abordagem.
+A Component Page é o ponto intermediário entre a Home e as páginas de samples de cada abordagem. No estado atual, somente Text / Label → Factory possui destino concreto implementado.
 
 ```text
 Home
@@ -17,13 +17,14 @@ Home
 Component Page do componente
   │
   ├── Factory
-  │      └── página futura com samples Factory
+  │      ├── Text / Label → TExampleTextLabelFactory [implementado]
+  │      └── demais componentes → futuro
   │
   └── Fluent Builder
-         └── página futura com samples Fluent Builder
+         └── páginas futuras
 ```
 
-Nesta etapa não existem páginas de destino Factory/Fluent, samples demonstrativos nem callbacks fictícios. `Ver exemplos` é somente parte do layout visual.
+Callbacks só existem quando há destino real. `Text / Label → Factory` já navega para sua Sample Page concreta; Fluent Builder de Text / Label e as abordagens dos demais componentes permanecem somente visuais.
 
 ## Arquitetura da família de páginas
 
@@ -133,7 +134,7 @@ Quando somente Fluent Builder existe, como no Edit:
 
 O card único é centralizado. Não existe placeholder de Factory.
 
-`Ver exemplos` permanece com `HitTest := False` e sem callback enquanto os destinos reais não existirem.
+`Ver exemplos` permanece com `HitTest := False` e sem callback enquanto o destino real não existir. Quando existe destino, como em `Text / Label → Factory`, a ação recebe `HitTest := True`, `crHandPoint` e callback real.
 
 ## Assets vetoriais
 
@@ -282,7 +283,7 @@ A referência visual original mencionava `TButton`, mas a implementação real d
 
 ## Próxima camada planejada
 
-A ação `Ver exemplos` será conectada futuramente à camada de páginas de exemplos. Essa camada possui especificação própria em `SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md` e **não faz parte da implementação atual**.
+A ação `Ver exemplos` é conectada individualmente apenas a destinos reais. `Text / Label → Factory` já abre `TExampleTextLabelFactory`; os demais destinos continuam futuros. A terceira camada é especificada em `SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`.
 
 A Component Page continua tendo somente a responsabilidade de escolher a abordagem. Ela não deve absorver menu lateral, código Delphi, resultado executável ou qualquer sample real.
 
@@ -301,8 +302,8 @@ A Component Page continua tendo somente a responsabilidade de escolher a abordag
 - `TSampleComponent`;
 - arrays com conteúdo dos seis componentes;
 - regra específica `Edit não possui Factory`;
-- páginas futuras Factory/Fluent;
-- samples futuros.
+- páginas Factory/Fluent ainda não implementadas;
+- novos samples além de Text / Label - Factory.
 
 Cada página concreta pode conhecer somente o conteúdo e as abordagens do seu próprio componente.
 
@@ -322,4 +323,4 @@ A implementação deve manter simultaneamente:
 - uma unit concreta por componente herdando de `TComponentCommon`;
 - `.dpr` e `.dproj` contendo explicitamente todas as units;
 - nenhum `samples/src` no Search Path;
-- nenhuma página futura Factory/Fluent criada nesta etapa.
+- nenhum callback habilitado para destino inexistente; Text / Label - Factory é a única navegação concreta desta etapa.

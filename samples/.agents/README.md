@@ -1,4 +1,4 @@
-# Governança de Agents do RickUIBuilder.Samples
+﻿# Governança de Agents do RickUIBuilder.Samples
 
 Esta pasta contém agentes locais do `samples/`. Eles não alteram a governança global do RickUIBuilder.
 
@@ -57,7 +57,7 @@ O auditor final de processo recebe o manifesto, mas não confia na seleção do 
 
 Os agentes aplicáveis devem tratar como critérios objetivos: units internas explicitamente incluídas no `.dpr` e `.dproj`; ausência do próprio `samples/src` no Search Path; organização física por responsabilidade (`App`, `Home`, `Components/Common` e diretórios concretos por componente quando houver unit real); header da Home alinhado ao client sem margem externa; e cards dimensionados para o conteúdo sem reduzir a tipografia aprovada.
 
-Para Component Pages, `RickUIBuilder.Samples.Component.Common` (`TComponentCommon`) deve permanecer base comum de layout/comportamento, com tokens visuais locais em `RickUIBuilder.Samples.Component.Common.Style`, sem conteúdo centralizado dos seis componentes e sem dependência de `Home.Style`. Cada componente navegável possui page concreta derivada. A página é intermediária: Factory/Fluent são divisões visuais e seus samples/destinos continuam fora do escopo até implementação explícita. O formulário deve ser borderless, o retorno deve fechar a modal e nenhum texto/card/painel pode sofrer clipping.
+Para Component Pages, `RickUIBuilder.Samples.Component.Common` (`TComponentCommon`) deve permanecer base comum de layout/comportamento, com tokens visuais locais em `RickUIBuilder.Samples.Component.Common.Style`, sem conteúdo centralizado dos seis componentes e sem dependência de `Home.Style`. Cada componente navegável possui page concreta derivada. A página é intermediária: Factory/Fluent são divisões de navegação e somente destinos realmente implementados podem ser clicáveis. Atualmente `Text / Label → Factory` é o primeiro destino concreto. O formulário deve ser borderless, o retorno deve fechar a modal e nenhum texto/card/painel pode sofrer clipping.
 
 ## Cabeçalho estrutural das units Delphi
 
@@ -75,4 +75,9 @@ O catálogo desta página deve corresponder aos arquivos físicos em `.agents/ag
 
 ## Regras obrigatórias para Sample Page Base
 
-`RickUIBuilder.Samples.Example.Common` (`TExampleCommon`) coordena a base visual da terceira camada de navegação do Samples. A estrutura física comum fica em `src/Examples/Common` e separa header, navegação, painel de código e painel de resultado em units próprias, além de `.Style` e `.Icons`; não concentrar novamente essas responsabilidades em `TExampleCommon`. Diretórios concretos de exemplos não devem ser criados antes de existirem páginas reais. A base deve permanecer menor que a Home, borderless, sem conhecimento de componentes/abordagens e sem catálogo global de exemplos. A faixa `Código Delphi` / `Resultado` permanece visual enquanto sua semântica não estiver confirmada. Páginas derivadas futuras serão responsáveis por categorias, código exibido e execução real.
+`RickUIBuilder.Samples.Example.Common` (`TExampleCommon`) coordena a base visual da terceira camada de navegação do Samples. A estrutura física comum fica em `src/Examples/Common` e separa header, navegação, painel de código e painel de resultado em units próprias, além de `.Style` e `.Icons`; não concentrar novamente essas responsabilidades em `TExampleCommon`. Diretórios concretos de exemplos não devem ser criados antes de existirem páginas reais. A base deve permanecer menor que a Home, borderless, sem conhecimento de componentes/abordagens e sem catálogo global de exemplos. A faixa `Código Delphi` / `Resultado` permanece visual enquanto sua semântica não estiver confirmada. `Text / Label - Factory` é a primeira derivada real e separa page, conteúdo/snippets e Runner; futuras derivadas devem manter responsabilidades equivalentes separadas quando aplicável.
+
+
+## Dependências FMX explícitas
+
+Toda unit Delphi do Samples que utilize `TTextAlign` deve declarar `FMX.Types` explicitamente no `uses`. Toda unit que utilize `TBrushKind` deve declarar `FMX.Graphics` explicitamente. O Delphi Code Auditor deve reprovar dependência transitiva desses símbolos.

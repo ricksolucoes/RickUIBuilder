@@ -21,7 +21,7 @@
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
 {  - TExampleCommon cria TExampleNavigation e delega AddItem/SelectItem.       }
-{  - A futura página derivada associa a ação do item retornado por AddItem.    }
+{  - A página derivada associa a ação do item retornado por AddItem.             }
 {                                                                              }
 {  Ownership / lifetime                                                        }
 {  --------------------                                                        }

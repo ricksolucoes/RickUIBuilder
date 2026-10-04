@@ -8,8 +8,8 @@
 {                                                                              }
 {  Funcionalidade                                                              }
 {  --------------                                                              }
-{  Materializa o título Resultado, a superfície visual e o host onde futuras   }
-{  páginas derivadas criarão os controles reais de cada sample.                }
+{  Materializa o título Resultado, a superfície visual e o host onde as páginas }
+{  derivadas criam os controles reais de cada sample.                            }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
@@ -20,13 +20,13 @@
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
-{  - TExampleCommon cria o painel e expõe seu Host às futuras derivadas.       }
+{  - TExampleCommon cria o painel e expõe seu Host às páginas derivadas.         }
 {  - Clear remove os filhos visuais antes de um novo resultado.                }
 {                                                                              }
 {  Ownership / lifetime                                                        }
 {  --------------------                                                        }
 {  - O painel é owned pela área principal da Sample Page.                      }
-{  - Host é owned pela superfície interna e owns os controles futuros.         }
+{  - Host é owned pela superfície interna e owns os controles de cada resultado.}
 {                                                                              }
 {  Restrições e responsabilidades                                              }
 {  -----------------------------                                               }

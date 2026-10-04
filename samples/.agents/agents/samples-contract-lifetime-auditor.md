@@ -1,4 +1,4 @@
-# Samples Contract & Lifetime Auditor
+﻿# Samples Contract & Lifetime Auditor
 
 ## Missão
 Auditar independentemente contratos, GUIDs, reference counting, ownership e lifetime do Samples sempre que esses aspectos existirem ou forem afetados pela tarefa.
@@ -32,3 +32,8 @@ Não modificar arquivos, não inventar lifetime não comprovado e não declarar 
 ## Critério da Sample Page Base
 
 Quando `TExampleCommon`, `TExampleResultPanel` ou futuras derivadas afetarem o resultado executável, verificar que `ResultHost` pertence à árvore visual da página, que `TExampleResultPanel.Clear` é a implementação usada por `ClearResult` para liberar os filhos visuais antes da substituição do exemplo e que nenhuma referência owning/non-owning criada pela derivada produz dupla liberação ou referência pendente. Não presumir ausência de leak sem execução apropriada.
+
+
+## Critério de navegação para Examples concretos
+
+Quando uma Component Page expuser callback para Sample Page, verificar que a referência de evento é non-owning, que o Coordinator possui lifetime superior enquanto a modal estiver ativa e que cada Sample Page criada sem Owner é liberada em `finally`. Para resultados Factory, confirmar que `ResultHost` é Owner/Parent quando essa for a implementação final e que `ClearResult` libera o resultado anterior antes de nova criação.

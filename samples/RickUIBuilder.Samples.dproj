@@ -327,6 +327,9 @@
         <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.ResultPanel.pas"/>
         <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.Icons.pas"/>
         <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.Style.pas"/>
+        <DCCReference Include="src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Factory.pas"/>
+        <DCCReference Include="src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Factory.Content.pas"/>
+        <DCCReference Include="src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Factory.Runner.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

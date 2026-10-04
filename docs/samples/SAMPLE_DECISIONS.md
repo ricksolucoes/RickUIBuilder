@@ -1,4 +1,4 @@
-# Decisões do RickUIBuilder.Samples
+﻿# Decisões do RickUIBuilder.Samples
 
 ## Decisões consolidadas
 
@@ -117,7 +117,7 @@ Textos técnicos da imagem não são copiados quando divergirem da implementaç�
 
 ### DEC-028 — `Ver exemplos` não possui destino fictício
 
-`Ver exemplos` representa a ação futura para abrir exemplos de Factory ou Fluent Builder. Enquanto essas páginas não existirem, o elemento permanece somente visual, sem callback vazio, `crHandPoint` ou navegação fictícia.
+`Ver exemplos` representa a ação para abrir uma Sample Page de Factory ou Fluent Builder. A ação só recebe callback, `crHandPoint` e hit testing quando o destino correspondente realmente existe. No estado atual, `Text / Label → Factory` é o primeiro destino concreto; os demais permanecem somente visuais até sua implementação.
 
 ### DEC-029 — Tipografia é preservada na Component Page
 
@@ -133,7 +133,7 @@ Cada página concreta possui painel informativo inferior com ícone oficial, tí
 
 ### DEC-032 — Component Page é somente a divisão para Factory e Fluent Builder
 
-As páginas concretas atuais são intermediárias. Elas não contêm os samples finais de Factory/Fluent Builder e não criam as páginas posteriores. Esses destinos serão implementados em etapa futura.
+As Component Pages permanecem intermediárias e não contêm os samples finais. A decisão de não criar destinos sem requisito continua válida; a implementação posterior de Text / Label - Factory é registrada em DEC-044 e não move o sample para a Component Page.
 
 ### DEC-033 — Component Page é borderless e o retorno fecha a modal
 
@@ -145,7 +145,7 @@ A família de Component Pages mantém geometria e paleta local em `RickUIBuilder
 
 ### DEC-035 — A página de exemplos possui uma base visual própria
 
-A terceira camada de navegação possui uma Sample Page Base própria, distinta da Home e da Component Page. Ela está implementada como `TExampleCommon` em `RickUIBuilder.Samples.Example.Common` e será reutilizada por herança pelas futuras páginas concretas de exemplos, sem centralizar regras específicas de componentes ou abordagens.
+A terceira camada de navegação possui uma Sample Page Base própria, distinta da Home e da Component Page. Ela está implementada como `TExampleCommon` em `RickUIBuilder.Samples.Example.Common` e é reutilizada por herança pelas páginas concretas, começando por Text / Label - Factory, sem centralizar regras específicas de componentes ou abordagens.
 
 ### DEC-036 — Sample Page permanece menor que a Home
 
@@ -161,7 +161,7 @@ A Sample Page Base fornece apenas infraestrutura comum. A página derivada de ca
 
 ### DEC-039 — Back da Sample Page retorna à Component Page de origem
 
-O header da futura página de exemplos preserva o contexto do componente pai. Exemplo: `Button - Factory` exibe `Button` no header e o retorno encerra somente essa página, devolvendo o usuário à Component Page de Button; a Component Page continua responsável por retornar à Home.
+O header de cada página de exemplos preserva o contexto do componente pai. No primeiro destino concreto, `Text / Label - Factory` exibe `Text / Label` no header e o retorno encerra somente essa página, devolvendo o usuário à Component Page; a Component Page continua responsável por retornar à Home.
 
 ### DEC-040 — Cobertura de exemplos deriva da API pública real
 
@@ -169,12 +169,25 @@ Quando uma página concreta de exemplos for implementada, sua cobertura deve ser
 
 ### DEC-041 — Referência visual não autoriza comportamento não confirmado
 
-Elementos presentes no mockup preservam posição, hierarquia e intenção visual, mas comportamentos não confirmados não são inventados. Em especial, a faixa visual `Código Delphi` / `Resultado` é reservada na estrutura; sua semântica de alternância só será implementada quando houver requisito explícito ou confirmação durante a implementação da primeira página concreta.
+Elementos presentes no mockup preservam posição, hierarquia e intenção visual, mas comportamentos não confirmados não são inventados. Em especial, a faixa visual `Código Delphi` / `Resultado` permanece estrutural e não alterna regiões. A primeira página concreta (`Text / Label - Factory`) preserva esse comportamento porque não houve requisito explícito para alternância; qualquer mudança futura exige decisão documental própria.
 
 ### DEC-042 — Estrutura física e API protegida da Sample Page Base
 
-A implementação comum fica em `samples/src/Examples/Common`. `TExampleCommon` expõe às futuras derivadas apenas operações protegidas para configurar identidade, adicionar/selecionar itens de navegação, definir o exemplo, preencher o código e acessar/limpar `ResultHost`. Nenhuma página concreta ou sample real faz parte desta decisão.
+A implementação comum fica em `samples/src/Examples/Common`. `TExampleCommon` expõe às derivadas apenas operações protegidas para configurar identidade, adicionar/selecionar itens de navegação, definir o exemplo, preencher o código e acessar/limpar `ResultHost`. Esta decisão trata somente da base; páginas concretas são decisões separadas, como DEC-044.
 
 ### DEC-043 — Controles estruturais da Sample Page Base são separados por responsabilidade
 
-`TExampleCommon` não concentra toda a materialização visual. Header, navegação, painel de código e painel de resultado são implementados respectivamente em `RickUIBuilder.Samples.Example.Common.Header`, `.Navigation`, `.CodePanel` e `.ResultPanel`; `.Icons` mantém vetores e `.Style` mantém os tokens visuais. A classe-base coordena esses elementos e preserva a API protegida destinada às futuras páginas derivadas. Essa separação segue o padrão de responsabilidades já usado no Samples e evita transformar a base em um arquivo monolítico.
+`TExampleCommon` não concentra toda a materialização visual. Header, navegação, painel de código e painel de resultado são implementados respectivamente em `RickUIBuilder.Samples.Example.Common.Header`, `.Navigation`, `.CodePanel` e `.ResultPanel`; `.Icons` mantém vetores e `.Style` mantém os tokens visuais. A classe-base coordena esses elementos e preserva a API protegida destinada às páginas derivadas. Essa separação segue o padrão de responsabilidades já usado no Samples e evita transformar a base em um arquivo monolítico.
+
+### DEC-044 — Text / Label - Factory é o primeiro sample concreto
+
+`TExampleTextLabelFactory` é a primeira derivada real de `TExampleCommon`. A implementação fica em `src/Examples/TextLabel` e separa coordenação da page (`Factory`), conteúdo/snippets (`Factory.Content`) e execução real (`Factory.Runner`). Os exemplos Básico, Geometria, Tipografia, Alinhamento e Completo cobrem `CreateText` e todos os campos públicos atuais de `TRickUIBuilderTextConfig`.
+
+### DEC-045 — Navegação só é habilitada para destino real e permanece coordenada fora da View
+
+`TComponentTextLabel` captura o clique de Factory e emite `OnFactoryExamples`; não cria a Sample Page. `TSampleApplicationCoordinator` conecta esse callback, cria `TExampleTextLabelFactory` sem Owner, executa `ShowModal` e libera a instância em `finally`. Os demais cards sem destino continuam sem callback e sem `HitTest`.
+
+### DEC-046 — Dependências FMX de símbolos visuais devem ser explícitas
+
+Toda unit do Samples que utilizar `TTextAlign` deve declarar `FMX.Types` explicitamente no `uses`. Toda unit que utilizar `TBrushKind` deve declarar `FMX.Graphics` explicitamente. A regra evita dependência acidental de símbolos trazidos transitivamente por outras units e faz parte da auditoria Delphi local.
+

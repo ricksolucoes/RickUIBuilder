@@ -1,4 +1,4 @@
-# Samples Delphi Code Auditor
+﻿# Samples Delphi Code Auditor
 
 ## Missão
 Auditar independentemente código Object Pascal criado ou modificado no Samples.
@@ -10,6 +10,7 @@ Usar requisito, normativa, código final e evidências primárias. Não adotar c
 - sintaxe e tipos verificáveis estaticamente;
 - símbolos declarados no escopo correto de `uses`;
 - `FMX.Graphics` explícito quando `TBrushKind` for utilizado;
+- `FMX.Types` explícito quando `TTextAlign` for utilizado;
 - dependências necessárias e ausência de dependências preventivas sem uso;
 - compatibilidade observável com o projeto;
 - callbacks, casts, enums e referências coerentes;
@@ -28,4 +29,9 @@ Para cada `.pas` criado ou modificado, confirmar que o arquivo inicia com cabeç
 
 ## Critérios específicos da Sample Page Base
 
-Ao auditar a Sample Page Base, confirmar `FMX.Graphics` explícito em toda unit que usa `TBrushKind`, formulário borderless, dimensões menores que a Home, `TScrollBox`/`TVertScrollBox` usados somente como infraestrutura comum, `ResultHost` disponível para derivadas sem execução específica e ausência de callbacks ou destinos concretos de Factory/Fluent. Confirmar também que `TExampleCommon` coordena `.Header`, `.Navigation`, `.CodePanel` e `.ResultPanel` em vez de concentrar a construção integral desses blocos. A faixa `Código Delphi` / `Resultado` deve permanecer não interativa enquanto esse comportamento não estiver especificado.
+Ao auditar a Sample Page Base, confirmar `FMX.Graphics` explícito em toda unit que usa `TBrushKind` e `FMX.Types` explícito em toda unit que usa `TTextAlign`, formulário borderless, dimensões menores que a Home, `TScrollBox`/`TVertScrollBox` usados somente como infraestrutura comum e `ResultHost` disponível para derivadas. A base não pode conter execução específica de componente/abordagem; destinos concretos pertencem às derivadas requisitadas. Confirmar também que `TExampleCommon` coordena `.Header`, `.Navigation`, `.CodePanel` e `.ResultPanel` em vez de concentrar a construção integral desses blocos. A faixa `Código Delphi` / `Resultado` deve permanecer não interativa enquanto esse comportamento não estiver especificado.
+
+
+## Critérios específicos de página concreta de examples
+
+Confirmar que a page derivada não reimplementa estrutura da base, que conteúdo/snippet e execução real permanecem coerentes, que `ClearResult` antecede a materialização do novo resultado e que o Runner usa somente API pública real da abordagem. Reprovar snippet que demonstre uma configuração diferente daquela executada no `ResultHost`.

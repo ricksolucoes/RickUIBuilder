@@ -40,7 +40,10 @@
 {  - src\Examples\Common                                                     }
 {      Contém a base visual e os controles estruturais comuns de header,       }
 {      navegação, código e resultado, além de ícones e tokens visuais.         }
-{      Nenhuma página concreta de sample é criada nesta etapa.                 }
+{                                                                              }
+{  - src\Examples\TextLabel                                                  }
+{      Contém a primeira página concreta de sample: Text / Label - Factory,    }
+{      além de conteúdo e execução específicos dessa abordagem.                }
 {                                                                              }
 {  Dependências principais                                                     }
 {  -----------------------                                                     }
@@ -138,7 +141,10 @@ uses
   RickUIBuilder.Samples.Example.Common.CodePanel in 'src\Examples\Common\RickUIBuilder.Samples.Example.Common.CodePanel.pas',
   RickUIBuilder.Samples.Example.Common.ResultPanel in 'src\Examples\Common\RickUIBuilder.Samples.Example.Common.ResultPanel.pas',
   RickUIBuilder.Samples.Example.Common.Icons in 'src\Examples\Common\RickUIBuilder.Samples.Example.Common.Icons.pas',
-  RickUIBuilder.Samples.Example.Common.Style in 'src\Examples\Common\RickUIBuilder.Samples.Example.Common.Style.pas';
+  RickUIBuilder.Samples.Example.Common.Style in 'src\Examples\Common\RickUIBuilder.Samples.Example.Common.Style.pas',
+  RickUIBuilder.Samples.Example.TextLabel.Factory in 'src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Factory.pas',
+  RickUIBuilder.Samples.Example.TextLabel.Factory.Content in 'src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Factory.Content.pas',
+  RickUIBuilder.Samples.Example.TextLabel.Factory.Runner in 'src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Factory.Runner.pas';
 
 {$R *.res}
 

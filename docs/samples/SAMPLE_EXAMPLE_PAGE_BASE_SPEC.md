@@ -1,12 +1,12 @@
-# Especificação da Sample Page Base
+﻿# Especificação da Sample Page Base
 
 ## Status
 
-**Sample Page Base implementada. Páginas concretas e samples reais permanecem futuros.**
+**Sample Page Base implementada e primeira página concreta disponível: Text / Label - Factory.**
 
 Este documento fixa a intenção visual, a sequência estrutural, os limites de responsabilidade e o comportamento da base das páginas de exemplos do `RickUIBuilder.Samples`.
 
-A implementação atual é coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A família é dividida por responsabilidade em units próprias para header, navegação, painel de código, painel de resultado, ícones e estilo. Não existem ainda páginas concretas `Button - Factory`, `Button - Fluent Builder` ou equivalentes.
+A implementação comum é coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A família é dividida por responsabilidade em units próprias para header, navegação, painel de código, painel de resultado, ícones e estilo. A primeira derivada real é `TExampleTextLabelFactory`; os demais destinos permanecem futuros.
 
 ## Papel na navegação
 
@@ -33,13 +33,13 @@ Factory             Fluent Builder
        SAMPLE PAGE BASE
 ```
 
-A Component Page continua sendo somente o divisor entre abordagens. A Sample Page concreta é onde os samples reais serão apresentados e executados no futuro.
+A Component Page continua sendo somente o divisor entre abordagens. A Sample Page concreta é onde os samples reais são apresentados e executados; Text / Label - Factory é o primeiro exemplo desse fluxo.
 
 ## Regra de tamanho
 
 A Sample Page deve permanecer **sempre menor que a Home**.
 
-No baseline atual, a Home possui referência de `644 × 534`. Portanto, a futura Sample Page deve respeitar simultaneamente:
+No baseline atual, a Home possui referência de `644 × 534`. Portanto, toda Sample Page deve respeitar simultaneamente:
 
 ```text
 SamplePage.ClientWidth  < 644
@@ -76,7 +76,7 @@ src/Examples/Common/
 
 Essa separação é estrutural e não cria regras específicas de componente. `TExampleCommon` coordena os controles acima; não reimplementa internamente header, navegação, painel de código ou painel de resultado.
 
-A base implementada expõe pontos de extensão protegidos para futuras derivadas:
+A base implementada expõe pontos de extensão protegidos para as derivadas:
 
 ```text
 ConfigurePage(parent, title, subtitle)
@@ -88,9 +88,40 @@ ClearResult
 ResultHost
 ```
 
-Esses pontos de extensão não materializam componente ou abordagem. `AddNavigationItem` cria somente o item visual; a futura derivada será responsável por associar sua ação. `SelectNavigationItem` controla apenas o estado visual selecionado. `ResultHost` é o container destinado aos controles reais futuros e `ClearResult` remove seus filhos visuais antes da substituição do exemplo.
+Esses pontos de extensão não materializam componente ou abordagem. `AddNavigationItem` cria somente o item visual; a derivada associa sua ação. `SelectNavigationItem` controla apenas o estado visual selecionado. `ResultHost` é o container dos controles reais e `ClearResult` remove seus filhos visuais antes da substituição do exemplo.
 
 A faixa `Código Delphi` / `Resultado` permanece com `HitTest` desabilitado e não implementa tabs.
+
+## Primeira página concreta — Text / Label - Factory
+
+A primeira implementação derivada valida a base sem transformá-la em catálogo global:
+
+```text
+src/Examples/TextLabel/
+├── RickUIBuilder.Samples.Example.TextLabel.Factory.pas
+├── RickUIBuilder.Samples.Example.TextLabel.Factory.Content.pas
+└── RickUIBuilder.Samples.Example.TextLabel.Factory.Runner.pas
+```
+
+Responsabilidades:
+
+- `Factory.pas`: coordena a page, itens de navegação e seleção;
+- `Factory.Content.pas`: contém somente textos/snippets dos exemplos Factory de Text / Label;
+- `Factory.Runner.pas`: materializa o resultado real com `TRickUIBuilderFactory.CreateText`.
+
+Cobertura atual da API pública Factory de Text / Label:
+
+| Exemplo | Cobertura |
+|---|---|
+| `Básico` | `CreateText`, `AOwner`, `AParent`, `AText` e `TRickUIBuilderTextConfig.Default` |
+| `Geometria` | `Left`, `Top`, `Width`, `Height` |
+| `Tipografia` | `FontSize`, `FontColor`, `Bold` |
+| `Alinhamento` | `HorizontalAlign` |
+| `Completo` | composição de todos os campos públicos atuais do record |
+
+Ao trocar a seleção, a page executa a sequência `SelectNavigationItem → SetExampleIdentity → SetCodeText → ClearResult → Runner.Render`. O Runner usa `ResultHost` como Owner e Parent do `TLabel`, mantendo o resultado dentro da árvore visual que será limpa antes da próxima execução.
+
+`TTextAlign` utilizado pelos exemplos de alinhamento exige `FMX.Types` explicitamente no `uses`; `TAlphaColors` exige `System.UITypes`. Essa dependência é parte do gate Delphi do Samples.
 
 ## Textframe normativo da tela-base
 
@@ -176,7 +207,7 @@ Regras:
 - o retorno fecha somente a página de exemplos atual;
 - após o fechamento, a Component Page daquele componente volta a ser a tela ativa;
 - retornar da Component Page para a Home continua sendo responsabilidade da própria Component Page;
-- a futura base não deve criar Router ou outra camada apenas para esse retorno se o fluxo modal existente continuar suficiente.
+- a base não deve criar Router ou outra camada apenas para esse retorno se o fluxo modal existente continuar suficiente.
 
 Fluxo esperado:
 
@@ -205,7 +236,7 @@ Button - Factory
 Exemplos de criação de botões usando a abordagem Factory.
 ```
 
-A futura página derivada fornece:
+A página derivada fornece:
 
 - nome do componente;
 - abordagem atual;
@@ -238,9 +269,9 @@ Comportamento comum esperado:
 - fornecer estado visual distinto para o item selecionado;
 - ao trocar a seleção, atualizar a área principal para o exemplo correspondente;
 - permitir quantidade variável de itens;
-- quando a quantidade exceder a área disponível, a solução futura deve preservar a largura/posição da coluna e tratar o overflow sem aumentar a janela acima da Home.
+- quando a quantidade exceder a área disponível, a solução deve preservar a largura/posição da coluna e tratar o overflow sem aumentar a janela acima da Home.
 
-A página derivada é responsável por declarar quais categorias/exemplos existem.
+Cada página derivada é responsável por declarar quais categorias/exemplos existem. Text / Label - Factory usa atualmente Básico, Geometria, Tipografia, Alinhamento e Completo.
 
 ## Conteúdo do exemplo
 
@@ -265,7 +296,7 @@ A referência visual contém a seguinte faixa:
 
 Nesta etapa, somente sua **posição e presença visual** estão especificadas.
 
-A semântica de clique/alternância entre `Código Delphi` e `Resultado` é **Não confirmada**. A implementação da base não deve inventar tabs, troca de conteúdo ou duplicação de estado sem requisito explícito ou decisão tomada ao implementar a primeira página concreta.
+A semântica de clique/alternância entre `Código Delphi` e `Resultado` é **Não confirmada**. A primeira página concreta não adiciona tabs; a implementação da base continua sem troca de conteúdo ou duplicação de estado.
 
 Até essa definição, o textframe deve preservar a região para que o Design System não elimine nem reposicione o elemento.
 
@@ -317,7 +348,7 @@ A estratégia Delphi concreta de ownership/limpeza deve ser confirmada na implem
 
 ## Responsabilidade da Sample Page Base
 
-A base futura pode conhecer:
+A Sample Page Base pode conhecer:
 
 - estrutura e dimensões comuns da família;
 - header e retorno;
@@ -328,7 +359,7 @@ A base futura pode conhecer:
 - cores, espaçamentos e tipografia comuns;
 - comportamento estrutural necessário para trocar o exemplo visível.
 
-A base futura não pode conhecer:
+A Sample Page Base não pode conhecer:
 
 - `Button`, `Badge`, `Divider`, `ComboBox`, `Edit` ou `Text / Label` como regras específicas;
 - lista global de APIs;
@@ -337,9 +368,9 @@ A base futura não pode conhecer:
 - execução de Factory ou Fluent Builder específica;
 - `case/if` por componente ou abordagem para materializar samples.
 
-## Responsabilidade das futuras páginas derivadas
+## Responsabilidade das páginas derivadas
 
-Cada página concreta componente/abordagem será responsável por:
+Cada página concreta componente/abordagem é responsável por:
 
 - identidade da página;
 - categorias/exemplos próprios;
@@ -352,20 +383,20 @@ Cada página concreta componente/abordagem será responsável por:
 
 Não haverá um arquivo único de configuração contendo os exemplos de todos os componentes.
 
-## Cobertura futura por componente e abordagem
+## Cobertura por componente e abordagem
 
 A matriz conhecida no baseline atual é:
 
 | Componente | Factory | Fluent Builder |
 |---|:---:|:---:|
-| Text / Label | previsto | previsto |
+| Text / Label | implementado | previsto |
 | Button | previsto | previsto |
 | Badge | previsto | previsto |
 | Divider | previsto | previsto |
 | ComboBox | previsto | previsto |
 | Edit | não disponível na API atual | previsto |
 
-Essa tabela é um planejamento de páginas futuras, não uma declaração de que essas páginas existem.
+A tabela diferencia o destino já implementado dos destinos ainda previstos; ela não declara como existente nenhuma página marcada como `previsto`.
 
 Ao implementar cada página concreta, a API pública deve ser reanalisada naquele momento. A cobertura esperada é:
 
