@@ -49,6 +49,7 @@ interface
 
 uses
   FMX.Layouts,
+  RickUIBuilder.Samples.App.Types,
   RickUIBuilder.Samples.Example.TextLabel.Factory.Content;
 
 type

@@ -42,18 +42,19 @@
 {                                                                              }
 {******************************************************************************}
 
-unit RickUIBuilder.Samples.Example.Common.ViewSelector;
+unit RickUIBuilder.Samples.Example.Common.View.Selector;
 
 interface
 
 uses
   System.Classes,
+
   FMX.Layouts,
-  FMX.Objects;
+  FMX.Objects,
+
+  RickUIBuilder.Samples.App.Types;
 
 type
-  /// <summary>Visualização ativa da área principal do exemplo.</summary>
-  TExampleView = (CodeView, ResultView);
 
   /// <summary>Seletor comum entre a visualização de código e de resultado.</summary>
   TExampleViewSelector = class(TLayout)

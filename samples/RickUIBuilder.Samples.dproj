@@ -323,9 +323,9 @@
         <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.pas"/>
         <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.Header.pas"/>
         <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.Navigation.pas"/>
-        <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.ViewSelector.pas"/>
-        <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.CodePanel.pas"/>
-        <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.ResultPanel.pas"/>
+        <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.View.Selector.pas"/>
+        <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.Code.Panel.pas"/>
+        <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.Result.Panel.pas"/>
         <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.Icons.pas"/>
         <DCCReference Include="src\Examples\Common\RickUIBuilder.Samples.Example.Common.Style.pas"/>
         <DCCReference Include="src\Examples\TextLabel\RickUIBuilder.Samples.Example.TextLabel.Factory.pas"/>

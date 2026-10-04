@@ -67,14 +67,16 @@ interface
 
 uses
   System.Classes,
+
   FMX.Forms,
   FMX.Layouts,
   FMX.Objects,
+
   RickUIBuilder.Samples.Example.Common.Header,
   RickUIBuilder.Samples.Example.Common.Navigation,
-  RickUIBuilder.Samples.Example.Common.ViewSelector,
-  RickUIBuilder.Samples.Example.Common.CodePanel,
-  RickUIBuilder.Samples.Example.Common.ResultPanel;
+  RickUIBuilder.Samples.Example.Common.Code.Panel,
+  RickUIBuilder.Samples.Example.Common.Result.Panel,
+  RickUIBuilder.Samples.Example.Common.View.Selector;
 
 type
   /// <summary>Base visual comum das páginas concretas de exemplos.</summary>
@@ -134,8 +136,11 @@ implementation
 
 uses
   System.UITypes,
+
   FMX.Types,
   FMX.Graphics,
+
+  RickUIBuilder.Samples.App.Types,
   RickUIBuilder.Samples.App.Typography,
   RickUIBuilder.Samples.Example.Common.Style;
 

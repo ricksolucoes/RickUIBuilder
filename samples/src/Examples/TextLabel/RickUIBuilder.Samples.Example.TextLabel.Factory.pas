@@ -54,6 +54,9 @@ interface
 
 uses
   System.Classes,
+
+  RickUIBuilder.Samples.App.Types,
+
   RickUIBuilder.Samples.Example.Common,
   RickUIBuilder.Samples.Example.Common.Navigation,
   RickUIBuilder.Samples.Example.TextLabel.Factory.Content;

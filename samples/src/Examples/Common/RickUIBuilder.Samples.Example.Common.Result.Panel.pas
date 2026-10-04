@@ -50,7 +50,7 @@
 {                                                                              }
 {******************************************************************************}
 
-unit RickUIBuilder.Samples.Example.Common.ResultPanel;
+unit RickUIBuilder.Samples.Example.Common.Result.Panel;
 
 interface
 

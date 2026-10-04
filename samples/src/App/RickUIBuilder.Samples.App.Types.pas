@@ -39,9 +39,14 @@ interface
 {$SCOPEDENUMS ON}
 
 type
+  /// <summary>Identifica os exemplos Factory atualmente demonstrados.</summary>
+  TTextLabelFactoryExample = (Basic, Geometry, Typography, Alignment, Complete);
 
   /// <summary>Identifica os componentes navegaveis apresentados pelo Samples.</summary>
   TSampleComponent = (TextLabel, Button, Badge, Divider, ComboBox, Edit);
+
+  /// <summary>Visualização ativa da área principal do exemplo.</summary>
+  TExampleView = (CodeView, ResultView);
 
 implementation
 

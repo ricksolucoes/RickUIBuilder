@@ -43,12 +43,10 @@ unit RickUIBuilder.Samples.Example.TextLabel.Factory.Content;
 
 interface
 
-{$SCOPEDENUMS ON}
+uses
+  RickUIBuilder.Samples.App.Types;
 
 type
-  /// <summary>Identifica os exemplos Factory atualmente demonstrados.</summary>
-  TTextLabelFactoryExample = (Basic, Geometry, Typography, Alignment, Complete);
-
   /// <summary>Conteúdo textual da página Text / Label - Factory.</summary>
   TTextLabelFactoryContent = class sealed
   public

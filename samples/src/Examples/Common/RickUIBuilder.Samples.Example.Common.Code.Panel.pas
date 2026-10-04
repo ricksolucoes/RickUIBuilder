@@ -59,7 +59,7 @@
 {                                                                              }
 {******************************************************************************}
 
-unit RickUIBuilder.Samples.Example.Common.CodePanel;
+unit RickUIBuilder.Samples.Example.Common.Code.Panel;
 
 interface
 
