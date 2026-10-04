@@ -245,6 +245,8 @@ Factory possui callback real para `TExampleBadgeFactory`; Fluent Builder possui 
 
 **Sobre:** `Divider usa TRectangle como separador horizontal ou vertical e pode ser criado pela Factory ou configurado pelo Fluent Builder.`
 
+Factory possui callback real para `TExampleDividerFactory`; Fluent Builder permanece visual, sem callback, até existir destino concreto.
+
 ### ComboBox
 
 **Classe:** `TComponentComboBox`
@@ -288,7 +290,7 @@ Factory possui callback real para `TExampleBadgeFactory`; Fluent Builder possui 
 
 ## Próxima camada planejada
 
-A ação `Ver exemplos` é conectada individualmente apenas a destinos reais. Text / Label, Button e Badge abrem Factory e Fluent Builder; os destinos ainda não implementados permanecem sem callback. A terceira camada é especificada em `SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`.
+A ação `Ver exemplos` é conectada individualmente apenas a destinos reais. Text / Label, Button e Badge abrem Factory e Fluent Builder; Divider abre Factory; os destinos ainda não implementados permanecem sem callback. A terceira camada é especificada em `SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`.
 
 A Component Page continua tendo somente a responsabilidade de escolher a abordagem. Ela não deve absorver menu lateral, código Delphi, resultado executável ou qualquer sample real.
 

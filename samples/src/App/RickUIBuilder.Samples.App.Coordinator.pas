@@ -3,7 +3,7 @@
 {  RickUIBuilder.Samples.App.Coordinator                                       }
 {                                                                              }
 { Esta unit coordena a abertura, integração e lifetime das Component Pages e   }
-{ Sample Pages concretas, incluindo Badge Factory/Fluent como destinos reais.  }
+{ Sample Pages concretas, incluindo Divider Factory como destino real.         }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
@@ -13,7 +13,7 @@
 {  --------------                                                              }
 {  Encerra a aplicação, resolve a Component Page concreta e conecta somente    }
 {  intenções com Sample Pages reais de Text / Label, Button e Badge nas        }
-{  abordagens Factory e Fluent Builder.                                        }
+{  abordagens Factory/Fluent e Divider na abordagem Factory.                  }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
@@ -29,6 +29,8 @@
 {      Fornecem os destinos concretos de Button.                               }
 {  - RickUIBuilder.Samples.Example.Badge.Factory/Fluent                        }
 {      Fornecem os destinos concretos de Badge.                                }
+{  - RickUIBuilder.Samples.Example.Divider.Factory                             }
+{      Fornece o destino concreto de Divider - Factory.                        }
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
@@ -77,12 +79,14 @@ type
     procedure ButtonFluentRequested(ASender: TObject);
     procedure BadgeFactoryRequested(ASender: TObject);
     procedure BadgeFluentRequested(ASender: TObject);
+    procedure DividerFactoryRequested(ASender: TObject);
     procedure OpenTextLabelFactory;
     procedure OpenTextLabelFluent;
     procedure OpenButtonFactory;
     procedure OpenButtonFluent;
     procedure OpenBadgeFactory;
     procedure OpenBadgeFluent;
+    procedure OpenDividerFactory;
   public
     /// <summary>Encerra o loop principal da aplicação.</summary>
     function Close: TSampleApplicationCoordinator;
@@ -105,6 +109,7 @@ uses
   RickUIBuilder.Samples.Example.Badge.Fluent,
   RickUIBuilder.Samples.Example.Button.Factory,
   RickUIBuilder.Samples.Example.Button.Fluent,
+  RickUIBuilder.Samples.Example.Divider.Factory,
   RickUIBuilder.Samples.Example.TextLabel.Factory,
   RickUIBuilder.Samples.Example.TextLabel.Fluent;
 
@@ -157,6 +162,8 @@ begin
         TComponentBadge(APage).OnFactoryExamples := BadgeFactoryRequested;
         TComponentBadge(APage).OnFluentExamples := BadgeFluentRequested;
       end;
+    TSampleComponent.Divider:
+      TComponentDivider(APage).OnFactoryExamples := DividerFactoryRequested;
   end;
 end;
 
@@ -194,6 +201,12 @@ procedure TSampleApplicationCoordinator.BadgeFluentRequested(
   ASender: TObject);
 begin
   OpenBadgeFluent;
+end;
+
+procedure TSampleApplicationCoordinator.DividerFactoryRequested(
+  ASender: TObject);
+begin
+  OpenDividerFactory;
 end;
 
 procedure TSampleApplicationCoordinator.OpenTextLabelFactory;
@@ -261,6 +274,18 @@ var
   LPage: TExampleBadgeFluent;
 begin
   LPage := TExampleBadgeFluent.Create(nil);
+  try
+    LPage.ShowModal;
+  finally
+    LPage.Free;
+  end;
+end;
+
+procedure TSampleApplicationCoordinator.OpenDividerFactory;
+var
+  LPage: TExampleDividerFactory;
+begin
+  LPage := TExampleDividerFactory.Create(nil);
   try
     LPage.ShowModal;
   finally

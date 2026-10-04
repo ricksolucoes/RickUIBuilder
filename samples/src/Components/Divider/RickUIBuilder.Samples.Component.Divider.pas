@@ -2,38 +2,47 @@
 {                                                                              }
 {  RickUIBuilder.Samples.Component.Divider                                     }
 {                                                                              }
+{ Esta unit implementa a Component Page de Divider e encaminha por callback    }
+{ non-owning a intenção Factory para o destino concreto existente.             }
+{                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
 {  Representar a página intermediária do componente Divider.                   }
 {                                                                              }
 {  Funcionalidade                                                              }
 {  --------------                                                              }
-{  Define título, subtítulo, abordagens e texto informativo próprios.          }
-{  Apresenta Factory e Fluent Builder como divisões visuais para destinos      }
-{  futuros.                                                                    }
+{  Define identidade, informação e as abordagens Factory e Fluent Builder.     }
+{  Somente Factory encaminha intenção de navegação nesta etapa.                }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
 {  - RickUIBuilder.Samples.Component.Common                                    }
-{      Fornece TComponentCommon, header, layout, cards e painel informativo.   }
+{      Fornece TComponentCommon, layout, cards e painel informativo.           }
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
-{  - TSampleApplicationCoordinator seleciona esta classe para o componente     }
-{    correspondente e a exibe modalmente.                                      }
-{  - O retorno e o lifetime modal permanecem na classe-base e no Coordinator,  }
-{    respectivamente.                                                          }
+{  - O Coordinator cria esta page, conecta Factory e chama ShowModal.          }
+{  - O clique Factory é encaminhado ao callback externo; esta page não cria    }
+{    diretamente a Sample Page de destino.                                     }
+{  - Fluent Builder permanece somente visual até existir destino concreto.     }
+{  - O retorno para a Home permanece implementado pela classe-base.            }
+{                                                                              }
+{  Ownership / lifetime                                                        }
+{  --------------------                                                        }
+{  - OnFactoryExamples é evento non-owning para o Coordinator, cujo lifetime   }
+{    é superior durante a navegação.                                           }
+{  - A page não possui Coordinator nem Sample Page concreta.                   }
 {                                                                              }
 {  Restrições e responsabilidades                                              }
 {  -----------------------------                                               }
-{  - A página contém Factory e Fluent Builder, sem implementar seus destinos   }
-{    futuros.                                                                  }
-{  - Esta página não cria samples nem páginas de destino Factory/Fluent.       }
+{  - Não implementa samples Factory/Fluent; somente emite a intenção Factory.  }
+{  - Não conhece TExampleDividerFactory.                                       }
+{  - Não habilita callback Fluent enquanto esse destino não existir.           }
 {                                                                              }
 {  Manutenção                                                                  }
 {  ----------                                                                  }
-{  Este cabeçalho deve ser atualizado quando conteúdo, dependências, fluxo ou  }
-{  restrições desta unit mudarem.                                              }
+{  Atualizar este cabeçalho quando conteúdo, eventos, fluxo ou destinos reais  }
+{  desta page mudarem.                                                         }
 {                                                                              }
 {******************************************************************************}
 
@@ -48,9 +57,15 @@ uses
 type
   /// <summary>Página intermediária específica de Divider.</summary>
   TComponentDivider = class(TComponentCommon)
+  strict private
+    FOnFactoryExamples: TNotifyEvent;
+    procedure FactoryExamplesRequested(ASender: TObject);
   public
     /// <summary>Cria a página com o conteúdo específico de Divider.</summary>
     constructor Create(AOwner: TComponent); override;
+    /// <summary>Intenção non-owning para abrir o destino Divider - Factory.</summary>
+    property OnFactoryExamples: TNotifyEvent read FOnFactoryExamples
+      write FOnFactoryExamples;
   end;
 
 implementation
@@ -64,9 +79,15 @@ constructor TComponentDivider.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   AddIdentity(_TITLE_, _SUBTITLE_);
-  AddFactoryApproach;
+  AddFactoryApproach(FactoryExamplesRequested);
   AddFluentApproach;
   AddInfoPanel(_INFO_);
+end;
+
+procedure TComponentDivider.FactoryExamplesRequested(ASender: TObject);
+begin
+  if Assigned(FOnFactoryExamples) then
+    FOnFactoryExamples(ASender);
 end;
 
 end.
