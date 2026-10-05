@@ -255,7 +255,9 @@ Factory possui callback real para `TExampleDividerFactory` e Fluent Builder para
 
 **Abordagens:** Factory + Fluent Builder.
 
-**Sobre:** `ComboBox possui suporte à Factory e ao Fluent Builder. O Builder concentra configuração, itens e modos de apresentação, com superfícies de seleção materializadas quando necessárias.`
+**Sobre:** `A Factory atual materializa o controle fechado do ComboBox. Itens, lista, seleção e modos de apresentação pertencem ao Builder/runtime no estado atual da API.`
+
+Factory possui callback real para `TExampleComboBoxFactory`; Fluent Builder permanece sem callback enquanto sua Sample Page não existir. A Component Page apenas emite a intenção Factory.
 
 ### Edit
 

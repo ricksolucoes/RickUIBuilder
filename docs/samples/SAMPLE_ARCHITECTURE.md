@@ -286,9 +286,14 @@ samples/
                 ├── RickUIBuilder.Samples.Example.Badge.Fluent.pas
                 ├── RickUIBuilder.Samples.Example.Badge.Fluent.Content.pas
                 └── RickUIBuilder.Samples.Example.Badge.Fluent.Runner.pas
+        └── ComboBox/
+            └── Factory/
+                ├── RickUIBuilder.Samples.Example.ComboBox.Factory.pas
+                ├── RickUIBuilder.Samples.Example.ComboBox.Factory.Content.pas
+                └── RickUIBuilder.Samples.Example.ComboBox.Factory.Runner.pas
 ```
 
-Diretórios específicos existem somente quando possuem units concretas. `src/Examples/Common` contém a base comum; páginas reais seguem `src/Examples/<Componente>/<Abordagem>`. Hoje existem `TextLabel/Factory`, `TextLabel/Fluent`, `Button/Factory`, `Button/Fluent`, `Badge/Factory` e `Badge/Fluent`; nenhum diretório de abordagem deve ser criado antecipadamente.
+Diretórios específicos existem somente quando possuem units concretas. `src/Examples/Common` contém a base comum; páginas reais seguem `src/Examples/<Componente>/<Abordagem>`. Hoje existem `TextLabel/Factory`, `TextLabel/Fluent`, `Button/Factory`, `Button/Fluent`, `Badge/Factory`, `Badge/Fluent` e `ComboBox/Factory`; nenhum diretório de abordagem deve ser criado antecipadamente.
 
 Todas as units internas do Samples são incorporadas explicitamente ao `.dpr` e ao `.dproj`. O `DCC_UnitSearchPath` não contém o próprio `samples/src`; o caminho de busca permanece reservado à dependência externa `..\src` da biblioteca Rick.UIBuilder e ao Search Path herdado.
 
@@ -310,7 +315,7 @@ Os cards preservam os SVGs oficiais fornecidos:
 
 A geometria de Factory e informação é renderizada por fill; Fluent Builder usa stroke, seguindo os assets originais.
 
-`Ver exemplos` permanece sem `HitTest` e sem callback quando o destino não existe. No estado atual, `Text / Label → Factory`, `Text / Label → Fluent Builder`, `Button → Factory`, `Button → Fluent Builder`, `Badge → Factory`, `Badge → Fluent Builder`, `Divider → Factory` e `Divider → Fluent Builder` recebem callback e `crHandPoint`; destinos ainda sem Sample Page permanecem não clicáveis.
+`Ver exemplos` permanece sem `HitTest` e sem callback quando o destino não existe. No estado atual, `Text / Label → Factory`, `Text / Label → Fluent Builder`, `Button → Factory`, `Button → Fluent Builder`, `Badge → Factory`, `Badge → Fluent Builder`, `Divider → Factory`, `Divider → Fluent Builder` e `ComboBox → Factory` recebem callback e `crHandPoint`; destinos ainda sem Sample Page permanecem não clicáveis.
 
 A Sample Page Base usa geometria e paleta próprias em `RickUIBuilder.Samples.Example.Common.Style`, vetor de retorno em `.Icons` e controles estruturais separados em `.Header`, `.Navigation`, `.View.Selector`, `.Code.Panel` e `.Result.Panel`. `TExampleCommon` apenas os coordena. A página possui client de `620 × 510`, é borderless e permanece menor que a Home. A sequência visual segue o textframe normativo: header → identidade → navegação/conteúdo → identificação do exemplo → seletor `Código Delphi`/`Resultado` → uma única view ativa. O estado selecionado da navegação usa fundo azul-claro e indicador vertical azul; o `CodePanel` usa `TMemo` read-only/selecionável com ação `Copiar código`; o `ResultPanel` preenche toda a área restante da view e mantém `ResultHost` como container estável owned pela própria superfície.
 

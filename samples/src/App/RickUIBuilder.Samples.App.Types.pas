@@ -3,8 +3,8 @@
 {  RickUIBuilder.Samples.App.Types                                             }
 {                                                                              }
 { Esta unit centraliza os enums compartilhados pelo Samples, identificando     }
-{ componentes navegáveis, exemplos concretos de Text / Label, Button, Badge e  }
-{ Divider e a view Código/Resultado ativa na Sample Page Base.                 }
+{ componentes navegáveis, exemplos concretos de Text / Label, Button, Badge,   }
+{ Divider, ComboBox e a view Código/Resultado ativa na Sample Page Base.       }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
@@ -22,6 +22,7 @@
 {    TBadgeFluentExample os onze exemplos Badge Fluent Builder.                }
 {  - TDividerFactoryExample identifica os quatro exemplos Divider - Factory e  }
 {    TDividerFluentExample os nove exemplos Divider Fluent Builder.            }
+{  - TComboBoxFactoryExample identifica os sete exemplos ComboBox - Factory.   }
 {  - TExampleView identifica a view Código Delphi ou Resultado ativa.          }
 {                                                                              }
 {  Dependências do projeto                                                     }
@@ -86,6 +87,10 @@ type
   /// <summary>Identifica os exemplos da página Divider - Fluent Builder.</summary>
   TDividerFluentExample = (Basic, InterfaceUsage, Geometry, Orientation, Layout,
     Appearance, State, CompleteDirect, CompleteInterfaces);
+
+  /// <summary>Identifica os exemplos da página ComboBox - Factory.</summary>
+  TComboBoxFactoryExample = (Basic, GeometryShape, TypographyText, Colors,
+    Arrow, State, Complete);
 
   /// <summary>Identifica os componentes navegáveis apresentados pelo Samples.</summary>
   TSampleComponent = (TextLabel, Button, Badge, Divider, ComboBox, Edit);

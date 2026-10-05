@@ -37,21 +37,24 @@
 {  - src\Components\<Componente>                                               }
 {      Contém a página intermediária concreta de cada componente navegável.    }
 {                                                                              }
-{  - src\Examples\Common                                                     }
+{  - src\Examples\Common                                                       }
 {      Contém a base visual e os controles estruturais comuns de header,       }
 {      navegação, código e resultado, além de ícones e tokens visuais.         }
 {                                                                              }
-{  - src\Examples\TextLabel\<Abordagem>                                      }
+{  - src\Examples\TextLabel\<Abordagem>                                        }
 {      Contém as páginas concretas Text / Label - Factory e Fluent Builder,    }
 {      separadas fisicamente por abordagem.                                    }
 {                                                                              }
-{  - src\Examples\Button\<Abordagem>                                         }
-{      Contém as páginas concretas Button - Factory e Fluent Builder,           }
+{  - src\Examples\Button\<Abordagem>                                           }
+{      Contém as páginas concretas Button - Factory e Fluent Builder,          }
 {      separadas fisicamente por abordagem.                                    }
 {                                                                              }
-{  - src\Examples\Badge\<Abordagem>                                        }
+{  - src\Examples\Badge\<Abordagem>                                            }
 {      Contém as páginas concretas Badge - Factory e Fluent Builder,           }
 {      separadas fisicamente por abordagem.                                    }
+{                                                                              }
+{  - src\Examples\ComboBox\Factory                                             }
+{      Contém a página concreta ComboBox - Factory, conteúdo e Runner.         }
 {                                                                              }
 {  Dependências principais                                                     }
 {  -----------------------                                                     }
@@ -169,6 +172,9 @@ uses
   RickUIBuilder.Samples.Example.Divider.Fluent in 'src\Examples\Divider\Fluent\RickUIBuilder.Samples.Example.Divider.Fluent.pas',
   RickUIBuilder.Samples.Example.Divider.Fluent.Content in 'src\Examples\Divider\Fluent\RickUIBuilder.Samples.Example.Divider.Fluent.Content.pas',
   RickUIBuilder.Samples.Example.Divider.Fluent.Runner in 'src\Examples\Divider\Fluent\RickUIBuilder.Samples.Example.Divider.Fluent.Runner.pas',
+  RickUIBuilder.Samples.Example.ComboBox.Factory in 'src\Examples\ComboBox\Factory\RickUIBuilder.Samples.Example.ComboBox.Factory.pas',
+  RickUIBuilder.Samples.Example.ComboBox.Factory.Content in 'src\Examples\ComboBox\Factory\RickUIBuilder.Samples.Example.ComboBox.Factory.Content.pas',
+  RickUIBuilder.Samples.Example.ComboBox.Factory.Runner in 'src\Examples\ComboBox\Factory\RickUIBuilder.Samples.Example.ComboBox.Factory.Runner.pas',
   RickUIBuilder.Samples.Example.TextLabel.Factory.Content in 'src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.Content.pas',
   RickUIBuilder.Samples.Example.TextLabel.Factory in 'src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.pas',
   RickUIBuilder.Samples.Example.TextLabel.Factory.Runner in 'src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.Runner.pas',

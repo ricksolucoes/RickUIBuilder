@@ -505,7 +505,7 @@ A matriz conhecida no baseline atual é:
 | Button | implementado | implementado |
 | Badge | implementado | previsto |
 | Divider | implementado | previsto |
-| ComboBox | previsto | previsto |
+| ComboBox | implementado | previsto |
 | Edit | não disponível na API atual | previsto |
 
 A tabela diferencia o destino já implementado dos destinos ainda previstos; ela não declara como existente nenhuma página marcada como `previsto`.

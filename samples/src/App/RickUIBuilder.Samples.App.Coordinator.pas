@@ -3,7 +3,7 @@
 {  RickUIBuilder.Samples.App.Coordinator                                       }
 {                                                                              }
 { Esta unit coordena a abertura, integração e lifetime das Component Pages e   }
-{ Sample Pages concretas, incluindo Divider Factory/Fluent como destinos reais.         }
+{ Sample Pages concretas, incluindo ComboBox Factory como destino real.        }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
@@ -12,8 +12,8 @@
 {  Funcionalidade                                                              }
 {  --------------                                                              }
 {  Encerra a aplicação, resolve a Component Page concreta e conecta somente    }
-{  intenções com Sample Pages reais de Text / Label, Button, Badge e Divider    }
-{  nas abordagens Factory e Fluent Builder.                                    }
+{  intenções com Sample Pages reais de Text / Label, Button, Badge, Divider e  }
+{  ComboBox, respeitando as abordagens concretamente implementadas.            }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
@@ -31,6 +31,8 @@
 {      Fornecem os destinos concretos de Badge.                                }
 {  - RickUIBuilder.Samples.Example.Divider.Factory/Fluent                      }
 {      Fornecem os destinos concretos de Divider.                              }
+{  - RickUIBuilder.Samples.Example.ComboBox.Factory                            }
+{      Fornece o destino concreto Factory de ComboBox.                         }
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
@@ -73,6 +75,11 @@ type
   strict private
     procedure ConfigureComponentPage(const AComponent: TSampleComponent;
       const APage: TObject);
+    procedure ConfigureTextLabelPage(const APage: TObject);
+    procedure ConfigureButtonPage(const APage: TObject);
+    procedure ConfigureBadgePage(const APage: TObject);
+    procedure ConfigureDividerPage(const APage: TObject);
+    procedure ConfigureComboBoxPage(const APage: TObject);
     procedure TextLabelFactoryRequested(ASender: TObject);
     procedure TextLabelFluentRequested(ASender: TObject);
     procedure ButtonFactoryRequested(ASender: TObject);
@@ -81,6 +88,7 @@ type
     procedure BadgeFluentRequested(ASender: TObject);
     procedure DividerFactoryRequested(ASender: TObject);
     procedure DividerFluentRequested(ASender: TObject);
+    procedure ComboBoxFactoryRequested(ASender: TObject);
     procedure OpenTextLabelFactory;
     procedure OpenTextLabelFluent;
     procedure OpenButtonFactory;
@@ -89,6 +97,7 @@ type
     procedure OpenBadgeFluent;
     procedure OpenDividerFactory;
     procedure OpenDividerFluent;
+    procedure OpenComboBoxFactory;
   public
     /// <summary>Encerra o loop principal da aplicação.</summary>
     function Close: TSampleApplicationCoordinator;
@@ -113,6 +122,7 @@ uses
   RickUIBuilder.Samples.Example.Button.Fluent,
   RickUIBuilder.Samples.Example.Divider.Factory,
   RickUIBuilder.Samples.Example.Divider.Fluent,
+  RickUIBuilder.Samples.Example.ComboBox.Factory,
   RickUIBuilder.Samples.Example.TextLabel.Factory,
   RickUIBuilder.Samples.Example.TextLabel.Fluent;
 
@@ -150,27 +160,46 @@ procedure TSampleApplicationCoordinator.ConfigureComponentPage(
   const AComponent: TSampleComponent; const APage: TObject);
 begin
   case AComponent of
-    TSampleComponent.TextLabel:
-      begin
-        TComponentTextLabel(APage).OnFactoryExamples := TextLabelFactoryRequested;
-        TComponentTextLabel(APage).OnFluentExamples := TextLabelFluentRequested;
-      end;
-    TSampleComponent.Button:
-      begin
-        TComponentButton(APage).OnFactoryExamples := ButtonFactoryRequested;
-        TComponentButton(APage).OnFluentExamples := ButtonFluentRequested;
-      end;
-    TSampleComponent.Badge:
-      begin
-        TComponentBadge(APage).OnFactoryExamples := BadgeFactoryRequested;
-        TComponentBadge(APage).OnFluentExamples := BadgeFluentRequested;
-      end;
-    TSampleComponent.Divider:
-      begin
-        TComponentDivider(APage).OnFactoryExamples := DividerFactoryRequested;
-        TComponentDivider(APage).OnFluentExamples := DividerFluentRequested;
-      end;
+    TSampleComponent.TextLabel: ConfigureTextLabelPage(APage);
+    TSampleComponent.Button: ConfigureButtonPage(APage);
+    TSampleComponent.Badge: ConfigureBadgePage(APage);
+    TSampleComponent.Divider: ConfigureDividerPage(APage);
+    TSampleComponent.ComboBox: ConfigureComboBoxPage(APage);
   end;
+end;
+
+procedure TSampleApplicationCoordinator.ConfigureTextLabelPage(
+  const APage: TObject);
+begin
+  TComponentTextLabel(APage).OnFactoryExamples := TextLabelFactoryRequested;
+  TComponentTextLabel(APage).OnFluentExamples := TextLabelFluentRequested;
+end;
+
+procedure TSampleApplicationCoordinator.ConfigureButtonPage(
+  const APage: TObject);
+begin
+  TComponentButton(APage).OnFactoryExamples := ButtonFactoryRequested;
+  TComponentButton(APage).OnFluentExamples := ButtonFluentRequested;
+end;
+
+procedure TSampleApplicationCoordinator.ConfigureBadgePage(
+  const APage: TObject);
+begin
+  TComponentBadge(APage).OnFactoryExamples := BadgeFactoryRequested;
+  TComponentBadge(APage).OnFluentExamples := BadgeFluentRequested;
+end;
+
+procedure TSampleApplicationCoordinator.ConfigureDividerPage(
+  const APage: TObject);
+begin
+  TComponentDivider(APage).OnFactoryExamples := DividerFactoryRequested;
+  TComponentDivider(APage).OnFluentExamples := DividerFluentRequested;
+end;
+
+procedure TSampleApplicationCoordinator.ConfigureComboBoxPage(
+  const APage: TObject);
+begin
+  TComponentComboBox(APage).OnFactoryExamples := ComboBoxFactoryRequested;
 end;
 
 procedure TSampleApplicationCoordinator.TextLabelFactoryRequested(
@@ -219,6 +248,12 @@ procedure TSampleApplicationCoordinator.DividerFluentRequested(
   ASender: TObject);
 begin
   OpenDividerFluent;
+end;
+
+procedure TSampleApplicationCoordinator.ComboBoxFactoryRequested(
+  ASender: TObject);
+begin
+  OpenComboBoxFactory;
 end;
 
 procedure TSampleApplicationCoordinator.OpenTextLabelFactory;
@@ -310,6 +345,18 @@ var
   LPage: TExampleDividerFluent;
 begin
   LPage := TExampleDividerFluent.Create(nil);
+  try
+    LPage.ShowModal;
+  finally
+    LPage.Free;
+  end;
+end;
+
+procedure TSampleApplicationCoordinator.OpenComboBoxFactory;
+var
+  LPage: TExampleComboBoxFactory;
+begin
+  LPage := TExampleComboBoxFactory.Create(nil);
   try
     LPage.ShowModal;
   finally
