@@ -1,4 +1,4 @@
-# Decisões do RickUIBuilder.Samples
+﻿# Decisões do RickUIBuilder.Samples
 
 ## Decisões consolidadas
 
@@ -264,3 +264,7 @@ Páginas reais da terceira camada seguem `samples/src/Examples/<Componente>/<Abo
 ### DEC-063 — ComboBox - Factory comprova somente o controle fechado
 
 `TExampleComboBoxFactory` herda de `TExampleCommon` e fica em `src/Examples/ComboBox/Factory`, separando coordenação (`Factory`), conteúdo/snippets (`Factory.Content`) e execução (`Factory.Runner`). A página possui sete exemplos: Básico, Geometria e forma, Tipografia e texto, Cores, Seta, Estado e Completo. Os exemplos focados demonstram somente o que `TRickUIBuilderFactory.CreateComboBox` materializa no estado atual: `TRectangle`, `TLabel`, `TPath` e as opções consumidas pelo controle fechado. Lista, popup, seleção e runtime não são simulados como capacidades Factory. O exemplo `Completo` atribui os 58 campos públicos de `TRickUIBuilderComboBoxConfig` por exaustividade do contrato, mas identifica que somente o subconjunto usado por `CreateComboBox` produz efeito nessa chamada. A evolução futura de listas na Factory é uma feature da biblioteca e está especificada separadamente em `specs/combobox-factory-listas.pt-BR.md`.
+
+### DEC-064 — ComboBox - Fluent Builder demonstra dados, apresentação e runtime reais
+
+`TExampleComboBoxFluent` herda de `TExampleCommon` e fica em `src/Examples/ComboBox/Fluent`, separando coordenação (`Fluent`), conteúdo/snippets (`Fluent.Content`) e execução (`Fluent.Runner`). A página possui quinze exemplos: Básico, Interface, Texto + Value, Lista estruturada, Seleção inicial, Geometria e popup, Desktop / Anchored, FullWindow e pesquisa, Configuração avançada, Seta, Estado, Eventos, Customização de item, Handle runtime e Completo. Todos os exemplos materializam dados reais; a matriz varia `Items`, os dois overloads de `AddItem`, `AddStructuredItem`, colunas `Auto`/`Fixed`/`Proportional`, seleção por índice/texto, presentation, pesquisa, callbacks e `IRickUIBuilderComboBoxHandle`. O Runner é uma instância mantida pela Sample Page para que callbacks `of object` permaneçam válidos sem `TComponent` auxiliar. O exemplo `Completo` atribui os 58 campos públicos de `TRickUIBuilderComboBoxConfig`, cobre os 32 métodos configuráveis de `IRickUIBuilderComboBox` e finaliza pela assinatura mais rica `BuildHandle`.

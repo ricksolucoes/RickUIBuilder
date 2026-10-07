@@ -3,7 +3,7 @@
 {  RickUIBuilder.Samples.Component.ComboBox                                    }
 {                                                                              }
 { Esta unit implementa a Component Page de ComboBox e encaminha por callback   }
-{ non-owning a intenção Factory para o destino concreto atualmente existente.  }
+{ non-owning as intenções Factory e Fluent para destinos concretos.            }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
@@ -11,8 +11,8 @@
 {                                                                              }
 {  Funcionalidade                                                              }
 {  --------------                                                              }
-{  Define identidade, informação e Factory/Fluent Builder. Factory possui      }
-{  destino real; Fluent permanece somente visual até existir Sample Page.      }
+{  Define identidade, informação e Factory/Fluent Builder, ambos com destinos  }
+{  reais e callbacks encaminhados ao Coordinator.                              }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
@@ -21,22 +21,20 @@
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
-{  - O Coordinator cria esta page, conecta Factory e chama ShowModal.          }
-{  - O clique Factory é encaminhado ao callback externo; esta page não cria    }
-{    diretamente TExampleComboBoxFactory.                                      }
-{  - Fluent Builder permanece sem callback enquanto não houver destino real.   }
+{  - O Coordinator cria esta page, conecta Factory/Fluent e chama ShowModal.   }
+{  - Os cliques são encaminhados a callbacks externos; esta page não cria      }
+{    diretamente Sample Pages concretas.                                       }
 {                                                                              }
 {  Ownership / lifetime                                                        }
 {  --------------------                                                        }
-{  - OnFactoryExamples é evento non-owning para o Coordinator, cujo lifetime   }
-{    é superior durante a navegação.                                           }
+{  - OnFactoryExamples e OnFluentExamples são eventos non-owning para o        }
+{    Coordinator, cujo lifetime é superior durante a navegação.                }
 {  - A page não possui Coordinator nem Sample Pages concretas.                 }
 {                                                                              }
 {  Restrições e responsabilidades                                              }
 {  -----------------------------                                               }
-{  - Não implementa samples; somente emite a intenção Factory.                 }
-{  - Não conhece TExampleComboBoxFactory.                                      }
-{  - Não cria callback Fluent sem destino concreto.                            }
+{  - Não implementa samples; somente emite intenções Factory/Fluent.           }
+{  - Não conhece TExampleComboBoxFactory nem TExampleComboBoxFluent.           }
 {                                                                              }
 {  Manutenção                                                                  }
 {  ----------                                                                  }
@@ -58,13 +56,18 @@ type
   TComponentComboBox = class(TComponentCommon)
   strict private
     FOnFactoryExamples: TNotifyEvent;
+    FOnFluentExamples: TNotifyEvent;
     procedure FactoryExamplesRequested(ASender: TObject);
+    procedure FluentExamplesRequested(ASender: TObject);
   public
     /// <summary>Cria a página com o conteúdo específico de ComboBox.</summary>
     constructor Create(AOwner: TComponent); override;
     /// <summary>Intenção non-owning para abrir ComboBox - Factory.</summary>
     property OnFactoryExamples: TNotifyEvent read FOnFactoryExamples
       write FOnFactoryExamples;
+    /// <summary>Intenção non-owning para abrir ComboBox - Fluent Builder.</summary>
+    property OnFluentExamples: TNotifyEvent read FOnFluentExamples
+      write FOnFluentExamples;
   end;
 
 implementation
@@ -72,14 +75,14 @@ implementation
 const
   _TITLE_ = 'ComboBox';
   _SUBTITLE_ = 'Crie seleções FireMonkey configuráveis com Rick.UIBuilder.';
-  _INFO_ = 'A Factory atual materializa o controle fechado do ComboBox. Itens, lista, seleção e modos de apresentação pertencem ao Builder/runtime no estado atual da API.';
+  _INFO_ = 'Factory demonstra o controle fechado; Fluent Builder demonstra listas, seleção, apresentação, eventos e runtime do ComboBox.';
 
 constructor TComponentComboBox.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   AddIdentity(_TITLE_, _SUBTITLE_);
   AddFactoryApproach(FactoryExamplesRequested);
-  AddFluentApproach;
+  AddFluentApproach(FluentExamplesRequested);
   AddInfoPanel(_INFO_);
 end;
 
@@ -87,6 +90,12 @@ procedure TComponentComboBox.FactoryExamplesRequested(ASender: TObject);
 begin
   if Assigned(FOnFactoryExamples) then
     FOnFactoryExamples(ASender);
+end;
+
+procedure TComponentComboBox.FluentExamplesRequested(ASender: TObject);
+begin
+  if Assigned(FOnFluentExamples) then
+    FOnFluentExamples(ASender);
 end;
 
 end.

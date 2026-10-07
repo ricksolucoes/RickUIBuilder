@@ -23,6 +23,7 @@
 {  - TDividerFactoryExample identifica os quatro exemplos Divider - Factory e  }
 {    TDividerFluentExample os nove exemplos Divider Fluent Builder.            }
 {  - TComboBoxFactoryExample identifica os sete exemplos ComboBox - Factory.   }
+{  - TComboBoxFluentExample identifica os quinze exemplos ComboBox Fluent.     }
 {  - TExampleView identifica a view Código Delphi ou Resultado ativa.          }
 {                                                                              }
 {  Dependências do projeto                                                     }
@@ -91,6 +92,11 @@ type
   /// <summary>Identifica os exemplos da página ComboBox - Factory.</summary>
   TComboBoxFactoryExample = (Basic, GeometryShape, TypographyText, Colors,
     Arrow, State, Complete);
+
+  /// <summary>Identifica os exemplos da página ComboBox - Fluent Builder.</summary>
+  TComboBoxFluentExample = (Basic, InterfaceUsage, DisplayValue, StructuredList,
+    InitialSelection, GeometryPopup, DesktopAnchored, FullWindowSearch,
+    CustomConfig, Arrow, State, Events, CustomizeItem, RuntimeHandle, Complete);
 
   /// <summary>Identifica os componentes navegáveis apresentados pelo Samples.</summary>
   TSampleComponent = (TextLabel, Button, Badge, Divider, ComboBox, Edit);

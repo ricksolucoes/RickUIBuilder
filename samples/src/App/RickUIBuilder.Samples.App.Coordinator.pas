@@ -3,7 +3,8 @@
 {  RickUIBuilder.Samples.App.Coordinator                                       }
 {                                                                              }
 { Esta unit coordena a abertura, integração e lifetime das Component Pages e   }
-{ Sample Pages concretas, incluindo ComboBox Factory como destino real.        }
+{ Sample Pages concretas, incluindo ComboBox Factory e Fluent como destinos    }
+{ reais.                                                                       }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
@@ -31,8 +32,8 @@
 {      Fornecem os destinos concretos de Badge.                                }
 {  - RickUIBuilder.Samples.Example.Divider.Factory/Fluent                      }
 {      Fornecem os destinos concretos de Divider.                              }
-{  - RickUIBuilder.Samples.Example.ComboBox.Factory                            }
-{      Fornece o destino concreto Factory de ComboBox.                         }
+{  - RickUIBuilder.Samples.Example.ComboBox.Factory/Fluent                     }
+{      Fornecem os destinos concretos de ComboBox.                             }
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
@@ -89,6 +90,7 @@ type
     procedure DividerFactoryRequested(ASender: TObject);
     procedure DividerFluentRequested(ASender: TObject);
     procedure ComboBoxFactoryRequested(ASender: TObject);
+    procedure ComboBoxFluentRequested(ASender: TObject);
     procedure OpenTextLabelFactory;
     procedure OpenTextLabelFluent;
     procedure OpenButtonFactory;
@@ -98,6 +100,7 @@ type
     procedure OpenDividerFactory;
     procedure OpenDividerFluent;
     procedure OpenComboBoxFactory;
+    procedure OpenComboBoxFluent;
   public
     /// <summary>Encerra o loop principal da aplicação.</summary>
     function Close: TSampleApplicationCoordinator;
@@ -123,6 +126,7 @@ uses
   RickUIBuilder.Samples.Example.Divider.Factory,
   RickUIBuilder.Samples.Example.Divider.Fluent,
   RickUIBuilder.Samples.Example.ComboBox.Factory,
+  RickUIBuilder.Samples.Example.ComboBox.Fluent,
   RickUIBuilder.Samples.Example.TextLabel.Factory,
   RickUIBuilder.Samples.Example.TextLabel.Fluent;
 
@@ -200,6 +204,7 @@ procedure TSampleApplicationCoordinator.ConfigureComboBoxPage(
   const APage: TObject);
 begin
   TComponentComboBox(APage).OnFactoryExamples := ComboBoxFactoryRequested;
+  TComponentComboBox(APage).OnFluentExamples := ComboBoxFluentRequested;
 end;
 
 procedure TSampleApplicationCoordinator.TextLabelFactoryRequested(
@@ -254,6 +259,12 @@ procedure TSampleApplicationCoordinator.ComboBoxFactoryRequested(
   ASender: TObject);
 begin
   OpenComboBoxFactory;
+end;
+
+procedure TSampleApplicationCoordinator.ComboBoxFluentRequested(
+  ASender: TObject);
+begin
+  OpenComboBoxFluent;
 end;
 
 procedure TSampleApplicationCoordinator.OpenTextLabelFactory;
@@ -357,6 +368,18 @@ var
   LPage: TExampleComboBoxFactory;
 begin
   LPage := TExampleComboBoxFactory.Create(nil);
+  try
+    LPage.ShowModal;
+  finally
+    LPage.Free;
+  end;
+end;
+
+procedure TSampleApplicationCoordinator.OpenComboBoxFluent;
+var
+  LPage: TExampleComboBoxFluent;
+begin
+  LPage := TExampleComboBoxFluent.Create(nil);
   try
     LPage.ShowModal;
   finally

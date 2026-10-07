@@ -1,4 +1,4 @@
-# Especificação da Component Page
+﻿# Especificação da Component Page
 
 ## Status
 
@@ -255,9 +255,9 @@ Factory possui callback real para `TExampleDividerFactory` e Fluent Builder para
 
 **Abordagens:** Factory + Fluent Builder.
 
-**Sobre:** `A Factory atual materializa o controle fechado do ComboBox. Itens, lista, seleção e modos de apresentação pertencem ao Builder/runtime no estado atual da API.`
+**Sobre:** `Factory demonstra o controle fechado; Fluent Builder demonstra listas, seleção, apresentação, eventos e runtime do ComboBox.`
 
-Factory possui callback real para `TExampleComboBoxFactory`; Fluent Builder permanece sem callback enquanto sua Sample Page não existir. A Component Page apenas emite a intenção Factory.
+Factory possui callback real para `TExampleComboBoxFactory` e Fluent Builder para `TExampleComboBoxFluent`; a Component Page apenas emite as duas intenções.
 
 ### Edit
 

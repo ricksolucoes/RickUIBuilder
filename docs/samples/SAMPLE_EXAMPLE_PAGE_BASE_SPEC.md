@@ -1,4 +1,4 @@
-# Especificação da Sample Page Base
+﻿# Especificação da Sample Page Base
 
 ## Status
 
@@ -505,7 +505,7 @@ A matriz conhecida no baseline atual é:
 | Button | implementado | implementado |
 | Badge | implementado | previsto |
 | Divider | implementado | previsto |
-| ComboBox | implementado | previsto |
+| ComboBox | implementado | implementado |
 | Edit | não disponível na API atual | previsto |
 
 A tabela diferencia o destino já implementado dos destinos ainda previstos; ela não declara como existente nenhuma página marcada como `previsto`.
