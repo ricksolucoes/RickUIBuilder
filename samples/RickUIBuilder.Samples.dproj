@@ -370,6 +370,9 @@
         <DCCReference Include="src\Examples\ComboBox\Fluent\RickUIBuilder.Samples.Example.ComboBox.Fluent.pas"/>
         <DCCReference Include="src\Examples\ComboBox\Fluent\RickUIBuilder.Samples.Example.ComboBox.Fluent.Content.pas"/>
         <DCCReference Include="src\Examples\ComboBox\Fluent\RickUIBuilder.Samples.Example.ComboBox.Fluent.Runner.pas"/>
+        <DCCReference Include="src\Examples\Edit\Fluent\RickUIBuilder.Samples.Example.Edit.Fluent.pas"/>
+        <DCCReference Include="src\Examples\Edit\Fluent\RickUIBuilder.Samples.Example.Edit.Fluent.Content.pas"/>
+        <DCCReference Include="src\Examples\Edit\Fluent\RickUIBuilder.Samples.Example.Edit.Fluent.Runner.pas"/>
         <DCCReference Include="src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.Content.pas"/>
         <DCCReference Include="src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.pas"/>
         <DCCReference Include="src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.Runner.pas"/>

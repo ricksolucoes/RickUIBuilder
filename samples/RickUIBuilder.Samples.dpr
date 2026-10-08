@@ -53,8 +53,14 @@
 {      Contém as páginas concretas Badge - Factory e Fluent Builder,           }
 {      separadas fisicamente por abordagem.                                    }
 {                                                                              }
-{  - src\Examples\ComboBox\Factory                                             }
-{      Contém a página concreta ComboBox - Factory, conteúdo e Runner.         }
+{  - src\Examples\Divider\<Abordagem>                                          }
+{      Contém as páginas concretas Divider - Factory e Fluent Builder.         }
+{                                                                              }
+{  - src\Examples\ComboBox\<Abordagem>                                         }
+{      Contém as páginas concretas ComboBox - Factory e Fluent Builder.        }
+{                                                                              }
+{  - src\Examples\Edit\Fluent                                                 }
+{      Contém a página concreta Edit - Fluent Builder, conteúdo e Runner.      }
 {                                                                              }
 {  Dependências principais                                                     }
 {  -----------------------                                                     }
@@ -178,6 +184,9 @@ uses
   RickUIBuilder.Samples.Example.ComboBox.Fluent in 'src\Examples\ComboBox\Fluent\RickUIBuilder.Samples.Example.ComboBox.Fluent.pas',
   RickUIBuilder.Samples.Example.ComboBox.Fluent.Content in 'src\Examples\ComboBox\Fluent\RickUIBuilder.Samples.Example.ComboBox.Fluent.Content.pas',
   RickUIBuilder.Samples.Example.ComboBox.Fluent.Runner in 'src\Examples\ComboBox\Fluent\RickUIBuilder.Samples.Example.ComboBox.Fluent.Runner.pas',
+  RickUIBuilder.Samples.Example.Edit.Fluent in 'src\Examples\Edit\Fluent\RickUIBuilder.Samples.Example.Edit.Fluent.pas',
+  RickUIBuilder.Samples.Example.Edit.Fluent.Content in 'src\Examples\Edit\Fluent\RickUIBuilder.Samples.Example.Edit.Fluent.Content.pas',
+  RickUIBuilder.Samples.Example.Edit.Fluent.Runner in 'src\Examples\Edit\Fluent\RickUIBuilder.Samples.Example.Edit.Fluent.Runner.pas',
   RickUIBuilder.Samples.Example.TextLabel.Factory.Content in 'src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.Content.pas',
   RickUIBuilder.Samples.Example.TextLabel.Factory in 'src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.pas',
   RickUIBuilder.Samples.Example.TextLabel.Factory.Runner in 'src\Examples\TextLabel\Factory\RickUIBuilder.Samples.Example.TextLabel.Factory.Runner.pas',

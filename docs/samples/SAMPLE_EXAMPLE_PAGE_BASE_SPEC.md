@@ -2,11 +2,11 @@
 
 ## Status
 
-**Sample Page Base implementada e oito páginas concretas disponíveis: Text / Label - Factory, Text / Label - Fluent Builder, Button - Factory, Button - Fluent Builder, Badge - Factory, Badge - Fluent Builder, Divider - Factory e Divider - Fluent Builder.**
+**Sample Page Base implementada e onze páginas concretas disponíveis: Text / Label, Button, Badge, Divider e ComboBox com Factory + Fluent Builder, além de Edit - Fluent Builder.**
 
 Este documento fixa a intenção visual, a sequência estrutural, os limites de responsabilidade e o comportamento da base das páginas de exemplos do `RickUIBuilder.Samples`.
 
-A implementação comum é coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A família é dividida por responsabilidade em units próprias para header, navegação, seletor de visualização, painel de código, painel de resultado, ícones e estilo. As derivadas reais atuais são `TExampleTextLabelFactory`, `TExampleTextLabelFluent`, `TExampleButtonFactory`, `TExampleButtonFluent`, `TExampleBadgeFactory`, `TExampleBadgeFluent`, `TExampleDividerFactory` e `TExampleDividerFluent`; os demais destinos permanecem futuros.
+A implementação comum é coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A família é dividida por responsabilidade em units próprias para header, navegação, seletor de visualização, painel de código, painel de resultado, ícones e estilo. As derivadas reais atuais cobrem Text / Label, Button, Badge, Divider e ComboBox nas abordagens Factory + Fluent Builder, além de `TExampleEditFluent`; destinos sem implementação permanecem futuros.
 
 ## Papel na navegação
 
@@ -33,7 +33,7 @@ Factory             Fluent Builder
        SAMPLE PAGE BASE
 ```
 
-A Component Page continua sendo somente o divisor entre abordagens. A Sample Page concreta é onde os samples reais são apresentados e executados; Text / Label, Button, Badge e Divider possuem Factory e Fluent Builder concretos.
+A Component Page continua sendo somente o divisor entre abordagens. A Sample Page concreta é onde os samples reais são apresentados e executados; Text / Label, Button, Badge, Divider e ComboBox possuem Factory e Fluent Builder concretos, enquanto Edit possui somente Fluent Builder porque a API pública atual não expõe `Factory.CreateEdit`.
 
 ## Regra de tamanho
 
@@ -78,7 +78,7 @@ src/Examples/Common/
 
 Essa separação é estrutural e não cria regras específicas de componente. `TExampleCommon` coordena os controles acima; não reimplementa internamente header, navegação, seletor, painel de código ou painel de resultado.
 
-`RickUIBuilder.Samples.App.Types` fornece atualmente os enums compartilhados usados por esta camada: `TExampleView` representa a seleção `Código Delphi`/`Resultado`, `TTextLabelFactoryExample` identifica Text / Label - Factory, `TTextLabelFluentExample` identifica Text / Label - Fluent Builder, `TButtonFactoryExample` identifica Button - Factory, `TButtonFluentExample` identifica Button - Fluent Builder, `TBadgeFactoryExample` identifica Badge - Factory, `TBadgeFluentExample` identifica Badge - Fluent Builder, `TDividerFactoryExample` identifica Divider - Factory e `TDividerFluentExample` identifica Divider - Fluent Builder. O seletor, as pages concretas, Contents e Runners consomem esses tipos sem redeclará-los.
+`RickUIBuilder.Samples.App.Types` fornece atualmente `TExampleView` e os enums compartilhados de examples para Text / Label, Button, Badge, Divider, ComboBox e Edit. Cada Page, Content e Runner consome o enum de sua abordagem sem redeclará-lo; Edit usa `TEditFluentExample` somente para Fluent Builder.
 
 A base implementada expõe pontos de extensão protegidos para as derivadas:
 
@@ -151,7 +151,7 @@ Cobertura da API pública `TRickUIBuilder.Label_` / `IRickUIBuilderLabel`:
 | `Estado` | `Opacity`, `Visible`, `HitTest`, `Tag` |
 | `Completo` | todos os métodos públicos configuráveis de `IRickUIBuilderLabel`, incluindo `Build`; `Margin` e `Padding` usam `TRickUIBuilderSpacing.Create` com os quatro lados explícitos |
 
-O exemplo `Completo` é deliberadamente exaustivo. Para Text / Label Factory, atribui todos os campos de `TRickUIBuilderTextConfig`; para Text / Label Fluent, chama todos os métodos configuráveis de `IRickUIBuilderLabel`; para Button Factory, atribui todos os nove campos de `TRickUIBuilderButtonConfig`; para Button Fluent, os dois exemplos completos chamam os 23 métodos configuráveis de `IRickUIBuilderButton`, usando `Build` no direto e `BuildHandle` na variante por interfaces; para Badge Factory, atribui os sete campos públicos de `TRickUIBuilderBadgeConfig`; para Badge Fluent, os dois exemplos completos chamam os quinze métodos configuráveis de `IRickUIBuilderBadge`, usando `IRickUIBuilderBadgeHandle` na variante por interfaces; para Divider Factory, atribui os quatro campos públicos de `TRickUIBuilderDividerConfig`; para Divider Fluent, os dois exemplos completos chamam os oito métodos configuráveis de `IRickUIBuilderDivider`. Se a API ou um record público usado por esses exemplos ganhar nova opção configurável, snippet, Runner e matriz devem ser atualizados em conjunto.
+O exemplo `Completo` é deliberadamente exaustivo. Para Factory, explicita todos os campos públicos do record de configuração usado pela abordagem; para Fluent, chama todos os métodos públicos configuráveis da interface principal, preservando as particularidades documentadas de cada componente. ComboBox Factory explicita 58/58 campos do config sem atribuir efeito aos campos não consumidos pelo controle fechado; ComboBox Fluent cobre 32/32 métodos e 58/58 campos do config; Edit Fluent cobre 62/62 métodos configuráveis de `IRickUIBuilderEdit` e finaliza com `Build`. Se a API ou um record público usado por esses exemplos ganhar nova opção configurável, snippet, Runner e matriz devem ser atualizados em conjunto.
 
 ## Página concreta — Button - Factory
 
@@ -198,6 +198,19 @@ Divider Factory segue `src/Examples/Divider/Factory/` com Page, Content e Runner
 ## Página concreta — Divider - Fluent Builder
 
 Divider Fluent segue `src/Examples/Divider/Fluent/` com Page, Content e Runner separados. A página possui nove exemplos: `Básico`, `Interface`, `Geometria`, `Orientação`, `Layout`, `Aparência`, `Estado`, `Completo - Direto` e `Completo - Interfaces`. O foco principal é `TRickUIBuilder.Divider`/`IRickUIBuilderDivider`; `TOrientation` e `TRickUIBuilderSpacing` aparecem somente quando exigidos pela API principal. `Orientação` demonstra separadamente Horizontal e Vertical, preservando `Width` como comprimento lógico. Os dois completos cobrem `Position`, `Width`, `Thickness`, `Orientation`, `Margin`, `Color`, `Opacity` e `Visible`.
+
+## Página concreta — ComboBox - Factory
+
+ComboBox Factory segue `src/Examples/ComboBox/Factory/` com Page, Content e Runner separados. A página possui sete exemplos comprováveis do controle fechado. `CreateComboBox` materializa `TRectangle`, `TLabel` e `TPath`; lista, popup e seleção não são simulados. O Completo explicita os 58 campos públicos de `TRickUIBuilderComboBoxConfig`, distinguindo o subconjunto efetivamente consumido por essa Factory.
+
+## Página concreta — ComboBox - Fluent Builder
+
+ComboBox Fluent segue `src/Examples/ComboBox/Fluent/` com Page, Content e Runner separados. A página possui quinze exemplos com listas reais e variadas: lista textual, `DisplayText/Value`, itens estruturados, colunas, seleção inicial, apresentações Anchored/FullWindow, pesquisa, eventos, customização e runtime por `IRickUIBuilderComboBoxHandle`. O Completo cobre 32/32 métodos configuráveis da interface principal e 58/58 campos do config.
+
+## Página concreta — Edit - Fluent Builder
+
+Edit Fluent segue `src/Examples/Edit/Fluent/` com Page, Content e Runner separados. A página possui vinte e nove exemplos. Os 14 valores públicos de `TRickUIBuilderEditPreset` são demonstrados individualmente; a matriz também cobre os três `CaseMode`, os dois `UrlCaseMode`, números Locale/Custom, Required, contador/clear, Password, os três feedbacks inválidos, RequirementIndicator, clipboard operacional mascarado de CPF/CNPJ, Outlined/Underline, ReadOnly, customização visual e `IRickUIBuilderEditHandle`. O Runner é uma instância sem ancestral artificial e libera seus Handles antes de `ClearResult`. O Completo cobre 62/62 métodos configuráveis de `IRickUIBuilderEdit` e finaliza com `Build`.
+
 
 ## Textframe normativo da tela-base
 
@@ -371,7 +384,7 @@ Comportamento comum esperado:
 - permitir quantidade variável de itens;
 - quando a quantidade exceder a área disponível, a solução deve preservar a largura/posição da coluna e tratar o overflow sem aumentar a janela acima da Home.
 
-Cada página derivada é responsável por declarar quais categorias/exemplos existem. Text / Label - Factory usa Básico, Geometria, Tipografia, Alinhamento e Completo; Button - Factory usa Básico, Geometria, Cores, Tipografia, Identificação, Caption interno, Clique e Completo; Button - Fluent Builder usa Básico, Interface, Geometria, Layout, Aparência, Tipografia, Estado, Hover, Clique, Resultado, Completo - Direto e Completo - Interfaces; Badge - Factory usa Básico, Geometria, Cores, Tipografia, Texto interno, Construção em etapas e Completo; Badge - Fluent Builder usa Básico, Interface, Geometria, Forma, Layout, Aparência, Tipografia, Estado, Resultado, Completo - Direto e Completo - Interfaces; Divider - Factory usa Básico, Geometria, Cor e Completo; Divider - Fluent Builder usa Básico, Interface, Geometria, Orientação, Layout, Aparência, Estado, Completo - Direto e Completo - Interfaces.
+Cada página derivada é responsável por declarar quais categorias/exemplos existem. A matriz vigente deriva da API pública de cada destino. Edit - Fluent Builder possui 29 exemplos: Básico, Interface, cobertura individual dos 14 presets, CaseMode, Obrigatoriedade, Limite/contador/limpar, Senha, Feedback inválido, Indicador de requisito, Copiar e colar mascarado, Aparência, Somente leitura, Customização visual, Handle runtime e Completo. As demais páginas preservam as categorias registradas em suas decisões específicas.
 
 ## Conteúdo do exemplo
 
@@ -503,10 +516,10 @@ A matriz conhecida no baseline atual é:
 |---|:---:|:---:|
 | Text / Label | implementado | implementado |
 | Button | implementado | implementado |
-| Badge | implementado | previsto |
-| Divider | implementado | previsto |
+| Badge | implementado | implementado |
+| Divider | implementado | implementado |
 | ComboBox | implementado | implementado |
-| Edit | não disponível na API atual | previsto |
+| Edit | não disponível na API atual | implementado |
 
 A tabela diferencia o destino já implementado dos destinos ainda previstos; ela não declara como existente nenhuma página marcada como `previsto`.
 

@@ -1,5 +1,4 @@
-﻿{ Esta unit implementa a base visual das Component Pages, centralizando formulário borderless, header, cards Factory/Fluent com callbacks somente para destinos reais e painel informativo, sem conhecer conteúdo específico de componente. }
-{******************************************************************************}
+﻿{******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.Component.Common                                      }
 {                                                                              }
@@ -141,7 +140,9 @@ type
     /// <summary>Adiciona o card Fluent Builder ligado a um destino real.</summary>
     procedure AddFluentApproach(const AOnClick: TNotifyEvent); overload;
     /// <summary>Adiciona o card Fluent Builder centralizado.</summary>
-    procedure AddCenteredFluentApproach;
+    procedure AddCenteredFluentApproach; overload;
+    /// <summary>Adiciona o card Fluent Builder centralizado ligado a destino real.</summary>
+    procedure AddCenteredFluentApproach(const AOnClick: TNotifyEvent); overload;
     /// <summary>Adiciona o painel Sobre este componente.</summary>
     procedure AddInfoPanel(const AText: string);
   public
@@ -330,12 +331,19 @@ begin
 end;
 
 procedure TComponentCommon.AddCenteredFluentApproach;
+begin
+  AddCenteredFluentApproach(nil);
+end;
+
+procedure TComponentCommon.AddCenteredFluentApproach(const AOnClick: TNotifyEvent);
 var
+  LAction: TRectangle;
   LLeft: Single;
 begin
   LLeft := (_COMPONENT_PAGE_WIDTH_ - _COMPONENT_PAGE_CARD_WIDTH_) / 2;
-  AddApproach('Fluent Builder', _FLUENT_DESCRIPTION_, _COMPONENT_PAGE_ICON_FLUENT_,
-    _COMPONENT_PAGE_FLUENT_ACCENT_, LLeft, True);
+  LAction := AddApproach('Fluent Builder', _FLUENT_DESCRIPTION_,
+    _COMPONENT_PAGE_ICON_FLUENT_, _COMPONENT_PAGE_FLUENT_ACCENT_, LLeft, True);
+  EnableExamplesAction(LAction, AOnClick);
 end;
 
 function TComponentCommon.AddApproach(const ACaption, ADescription,

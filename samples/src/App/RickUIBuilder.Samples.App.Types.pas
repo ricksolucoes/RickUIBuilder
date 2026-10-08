@@ -4,7 +4,7 @@
 {                                                                              }
 { Esta unit centraliza os enums compartilhados pelo Samples, identificando     }
 { componentes navegáveis, exemplos concretos de Text / Label, Button, Badge,   }
-{ Divider, ComboBox e a view Código/Resultado ativa na Sample Page Base.       }
+{ Divider, ComboBox, Edit e a view Código/Resultado ativa na Sample Page Base. }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
@@ -24,6 +24,7 @@
 {    TDividerFluentExample os nove exemplos Divider Fluent Builder.            }
 {  - TComboBoxFactoryExample identifica os sete exemplos ComboBox - Factory.   }
 {  - TComboBoxFluentExample identifica os quinze exemplos ComboBox Fluent.     }
+{  - TEditFluentExample identifica os vinte e nove exemplos Edit Fluent.       }
 {  - TExampleView identifica a view Código Delphi ou Resultado ativa.          }
 {                                                                              }
 {  Dependências do projeto                                                     }
@@ -97,6 +98,14 @@ type
   TComboBoxFluentExample = (Basic, InterfaceUsage, DisplayValue, StructuredList,
     InitialSelection, GeometryPopup, DesktopAnchored, FullWindowSearch,
     CustomConfig, Arrow, State, Events, CustomizeItem, RuntimeHandle, Complete);
+
+  /// <summary>Identifica os exemplos da página Edit - Fluent Builder.</summary>
+  TEditFluentExample = (Basic, InterfaceUsage, AllCharacters, CPF, CNPJ, CEP,
+    Email, URL, Phone, Mobile, IntegerNumber, FloatLocale, FloatCustom,
+    TextNoAccents, TextPunctuationNoAccents, TextWithAccents,
+    TextPunctuationWithAccents, CaseMode, Required, CounterClear, Password,
+    InvalidFeedback, Requirement, ClipboardMasked, Appearance, ReadOnly,
+    VisualCustomization, RuntimeHandle, Complete);
 
   /// <summary>Identifica os componentes navegáveis apresentados pelo Samples.</summary>
   TSampleComponent = (TextLabel, Button, Badge, Divider, ComboBox, Edit);

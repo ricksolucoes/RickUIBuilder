@@ -3,8 +3,8 @@
 {  RickUIBuilder.Samples.App.Coordinator                                       }
 {                                                                              }
 { Esta unit coordena a abertura, integração e lifetime das Component Pages e   }
-{ Sample Pages concretas, incluindo ComboBox Factory e Fluent como destinos    }
-{ reais.                                                                       }
+{ Sample Pages concretas, incluindo ComboBox Factory/Fluent e Edit Fluent como }
+{ destinos reais.                                                               }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
@@ -13,8 +13,8 @@
 {  Funcionalidade                                                              }
 {  --------------                                                              }
 {  Encerra a aplicação, resolve a Component Page concreta e conecta somente    }
-{  intenções com Sample Pages reais de Text / Label, Button, Badge, Divider e  }
-{  ComboBox, respeitando as abordagens concretamente implementadas.            }
+{  intenções com Sample Pages reais de Text / Label, Button, Badge, Divider,    }
+{  ComboBox e Edit, respeitando as abordagens concretamente implementadas.       }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
@@ -34,6 +34,8 @@
 {      Fornecem os destinos concretos de Divider.                              }
 {  - RickUIBuilder.Samples.Example.ComboBox.Factory/Fluent                     }
 {      Fornecem os destinos concretos de ComboBox.                             }
+{  - RickUIBuilder.Samples.Example.Edit.Fluent                                 }
+{      Fornece o destino concreto Fluent Builder de Edit.                      }
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
@@ -76,11 +78,14 @@ type
   strict private
     procedure ConfigureComponentPage(const AComponent: TSampleComponent;
       const APage: TObject);
+    procedure ConfigureDualApproachComponentPage(
+      const AComponent: TSampleComponent; const APage: TObject);
     procedure ConfigureTextLabelPage(const APage: TObject);
     procedure ConfigureButtonPage(const APage: TObject);
     procedure ConfigureBadgePage(const APage: TObject);
     procedure ConfigureDividerPage(const APage: TObject);
     procedure ConfigureComboBoxPage(const APage: TObject);
+    procedure ConfigureEditPage(const APage: TObject);
     procedure TextLabelFactoryRequested(ASender: TObject);
     procedure TextLabelFluentRequested(ASender: TObject);
     procedure ButtonFactoryRequested(ASender: TObject);
@@ -91,6 +96,7 @@ type
     procedure DividerFluentRequested(ASender: TObject);
     procedure ComboBoxFactoryRequested(ASender: TObject);
     procedure ComboBoxFluentRequested(ASender: TObject);
+    procedure EditFluentRequested(ASender: TObject);
     procedure OpenTextLabelFactory;
     procedure OpenTextLabelFluent;
     procedure OpenButtonFactory;
@@ -101,6 +107,7 @@ type
     procedure OpenDividerFluent;
     procedure OpenComboBoxFactory;
     procedure OpenComboBoxFluent;
+    procedure OpenEditFluent;
   public
     /// <summary>Encerra o loop principal da aplicação.</summary>
     function Close: TSampleApplicationCoordinator;
@@ -127,6 +134,7 @@ uses
   RickUIBuilder.Samples.Example.Divider.Fluent,
   RickUIBuilder.Samples.Example.ComboBox.Factory,
   RickUIBuilder.Samples.Example.ComboBox.Fluent,
+  RickUIBuilder.Samples.Example.Edit.Fluent,
   RickUIBuilder.Samples.Example.TextLabel.Factory,
   RickUIBuilder.Samples.Example.TextLabel.Fluent;
 
@@ -161,6 +169,15 @@ begin
 end;
 
 procedure TSampleApplicationCoordinator.ConfigureComponentPage(
+  const AComponent: TSampleComponent; const APage: TObject);
+begin
+  if AComponent = TSampleComponent.Edit then
+    ConfigureEditPage(APage)
+  else
+    ConfigureDualApproachComponentPage(AComponent, APage);
+end;
+
+procedure TSampleApplicationCoordinator.ConfigureDualApproachComponentPage(
   const AComponent: TSampleComponent; const APage: TObject);
 begin
   case AComponent of
@@ -205,6 +222,13 @@ procedure TSampleApplicationCoordinator.ConfigureComboBoxPage(
 begin
   TComponentComboBox(APage).OnFactoryExamples := ComboBoxFactoryRequested;
   TComponentComboBox(APage).OnFluentExamples := ComboBoxFluentRequested;
+end;
+
+
+procedure TSampleApplicationCoordinator.ConfigureEditPage(
+  const APage: TObject);
+begin
+  TComponentEdit(APage).OnFluentExamples := EditFluentRequested;
 end;
 
 procedure TSampleApplicationCoordinator.TextLabelFactoryRequested(
@@ -265,6 +289,12 @@ procedure TSampleApplicationCoordinator.ComboBoxFluentRequested(
   ASender: TObject);
 begin
   OpenComboBoxFluent;
+end;
+
+
+procedure TSampleApplicationCoordinator.EditFluentRequested(ASender: TObject);
+begin
+  OpenEditFluent;
 end;
 
 procedure TSampleApplicationCoordinator.OpenTextLabelFactory;
@@ -380,6 +410,18 @@ var
   LPage: TExampleComboBoxFluent;
 begin
   LPage := TExampleComboBoxFluent.Create(nil);
+  try
+    LPage.ShowModal;
+  finally
+    LPage.Free;
+  end;
+end;
+
+procedure TSampleApplicationCoordinator.OpenEditFluent;
+var
+  LPage: TExampleEditFluent;
+begin
+  LPage := TExampleEditFluent.Create(nil);
   try
     LPage.ShowModal;
   finally

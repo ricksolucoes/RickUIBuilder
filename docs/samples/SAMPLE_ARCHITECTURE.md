@@ -22,7 +22,7 @@ Home
 
 `Edit` não apresenta Factory porque a API pública analisada não expõe `Factory.CreateEdit`. Essa ausência descreve somente o estado atual da API.
 
-A terceira camada possui hoje oito destinos concretos: Text / Label - Factory, Text / Label - Fluent Builder, Button - Factory, Button - Fluent Builder, Badge - Factory, Badge - Fluent Builder, Divider - Factory e Divider - Fluent Builder. `TComponentTextLabel`, `TComponentButton`, `TComponentBadge` e `TComponentDivider` emitem ao Coordinator somente as intenções que possuem destino real; abordagens sem página concreta permanecem somente visuais.
+A terceira camada possui hoje onze destinos concretos: Text / Label, Button, Badge, Divider e ComboBox com Factory + Fluent Builder, além de Edit - Fluent Builder. As Component Pages emitem ao Coordinator somente as intenções que possuem destino real; Edit mantém apenas o card Fluent centralizado porque a API pública não expõe `Factory.CreateEdit`.
 
 Composition continua sendo uma abordagem pública do Rick.UIBuilder, mas não foi adicionada às páginas de componente. Sua apresentação no Samples permanece trabalho futuro até existir decisão específica de UX/navegação.
 
@@ -87,7 +87,7 @@ A seta de retorno da `TComponentCommon` fecha a janela modal atual. O retorno n�
 
 A terceira camada do Samples possui uma base visual/comportamental coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A construção visual comum permanece separada em units coesas de header, navegação, seletor de visualização, painel de código e painel de resultado, além de ícones e estilo.
 
-Os destinos concretos atualmente implementados são Text / Label, Button, Badge e Divider com **Factory + Fluent Builder**:
+Os destinos concretos atualmente implementados são Text / Label, Button, Badge, Divider e ComboBox com **Factory + Fluent Builder**, além de **Edit - Fluent Builder**:
 
 ```text
 Home
@@ -122,6 +122,15 @@ TComponentDivider
   │                           ▲
   │                           └── herda TExampleCommon
   └── Fluent Builder ──► TExampleDividerFluent
+                              ▲
+                              └── herda TExampleCommon
+
+TComponentComboBox
+  ├── Factory ─────────► TExampleComboBoxFactory
+  └── Fluent Builder ──► TExampleComboBoxFluent
+
+TComponentEdit
+  └── Fluent Builder ──► TExampleEditFluent
                               ▲
                               └── herda TExampleCommon
 ```
@@ -159,7 +168,13 @@ Badge Factory demonstra sete exemplos: `Básico`, `Geometria`, `Cores`, `Tipogra
 
 Badge Fluent demonstra onze exemplos: `Básico`, `Interface`, `Geometria`, `Forma`, `Layout`, `Aparência`, `Tipografia`, `Estado`, `Resultado`, `Completo - Direto` e `Completo - Interfaces`. Os dois completos cobrem os quinze métodos configuráveis de `IRickUIBuilderBadge`; ambos usam `Pill(False)` para manter `CornerRadius` efetivo. A variante por interfaces mantém `IRickUIBuilderBadge` e usa o `IRickUIBuilderBadgeHandle` retornado por `Build`.
 
-Os tipos compartilhados usados por essa terceira camada ficam em `RickUIBuilder.Samples.App.Types`: `TExampleView` identifica a view `Código Delphi`/`Resultado`, `TTextLabelFactoryExample` identifica os cinco exemplos Text / Label Factory, `TTextLabelFluentExample` os oito exemplos Text / Label Fluent, `TButtonFactoryExample` os oito exemplos Button Factory, `TButtonFluentExample` os doze exemplos Button Fluent, `TBadgeFactoryExample` os sete exemplos Badge Factory e `TBadgeFluentExample` os onze exemplos Badge Fluent. Pages, Contents e Runners consomem os enums correspondentes sem redeclará-los.
+Divider Factory demonstra quatro exemplos: `Básico`, `Geometria`, `Cor` e `Completo`; o Completo cobre 4/4 campos de `TRickUIBuilderDividerConfig`. Divider Fluent demonstra nove exemplos, incluindo uso por interface, orientação horizontal/vertical e dois completos com cobertura 8/8 de `IRickUIBuilderDivider`.
+
+ComboBox Factory demonstra sete exemplos restritos ao controle fechado materializado por `CreateComboBox`; o Completo explicita 58/58 campos do config sem simular lista/popup. ComboBox Fluent demonstra quinze exemplos com listas reais, `DisplayText/Value`, itens estruturados, colunas, seleção, apresentação, callbacks e runtime; o Completo cobre 32/32 métodos configuráveis e 58/58 campos do config.
+
+Edit Fluent demonstra vinte e nove exemplos. Os 14 valores de `TRickUIBuilderEditPreset` possuem cobertura individual; os demais exemplos cobrem CaseMode, Required, contador/clear, senha, feedback inválido, requisito, clipboard mascarado de CPF/CNPJ, aparências, ReadOnly, customização visual, `IRickUIBuilderEditHandle` e o Completo 62/62. Edit não possui destino Factory porque a API pública atual não expõe `Factory.CreateEdit`.
+
+Os tipos compartilhados usados por essa terceira camada ficam em `RickUIBuilder.Samples.App.Types`: `TExampleView` identifica a view `Código Delphi`/`Resultado`; os enums `TTextLabelFactoryExample`, `TTextLabelFluentExample`, `TButtonFactoryExample`, `TButtonFluentExample`, `TBadgeFactoryExample`, `TBadgeFluentExample`, `TDividerFactoryExample`, `TDividerFluentExample`, `TComboBoxFactoryExample`, `TComboBoxFluentExample` e `TEditFluentExample` identificam os exemplos de cada destino concreto. Pages, Contents e Runners consomem os enums correspondentes sem redeclará-los.
 
 A base continua responsável somente pela infraestrutura comum:
 
@@ -199,6 +214,8 @@ O `TSampleApplicationCoordinator` executa o fluxo global: encerramento da aplica
 - para Text / Label, o Coordinator cria e libera as Sample Pages Factory e Fluent Builder modais;
 - para Button, o Coordinator cria e libera as Sample Pages Factory e Fluent Builder modais;
 - para Badge, o Coordinator cria e libera as Sample Pages Factory e Fluent Builder modais;
+- para Divider e ComboBox, o Coordinator cria e libera as Sample Pages Factory e Fluent Builder modais;
+- para Edit, o Coordinator cria e libera somente a Sample Page Fluent Builder modal;
 - uma Component Page não possui Presenter, Coordinator ou Home; o callback de navegação é non-owning.
 
 ## Contratos
@@ -270,34 +287,24 @@ samples/
         │       └── RickUIBuilder.Samples.Example.TextLabel.Fluent.Runner.pas
         ├── Button/
         │   ├── Factory/
-        │   │   ├── RickUIBuilder.Samples.Example.Button.Factory.pas
-        │   │   ├── RickUIBuilder.Samples.Example.Button.Factory.Content.pas
-        │   │   └── RickUIBuilder.Samples.Example.Button.Factory.Runner.pas
         │   └── Fluent/
-        │       ├── RickUIBuilder.Samples.Example.Button.Fluent.pas
-        │       ├── RickUIBuilder.Samples.Example.Button.Fluent.Content.pas
-        │       └── RickUIBuilder.Samples.Example.Button.Fluent.Runner.pas
-        └── Badge/
-            ├── Factory/
-            │   ├── RickUIBuilder.Samples.Example.Badge.Factory.pas
-            │   ├── RickUIBuilder.Samples.Example.Badge.Factory.Content.pas
-            │   └── RickUIBuilder.Samples.Example.Badge.Factory.Runner.pas
+        ├── Badge/
+        │   ├── Factory/
+        │   └── Fluent/
+        ├── Divider/
+        │   ├── Factory/
+        │   └── Fluent/
+        ├── ComboBox/
+        │   ├── Factory/
+        │   └── Fluent/
+        └── Edit/
             └── Fluent/
-                ├── RickUIBuilder.Samples.Example.Badge.Fluent.pas
-                ├── RickUIBuilder.Samples.Example.Badge.Fluent.Content.pas
-                └── RickUIBuilder.Samples.Example.Badge.Fluent.Runner.pas
-        └── ComboBox/
-            ├── Factory/
-            │   ├── RickUIBuilder.Samples.Example.ComboBox.Factory.pas
-            │   ├── RickUIBuilder.Samples.Example.ComboBox.Factory.Content.pas
-            │   └── RickUIBuilder.Samples.Example.ComboBox.Factory.Runner.pas
-            └── Fluent/
-                ├── RickUIBuilder.Samples.Example.ComboBox.Fluent.pas
-                ├── RickUIBuilder.Samples.Example.ComboBox.Fluent.Content.pas
-                └── RickUIBuilder.Samples.Example.ComboBox.Fluent.Runner.pas
+                ├── RickUIBuilder.Samples.Example.Edit.Fluent.pas
+                ├── RickUIBuilder.Samples.Example.Edit.Fluent.Content.pas
+                └── RickUIBuilder.Samples.Example.Edit.Fluent.Runner.pas
 ```
 
-Diretórios específicos existem somente quando possuem units concretas. `src/Examples/Common` contém a base comum; páginas reais seguem `src/Examples/<Componente>/<Abordagem>`. Hoje existem `TextLabel/Factory`, `TextLabel/Fluent`, `Button/Factory`, `Button/Fluent`, `Badge/Factory`, `Badge/Fluent`, `ComboBox/Factory` e `ComboBox/Fluent`; nenhum diretório de abordagem deve ser criado antecipadamente.
+Diretórios específicos existem somente quando possuem units concretas. `src/Examples/Common` contém a base comum; páginas reais seguem `src/Examples/<Componente>/<Abordagem>`. Hoje existem `TextLabel/Factory`, `TextLabel/Fluent`, `Button/Factory`, `Button/Fluent`, `Badge/Factory`, `Badge/Fluent`, `Divider/Factory`, `Divider/Fluent`, `ComboBox/Factory`, `ComboBox/Fluent` e `Edit/Fluent`; nenhum diretório de abordagem deve ser criado antecipadamente.
 
 Todas as units internas do Samples são incorporadas explicitamente ao `.dpr` e ao `.dproj`. O `DCC_UnitSearchPath` não contém o próprio `samples/src`; o caminho de busca permanece reservado à dependência externa `..\src` da biblioteca Rick.UIBuilder e ao Search Path herdado.
 
@@ -319,7 +326,7 @@ Os cards preservam os SVGs oficiais fornecidos:
 
 A geometria de Factory e informação é renderizada por fill; Fluent Builder usa stroke, seguindo os assets originais.
 
-`Ver exemplos` permanece sem `HitTest` e sem callback quando o destino não existe. No estado atual, `Text / Label → Factory`, `Text / Label → Fluent Builder`, `Button → Factory`, `Button → Fluent Builder`, `Badge → Factory`, `Badge → Fluent Builder`, `Divider → Factory`, `Divider → Fluent Builder`, `ComboBox → Factory` e `ComboBox → Fluent Builder` recebem callback e `crHandPoint`; destinos ainda sem Sample Page permanecem não clicáveis.
+`Ver exemplos` permanece sem `HitTest` e sem callback quando o destino não existe. No estado atual, `Text / Label → Factory`, `Text / Label → Fluent Builder`, `Button → Factory`, `Button → Fluent Builder`, `Badge → Factory`, `Badge → Fluent Builder`, `Divider → Factory`, `Divider → Fluent Builder`, `ComboBox → Factory`, `ComboBox → Fluent Builder` e `Edit → Fluent Builder` recebem callback e `crHandPoint`; destinos ainda sem Sample Page permanecem não clicáveis.
 
 A Sample Page Base usa geometria e paleta próprias em `RickUIBuilder.Samples.Example.Common.Style`, vetor de retorno em `.Icons` e controles estruturais separados em `.Header`, `.Navigation`, `.View.Selector`, `.Code.Panel` e `.Result.Panel`. `TExampleCommon` apenas os coordena. A página possui client de `620 × 510`, é borderless e permanece menor que a Home. A sequência visual segue o textframe normativo: header → identidade → navegação/conteúdo → identificação do exemplo → seletor `Código Delphi`/`Resultado` → uma única view ativa. O estado selecionado da navegação usa fundo azul-claro e indicador vertical azul; o `CodePanel` usa `TMemo` read-only/selecionável com ação `Copiar código`; o `ResultPanel` preenche toda a área restante da view e mantém `ResultHost` como container estável owned pela própria superfície.
 

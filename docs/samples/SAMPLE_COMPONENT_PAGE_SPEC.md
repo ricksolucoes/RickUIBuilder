@@ -8,7 +8,7 @@ Este documento descreve a página intermediária de componente e suas seis imple
 
 ## Papel da página
 
-A Component Page é o ponto intermediário entre a Home e as páginas de samples de cada abordagem. No estado atual, Text / Label, Button e Badge possuem destinos concretos para Factory e Fluent Builder.
+A Component Page é o ponto intermediário entre a Home e as páginas de samples de cada abordagem. No estado atual, Text / Label, Button, Badge, Divider e ComboBox possuem destinos concretos para Factory e Fluent Builder; Edit possui destino concreto somente para Fluent Builder.
 
 ```text
 Home
@@ -27,7 +27,7 @@ Component Page do componente
          └── demais componentes → futuro
 ```
 
-Callbacks só existem quando há destino real. `Text / Label → Factory`, `Text / Label → Fluent Builder`, `Button → Factory`, `Button → Fluent Builder`, `Badge → Factory` e `Badge → Fluent Builder` navegam para suas Sample Pages concretas; as demais abordagens sem destino permanecem somente visuais.
+Callbacks só existem quando há destino real. No estado atual, Text / Label, Button, Badge, Divider e ComboBox possuem destinos Factory + Fluent Builder; Edit possui somente Fluent Builder. Abordagens sem destino permanecem somente visuais.
 
 ## Arquitetura da família de páginas
 
@@ -123,7 +123,7 @@ Quando Factory e Fluent Builder estão disponíveis:
 └──────────────────────┘  └──────────────────────┘
 ```
 
-Quando somente Fluent Builder existe, como no Edit:
+Quando somente Fluent Builder existe, como no Edit, o card permanece centralizado e recebe callback somente quando a Sample Page concreta existe:
 
 ```text
               ┌──────────────────────┐
@@ -269,6 +269,8 @@ Factory possui callback real para `TExampleComboBoxFactory` e Fluent Builder par
 
 **Sobre:** `Edit é o builder de entrada de texto de uma linha do Rick.UIBuilder. No estado atual da API, ele está disponível pelo Fluent Builder e não possui Factory.CreateEdit.`
 
+Fluent Builder possui callback real para `TExampleEditFluent`; a Component Page mantém o card centralizado e apenas emite a intenção ao Coordinator.
+
 ```text
 ┌────────────────────────────────────────────────────────────┐
 │  ←   Componentes                                           │
@@ -292,7 +294,7 @@ Factory possui callback real para `TExampleComboBoxFactory` e Fluent Builder par
 
 ## Próxima camada planejada
 
-A ação `Ver exemplos` é conectada individualmente apenas a destinos reais. Text / Label, Button, Badge e Divider abrem Factory e Fluent Builder; os destinos ainda não implementados permanecem sem callback. A terceira camada é especificada em `SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`.
+A ação `Ver exemplos` é conectada individualmente apenas a destinos reais. Text / Label, Button, Badge, Divider e ComboBox abrem Factory e Fluent Builder; Edit abre somente Fluent Builder. Destinos ainda não implementados permanecem sem callback. A terceira camada é especificada em `SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`.
 
 A Component Page continua tendo somente a responsabilidade de escolher a abordagem. Ela não deve absorver menu lateral, código Delphi, resultado executável ou qualquer sample real.
 
@@ -312,7 +314,7 @@ A Component Page continua tendo somente a responsabilidade de escolher a abordag
 - arrays com conteúdo dos seis componentes;
 - regra específica `Edit não possui Factory`;
 - páginas Factory/Fluent ainda não implementadas;
-- samples concretos pertencentes à terceira camada, incluindo Text / Label, Button e Badge nas abordagens Factory e Fluent Builder.
+- samples concretos pertencentes à terceira camada; no estado atual, Text / Label, Button, Badge, Divider e ComboBox possuem Factory + Fluent e Edit possui apenas Fluent.
 
 Cada página concreta pode conhecer somente o conteúdo e as abordagens do seu próprio componente.
 
@@ -332,4 +334,4 @@ A implementação deve manter simultaneamente:
 - uma unit concreta por componente herdando de `TComponentCommon`;
 - `.dpr` e `.dproj` contendo explicitamente todas as units;
 - nenhum `samples/src` no Search Path;
-- nenhum callback habilitado para destino inexistente; Text / Label, Button e Badge possuem Factory/Fluent concretos nesta etapa.
+- nenhum callback habilitado para destino inexistente; Text / Label, Button, Badge, Divider e ComboBox possuem Factory/Fluent concretos, e Edit possui Fluent concreto nesta etapa.

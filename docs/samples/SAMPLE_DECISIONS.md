@@ -117,7 +117,7 @@ Textos técnicos da imagem não são copiados quando divergirem da implementaç�
 
 ### DEC-028 — `Ver exemplos` não possui destino fictício
 
-`Ver exemplos` representa a ação para abrir uma Sample Page de Factory ou Fluent Builder. A ação só recebe callback, `crHandPoint` e hit testing quando o destino correspondente realmente existe. No estado atual, `Text / Label → Factory`, `Text / Label → Fluent Builder`, `Button → Factory`, `Button → Fluent Builder`, `Badge → Factory` e `Badge → Fluent Builder` possuem destinos concretos; abordagens sem destino permanecem somente visuais até sua implementação.
+`Ver exemplos` representa a ação para abrir uma Sample Page de Factory ou Fluent Builder. A ação só recebe callback, `crHandPoint` e hit testing quando o destino correspondente realmente existe. No estado atual, Text / Label, Button, Badge, Divider e ComboBox possuem destinos Factory + Fluent Builder; Edit possui somente Fluent Builder. Abordagens sem destino permanecem somente visuais até sua implementação.
 
 ### DEC-029 — Tipografia é preservada na Component Page
 
@@ -185,7 +185,7 @@ A implementação comum fica em `samples/src/Examples/Common`. `TExampleCommon` 
 
 ### DEC-045 — Navegação só é habilitada para destino real e permanece coordenada fora da View
 
-`TComponentTextLabel`, `TComponentButton`, `TComponentBadge` e `TComponentDivider` capturam separadamente os cliques Factory e Fluent Builder. Nenhuma Component Page cria Sample Pages. `TSampleApplicationCoordinator` conecta somente callbacks com destino real, cria `TExampleTextLabelFactory`, `TExampleTextLabelFluent`, `TExampleButtonFactory`, `TExampleButtonFluent`, `TExampleBadgeFactory`, `TExampleBadgeFluent`, `TExampleDividerFactory` ou `TExampleDividerFluent` sem Owner, executa `ShowModal` e libera a instância em `finally`. Cards sem destino continuam sem callback e sem `HitTest`.
+As Component Pages capturam somente as intenções correspondentes aos destinos reais. Nenhuma Component Page cria Sample Pages. `TSampleApplicationCoordinator` conecta os callbacks de Text / Label, Button, Badge, Divider e ComboBox para Factory + Fluent Builder e o callback Fluent de Edit; cria a Sample Page concreta sem Owner, executa `ShowModal` e libera a instância em `finally`. Cards sem destino continuam sem callback e sem `HitTest`.
 
 ### DEC-046 — Dependências FMX de símbolos visuais devem ser explícitas
 
@@ -216,7 +216,7 @@ O item ativo da navegação lateral usa fundo azul-claro, texto azul e indicador
 
 ### DEC-052 — Tipos compartilhados da navegação de examples ficam em App.Types
 
-O código vigente centraliza `TSampleComponent`, `TTextLabelFactoryExample`, `TTextLabelFluentExample` e `TExampleView` em `RickUIBuilder.Samples.App.Types`. Os enums Factory/Fluent são compartilhados por suas respectivas pages, Contents e Runners; `TExampleView` é compartilhado por `TExampleCommon` e `TExampleViewSelector`. As units de conteúdo não declaram esses enums.
+O código vigente centraliza `TSampleComponent`, `TExampleView` e os enums de examples de Text / Label, Button, Badge, Divider, ComboBox e Edit em `RickUIBuilder.Samples.App.Types`. Os enums Factory/Fluent são compartilhados por suas respectivas pages, Contents e Runners; `TExampleView` é compartilhado por `TExampleCommon` e `TExampleViewSelector`. As units de conteúdo não declaram esses enums.
 
 ### DEC-053 — Units estruturais de examples usam namespaces físicos segmentados
 
@@ -241,7 +241,7 @@ Em cada abordagem concreta, o item `Completo` funciona como referência exaustiv
 
 ### DEC-058 — Examples concretos são organizados por componente e abordagem
 
-Páginas reais da terceira camada seguem `samples/src/Examples/<Componente>/<Abordagem>`. Text / Label, Button, Badge e Divider mantêm `Factory/` e `Fluent/`. Diretórios de abordagem sem implementação não são criados. `Button - Factory` mantém o exemplo `Completo` exaustivo para os nove campos públicos de `TRickUIBuilderButtonConfig` e demonstra também as duas sobrecargas públicas de `CreateButton`. `Button - Fluent Builder` mantém dois exemplos completos: um direto e outro por interfaces; ambos cobrem os 23 métodos configuráveis de `IRickUIBuilderButton`.
+Páginas reais da terceira camada seguem `samples/src/Examples/<Componente>/<Abordagem>`. Text / Label, Button, Badge, Divider e ComboBox mantêm `Factory/` e `Fluent/`; Edit mantém somente `Fluent/`. Diretórios de abordagem sem implementação não são criados. `Button - Factory` mantém o exemplo `Completo` exaustivo para os nove campos públicos de `TRickUIBuilderButtonConfig` e demonstra também as duas sobrecargas públicas de `CreateButton`. `Button - Fluent Builder` mantém dois exemplos completos: um direto e outro por interfaces; ambos cobrem os 23 métodos configuráveis de `IRickUIBuilderButton`.
 
 ### DEC-059 — Badge - Factory é o quinto destino concreto da Sample Page
 
@@ -268,3 +268,8 @@ Páginas reais da terceira camada seguem `samples/src/Examples/<Componente>/<Abo
 ### DEC-064 — ComboBox - Fluent Builder demonstra dados, apresentação e runtime reais
 
 `TExampleComboBoxFluent` herda de `TExampleCommon` e fica em `src/Examples/ComboBox/Fluent`, separando coordenação (`Fluent`), conteúdo/snippets (`Fluent.Content`) e execução (`Fluent.Runner`). A página possui quinze exemplos: Básico, Interface, Texto + Value, Lista estruturada, Seleção inicial, Geometria e popup, Desktop / Anchored, FullWindow e pesquisa, Configuração avançada, Seta, Estado, Eventos, Customização de item, Handle runtime e Completo. Todos os exemplos materializam dados reais; a matriz varia `Items`, os dois overloads de `AddItem`, `AddStructuredItem`, colunas `Auto`/`Fixed`/`Proportional`, seleção por índice/texto, presentation, pesquisa, callbacks e `IRickUIBuilderComboBoxHandle`. O Runner é uma instância mantida pela Sample Page para que callbacks `of object` permaneçam válidos sem `TComponent` auxiliar. O exemplo `Completo` atribui os 58 campos públicos de `TRickUIBuilderComboBoxConfig`, cobre os 32 métodos configuráveis de `IRickUIBuilderComboBox` e finaliza pela assinatura mais rica `BuildHandle`.
+
+
+### DEC-065 — Edit - Fluent Builder cobre presets, validação e runtime
+
+`TExampleEditFluent` herda de `TExampleCommon` e fica em `src/Examples/Edit/Fluent`, separando coordenação (`Fluent`), conteúdo/snippets (`Fluent.Content`) e execução (`Fluent.Runner`). A página possui vinte e nove exemplos: Básico, Interface, um exemplo individual para cada um dos 14 presets públicos, CaseMode, Obrigatoriedade, Limite/contador/limpar, Senha, Feedback inválido, Indicador de requisito, Copiar e colar mascarado, Aparência, Somente leitura, Customização visual, Handle runtime e Completo. O fluxo de clipboard preserva os cenários operacionais de CPF/CNPJ do Sample legado. O Runner é uma instância mantida pela Sample Page para que handlers de botões permaneçam válidos sem `TComponent` auxiliar; `Reset` libera referências a handles antes de `ClearResult`. O exemplo `Completo` cobre os 62 métodos configuráveis de `IRickUIBuilderEdit` e finaliza com `Build`. Edit continua sem Factory porque a API pública não expõe `Factory.CreateEdit`.
