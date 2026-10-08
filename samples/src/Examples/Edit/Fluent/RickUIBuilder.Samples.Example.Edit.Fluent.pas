@@ -60,6 +60,7 @@ uses
   RickUIBuilder.Samples.App.Types,
   RickUIBuilder.Samples.Example.Common,
   RickUIBuilder.Samples.Example.Common.Navigation,
+  RickUIBuilder.Samples.Example.Common.Style,
   RickUIBuilder.Samples.Example.Edit.Fluent.Content,
   RickUIBuilder.Samples.Example.Edit.Fluent.Runner;
 
@@ -73,6 +74,8 @@ type
     procedure NavigationRequested(ASender: TObject);
     procedure ShowExample(const AExample: TEditFluentExample;
       const AItem: TExampleNavigationItem);
+  strict protected
+    procedure ConfigureLayout(var ALayout: TExamplePageLayout); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -84,6 +87,15 @@ const
   _PARENT_TITLE_ = 'Edit';
   _PAGE_TITLE_ = 'Edit - Fluent Builder';
   _PAGE_SUBTITLE_ = 'Presets, validação e runtime com TRickUIBuilder.Edit.';
+  _EDIT_FLUENT_PAGE_WIDTH_ = 640;
+  _EDIT_FLUENT_NAV_WIDTH_ = 170;
+
+procedure TExampleEditFluent.ConfigureLayout(var ALayout: TExamplePageLayout);
+begin
+  inherited ConfigureLayout(ALayout);
+  ALayout.PageWidth := _EDIT_FLUENT_PAGE_WIDTH_;
+  ALayout.NavigationWidth := _EDIT_FLUENT_NAV_WIDTH_;
+end;
 
 constructor TExampleEditFluent.Create(AOwner: TComponent);
 var

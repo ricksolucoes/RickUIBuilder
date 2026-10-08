@@ -23,6 +23,8 @@
 {      Fornece TExampleCommon e a infraestrutura visual compartilhada.         }
 {  - RickUIBuilder.Samples.Example.Common.Navigation                           }
 {      Fornece TExampleNavigationItem retornado pela API protegida da base.    }
+{  - RickUIBuilder.Samples.Example.Common.Style                                }
+{      Fornece TExamplePageLayout usado na especialização local da geometria.  }
 {  - RickUIBuilder.Samples.Example.ComboBox.Fluent.Content                     }
 {      Fornece captions, títulos, descrições e snippets dos exemplos.          }
 {  - RickUIBuilder.Samples.Example.ComboBox.Fluent.Runner                      }
@@ -65,6 +67,7 @@ uses
 
   RickUIBuilder.Samples.Example.Common,
   RickUIBuilder.Samples.Example.Common.Navigation,
+  RickUIBuilder.Samples.Example.Common.Style,
   RickUIBuilder.Samples.Example.ComboBox.Fluent.Content,
   RickUIBuilder.Samples.Example.ComboBox.Fluent.Runner;
 
@@ -79,6 +82,8 @@ type
     procedure NavigationRequested(ASender: TObject);
     procedure ShowExample(const AExample: TComboBoxFluentExample;
       const AItem: TExampleNavigationItem);
+  strict protected
+    procedure ConfigureLayout(var ALayout: TExamplePageLayout); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -90,6 +95,16 @@ const
   _PARENT_TITLE_ = 'ComboBox';
   _PAGE_TITLE_ = 'ComboBox - Fluent Builder';
   _PAGE_SUBTITLE_ = 'Listas, seleção e runtime com TRickUIBuilder.ComboBox.';
+  _COMBOBOX_FLUENT_PAGE_WIDTH_ = 640;
+  _COMBOBOX_FLUENT_NAV_WIDTH_ = 180;
+
+procedure TExampleComboBoxFluent.ConfigureLayout(
+  var ALayout: TExamplePageLayout);
+begin
+  inherited ConfigureLayout(ALayout);
+  ALayout.PageWidth := _COMBOBOX_FLUENT_PAGE_WIDTH_;
+  ALayout.NavigationWidth := _COMBOBOX_FLUENT_NAV_WIDTH_;
+end;
 
 constructor TExampleComboBoxFluent.Create(AOwner: TComponent);
 var

@@ -1,4 +1,4 @@
-﻿# Especificação da Sample Page Base
+# Especificação da Sample Page Base
 
 ## Status
 
@@ -52,7 +52,7 @@ O layout padrão continua `620 × 510`, mantendo simultaneamente `620 < 644` e `
 
 `TExampleCommon` inicializa `TExamplePageLayout.Default` antes da construção visual e chama o hook protegido virtual `ConfigureLayout(var ALayout)`. A implementação da base não altera o default. Uma derivada que sobrescreva o hook deve modificar somente o record recebido e não depender de campos próprios inicializados depois de `inherited Create`. As métricas derivadas continuam responsabilidade da infraestrutura, evitando que a filha configure combinações geométricas inconsistentes.
 
-Nesta implementação, `TExampleButtonFluent` especializa o layout para `640 × 530` com navegação de `170` px, enquanto `TExampleBadgeFactory`, `TExampleBadgeFluent` e `TExampleDividerFluent` usam `640 × 510` com navegação de `170` px; `NavigationItemHeight` permanece no default de `28` px nas quatro páginas. As demais páginas concretas não sobrescrevem o hook e continuam em `620 × 510`, com navegação de `142` px. Todas as dimensões efetivas permanecem menores que a Home de `644 × 534`.
+Nesta implementação, `TExampleButtonFluent` especializa o layout para `640 × 530` com navegação de `170` px, enquanto `TExampleBadgeFactory`, `TExampleBadgeFluent`, `TExampleDividerFluent`, `TExampleComboBoxFluent` e `TExampleEditFluent` usam `640 × 510` com navegação de `170` px; `NavigationItemHeight` permanece no default de `28` px nas seis páginas. As demais páginas concretas não sobrescrevem o hook e continuam em `620 × 510`, com navegação de `142` px. Todas as dimensões efetivas permanecem menores que a Home de `644 × 534`.
 
 A navegação lateral utiliza `TVertScrollBox`. A superfície de código utiliza `TMemo` read-only e selecionável, com `WordWrap = False` e scrollbars em comportamento AutoHide: a rolagem pertence ao overflow real do conteúdo, sem canvas artificialmente maior que o viewport. Não aumentar a Sample Page acima da Home e não reduzir tipografia para esconder clipping.
 
@@ -216,7 +216,7 @@ ComboBox Fluent segue `src/Examples/ComboBox/Fluent/` com Page, Content e Runner
 
 ## Página concreta — Edit - Fluent Builder
 
-Edit Fluent segue `src/Examples/Edit/Fluent/` com Page, Content e Runner separados. A página possui vinte e nove exemplos. Os 14 valores públicos de `TRickUIBuilderEditPreset` são demonstrados individualmente; a matriz também cobre os três `CaseMode`, os dois `UrlCaseMode`, números Locale/Custom, Required, contador/clear, Password, os três feedbacks inválidos, RequirementIndicator, clipboard operacional mascarado de CPF/CNPJ, Outlined/Underline, ReadOnly, customização visual e `IRickUIBuilderEditHandle`. O Runner é uma instância sem ancestral artificial e libera seus Handles antes de `ClearResult`. O Completo cobre 62/62 métodos configuráveis de `IRickUIBuilderEdit` e finaliza com `Build`.
+Edit Fluent segue `src/Examples/Edit/Fluent/` com Page, Content e Runner separados. A page sobrescreve `ConfigureLayout` somente para ampliar a largura da janela para `640` px e a navegação para `170` px, mantendo a altura padrão de `510` px e `NavigationItemHeight = 28`. A página possui vinte e nove exemplos. Os 14 valores públicos de `TRickUIBuilderEditPreset` são demonstrados individualmente; a matriz também cobre os três `CaseMode`, os dois `UrlCaseMode`, números Locale/Custom, Required, contador/clear, Password, os três feedbacks inválidos, RequirementIndicator, clipboard operacional mascarado de CPF/CNPJ, Outlined/Underline, ReadOnly, customização visual e `IRickUIBuilderEditHandle`. O Runner é uma instância sem ancestral artificial e libera seus Handles antes de `ClearResult`. O Completo cobre 62/62 métodos configuráveis de `IRickUIBuilderEdit` e finaliza com `Build`.
 
 
 ## Textframe normativo da tela-base
