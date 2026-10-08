@@ -46,7 +46,13 @@ SamplePage.ClientWidth  < 644
 SamplePage.ClientHeight < 534
 ```
 
-A implementação atual define `620 × 510`, mantendo simultaneamente `620 < 644` e `510 < 534`.
+O layout padrão continua `620 × 510`, mantendo simultaneamente `620 < 644` e `510 < 534`. Esse valor agora é o **default da base**, e não uma geometria obrigatoriamente idêntica para toda derivada. Uma página concreta pode especializar dimensões por herança quando houver necessidade real de UI/UX, desde que continue estritamente menor que a Home e preserve a estrutura comum.
+
+`RickUIBuilder.Samples.Example.Common.Style` define `TExamplePageLayout`. O record mantém somente os valores primários que podem variar (`PageWidth`, `PageHeight`, `NavigationWidth` e `NavigationItemHeight`) e calcula as demais métricas (`ContentWidth`, `BodyHeight`, `NavigationItemWidth`, `NavigationIndicatorHeight`, `MainWidth`, `ViewContentHeight` e `ResultSurfaceHeight`). O tipo pertence a `Examples/Common` porque descreve geometria da infraestrutura da terceira camada; ele não pertence a `App.Types`, que continua reservado aos enums compartilhados de navegação/examples.
+
+`TExampleCommon` inicializa `TExamplePageLayout.Default` antes da construção visual e chama o hook protegido virtual `ConfigureLayout(var ALayout)`. A implementação da base não altera o default. Uma derivada que sobrescreva o hook deve modificar somente o record recebido e não depender de campos próprios inicializados depois de `inherited Create`. As métricas derivadas continuam responsabilidade da infraestrutura, evitando que a filha configure combinações geométricas inconsistentes.
+
+Nesta implementação, `TExampleButtonFluent` especializa o layout para `640 × 530` com navegação de `170` px, enquanto `TExampleBadgeFactory`, `TExampleBadgeFluent` e `TExampleDividerFluent` usam `640 × 510` com navegação de `170` px; `NavigationItemHeight` permanece no default de `28` px nas quatro páginas. As demais páginas concretas não sobrescrevem o hook e continuam em `620 × 510`, com navegação de `142` px. Todas as dimensões efetivas permanecem menores que a Home de `644 × 534`.
 
 A navegação lateral utiliza `TVertScrollBox`. A superfície de código utiliza `TMemo` read-only e selecionável, com `WordWrap = False` e scrollbars em comportamento AutoHide: a rolagem pertence ao overflow real do conteúdo, sem canvas artificialmente maior que o viewport. Não aumentar a Sample Page acima da Home e não reduzir tipografia para esconder clipping.
 
@@ -83,6 +89,7 @@ Essa separação é estrutural e não cria regras específicas de componente. `T
 A base implementada expõe pontos de extensão protegidos para as derivadas:
 
 ```text
+ConfigureLayout(var layout)
 ConfigurePage(parent, title, subtitle)
 AddNavigationItem(caption)
 SelectNavigationItem(item)
@@ -92,7 +99,7 @@ ClearResult
 ResultHost
 ```
 
-Esses pontos de extensão não materializam componente ou abordagem. `AddNavigationItem` cria somente o item visual; a derivada associa sua ação. `SelectNavigationItem` controla apenas o estado visual selecionado. `ResultHost` é o container estável, owned por `TExampleResultPanel`, onde a derivada anexa os controles reais do resultado; a derivada não deve liberar nem substituir esse host. `ClearResult` remove somente os filhos visuais antes da substituição do exemplo, preservando a infraestrutura para a próxima materialização.
+`ConfigureLayout` é o único ponto de extensão de geometria: parte do `TExamplePageLayout.Default` e é chamado antes de qualquer controle estrutural ser criado. Os demais pontos de extensão não materializam componente ou abordagem. `AddNavigationItem` cria somente o item visual; a derivada associa sua ação. `SelectNavigationItem` controla apenas o estado visual selecionado. `ResultHost` é o container estável, owned por `TExampleResultPanel`, onde a derivada anexa os controles reais do resultado; a derivada não deve liberar nem substituir esse host. `ClearResult` remove somente os filhos visuais antes da substituição do exemplo, preservando a infraestrutura para a próxima materialização.
 
 `Código Delphi` e `Resultado` são opções clicáveis coordenadas por `TExampleViewSelector`. Exatamente uma view fica ativa: `Código Delphi` é o estado inicial; selecionar `Resultado` oculta o código e exibe somente o painel de resultado, e selecionar `Código Delphi` executa a alternância inversa.
 
@@ -181,15 +188,15 @@ Cobertura da API pública `TRickUIBuilderFactory.CreateButton`:
 
 ## Página concreta — Button - Fluent Builder
 
-Button Fluent segue `src/Examples/Button/Fluent/` com Page, Content e Runner separados. A página possui doze exemplos: `Básico`, `Interface`, `Geometria`, `Layout`, `Aparência`, `Tipografia`, `Estado`, `Hover`, `Clique`, `Resultado`, `Completo - Direto` e `Completo - Interfaces`. O foco principal é `TRickUIBuilder.Button`/`IRickUIBuilderButton`; `IRickUIBuilderButtonHandle`, `IRickUIBuilderButtonHoverState` e `TRickUIBuilderSpacing` aparecem somente quando necessários à API principal. `Clique` e `Hover` são executáveis. `Completo - Direto` cobre os 23 métodos configuráveis e usa `Build`; `Completo - Interfaces` cobre a mesma configuração mantendo `IRickUIBuilderButton`, usa `BuildHandle` e demonstra também as duas interfaces secundárias do Button.
+Button Fluent segue `src/Examples/Button/Fluent/` com Page, Content e Runner separados. A page sobrescreve `ConfigureLayout` para ampliar a janela para `640 × 530` e a navegação para `170` px, preservando as demais métricas padrão da base. A página possui doze exemplos: `Básico`, `Interface`, `Geometria`, `Layout`, `Aparência`, `Tipografia`, `Estado`, `Hover`, `Clique`, `Resultado`, `Completo - Direto` e `Completo - Interfaces`. O foco principal é `TRickUIBuilder.Button`/`IRickUIBuilderButton`; `IRickUIBuilderButtonHandle`, `IRickUIBuilderButtonHoverState` e `TRickUIBuilderSpacing` aparecem somente quando necessários à API principal. `Clique` e `Hover` são executáveis. `Completo - Direto` cobre os 23 métodos configuráveis e usa `Build`; `Completo - Interfaces` cobre a mesma configuração mantendo `IRickUIBuilderButton`, usa `BuildHandle` e demonstra também as duas interfaces secundárias do Button.
 
 ## Página concreta — Badge - Factory
 
-Badge Factory segue `src/Examples/Badge/Factory/` com Page, Content e Runner separados. A página possui sete exemplos: `Básico`, `Geometria`, `Cores`, `Tipografia`, `Texto interno`, `Construção em etapas` e `Completo`. `CreateBadge` é a operação principal; o exemplo `Texto interno` demonstra o `TRectangle` retornado e `out ATextLabel`, enquanto `Construção em etapas` mostra as APIs públicas auxiliares `CreateBadgeContainer` e `BuildBadgeTextConfig`. `Completo` atribui explicitamente `Left`, `Top`, `Width`, `Height`, `BackgroundColor`, `TextColor` e `FontSize`.
+Badge Factory segue `src/Examples/Badge/Factory/` com Page, Content e Runner separados. A page sobrescreve `ConfigureLayout` somente para ampliar a largura da janela para `640` px e a navegação para `170` px, mantendo a altura padrão de `510` px e `NavigationItemHeight = 28`. A página possui sete exemplos: `Básico`, `Geometria`, `Cores`, `Tipografia`, `Texto interno`, `Construção em etapas` e `Completo`. `CreateBadge` é a operação principal; o exemplo `Texto interno` demonstra o `TRectangle` retornado e `out ATextLabel`, enquanto `Construção em etapas` mostra as APIs públicas auxiliares `CreateBadgeContainer` e `BuildBadgeTextConfig`. `Completo` atribui explicitamente `Left`, `Top`, `Width`, `Height`, `BackgroundColor`, `TextColor` e `FontSize`.
 
 ## Página concreta — Badge - Fluent Builder
 
-Badge Fluent segue `src/Examples/Badge/Fluent/` com Page, Content e Runner separados. A página possui onze exemplos: `Básico`, `Interface`, `Geometria`, `Forma`, `Layout`, `Aparência`, `Tipografia`, `Estado`, `Resultado`, `Completo - Direto` e `Completo - Interfaces`. O foco principal é `TRickUIBuilder.Badge`/`IRickUIBuilderBadge`; `IRickUIBuilderBadgeHandle` e `TRickUIBuilderSpacing` aparecem somente quando exigidos pela API principal. `Forma` demonstra separadamente `Pill(True)` e `Pill(False) + CornerRadius`; os dois completos usam `Pill(False)` para que `CornerRadius` permaneça efetivo e cobrem os quinze métodos configuráveis. A variante por interfaces mantém `IRickUIBuilderBadge` e recebe `IRickUIBuilderBadgeHandle` de `Build`.
+Badge Fluent segue `src/Examples/Badge/Fluent/` com Page, Content e Runner separados. A page sobrescreve `ConfigureLayout` somente para ampliar a largura da janela para `640` px e a navegação para `170` px, mantendo a altura padrão de `510` px e `NavigationItemHeight = 28`. A página possui onze exemplos: `Básico`, `Interface`, `Geometria`, `Forma`, `Layout`, `Aparência`, `Tipografia`, `Estado`, `Resultado`, `Completo - Direto` e `Completo - Interfaces`. O foco principal é `TRickUIBuilder.Badge`/`IRickUIBuilderBadge`; `IRickUIBuilderBadgeHandle` e `TRickUIBuilderSpacing` aparecem somente quando exigidos pela API principal. `Forma` demonstra separadamente `Pill(True)` e `Pill(False) + CornerRadius`; os dois completos usam `Pill(False)` para que `CornerRadius` permaneça efetivo e cobrem os quinze métodos configuráveis. A variante por interfaces mantém `IRickUIBuilderBadge` e recebe `IRickUIBuilderBadgeHandle` de `Build`.
 
 ## Página concreta — Divider - Factory
 
@@ -197,7 +204,7 @@ Divider Factory segue `src/Examples/Divider/Factory/` com Page, Content e Runner
 
 ## Página concreta — Divider - Fluent Builder
 
-Divider Fluent segue `src/Examples/Divider/Fluent/` com Page, Content e Runner separados. A página possui nove exemplos: `Básico`, `Interface`, `Geometria`, `Orientação`, `Layout`, `Aparência`, `Estado`, `Completo - Direto` e `Completo - Interfaces`. O foco principal é `TRickUIBuilder.Divider`/`IRickUIBuilderDivider`; `TOrientation` e `TRickUIBuilderSpacing` aparecem somente quando exigidos pela API principal. `Orientação` demonstra separadamente Horizontal e Vertical, preservando `Width` como comprimento lógico. Os dois completos cobrem `Position`, `Width`, `Thickness`, `Orientation`, `Margin`, `Color`, `Opacity` e `Visible`.
+Divider Fluent segue `src/Examples/Divider/Fluent/` com Page, Content e Runner separados. A page sobrescreve `ConfigureLayout` somente para ampliar a largura da janela para `640` px e a navegação para `170` px, mantendo a altura padrão de `510` px e `NavigationItemHeight = 28`. A página possui nove exemplos: `Básico`, `Interface`, `Geometria`, `Orientação`, `Layout`, `Aparência`, `Estado`, `Completo - Direto` e `Completo - Interfaces`. O foco principal é `TRickUIBuilder.Divider`/`IRickUIBuilderDivider`; `TOrientation` e `TRickUIBuilderSpacing` aparecem somente quando exigidos pela API principal. `Orientação` demonstra separadamente Horizontal e Vertical, preservando `Width` como comprimento lógico. Os dois completos cobrem `Position`, `Width`, `Thickness`, `Orientation`, `Margin`, `Color`, `Opacity` e `Visible`.
 
 ## Página concreta — ComboBox - Factory
 

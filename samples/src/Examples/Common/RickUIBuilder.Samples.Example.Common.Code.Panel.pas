@@ -1,7 +1,9 @@
-﻿{ Esta unit implementa a superfície de código read-only da Sample Page Base, garantindo leitura em tema escuro, seleção parcial/total, cópia integral com feedback visual e scroll exibido somente quando o conteúdo ultrapassa o viewport. }
-{******************************************************************************}
+﻿{******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.Example.Common.Code.Panel                              }
+{                                                                              }
+{ Esta unit implementa a superfície de código read-only usando largura e altura }
+{ calculadas pelo layout efetivo da Sample Page Base.                           }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
@@ -68,7 +70,9 @@ uses
   FMX.Layouts,
   FMX.Memo,
   FMX.Objects,
-  FMX.Types;
+  FMX.Types,
+
+  RickUIBuilder.Samples.Example.Common.Style;
 
 type
   /// <summary>
@@ -77,6 +81,7 @@ type
   /// </summary>
   TExampleCodePanel = class(TLayout)
   strict private
+    FLayout: TExamplePageLayout;
     FCodeMemo: TMemo;
     FCopyAction: TRectangle;
     FCopyCaption: TText;
@@ -100,7 +105,8 @@ type
     procedure ShowCopiedFeedback;
     procedure ResetCopyFeedback(ASender: TObject);
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent;
+      const ALayout: TExamplePageLayout); reintroduce;
     procedure SetCodeText(const ACode: string);
   end;
 
@@ -111,25 +117,26 @@ uses
   System.UITypes,
   FMX.BehaviorManager,
   FMX.Graphics,
-  FMX.Platform,
-  RickUIBuilder.Samples.Example.Common.Style;
+  FMX.Platform;
 
 const
   _CODE_MEMO_BACKGROUND_STYLE_ = 'samplecodebackground';
   _COPY_CAPTION_ = 'Copiar código';
   _COPIED_CAPTION_ = 'Copiado';
 
-constructor TExampleCodePanel.Create(AOwner: TComponent);
+constructor TExampleCodePanel.Create(AOwner: TComponent;
+  const ALayout: TExamplePageLayout);
 begin
   inherited Create(AOwner);
+  FLayout := ALayout;
   ConfigureLayout;
   BuildCodeSurface;
 end;
 
 procedure TExampleCodePanel.ConfigureLayout;
 begin
-  SetBounds(0, _EXAMPLE_PAGE_VIEW_CONTENT_TOP_, _EXAMPLE_PAGE_MAIN_WIDTH_,
-    _EXAMPLE_PAGE_VIEW_CONTENT_HEIGHT_);
+  SetBounds(0, _EXAMPLE_PAGE_VIEW_CONTENT_TOP_, FLayout.MainWidth,
+    FLayout.ViewContentHeight);
 end;
 
 procedure TExampleCodePanel.BuildCodeSurface;
@@ -138,8 +145,8 @@ var
 begin
   LSurface := TRectangle.Create(Self);
   LSurface.Parent := Self;
-  LSurface.SetBounds(0, 0, _EXAMPLE_PAGE_MAIN_WIDTH_,
-    _EXAMPLE_PAGE_VIEW_CONTENT_HEIGHT_);
+  LSurface.SetBounds(0, 0, FLayout.MainWidth,
+    FLayout.ViewContentHeight);
   ConfigureCodeSurface(LSurface);
   AddCopyAction(LSurface);
   AddCodeMemo(LSurface);
@@ -161,7 +168,7 @@ var
 begin
   LAction := TRectangle.Create(ASurface);
   LAction.Parent := ASurface;
-  LAction.SetBounds(_EXAMPLE_PAGE_MAIN_WIDTH_ - _EXAMPLE_PAGE_CODE_PADDING_ -
+  LAction.SetBounds(FLayout.MainWidth - _EXAMPLE_PAGE_CODE_PADDING_ -
     _EXAMPLE_PAGE_CODE_COPY_WIDTH_, _EXAMPLE_PAGE_CODE_COPY_TOP_,
     _EXAMPLE_PAGE_CODE_COPY_WIDTH_, _EXAMPLE_PAGE_CODE_COPY_HEIGHT_);
   ConfigureCopyAction(LAction);
@@ -209,8 +216,8 @@ begin
   FCodeMemo := TMemo.Create(ASurface);
   FCodeMemo.Parent := ASurface;
   FCodeMemo.SetBounds(_EXAMPLE_PAGE_CODE_PADDING_, _EXAMPLE_PAGE_CODE_MEMO_TOP_,
-    _EXAMPLE_PAGE_MAIN_WIDTH_ - (_EXAMPLE_PAGE_CODE_PADDING_ * 2),
-    _EXAMPLE_PAGE_VIEW_CONTENT_HEIGHT_ - _EXAMPLE_PAGE_CODE_MEMO_TOP_ -
+    FLayout.MainWidth - (_EXAMPLE_PAGE_CODE_PADDING_ * 2),
+    FLayout.ViewContentHeight - _EXAMPLE_PAGE_CODE_MEMO_TOP_ -
     _EXAMPLE_PAGE_CODE_PADDING_);
   ConfigureCodeMemo;
   ConfigureCodeText;

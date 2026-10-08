@@ -1,7 +1,10 @@
-﻿{ Esta unit orquestra a Sample Page Base, compõe os controles estruturais separados, alterna Código/Resultado por TExampleView e expõe ResultHost às páginas derivadas sem conhecer conteúdo específico de componente ou abordagem. }
-{******************************************************************************}
+﻿{******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.Example.Common                                        }
+{                                                                              }
+{ Esta unit orquestra a Sample Page Base, resolve o layout efetivo antes da     }
+{ construção visual e expõe infraestrutura comum sem conhecer conteúdo         }
+{ específico de componente ou abordagem.                                       }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
@@ -10,9 +13,9 @@
 {                                                                              }
 {  Funcionalidade                                                              }
 {  --------------                                                              }
-{  Configura a janela FMX borderless menor que a Home, compõe header,          }
-{  identidade, navegação lateral, seletor Código Delphi/Resultado e a view     }
-{  principal, expondo operações protegidas para as páginas derivadas.          }
+{  Configura a janela FMX borderless menor que a Home, resolve defaults e      }
+{  especializações de layout por herança, compõe a infraestrutura visual e     }
+{  expõe operações protegidas para as páginas derivadas.                       }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
@@ -31,7 +34,7 @@
 {  - RickUIBuilder.Samples.Example.Common.Result.Panel                         }
 {      Materializa exclusivamente a superfície e o host do resultado.          }
 {  - RickUIBuilder.Samples.Example.Common.Style                                }
-{      Fornece dimensões, espaçamentos e paleta específicos desta família.     }
+{      Fornece TExamplePageLayout, defaults, cálculos derivados e paleta.      }
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
@@ -79,12 +82,14 @@ uses
   RickUIBuilder.Samples.Example.Common.Navigation,
   RickUIBuilder.Samples.Example.Common.Code.Panel,
   RickUIBuilder.Samples.Example.Common.Result.Panel,
-  RickUIBuilder.Samples.Example.Common.View.Selector;
+  RickUIBuilder.Samples.Example.Common.View.Selector,
+  RickUIBuilder.Samples.Example.Common.Style;
 
 type
   /// <summary>Base visual comum das páginas concretas de exemplos.</summary>
   TExampleCommon = class abstract(TForm)
   strict private
+    FLayout: TExamplePageLayout;
     FHeader: TExampleHeader;
     FPageTitle: TText;
     FPageSubtitle: TText;
@@ -115,6 +120,12 @@ type
     procedure BackRequested(ASender: TObject);
     function GetResultHost: TLayout;
   strict protected
+    /// <summary>
+    /// Permite que a derivada ajuste os valores primários do layout antes da
+    /// construção da interface. O override não deve depender de campos próprios
+    /// inicializados após inherited Create.
+    /// </summary>
+    procedure ConfigureLayout(var ALayout: TExamplePageLayout); virtual;
     procedure ConfigurePage(const AParentTitle, ATitle, ASubtitle: string);
     function AddNavigationItem(const ACaption: string): TExampleNavigationItem;
     procedure SelectNavigationItem(const AItem: TExampleNavigationItem);
@@ -144,12 +155,13 @@ uses
   FMX.Graphics,
 
   RickUIBuilder.Samples.App.Types,
-  RickUIBuilder.Samples.App.Typography,
-  RickUIBuilder.Samples.Example.Common.Style;
+  RickUIBuilder.Samples.App.Typography;
 
 constructor TExampleCommon.Create(AOwner: TComponent);
 begin
   inherited CreateNew(AOwner);
+  FLayout := TExamplePageLayout.Default;
+  ConfigureLayout(FLayout);
   ConfigureForm;
   BuildInterface;
 end;
@@ -158,10 +170,10 @@ procedure TExampleCommon.ConfigureForm;
 begin
   Caption := 'Rick.UIBuilder - Samples';
   BorderStyle := TFmxFormBorderStyle.None;
-  ClientWidth := _EXAMPLE_PAGE_WIDTH_;
-  ClientHeight := _EXAMPLE_PAGE_HEIGHT_;
-  Constraints.MinWidth := _EXAMPLE_PAGE_WIDTH_;
-  Constraints.MinHeight := _EXAMPLE_PAGE_HEIGHT_;
+  ClientWidth :=  Round(FLayout.PageWidth);
+  ClientHeight := Round(FLayout.PageHeight);
+  Constraints.MinWidth := FLayout.PageWidth;
+  Constraints.MinHeight := FLayout.PageHeight;
   Position := TFormPosition.ScreenCenter;
   Fill.Kind := TBrushKind.Solid;
   Fill.Color := _EXAMPLE_PAGE_BACKGROUND_;
@@ -195,7 +207,7 @@ begin
   FPageTitle := TText.Create(Self);
   FPageTitle.Parent := Self;
   FPageTitle.SetBounds(_EXAMPLE_PAGE_CONTENT_LEFT_, _EXAMPLE_PAGE_TITLE_TOP_,
-    _EXAMPLE_PAGE_CONTENT_WIDTH_, _EXAMPLE_PAGE_TITLE_HEIGHT_);
+    FLayout.ContentWidth, _EXAMPLE_PAGE_TITLE_HEIGHT_);
   FPageTitle.TextSettings.Font.Size := _FONT_SIZE_PAGE_TITLE_;
   FPageTitle.TextSettings.Font.Style := [TFontStyle.fsBold];
   FPageTitle.TextSettings.FontColor := _EXAMPLE_PAGE_TEXT_PRIMARY_;
@@ -209,7 +221,7 @@ begin
   FPageSubtitle := TText.Create(Self);
   FPageSubtitle.Parent := Self;
   FPageSubtitle.SetBounds(_EXAMPLE_PAGE_CONTENT_LEFT_, _EXAMPLE_PAGE_SUBTITLE_TOP_,
-    _EXAMPLE_PAGE_CONTENT_WIDTH_, _EXAMPLE_PAGE_SUBTITLE_HEIGHT_);
+    FLayout.ContentWidth, _EXAMPLE_PAGE_SUBTITLE_HEIGHT_);
   FPageSubtitle.WordWrap := True;
   FPageSubtitle.TextSettings.Font.Size := _FONT_SIZE_PAGE_SUBTITLE_;
   FPageSubtitle.TextSettings.FontColor := _EXAMPLE_PAGE_TEXT_SECONDARY_;
@@ -225,14 +237,14 @@ begin
   LBody := TLayout.Create(Self);
   LBody.Parent := Self;
   LBody.SetBounds(_EXAMPLE_PAGE_CONTENT_LEFT_, _EXAMPLE_PAGE_BODY_TOP_,
-    _EXAMPLE_PAGE_CONTENT_WIDTH_, _EXAMPLE_PAGE_BODY_HEIGHT_);
+    FLayout.ContentWidth, FLayout.BodyHeight);
   BuildNavigation(LBody);
   BuildContent(LBody);
 end;
 
 procedure TExampleCommon.BuildNavigation(const AParent: TLayout);
 begin
-  FNavigation := TExampleNavigation.Create(AParent);
+  FNavigation := TExampleNavigation.Create(AParent, FLayout);
   FNavigation.Parent := AParent;
 end;
 
@@ -240,8 +252,8 @@ procedure TExampleCommon.BuildContent(const AParent: TLayout);
 begin
   FContentHost := TLayout.Create(AParent);
   FContentHost.Parent := AParent;
-  FContentHost.SetBounds(_EXAMPLE_PAGE_NAV_WIDTH_ + _EXAMPLE_PAGE_BODY_GAP_, 0,
-    _EXAMPLE_PAGE_MAIN_WIDTH_, _EXAMPLE_PAGE_BODY_HEIGHT_);
+  FContentHost.SetBounds(FLayout.NavigationWidth + _EXAMPLE_PAGE_BODY_GAP_, 0,
+    FLayout.MainWidth, FLayout.BodyHeight);
   BuildExampleIdentity;
   BuildViewSelector;
   BuildCodePanel;
@@ -260,7 +272,7 @@ begin
   FExampleTitle := TText.Create(FContentHost);
   FExampleTitle.Parent := FContentHost;
   FExampleTitle.SetBounds(0, _EXAMPLE_PAGE_EXAMPLE_TITLE_TOP_,
-    _EXAMPLE_PAGE_MAIN_WIDTH_, _EXAMPLE_PAGE_EXAMPLE_TITLE_HEIGHT_);
+    FLayout.MainWidth, _EXAMPLE_PAGE_EXAMPLE_TITLE_HEIGHT_);
   FExampleTitle.TextSettings.Font.Size := _FONT_SIZE_BODY_;
   FExampleTitle.TextSettings.Font.Style := [TFontStyle.fsBold];
   FExampleTitle.TextSettings.FontColor := _EXAMPLE_PAGE_TEXT_PRIMARY_;
@@ -274,7 +286,7 @@ begin
   FExampleDescription := TText.Create(FContentHost);
   FExampleDescription.Parent := FContentHost;
   FExampleDescription.SetBounds(0, _EXAMPLE_PAGE_EXAMPLE_DESCRIPTION_TOP_,
-    _EXAMPLE_PAGE_MAIN_WIDTH_, _EXAMPLE_PAGE_EXAMPLE_DESCRIPTION_HEIGHT_);
+    FLayout.MainWidth, _EXAMPLE_PAGE_EXAMPLE_DESCRIPTION_HEIGHT_);
   FExampleDescription.WordWrap := True;
   FExampleDescription.TextSettings.Font.Size := _FONT_SIZE_NAVIGATION_;
   FExampleDescription.TextSettings.FontColor := _EXAMPLE_PAGE_TEXT_SECONDARY_;
@@ -287,7 +299,7 @@ procedure TExampleCommon.BuildViewSelector;
 var
   LViewSelector: TExampleViewSelector;
 begin
-  LViewSelector := TExampleViewSelector.Create(FContentHost);
+  LViewSelector := TExampleViewSelector.Create(FContentHost, FLayout);
   LViewSelector.Parent := FContentHost;
   LViewSelector.OnChange := ViewSelectionChanged;
   FViewSelector := LViewSelector;
@@ -297,7 +309,7 @@ procedure TExampleCommon.BuildCodePanel;
 var
   LCodePanel: TExampleCodePanel;
 begin
-  LCodePanel := TExampleCodePanel.Create(FContentHost);
+  LCodePanel := TExampleCodePanel.Create(FContentHost, FLayout);
   LCodePanel.Parent := FContentHost;
   FCodePanel := LCodePanel;
 end;
@@ -306,7 +318,7 @@ procedure TExampleCommon.BuildResultPanel;
 var
   LResultPanel: TExampleResultPanel;
 begin
-  LResultPanel := TExampleResultPanel.Create(FContentHost);
+  LResultPanel := TExampleResultPanel.Create(FContentHost, FLayout);
   LResultPanel.Parent := FContentHost;
   FResultPanel := LResultPanel;
 end;
@@ -320,6 +332,10 @@ procedure TExampleCommon.ApplySelectedView;
 begin
   FCodePanel.Visible := FViewSelector.SelectedView = TExampleView.CodeView;
   FResultPanel.Visible := FViewSelector.SelectedView = TExampleView.ResultView;
+end;
+
+procedure TExampleCommon.ConfigureLayout(var ALayout: TExamplePageLayout);
+begin
 end;
 
 procedure TExampleCommon.ConfigurePage(const AParentTitle, ATitle,

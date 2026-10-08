@@ -13,8 +13,8 @@
 {                                                                              }
 {  Funcionalidade                                                              }
 {  --------------                                                              }
-{  Configura a Sample Page Base, cria a navegação dos exemplos Fluent,         }
-{  sincroniza título/descrição/snippet e solicita a execução real no           }
+{  Configura a Sample Page Base com layout especializado para a navegação      }
+{  desta página, cria os exemplos Fluent e solicita a execução real no         }
 {  ResultHost por meio de TRickUIBuilder.Button.                               }
 {                                                                              }
 {  Dependências do projeto                                                     }
@@ -25,6 +25,8 @@
 {      Fornece TExampleCommon e a infraestrutura visual compartilhada.         }
 {  - RickUIBuilder.Samples.Example.Common.Navigation                           }
 {      Fornece TExampleNavigationItem retornado pela API protegida da base.    }
+{  - RickUIBuilder.Samples.Example.Common.Style                                }
+{      Fornece TExamplePageLayout especializado por herança nesta página.      }
 {  - RickUIBuilder.Samples.Example.Button.Fluent.Content                       }
 {      Fornece captions, títulos, descrições e snippets dos exemplos.          }
 {  - RickUIBuilder.Samples.Example.Button.Fluent.Runner                        }
@@ -50,6 +52,7 @@
 {  - Não contém implementação Factory nem exemplos de outro componente.        }
 {  - Conteúdo textual e execução permanecem separados em units próprias.       }
 {  - O Runner recebe os eventos dos exemplos sem depender de TComponent.       }
+{  - Somente esta página amplia janela e navegação; as demais usam os defaults. }
 {                                                                              }
 {  Manutenção                                                                  }
 {  ----------                                                                  }
@@ -67,6 +70,7 @@ uses
   RickUIBuilder.Samples.App.Types,
   RickUIBuilder.Samples.Example.Common,
   RickUIBuilder.Samples.Example.Common.Navigation,
+  RickUIBuilder.Samples.Example.Common.Style,
   RickUIBuilder.Samples.Example.Button.Fluent.Content,
   RickUIBuilder.Samples.Example.Button.Fluent.Runner;
 
@@ -80,6 +84,8 @@ type
     procedure NavigationRequested(ASender: TObject);
     procedure ShowExample(const AExample: TButtonFluentExample;
       const AItem: TExampleNavigationItem);
+  strict protected
+    procedure ConfigureLayout(var ALayout: TExamplePageLayout); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -91,6 +97,18 @@ const
   _PARENT_TITLE_ = 'Button';
   _PAGE_TITLE_ = 'Button - Fluent Builder';
   _PAGE_SUBTITLE_ = 'Criação encadeada de Button com TRickUIBuilder.Button.';
+  _BUTTON_FLUENT_PAGE_WIDTH_ = 640;
+  _BUTTON_FLUENT_PAGE_HEIGHT_ = 530;
+  _BUTTON_FLUENT_NAV_WIDTH_ = 170;
+
+procedure TExampleButtonFluent.ConfigureLayout(
+  var ALayout: TExamplePageLayout);
+begin
+  inherited ConfigureLayout(ALayout);
+  ALayout.PageWidth := _BUTTON_FLUENT_PAGE_WIDTH_;
+  ALayout.PageHeight := _BUTTON_FLUENT_PAGE_HEIGHT_;
+  ALayout.NavigationWidth := _BUTTON_FLUENT_NAV_WIDTH_;
+end;
 
 constructor TExampleButtonFluent.Create(AOwner: TComponent);
 var

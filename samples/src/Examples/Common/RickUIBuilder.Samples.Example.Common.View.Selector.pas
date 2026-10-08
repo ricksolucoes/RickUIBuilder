@@ -1,7 +1,9 @@
-﻿{ Esta unit implementa o seletor reutilizável Código Delphi/Resultado da Sample Page Base, mantendo uma única TExampleView ativa e notificando TExampleCommon quando o usuário alterna a visualização. }
-{******************************************************************************}
+﻿{******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.Example.Common.View.Selector                          }
+{                                                                              }
+{ Esta unit implementa o seletor reutilizável Código Delphi/Resultado usando   }
+{ a largura principal calculada pelo layout efetivo da Sample Page Base.       }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
@@ -55,13 +57,15 @@ uses
   FMX.Layouts,
   FMX.Objects,
 
-  RickUIBuilder.Samples.App.Types;
+  RickUIBuilder.Samples.App.Types,
+  RickUIBuilder.Samples.Example.Common.Style;
 
 type
 
   /// <summary>Seletor comum entre a visualização de código e de resultado.</summary>
   TExampleViewSelector = class(TLayout)
   strict private
+    FLayout: TExamplePageLayout;
     FCodeSurface: TRectangle;
     FCodeText: TText;
     FResultSurface: TRectangle;
@@ -79,7 +83,8 @@ type
     procedure ResultRequested(ASender: TObject);
     procedure ChangeView(const AView: TExampleView);
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent;
+      const ALayout: TExamplePageLayout); reintroduce;
     property SelectedView: TExampleView read FSelectedView;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
   end;
@@ -90,12 +95,13 @@ uses
   System.UITypes,
   FMX.Graphics,
   FMX.Types,
-  RickUIBuilder.Samples.App.Typography,
-  RickUIBuilder.Samples.Example.Common.Style;
+  RickUIBuilder.Samples.App.Typography;
 
-constructor TExampleViewSelector.Create(AOwner: TComponent);
+constructor TExampleViewSelector.Create(AOwner: TComponent;
+  const ALayout: TExamplePageLayout);
 begin
   inherited Create(AOwner);
+  FLayout := ALayout;
   FSelectedView := TExampleView.CodeView;
   ConfigureLayout;
   BuildSelectors;
@@ -104,7 +110,7 @@ end;
 
 procedure TExampleViewSelector.ConfigureLayout;
 begin
-  SetBounds(0, _EXAMPLE_PAGE_VIEW_SELECTOR_TOP_, _EXAMPLE_PAGE_MAIN_WIDTH_,
+  SetBounds(0, _EXAMPLE_PAGE_VIEW_SELECTOR_TOP_, FLayout.MainWidth,
     _EXAMPLE_PAGE_SELECTOR_HEIGHT_);
 end;
 

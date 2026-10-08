@@ -41,7 +41,7 @@ Quando aplicável, `PASS` exige evidência de que: a base `TComponentCommon` nã
 
 ## Gate específico da Sample Page Base
 
-Quando aplicável, `PASS` exige evidência de que `TExampleCommon` permanece menor que a Home, borderless, aderente à sequência normativa do textframe, sem conteúdo específico de componente/abordagem, sem conteúdo específico na base e com `Código Delphi` / `Resultado` funcionando como views mutuamente exclusivas, iniciando em Código Delphi. Páginas concretas requisitadas são permitidas somente fora de `Examples/Common`. Deve haver separação efetiva entre `.Common`, `.Header`, `.Navigation`, `.View.Selector`, `.Code.Panel`, `.Result.Panel`, `.Style` e `.Icons`, com todas as units explicitamente registradas no `.dpr` e `.dproj`; ownership do `ResultHost`/limpeza deve ser coerente com o código final.
+Quando aplicável, `PASS` exige evidência de que `TExampleCommon` usa layout default menor que a Home, qualquer override concreto também permanece menor que a Home, `TExamplePageLayout` concentra os valores primários/cálculos derivados, e a página é borderless, aderente à sequência normativa do textframe, sem conteúdo específico de componente/abordagem, sem conteúdo específico na base e com `Código Delphi` / `Resultado` funcionando como views mutuamente exclusivas, iniciando em Código Delphi. Páginas concretas requisitadas são permitidas somente fora de `Examples/Common`. Deve haver separação efetiva entre `.Common`, `.Header`, `.Navigation`, `.View.Selector`, `.Code.Panel`, `.Result.Panel`, `.Style` e `.Icons`, com todas as units explicitamente registradas no `.dpr` e `.dproj`; ownership do `ResultHost`/limpeza deve ser coerente com o código final.
 
 
 ## Gate específico de Examples concretos

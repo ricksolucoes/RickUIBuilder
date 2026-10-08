@@ -24,6 +24,8 @@
 {      Fornece TExampleCommon e a infraestrutura visual compartilhada.         }
 {  - RickUIBuilder.Samples.Example.Common.Navigation                           }
 {      Fornece TExampleNavigationItem retornado pela API protegida da base.    }
+{  - RickUIBuilder.Samples.Example.Common.Style                                }
+{      Fornece TExamplePageLayout usado na especialização local da geometria.  }
 {  - RickUIBuilder.Samples.Example.Badge.Factory.Content                       }
 {      Fornece captions, títulos, descrições e snippets dos exemplos.          }
 {  - RickUIBuilder.Samples.Example.Badge.Factory.Runner                        }
@@ -65,6 +67,7 @@ uses
 
   RickUIBuilder.Samples.Example.Common,
   RickUIBuilder.Samples.Example.Common.Navigation,
+  RickUIBuilder.Samples.Example.Common.Style,
   RickUIBuilder.Samples.Example.Badge.Factory.Content;
 
 type
@@ -77,6 +80,8 @@ type
     procedure NavigationRequested(ASender: TObject);
     procedure ShowExample(const AExample: TBadgeFactoryExample;
       const AItem: TExampleNavigationItem);
+  strict protected
+    procedure ConfigureLayout(var ALayout: TExamplePageLayout); override;
   public
     constructor Create(AOwner: TComponent); override;
   end;
@@ -90,6 +95,16 @@ const
   _PARENT_TITLE_ = 'Badge';
   _PAGE_TITLE_ = 'Badge - Factory';
   _PAGE_SUBTITLE_ = 'Criação direta de TRectangle + TLabel com TRickUIBuilderFactory.CreateBadge.';
+  _BADGE_FACTORY_PAGE_WIDTH_ = 640;
+  _BADGE_FACTORY_NAV_WIDTH_ = 170;
+
+procedure TExampleBadgeFactory.ConfigureLayout(
+  var ALayout: TExamplePageLayout);
+begin
+  inherited ConfigureLayout(ALayout);
+  ALayout.PageWidth := _BADGE_FACTORY_PAGE_WIDTH_;
+  ALayout.NavigationWidth := _BADGE_FACTORY_NAV_WIDTH_;
+end;
 
 constructor TExampleBadgeFactory.Create(AOwner: TComponent);
 var

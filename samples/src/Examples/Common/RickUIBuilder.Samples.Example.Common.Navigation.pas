@@ -2,6 +2,9 @@
 {                                                                              }
 {  RickUIBuilder.Samples.Example.Common.Navigation                             }
 {                                                                              }
+{ Esta unit implementa a navegação lateral reutilizável usando o layout        }
+{ efetivo recebido da Sample Page Base e preservando seleção/scroll comuns.    }
+{                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
 {  Encapsular a navegação lateral reutilizável da Sample Page Base.            }
@@ -9,15 +12,15 @@
 {  Funcionalidade                                                              }
 {  --------------                                                              }
 {  Materializa a superfície lateral, o scroll vertical, os itens de navegação  }
-{  e o estado visual aprovado do item atualmente selecionado, incluindo        }
-{  fundo azul-claro e indicador vertical azul à esquerda.                      }
+{  e o estado visual selecionado usando o TExamplePageLayout efetivo recebido  }
+{  da Sample Page Base.                                                        }
 {                                                                              }
 {  Dependências do projeto                                                     }
 {  -----------------------                                                     }
 {  - RickUIBuilder.Samples.App.Typography                                      }
 {      Fornece o token tipográfico dos itens de navegação.                     }
 {  - RickUIBuilder.Samples.Example.Common.Style                                }
-{      Fornece dimensões, espaçamentos e cores da navegação.                   }
+{      Fornece TExamplePageLayout, espaçamentos e cores da navegação.      }
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
@@ -49,7 +52,9 @@ interface
 uses
   System.Classes,
   FMX.Layouts,
-  FMX.Objects;
+  FMX.Objects,
+
+  RickUIBuilder.Samples.Example.Common.Style;
 
 type
   /// <summary>Item visual reutilizável da navegação lateral.</summary>
@@ -58,10 +63,10 @@ type
     FSelectionIndicator: TRectangle;
     FLabel: TText;
     procedure ConfigureSurface;
-    procedure BuildSelectionIndicator;
+    procedure BuildSelectionIndicator(const AHeight: Single);
     procedure BuildLabel;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent; const AIndicatorHeight: Single); reintroduce;
     procedure SetCaption(const ACaption: string);
     procedure SetSelected(const ASelected: Boolean);
   end;
@@ -69,13 +74,15 @@ type
   /// <summary>Container rolável responsável pela navegação lateral comum.</summary>
   TExampleNavigation = class(TRectangle)
   strict private
+    FLayout: TExamplePageLayout;
     FHost: TVertScrollBox;
     FSelectedItem: TExampleNavigationItem;
     FItemTop: Single;
     procedure ConfigureSurface;
     procedure BuildHost;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent;
+      const ALayout: TExamplePageLayout); reintroduce;
     function AddItem(const ACaption: string): TExampleNavigationItem;
     procedure SelectItem(const AItem: TExampleNavigationItem);
   end;
@@ -86,16 +93,16 @@ uses
   System.UITypes,
   FMX.Graphics,
   FMX.Types,
-  RickUIBuilder.Samples.App.Typography,
-  RickUIBuilder.Samples.Example.Common.Style;
+  RickUIBuilder.Samples.App.Typography;
 
 { TExampleNavigationItem }
 
-constructor TExampleNavigationItem.Create(AOwner: TComponent);
+constructor TExampleNavigationItem.Create(AOwner: TComponent;
+  const AIndicatorHeight: Single);
 begin
   inherited Create(AOwner);
   ConfigureSurface;
-  BuildSelectionIndicator;
+  BuildSelectionIndicator(AIndicatorHeight);
   BuildLabel;
 end;
 
@@ -109,12 +116,13 @@ begin
   Cursor := crHandPoint;
 end;
 
-procedure TExampleNavigationItem.BuildSelectionIndicator;
+procedure TExampleNavigationItem.BuildSelectionIndicator(
+  const AHeight: Single);
 begin
   FSelectionIndicator := TRectangle.Create(Self);
   FSelectionIndicator.Parent := Self;
   FSelectionIndicator.SetBounds(0, _EXAMPLE_PAGE_NAV_INDICATOR_TOP_,
-    _EXAMPLE_PAGE_NAV_INDICATOR_WIDTH_, _EXAMPLE_PAGE_NAV_INDICATOR_HEIGHT_);
+    _EXAMPLE_PAGE_NAV_INDICATOR_WIDTH_, AHeight);
   FSelectionIndicator.Fill.Kind := TBrushKind.Solid;
   FSelectionIndicator.Fill.Color := _EXAMPLE_PAGE_PRIMARY_;
   FSelectionIndicator.Stroke.Kind := TBrushKind.None;
@@ -155,16 +163,18 @@ end;
 
 { TExampleNavigation }
 
-constructor TExampleNavigation.Create(AOwner: TComponent);
+constructor TExampleNavigation.Create(AOwner: TComponent;
+  const ALayout: TExamplePageLayout);
 begin
   inherited Create(AOwner);
+  FLayout := ALayout;
   ConfigureSurface;
   BuildHost;
 end;
 
 procedure TExampleNavigation.ConfigureSurface;
 begin
-  SetBounds(0, 0, _EXAMPLE_PAGE_NAV_WIDTH_, _EXAMPLE_PAGE_BODY_HEIGHT_);
+  SetBounds(0, 0, FLayout.NavigationWidth, FLayout.BodyHeight);
   Fill.Kind := TBrushKind.Solid;
   Fill.Color := _EXAMPLE_PAGE_SURFACE_BACKGROUND_;
   Stroke.Kind := TBrushKind.Solid;
@@ -176,20 +186,21 @@ begin
   FHost := TVertScrollBox.Create(Self);
   FHost.Parent := Self;
   FHost.SetBounds(_EXAMPLE_PAGE_NAV_PADDING_, _EXAMPLE_PAGE_NAV_PADDING_,
-    _EXAMPLE_PAGE_NAV_ITEM_WIDTH_,
-    _EXAMPLE_PAGE_BODY_HEIGHT_ - (_EXAMPLE_PAGE_NAV_PADDING_ * 2));
+    FLayout.NavigationItemWidth,
+    FLayout.BodyHeight - (_EXAMPLE_PAGE_NAV_PADDING_ * 2));
   FItemTop := 0;
 end;
 
 function TExampleNavigation.AddItem(
   const ACaption: string): TExampleNavigationItem;
 begin
-  Result := TExampleNavigationItem.Create(FHost);
+  Result := TExampleNavigationItem.Create(FHost,
+    FLayout.NavigationIndicatorHeight);
   Result.Parent := FHost;
-  Result.SetBounds(0, FItemTop, _EXAMPLE_PAGE_NAV_ITEM_WIDTH_,
-    _EXAMPLE_PAGE_NAV_ITEM_HEIGHT_);
+  Result.SetBounds(0, FItemTop, FLayout.NavigationItemWidth,
+    FLayout.NavigationItemHeight);
   Result.SetCaption(ACaption);
-  FItemTop := FItemTop + _EXAMPLE_PAGE_NAV_ITEM_HEIGHT_ +
+  FItemTop := FItemTop + FLayout.NavigationItemHeight +
     _EXAMPLE_PAGE_NAV_ITEM_GAP_;
 end;
 

@@ -149,7 +149,7 @@ A terceira camada de navegação possui uma Sample Page Base própria, distinta 
 
 ### DEC-036 — Sample Page permanece menor que a Home
 
-A família de páginas de exemplos deve permanecer estritamente menor que a Home. A base implementada usa `620 × 510`, enquanto a Home usa `644 × 534`. Excesso de navegação e código é tratado dentro das regiões roláveis da própria página, sem aumentar a janela acima da Home nem reduzir tipografia para mascarar clipping.
+A família de páginas de exemplos deve permanecer estritamente menor que a Home. O layout padrão da base usa `620 × 510`, enquanto a Home usa `644 × 534`. **DEC-066 complementa esta decisão** permitindo especialização controlada por herança quando uma página concreta precisa de mais espaço, sempre abaixo da Home. Excesso de conteúdo continua sendo tratado pelas regiões roláveis apropriadas, sem reduzir tipografia para mascarar clipping.
 
 ### DEC-037 — O textframe fixa a sequência estrutural da Sample Page
 
@@ -273,3 +273,12 @@ Páginas reais da terceira camada seguem `samples/src/Examples/<Componente>/<Abo
 ### DEC-065 — Edit - Fluent Builder cobre presets, validação e runtime
 
 `TExampleEditFluent` herda de `TExampleCommon` e fica em `src/Examples/Edit/Fluent`, separando coordenação (`Fluent`), conteúdo/snippets (`Fluent.Content`) e execução (`Fluent.Runner`). A página possui vinte e nove exemplos: Básico, Interface, um exemplo individual para cada um dos 14 presets públicos, CaseMode, Obrigatoriedade, Limite/contador/limpar, Senha, Feedback inválido, Indicador de requisito, Copiar e colar mascarado, Aparência, Somente leitura, Customização visual, Handle runtime e Completo. O fluxo de clipboard preserva os cenários operacionais de CPF/CNPJ do Sample legado. O Runner é uma instância mantida pela Sample Page para que handlers de botões permaneçam válidos sem `TComponent` auxiliar; `Reset` libera referências a handles antes de `ClearResult`. O exemplo `Completo` cobre os 62 métodos configuráveis de `IRickUIBuilderEdit` e finaliza com `Build`. Edit continua sem Factory porque a API pública não expõe `Factory.CreateEdit`.
+
+### DEC-066 — Sample Page usa layout padrão com especialização controlada por herança
+
+`RickUIBuilder.Samples.Example.Common.Style` passa a definir `TExamplePageLayout`, record específico da infraestrutura de `Examples/Common`. Ele mantém apenas `PageWidth`, `PageHeight`, `NavigationWidth` e `NavigationItemHeight` como valores primários; larguras e alturas dependentes são calculadas pela própria infraestrutura. O tipo não é colocado em `RickUIBuilder.Samples.App.Types`, que permanece responsável pelos enums compartilhados de navegação/examples.
+
+`TExampleCommon` inicializa `TExamplePageLayout.Default` (`620 × 510`, navegação `142`, item `28`) e chama o hook protegido virtual `ConfigureLayout(var ALayout)` antes de construir controles. A base não altera esses defaults. Derivadas podem sobrescrever o hook somente quando houver necessidade concreta de UI/UX, sem depender de campos próprios ainda não inicializados e mantendo a janela estritamente menor que a Home de `644 × 534`.
+
+No estado atual, `TExampleButtonFluent` especializa a geometria para `640 × 530` com navegação de `170` px, enquanto `TExampleBadgeFactory`, `TExampleBadgeFluent` e `TExampleDividerFluent` usam `640 × 510` com navegação de `170` px; nas quatro páginas o item permanece com `28` px. As demais Sample Pages não sobrescrevem o hook e preservam exatamente o layout padrão. A especialização não autoriza cada derivada a manipular diretamente controles internos ou métricas derivadas da base.
+

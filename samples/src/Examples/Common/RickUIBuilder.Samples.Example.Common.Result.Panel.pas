@@ -1,7 +1,9 @@
-﻿{ Esta unit implementa a view de Resultado ocupando toda a área útil restante e fornece o ResultHost, container estável onde as páginas derivadas materializam e substituem os controles executáveis de cada sample. }
-{******************************************************************************}
+﻿{******************************************************************************}
 {                                                                              }
 {  RickUIBuilder.Samples.Example.Common.Result.Panel                            }
+{                                                                              }
+{ Esta unit implementa a view de Resultado usando a área útil calculada pelo    }
+{ layout efetivo e mantém ResultHost estável entre as materializações.          }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
@@ -57,12 +59,15 @@ interface
 uses
   System.Classes,
   FMX.Layouts,
-  FMX.Objects;
+  FMX.Objects,
+
+  RickUIBuilder.Samples.Example.Common.Style;
 
 type
   /// <summary>Região visual que hospeda o resultado executável do sample.</summary>
   TExampleResultPanel = class(TLayout)
   strict private
+    FLayout: TExamplePageLayout;
     FHost: TLayout;
     procedure ConfigureLayout;
     procedure AddTitle;
@@ -70,7 +75,8 @@ type
     procedure ConfigureSurface(const ASurface: TRectangle);
     procedure BuildHost(const ASurface: TRectangle);
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent;
+      const ALayout: TExamplePageLayout); reintroduce;
     /// <summary>
     /// Remove e libera os controles materializados no ResultHost, preservando
     /// o próprio host para que o próximo sample reutilize a mesma infraestrutura.
@@ -90,12 +96,13 @@ uses
   System.UITypes,
   FMX.Graphics,
   FMX.Types,
-  RickUIBuilder.Samples.App.Typography,
-  RickUIBuilder.Samples.Example.Common.Style;
+  RickUIBuilder.Samples.App.Typography;
 
-constructor TExampleResultPanel.Create(AOwner: TComponent);
+constructor TExampleResultPanel.Create(AOwner: TComponent;
+  const ALayout: TExamplePageLayout);
 begin
   inherited Create(AOwner);
+  FLayout := ALayout;
   ConfigureLayout;
   AddTitle;
   AddSurface;
@@ -103,8 +110,8 @@ end;
 
 procedure TExampleResultPanel.ConfigureLayout;
 begin
-  SetBounds(0, _EXAMPLE_PAGE_VIEW_CONTENT_TOP_, _EXAMPLE_PAGE_MAIN_WIDTH_,
-    _EXAMPLE_PAGE_VIEW_CONTENT_HEIGHT_);
+  SetBounds(0, _EXAMPLE_PAGE_VIEW_CONTENT_TOP_, FLayout.MainWidth,
+    FLayout.ViewContentHeight);
 end;
 
 procedure TExampleResultPanel.AddTitle;
@@ -113,7 +120,7 @@ var
 begin
   LTitle := TText.Create(Self);
   LTitle.Parent := Self;
-  LTitle.SetBounds(0, 0, _EXAMPLE_PAGE_MAIN_WIDTH_,
+  LTitle.SetBounds(0, 0, FLayout.MainWidth,
     _EXAMPLE_PAGE_RESULT_TITLE_HEIGHT_);
   LTitle.Text := 'Resultado';
   LTitle.TextSettings.Font.Size := _FONT_SIZE_BODY_;
@@ -131,7 +138,7 @@ begin
   LSurface := TRectangle.Create(Self);
   LSurface.Parent := Self;
   LSurface.SetBounds(0, _EXAMPLE_PAGE_RESULT_SURFACE_TOP_,
-    _EXAMPLE_PAGE_MAIN_WIDTH_, _EXAMPLE_PAGE_RESULT_SURFACE_HEIGHT_);
+    FLayout.MainWidth, FLayout.ResultSurfaceHeight);
   ConfigureSurface(LSurface);
   BuildHost(LSurface);
 end;
@@ -151,8 +158,8 @@ begin
   FHost := TLayout.Create(ASurface);
   FHost.Parent := ASurface;
   FHost.SetBounds(_EXAMPLE_PAGE_RESULT_PADDING_, _EXAMPLE_PAGE_RESULT_PADDING_,
-    _EXAMPLE_PAGE_MAIN_WIDTH_ - (_EXAMPLE_PAGE_RESULT_PADDING_ * 2),
-    _EXAMPLE_PAGE_RESULT_SURFACE_HEIGHT_ - (_EXAMPLE_PAGE_RESULT_PADDING_ * 2));
+    FLayout.MainWidth - (_EXAMPLE_PAGE_RESULT_PADDING_ * 2),
+    FLayout.ResultSurfaceHeight - (_EXAMPLE_PAGE_RESULT_PADDING_ * 2));
 end;
 
 procedure TExampleResultPanel.Clear;
