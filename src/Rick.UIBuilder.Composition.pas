@@ -1,4 +1,4 @@
-unit Rick.UIBuilder.Composition;
+﻿unit Rick.UIBuilder.Composition;
 (*
   ==============================================================================
   Unit: Rick.UIBuilder.Composition
@@ -15,12 +15,13 @@ unit Rick.UIBuilder.Composition;
   compor sequencias curtas e fixas de controles em uma tela.
 
   Diferente dos builders IRickUIBuilderLabel/IRickUIBuilderButton/
-  IRickUIBuilderBadge/IRickUIBuilderDivider, o composer NAO acumula
+  IRickUIBuilderBadge/IRickUIBuilderDivider/IRickUIBuilderComboBox/
+  IRickUIBuilderEdit, o composer NAO acumula
   estado ate um Build final - cada metodo Add* ja cria o controle
   imediatamente e devolve a propria instancia para encadeamento.
 
-  Ver docs/usage-guide.md (tabela de decisao) para quando utilizar
-  esta abordagem em vez da Factory direta ou dos builders fluentes.
+  O README.md resume quando utilizar Composition, Factory ou os builders
+  fluentes e aponta para a documentacao detalhada dos componentes.
 
   ==============================================================================
 *)

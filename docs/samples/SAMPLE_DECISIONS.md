@@ -117,7 +117,7 @@ Textos técnicos da imagem não são copiados quando divergirem da implementaç�
 
 ### DEC-028 — `Ver exemplos` não possui destino fictício
 
-`Ver exemplos` representa a ação para abrir uma Sample Page de Factory ou Fluent Builder. A ação só recebe callback, `crHandPoint` e hit testing quando o destino correspondente realmente existe. No estado atual, Text / Label, Button, Badge, Divider e ComboBox possuem destinos Factory + Fluent Builder; Edit possui somente Fluent Builder. Abordagens sem destino permanecem somente visuais até sua implementação.
+`Ver exemplos` representa a ação para abrir uma Sample Page de Factory ou Fluent Builder. A ação só recebe callback, `crHandPoint` e hit testing quando o destino correspondente realmente existe. No estado atual, Text / Label, Button, Badge, Divider e ComboBox possuem destinos Factory + Fluent Builder; Edit possui somente Fluent Builder. Nenhuma abordagem sem destino é apresentada como opção funcional.
 
 ### DEC-029 — Tipografia é preservada na Component Page
 
@@ -185,7 +185,7 @@ A implementação comum fica em `samples/src/Examples/Common`. `TExampleCommon` 
 
 ### DEC-045 — Navegação só é habilitada para destino real e permanece coordenada fora da View
 
-As Component Pages capturam somente as intenções correspondentes aos destinos reais. Nenhuma Component Page cria Sample Pages. `TSampleApplicationCoordinator` conecta os callbacks de Text / Label, Button, Badge, Divider e ComboBox para Factory + Fluent Builder e o callback Fluent de Edit; cria a Sample Page concreta sem Owner, executa `ShowModal` e libera a instância em `finally`. Cards sem destino continuam sem callback e sem `HitTest`.
+As Component Pages capturam somente as intenções correspondentes aos destinos reais. Nenhuma Component Page cria Sample Pages. `TSampleApplicationCoordinator` conecta os callbacks de Text / Label, Button, Badge, Divider e ComboBox para Factory + Fluent Builder e o callback Fluent de Edit; cria a Sample Page concreta sem Owner, executa `ShowModal` e libera a instância em `finally`. Se uma abordagem futura ainda não possuir destino real, ela não deve ser apresentada como ação funcional.
 
 ### DEC-046 — Dependências FMX de símbolos visuais devem ser explícitas
 
@@ -280,5 +280,5 @@ Páginas reais da terceira camada seguem `samples/src/Examples/<Componente>/<Abo
 
 `TExampleCommon` inicializa `TExamplePageLayout.Default` (`620 × 510`, navegação `142`, item `28`) e chama o hook protegido virtual `ConfigureLayout(var ALayout)` antes de construir controles. A base não altera esses defaults. Derivadas podem sobrescrever o hook somente quando houver necessidade concreta de UI/UX, sem depender de campos próprios ainda não inicializados e mantendo a janela estritamente menor que a Home de `644 × 534`.
 
-No estado atual, `TExampleButtonFluent` especializa a geometria para `640 × 530` com navegação de `170` px, enquanto `TExampleBadgeFactory`, `TExampleBadgeFluent`, `TExampleDividerFluent`, `TExampleComboBoxFluent` e `TExampleEditFluent` usam `640 × 510` com navegação de `170` px; nas seis páginas o item permanece com `28` px. As demais Sample Pages não sobrescrevem o hook e preservam exatamente o layout padrão. A especialização não autoriza cada derivada a manipular diretamente controles internos ou métricas derivadas da base.
+No estado atual, `TExampleButtonFluent` especializa a geometria para `640 × 530` com navegação de `170` px, enquanto `TExampleBadgeFactory`, `TExampleBadgeFluent`, `TExampleDividerFluent` e `TExampleEditFluent` usam `640 × 510` com navegação de `170` px; `TExampleComboBoxFluent` usa `640 × 510` com navegação de `180` px; nas seis páginas o item permanece com `28` px. As demais Sample Pages não sobrescrevem o hook e preservam exatamente o layout padrão. A especialização não autoriza cada derivada a manipular diretamente controles internos ou métricas derivadas da base.
 

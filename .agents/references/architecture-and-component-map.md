@@ -10,7 +10,7 @@ RickUIBuilder.dpk
 RickUIBuilder.dproj
 src/
 tests/
-sample/
+samples/
 docs/
 AGENTS.md
 .agents/
@@ -20,7 +20,7 @@ Projetos conhecidos:
 
 - package/library: `RickUIBuilder.dpk` + `RickUIBuilder.dproj`;
 - tests: `tests/RickUIBuilder.Test.dpr` + `tests/RickUIBuilder.Test.dproj`;
-- Sample: `sample/RickUIBuilder.Sample.dpr` + `sample/RickUIBuilder.Sample.dproj`.
+- Samples: `samples/RickUIBuilder.Samples.dpr` + `samples/RickUIBuilder.Samples.dproj`.
 
 O `.dproj` identifica Delphi personality, mas isso sozinho não deve ser usado para afirmar a versão exata do compiler sem confirmação adicional.
 
@@ -133,7 +133,20 @@ Responsabilidades especializadas existem porque o comportamento justifica:
 
 Antes de alterar ComboBox, leia `docs/combobox/README*` e os documentos específicos do domínio afetado.
 
-## 9. Composition
+## 9. Edit
+
+```text
+src/Rick.UIBuilder.Edit.pas
+src/Rick.UIBuilder.Edit.Input.pas
+src/Rick.UIBuilder.Edit.Handle.pas
+src/Rick.UIBuilder.Edit.Behavior.pas
+tests/src/Rick.UIBuilder.Tests.Edit.pas
+docs/edit/**
+```
+
+Edit é exposto somente pelo Fluent Builder no estado atual: `TRickUIBuilder.Edit` retorna `IRickUIBuilderEdit`, e `Build` retorna `IRickUIBuilderEditHandle`. A Factory pública não expõe `CreateEdit`. Mudanças devem considerar presets/input, materialização visual, Behavior owned pelo Parent e o caráter non-owning do Handle.
+
+## 10. Composition
 
 ```text
 src/Rick.UIBuilder.Composition.pas
@@ -142,7 +155,7 @@ tests/src/Rick.UIBuilder.Tests.Composition.pas
 
 Trata operações de composição. Mudanças devem considerar compatibilidade entre componentes e não vazar detalhes internos de um builder específico.
 
-## 10. Facade e Types tests
+## 11. Facade e Types tests
 
 ```text
 tests/src/Rick.UIBuilder.Tests.Facade.pas
@@ -151,19 +164,21 @@ tests/src/Rick.UIBuilder.Tests.Types.pas
 
 Use para validar contratos de entrada/defaults compartilhados.
 
-## 11. Sample
+## 12. Samples
 
 ```text
-sample/RickUIBuilder.Sample.dpr
-sample/RickUIBuilder.Sample.dproj
-sample/src/RickUIBuilderSample.Main.pas
-sample/src/RickUIBuilderSample.Main.fmx
-sample/Readme.md
+samples/RickUIBuilder.Samples.dpr
+samples/RickUIBuilder.Samples.dproj
+samples/src/App/**
+samples/src/Home/**
+samples/src/Components/**
+samples/src/Examples/**
+docs/samples/**
 ```
 
-Sample demonstra uso público e integração visual. Não substitui testes automatizados.
+O Samples atual é um catálogo component-first. Text / Label, Button, Badge, Divider e ComboBox possuem páginas Factory + Fluent Builder; Edit possui somente Fluent Builder porque `Factory.CreateEdit` não existe. As Sample Pages concretas seguem a divisão Page / Content / Runner e herdam de `TExampleCommon`. Composition é API pública, mas ainda não integra essa navegação. Sample demonstra uso público e integração visual; não substitui testes automatizados.
 
-## 12. Dependency discovery workflow
+## 13. Dependency discovery workflow
 
 Para um componente-alvo:
 
@@ -178,7 +193,7 @@ Para um componente-alvo:
 9. identificar lifecycle/event callbacks;
 10. confirmar antes de alterar.
 
-## 13. Regra para novos componentes
+## 14. Regra para novos componentes
 
 Considere camadas por responsabilidade, não por template fixo:
 
@@ -195,7 +210,7 @@ Considere camadas por responsabilidade, não por template fixo:
 
 “Outro componente tem essa unit” não é justificativa arquitetural.
 
-## 14. Trigger de atualização deste mapa
+## 15. Trigger de atualização deste mapa
 
 Atualize quando:
 

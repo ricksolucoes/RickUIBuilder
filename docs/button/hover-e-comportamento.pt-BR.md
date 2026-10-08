@@ -8,11 +8,11 @@
 
 ## Estado público
 
-`IRickUIBuilderButtonHoverState` expõe setters/getters para `Button`, `FillColor`, `HoverFillColor`, `OnEnter` e `OnLeave`, além de `HasHoverFillColor` e `Build(AOwner)`.
+`IRickUIBuilderButtonHoverState` expõe setters/getters para `Button`, `FillColor`, `HoverFillColor`, `OnEnter` e `OnLeave`, além de `Build(AOwner)`. A informação de que uma cor de hover foi configurada explicitamente é interna a `TRickUIBuilderButtonHoverState`; `HasHoverFillColor` não faz parte da interface pública.
 
 ## MouseEnter
 
-Se `HasHoverFillColor=True`, o Behavior aplica o `HoverFillColor` atual ao `FButton`; depois consulta e executa o `OnEnter` atual.
+Quando o indicador interno de hover color está ativo, o Behavior aplica o `HoverFillColor` atual ao `FButton`; depois consulta e executa o `OnEnter` atual.
 
 ## MouseLeave
 
@@ -26,7 +26,7 @@ O Behavior consulta o estado a cada evento. Portanto, alterações posteriores e
 
 ## Builder
 
-`HoverFillColor` e `OnHover` configuram o mesmo estado usado pelo Behavior. Mesmo sem hover color explícita, o estado é criado e callbacks `OnHover` podem ser executados; a troca de cor só ocorre quando `HasHoverFillColor=True`.
+`HoverFillColor` e `OnHover` configuram o mesmo estado usado pelo Behavior. Mesmo sem hover color explícita, o estado é criado e callbacks `OnHover` podem ser executados; a troca de cor só ocorre quando uma cor de hover foi configurada explicitamente.
 
 ## Pré-condição no uso direto de HoverState
 

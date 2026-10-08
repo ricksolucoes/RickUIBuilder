@@ -163,7 +163,7 @@ Strings de path são interpretadas por `TPathData` do FireMonkey; consulte o doc
 
 ## CustomConfig
 
-Use `TRickUIBuilderComboBoxConfig.Default` como ponto de partida, altere somente os tokens necessários e passe o record para `.CustomConfig(Config)`. Isso preserva todos os defaults atualmente definidos e evita deixar novos campos sem inicialização em versões futuras.
+Use `TRickUIBuilderComboBoxConfig.Default` como ponto de partida, altere os tokens necessários e passe o record para `.CustomConfig(Config)`. Isso é mais seguro do que partir de um record arbitrariamente parcial, mas não garante que todo campo público receba uma atribuição explícita de default. No código atual, `EditBackgroundColor` é público, não é atribuído explicitamente por `Default` e não é consumido pela renderização do ComboBox.
 
 ### Tipografia e cores avançadas
 

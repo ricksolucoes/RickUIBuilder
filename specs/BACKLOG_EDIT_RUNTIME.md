@@ -2,12 +2,11 @@
 
 **Projeto:** RickUIBuilder\
 **Feature:** `Edit` runtime\
-**Status:** Planejamento --- pré-implementação\
+**Status:** registro histórico do planejamento pré-implementação\
 **Documento relacionado:**
-`ESPECIFICACAO_EDIT_RUNTIME_RICKUIBUILDER.pt-BR.md`
+`edit-runtime.pt-BR.md`
 
-> Este backlog organiza a implementação da especificação aprovada. Não
-> representa funcionalidades já implementadas.
+> Este backlog preserva o planejamento original da implementação. O componente `Edit` já existe no código atual; os estados iniciais e itens abaixo não representam o status corrente da implementação. Não inferir conclusão item a item sem evidência específica; para o comportamento atual, consultar o código e `docs/edit/`.
 
 ------------------------------------------------------------------------
 

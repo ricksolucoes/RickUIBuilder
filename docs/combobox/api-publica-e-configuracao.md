@@ -86,6 +86,7 @@ Scoped enum syntax is used: refer to members as `Type.Member`.
 | `TextAlign` | `TTextAlign.Leading` |
 | `Trimming` | `TTextTrimming.None` |
 | `BackgroundColor` | `TAlphaColors.White` |
+| `EditBackgroundColor` | **No explicit assignment in `Default`** |
 | `BorderColor` | `$FFD0D5DD` |
 | `TextColor` | `$FF1D2939` |
 | `PlaceholderColor` | `$FF667085` |
@@ -119,7 +120,7 @@ Scoped enum syntax is used: refer to members as `Type.Member`.
 
 ## Advanced record configuration
 
-Not every `TRickUIBuilderComboBoxConfig` field has a dedicated fluent method. For those cases, use `TRickUIBuilderComboBoxConfig.Default` as the baseline and apply the record through `CustomConfig`.
+Not every `TRickUIBuilderComboBoxConfig` field has a dedicated fluent method. For those cases, use `TRickUIBuilderComboBoxConfig.Default` as the baseline and apply the record through `CustomConfig`. One public field is an exception that must be treated explicitly: `EditBackgroundColor` exists in the record, but the current `Default` implementation does not assign it and the current ComboBox Factory/Builder/Presentation code does not read it. Do not rely on that field to affect ComboBox rendering in this revision.
 
 The main advanced fields are:
 

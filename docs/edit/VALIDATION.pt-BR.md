@@ -1,6 +1,8 @@
-# Validação da implementação do Edit
+# Registro histórico de validação da implementação do Edit
 
-## Executado nesta entrega
+> Este arquivo registra validações realizadas na entrega original do Edit e na correção de 2026-09-27. Ele **não** representa validação da revisão atual do repositório. Build, testes, validação FMX e Method Toxicity da revisão atual exigem nova execução no ambiente Delphi/RAD Studio.
+
+## Executado na entrega registrada
 
 - leitura do `AGENTS.md` e workflows aplicáveis;
 - leitura da especificação, backlog e plano técnico na ordem definida;

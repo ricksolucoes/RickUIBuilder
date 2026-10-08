@@ -1,11 +1,10 @@
 # Especificação do componente Edit runtime
 
 **Projeto:** RickUIBuilder\
-**Status:** definição funcional --- pré-implementação\
-**Escopo:** novo componente `Edit` criado em runtime
+**Status:** especificação funcional original --- registro histórico de pré-implementação\
+**Escopo:** contrato funcional que orientou a implementação do componente `Edit` runtime
 
-> Este documento define o que deverá ser implementado. Ele não afirma
-> que os recursos abaixo já existem no código.
+> Este documento preserva os requisitos definidos antes da implementação. No código atual do repositório o componente `Edit` já existe; para o comportamento efetivamente implementado, o código e `docs/edit/` são as fontes atuais. A redação futura mantida nas seções abaixo registra a especificação original e não deve ser interpretada como backlog pendente.
 
 ## 1. Objetivo
 

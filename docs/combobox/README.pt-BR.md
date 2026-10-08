@@ -36,7 +36,7 @@ O builder acumula configuração e itens lógicos. `Build` ou `BuildHandle` reso
 | [Virtualização e renderização](virtualizacao-e-renderizacao.pt-BR.md) | Pool de rows, colunas, estado visual e conteúdo customizado. |
 | [Lifecycle, ownership e handle](lifecycle-ownership-e-handle.pt-BR.md) | Lifetime do behavior, `FreeNotification`, regras de detach e referências non-owning. |
 | [Customização e exemplos](customizacao-e-exemplos.pt-BR.md) | Exemplos progressivos baseados na API implementada. |
-| [Testes e contratos](testes-e-contratos.pt-BR.md) | Comportamentos validados e baseline DUnitX atual. |
+| [Testes e contratos](testes-e-contratos.pt-BR.md) | Contratos declarados, cobertura atual no código-fonte e baseline DUnitX histórica. |
 | [Manutenção e armadilhas](manutencao-e-armadilhas.pt-BR.md) | Invariantes que devem ser preservadas em alterações futuras. |
 
 ## Trilhas de leitura recomendadas
@@ -58,6 +58,6 @@ O ponto de entrada fluente público é `TRickUIBuilder.ComboBox`, que retorna `I
 - `ViewIndex` e `SourceIndex` são distintos quando existe filtro ativo.
 - O `TPath` visual não é o alvo de interação de Back/Clear; a área externa de hit é.
 
-## Baseline validada
+## Evidência de testes
 
-A implementação documentada corresponde ao estado validado em 2026-09-22 pelo DUnitX: **197 testes encontrados, 197 aprovados, 0 failures, 0 errors e 0 leaks**. Essa quantidade é uma baseline deste estado documentado, não uma invariante permanente do projeto.
+O ZIP atual declara **240** métodos `[Test]` nas units DUnitX; essa é uma contagem estática do código-fonte, não um resultado de execução. A governança do projeto registra uma baseline DUnitX real anterior de **197 encontrados / 197 aprovados / 0 failures / 0 errors / 0 leaks**. Essa execução histórica não deve ser usada como validação da revisão atual sem uma nova execução.

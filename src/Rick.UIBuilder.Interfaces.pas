@@ -1283,13 +1283,9 @@ type
   end;
 
   /// <summary>
-  ///    Composer fluente para a abordagem de composicao (meio-termo)
-  ///    do framework Rick.UIBuilder: encadeia a criacao de multiplos
-  ///    controles no mesmo Parent, delegando cada criacao para
-  ///    TRickUIBuilderFactory. Ao contrario dos builders IRickUIBuilderLabel,
-  ///    IRickUIBuilderButton, IRickUIBuilderBadge e IRickUIBuilderDivider,
-  ///    cada metodo aqui ja cria o controle imediatamente - nao ha um
-  ///    Build final.
+  ///    Handle runtime non-owning do Edit materializado. Expoe o container e
+  ///    o TEdit internos para consulta/operacoes enquanto o Parent que possui
+  ///    a arvore visual permanecer vivo.
   /// </summary>
   IRickUIBuilderEditHandle = interface
     ['{A6DBF60F-A407-4EF1-8B2D-A674EB53553F}']

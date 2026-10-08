@@ -6,7 +6,7 @@
 
 Este documento fixa a intenção visual, a sequência estrutural, os limites de responsabilidade e o comportamento da base das páginas de exemplos do `RickUIBuilder.Samples`.
 
-A implementação comum é coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A família é dividida por responsabilidade em units próprias para header, navegação, seletor de visualização, painel de código, painel de resultado, ícones e estilo. As derivadas reais atuais cobrem Text / Label, Button, Badge, Divider e ComboBox nas abordagens Factory + Fluent Builder, além de `TExampleEditFluent`; destinos sem implementação permanecem futuros.
+A implementação comum é coordenada por `RickUIBuilder.Samples.Example.Common`, com classe abstrata `TExampleCommon`. A família é dividida por responsabilidade em units próprias para header, navegação, seletor de visualização, painel de código, painel de resultado, ícones e estilo. As derivadas reais atuais cobrem toda a matriz suportada pela API nas páginas component-first: Text / Label, Button, Badge, Divider e ComboBox em Factory + Fluent Builder, além de `TExampleEditFluent`. Novos destinos somente devem ser adicionados quando a API pública e a navegação realmente os suportarem.
 
 ## Papel na navegação
 
@@ -52,7 +52,7 @@ O layout padrão continua `620 × 510`, mantendo simultaneamente `620 < 644` e `
 
 `TExampleCommon` inicializa `TExamplePageLayout.Default` antes da construção visual e chama o hook protegido virtual `ConfigureLayout(var ALayout)`. A implementação da base não altera o default. Uma derivada que sobrescreva o hook deve modificar somente o record recebido e não depender de campos próprios inicializados depois de `inherited Create`. As métricas derivadas continuam responsabilidade da infraestrutura, evitando que a filha configure combinações geométricas inconsistentes.
 
-Nesta implementação, `TExampleButtonFluent` especializa o layout para `640 × 530` com navegação de `170` px, enquanto `TExampleBadgeFactory`, `TExampleBadgeFluent`, `TExampleDividerFluent`, `TExampleComboBoxFluent` e `TExampleEditFluent` usam `640 × 510` com navegação de `170` px; `NavigationItemHeight` permanece no default de `28` px nas seis páginas. As demais páginas concretas não sobrescrevem o hook e continuam em `620 × 510`, com navegação de `142` px. Todas as dimensões efetivas permanecem menores que a Home de `644 × 534`.
+Nesta implementação, `TExampleButtonFluent` especializa o layout para `640 × 530` com navegação de `170` px, enquanto `TExampleBadgeFactory`, `TExampleBadgeFluent`, `TExampleDividerFluent` e `TExampleEditFluent` usam `640 × 510` com navegação de `170` px; `TExampleComboBoxFluent` usa `640 × 510` com navegação de `180` px; `NavigationItemHeight` permanece no default de `28` px nas seis páginas. As demais páginas concretas não sobrescrevem o hook e continuam em `620 × 510`, com navegação de `142` px. Todas as dimensões efetivas permanecem menores que a Home de `644 × 534`.
 
 A navegação lateral utiliza `TVertScrollBox`. A superfície de código utiliza `TMemo` read-only e selecionável, com `WordWrap = False` e scrollbars em comportamento AutoHide: a rolagem pertence ao overflow real do conteúdo, sem canvas artificialmente maior que o viewport. Não aumentar a Sample Page acima da Home e não reduzir tipografia para esconder clipping.
 
@@ -528,7 +528,7 @@ A matriz conhecida no baseline atual é:
 | ComboBox | implementado | implementado |
 | Edit | não disponível na API atual | implementado |
 
-A tabela diferencia o destino já implementado dos destinos ainda previstos; ela não declara como existente nenhuma página marcada como `previsto`.
+A tabela reflete todos os destinos atualmente suportados pela API e materializados no Samples. `Edit - Factory` não é um destino previsto nesta matriz porque a API pública atual não expõe `Factory.CreateEdit`.
 
 Ao implementar cada página concreta, a API pública deve ser reanalisada naquele momento. A cobertura esperada é:
 
@@ -590,12 +590,11 @@ A implementação atual da base deve ser considerada aderente a esta especifica�
 - não centralizar catálogo global de exemplos;
 - não alterar Home ou Component Pages além do necessário para uma integração explicitamente autorizada em etapa posterior.
 
-## Fora do escopo após a implementação da base
+## Fora do escopo atual
 
 Continuam fora do escopo até nova autorização:
 
-- implementação dos menus definitivos dos destinos ainda não implementados;
-- snippets reais de API para destinos ainda não implementados;
-- criação/execução real dos controles dos samples ainda não implementados;
-- interatividade de `Ver exemplos` nas Component Pages que ainda não possuem destino real;
-- Composition nessa navegação.
+- Composition nessa navegação component-first;
+- qualquer nova abordagem/destino que a API pública venha a expor no futuro;
+- criação de entrada `Edit - Factory` enquanto `Factory.CreateEdit` não existir;
+- ampliação dos Samples para antecipar funcionalidades ainda descritas apenas em `specs/`.

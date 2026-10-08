@@ -86,6 +86,7 @@ A sintaxe de scoped enums é utilizada: referencie membros como `Type.Member`.
 | `TextAlign` | `TTextAlign.Leading` |
 | `Trimming` | `TTextTrimming.None` |
 | `BackgroundColor` | `TAlphaColors.White` |
+| `EditBackgroundColor` | **Sem atribuição explícita em `Default`** |
 | `BorderColor` | `$FFD0D5DD` |
 | `TextColor` | `$FF1D2939` |
 | `PlaceholderColor` | `$FF667085` |
@@ -119,7 +120,7 @@ A sintaxe de scoped enums é utilizada: referencie membros como `Type.Member`.
 
 ## Configurações avançadas do record
 
-Nem todos os campos de `TRickUIBuilderComboBoxConfig` possuem um método fluente dedicado. Para esses casos, use `TRickUIBuilderComboBoxConfig.Default` como base e aplique o record com `CustomConfig`.
+Nem todos os campos de `TRickUIBuilderComboBoxConfig` possuem um método fluente dedicado. Para esses casos, use `TRickUIBuilderComboBoxConfig.Default` como base e aplique o record com `CustomConfig`. Há uma exceção pública que precisa ser tratada explicitamente: `EditBackgroundColor` existe no record, mas a implementação atual de `Default` não atribui esse campo e o código atual de Factory/Builder/Presentation do ComboBox não o lê. Nesta revisão, não dependa desse campo para alterar a renderização do ComboBox.
 
 Os principais campos avançados são:
 

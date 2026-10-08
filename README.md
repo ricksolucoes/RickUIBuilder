@@ -28,6 +28,7 @@ The library is distributed as source code. To use it, add the `src` directory to
 - [Badge Builder](#badge-builder)
 - [Divider Builder](#divider-builder)
 - [ComboBox Builder](#combobox-builder)
+- [Edit Builder](#edit-builder)
 - [Composition](#composition)
 - [Working with Interfaces](#working-with-interfaces)
 - [Sample Application](#sample-application)
@@ -48,6 +49,7 @@ TRickUIBuilder
 ├── Badge     -> fluent Badge builder
 ├── Divider   -> fluent Divider builder
 ├── ComboBox  -> fluent, stateful ComboBox builder
+├── Edit      -> fluent single-line Edit builder
 └── On(...)   -> UI composition
 ```
 
@@ -56,7 +58,7 @@ The three creation styles are intended for different levels of configuration:
 | Style | Entry point | Typical use |
 | --- | --- | --- |
 | Factory | `TRickUIBuilder.Factory` or `TRickUIBuilderFactory` | Create a control directly from a configuration record |
-| Fluent Builders | `Label_`, `Button`, `Badge`, `Divider`, `ComboBox` | Configure a component through a readable fluent chain before calling `Build` |
+| Fluent Builders | `Label_`, `Button`, `Badge`, `Divider`, `ComboBox`, `Edit` | Configure a component through a readable fluent chain before calling `Build` |
 | Composition | `TRickUIBuilder.On(AParent)` | Create a short sequence of controls on the same parent |
 
 Using an `IRickUIBuilder*` interface explicitly is **not a fourth creation style**. It is an alternative way to hold and use the same fluent builders through their public contracts.
@@ -64,8 +66,8 @@ Using an `IRickUIBuilder*` interface explicitly is **not a fourth creation style
 <a name="features"></a>
 ## ✨ Features
 
-- Direct creation of FMX text, buttons, badges, and dividers through `TRickUIBuilderFactory`.
-- Fluent Label, Button, Badge, Divider, and ComboBox builders.
+- Direct creation of FMX text, buttons, badges, dividers, and the closed ComboBox visual through `TRickUIBuilderFactory`.
+- Fluent Label, Button, Badge, Divider, ComboBox, and Edit builders.
 - UI composition through `TRickUIBuilder.On(AParent)`.
 - Configuration records with reusable defaults for direct Factory creation.
 - Shared spacing support through `TRickUIBuilderSpacing`.
@@ -74,7 +76,8 @@ Using an `IRickUIBuilder*` interface explicitly is **not a fourth creation style
 - ComboBox presentation modes `Auto`, `Anchored`, `Overlay`, and `FullWindow`, with Desktop, Mobile, Adaptive, and Custom style profiles.
 - FullWindow search with clear/back hit areas, filtered-view mapping, empty state, and custom SVG paths.
 - Virtualized ComboBox item rendering with optional `OnCustomizeItem` content.
-- Explicit public interfaces for fluent builders, generated-control handles, mutable hover state, ComboBox runtime control, and composition.
+- Single-line Edit with presets, masks/formatting, validation feedback, read-only/password states, action icons, and runtime access through `IRickUIBuilderEditHandle`.
+- Explicit public interfaces for fluent builders, generated-control handles, mutable hover state, ComboBox/Edit runtime control, and composition.
 - Detailed ComboBox architecture and maintenance documentation under [`docs/combobox`](docs/combobox/README.md).
 
 <a name="requirements"></a>
@@ -144,6 +147,9 @@ TRickUIBuilder.Factory
 | `CreateDivider` | `TRectangle` |
 | `CreateBadge` | Badge `TRectangle` plus its internal `TLabel` through an `out` parameter |
 | `CreateButton` | Button `TRectangle`; an additive overload also returns the internal caption `TLabel` through an `out` parameter |
+| `CreateComboBox` | Closed ComboBox `TRectangle` plus its internal `TLabel` and arrow `TPath` through `out` parameters; list/popup/runtime behavior belongs to the Fluent Builder |
+| `CreateBadgeContainer` | Badge `TRectangle` container without the internal text label |
+| `BuildBadgeTextConfig` | Derives the internal badge `TRickUIBuilderTextConfig` from `TRickUIBuilderBadgeConfig` |
 
 ### Configuration records
 
@@ -155,6 +161,7 @@ Factory creation uses records from `Rick.UIBuilder.Types`. Start from `Default`,
 | `TRickUIBuilderButtonConfig` | `Left`, `Top`, `Width`, `Height`, `FillColor`, `BorderColor`, `TextColor`, `Tag`, `FontSize` |
 | `TRickUIBuilderBadgeConfig` | `Left`, `Top`, `Width`, `Height`, `BackgroundColor`, `TextColor`, `FontSize` |
 | `TRickUIBuilderDividerConfig` | `Left`, `Top`, `Width`, `Color` |
+| `TRickUIBuilderComboBoxConfig` | Public ComboBox geometry, typography, colors, style/presentation and path fields; the direct Factory consumes only the subset required by the closed visual |
 
 The examples below intentionally change only a few fields. The remaining fields can be configured when the screen requires them.
 
@@ -537,7 +544,37 @@ For the complete public API, internal dependency map, FullWindow behavior, filte
 
 ---
 
-<a name="composition"></a>
+<a name="edit-builder"></a>
+## ✏️ Edit Builder
+
+**Implementation units:** `Rick.UIBuilder.Edit`, `Rick.UIBuilder.Edit.Input`, `Rick.UIBuilder.Edit.Handle`, and `Rick.UIBuilder.Edit.Behavior`.
+
+`TRickUIBuilder.Edit` creates a single-line runtime input through the Fluent Builder. The current public Factory does **not** expose `CreateEdit`. `Build(AParent)` returns `IRickUIBuilderEditHandle`, which provides runtime access to the generated container and `TEdit` without owning that visual tree.
+
+```pascal
+uses
+  Rick.UIBuilder,
+  Rick.UIBuilder.Interfaces,
+  Rick.UIBuilder.Types;
+
+procedure TMainForm.BuildEmailEdit;
+begin
+  FEditHandle := TRickUIBuilder.Edit
+    .LabelText('Email')
+    .Preset(TRickUIBuilderEditPreset.Email)
+    .Required
+    .ClearButton
+    .Build(Self);
+end;
+```
+
+The builder also exposes presets for masked and numeric input, case/URL policies, character limits, password/read-only modes, validation feedback, requirement indicators, appearance and color/path customization. The Handle is non-owning with respect to the controls and Behavior; do not use it after the owning Parent has been destroyed.
+
+For the complete contract and operational details, read the [Edit technical documentation](docs/edit/README.md).
+
+---
+
+<a name="component-documentation"></a>
 ## 📚 Detailed component documentation
 
 Complete references for the builders are organized by component:
@@ -550,6 +587,7 @@ Complete references for the builders are organized by component:
 
 - [ComboBox](docs/combobox/README.md) — complete ComboBox technical documentation.
 
+<a name="composition"></a>
 ## 🧩 Composition
 
 **Implementation unit:** `Rick.UIBuilder.Composition`
@@ -633,6 +671,8 @@ RickUIBuilder exposes public contracts for the fluent builders, mutable button h
 | `IRickUIBuilderDivider` | Divider fluent builder contract |
 | `IRickUIBuilderComboBox` | ComboBox fluent builder contract |
 | `IRickUIBuilderComboBoxHandle` | Non-owning runtime contract for selection, data mutation, open/close, and arrow updates |
+| `IRickUIBuilderEdit` | Edit fluent builder contract |
+| `IRickUIBuilderEditHandle` | Non-owning runtime access to the generated Edit container/control and validation operations |
 | `IRickUIBuilderComposer` | Composition contract |
 
 Using an interface explicitly does not create a different implementation. It simply stores the same builder returned by `TRickUIBuilder` behind its public contract.
@@ -666,70 +706,60 @@ This style is useful when code should explicitly depend on the interface contrac
 <a name="sample-application"></a>
 ## 🎨 Sample Application
 
-The `sample` project demonstrates the framework usage styles and the current ComboBox matrix:
+The current sample project is `samples/RickUIBuilder.Samples.dproj`. It is organized as a component-first catalog rather than a single demonstration form:
 
-- Factory.
-- Fluent Builders.
-- Composition.
-- Desktop ComboBox with `Anchored` presentation.
-- Mobile ComboBox with `Auto` resolving to FullWindow and real-time search.
-- Adaptive ComboBox with structured columns and a retained runtime handle.
-- Custom ComboBox with multiple columns, `OnCustomizeItem`, and left-positioned arrow.
-- Custom FullWindow ComboBox using the same data and rendering pipeline.
-- Runtime ComboBox updates through `IRickUIBuilderComboBoxHandle`.
+```text
+Home
+├── Text / Label -> Factory + Fluent Builder
+├── Button       -> Factory + Fluent Builder
+├── Badge        -> Factory + Fluent Builder
+├── Divider      -> Factory + Fluent Builder
+├── ComboBox     -> Factory + Fluent Builder
+└── Edit         -> Fluent Builder only
+```
+
+The third layer contains eleven concrete Sample Pages. Each concrete destination uses the Page / Content / Runner split and inherits the common `TExampleCommon` infrastructure. The Edit page intentionally has no Factory destination because the public API does not expose `Factory.CreateEdit`. Composition remains a public library API, but it is not part of the current component-first sample navigation.
 
 Open:
 
 ```text
-sample\RickUIBuilder.Sample.dproj
+samples\RickUIBuilder.Samples.dproj
 ```
 
-The detailed ComboBox design is documented separately under [`docs/combobox`](docs/combobox/README.md).
+The sample executable also accepts the optional `-nodx` switch, which sets `FMX.Types.GlobalUseDX := False` before `Application.Initialize`. Sample architecture and decisions are documented under [`docs/samples`](docs/samples/SAMPLE_ARCHITECTURE.md).
 
 <a name="tests"></a>
 ## ✅ Tests
 
-The project includes a DUnitX suite covering the main RickUIBuilder areas, including Types, Factory, Label, Button, Badge, Divider, Composition, Facade, and ComboBox data/integration/style behavior. The current source declares **197** `[Test]` methods.
+The repository contains ten DUnitX test units covering Types, Factory, Label, Button, Badge, Divider, Composition, Facade, ComboBox, and Edit. Static inspection of the current ZIP finds **240** `[Test]` declarations:
 
-### Latest verified DUnitX result
-
-The supplied NUnit XML identifies `RickUIBuilder.Test.exe` and records a real execution at **2026-09-25 23:08:08** with assembly result `Success` / `success="True"`:
-
-| DUnitX result | Value |
+| Test unit | Declared `[Test]` methods |
 | --- | ---: |
-| Tests Found | **197** |
-| Tests Passed | **197** |
-| Tests Ignored | **0** |
-| Tests Failed | **0** |
-| Tests Errored | **0** |
-| Inconclusive | **0** |
-| Not run | **0** |
-| Skipped | **0** |
-| Invalid | **0** |
+| Types | 18 |
+| Factory | 20 |
+| Label | 17 |
+| Button | 56 |
+| Badge | 21 |
+| Divider | 15 |
+| Composition | 7 |
+| Facade | 7 |
+| ComboBox | 36 |
+| Edit | 43 |
+| **Total** | **240** |
 
-The ComboBox coverage includes data selection/filter mapping, runtime handle behavior, Parent/Popup lifecycle, arrow behavior, FullWindow host resolution, FullWindow search structure, clear/back actions, filtered selection, empty state, custom FullWindow, path defaults, and style/presentation resolution.
+This is a **static source count**, not a test execution result. The current ZIP does not contain a DUnitX/NUnit result file that proves pass/fail status for these 240 tests. Project governance retains a historical real baseline of **197 found / 197 passed / 0 failed / 0 errored / 0 leaked**, but explicitly marks it as historical and not evidence for later revisions.
 
 ### Method Toxicity Metrics
 
-The currently supplied `RickUIBuilder.csv` is a real RAD Studio Method Toxicity Metrics export for the library and contains **404 measured methods**. The Tests and Sample values below are the **last real baseline recorded by the project** from previously supplied RAD Studio CSV reports; they are not measurements from the currently supplied library CSV.
+The current ZIP does not contain a RAD Studio Method Toxicity CSV for this revision. Therefore no current composite `Toxicity` result is asserted here. Project governance retains the following **historical real baseline** from previously supplied RAD Studio CSV reports:
 
-| Project | Methods | Max `Length` | Max `Parameters` | Max `If Depth` | Max `Cyclomatic Complexity` | Max `Toxicity` | Gate violations |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `RickUIBuilder.dproj` / library package | **404** | **20** | **5** | **3** | **4** | **0.554** | **0** |
-| `RickUIBuilder.Test.dproj` | **252** | **14** | **2** | **2** | **6** | **0.571** | **0** |
-| `RickUIBuilder.Sample.dproj` | **35** | **14** | **4** | **1** | **2** | **0.338** | **0** |
+| Project | Methods measured | Max `Length` | Max `Parameters` | Max `If Depth` | Max `Cyclomatic Complexity` | Max `Toxicity` |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Library/BPL | 404 | 20 | 5 | 3 | 4 | 0.554 |
+| Tests | 252 | 14 | 2 | 2 | 6 | 0.571 |
+| Sample | 35 | 14 | 4 | 1 | 2 | 0.338 |
 
-The project quality gates are `Length <= 20`, `Parameters <= 6`, `If Depth <= 5`, `Cyclomatic Complexity <= 6`, and `Toxicity < 1`. The current library CSV is within those limits. The recorded Tests and Sample baseline was also within those limits when measured.
-
-The current library measurement and the last recorded Tests/Sample baseline report these maximum Toxicity values:
-
-| Project | Method | Toxicity |
-| --- | --- | ---: |
-| Library | `TRickUIBuilderComboBoxVirtualizer.CreateColumnLabel` | **0.554** |
-| Tests | `TRickUIBuilderComboBoxIntegrationTests.FindPath` and `FindLabel` | **0.571** |
-| Sample | `TPageSampleMain.CustomizeComboBoxItem` | **0.338** |
-
-These are real RAD Studio values, not source-code estimates. The Library row is confirmed by the currently supplied `RickUIBuilder.csv`; the Tests and Sample rows are historical real measurements retained as the project's last recorded baseline. They must not be presented as measurements of a later revision without new corresponding CSV exports.
+The permanent project gates are `Length <= 20`, `Parameters <= 6`, `If Depth <= 5`, `Cyclomatic Complexity <= 6`, and `Toxicity < 1` when measured by RAD Studio. These historical values must not be presented as measurements of the current revision without new CSV exports.
 
 <a name="ai-assisted-maintenance"></a>
 ## 🤖 AI-assisted Maintenance
@@ -743,9 +773,9 @@ The local adaptation preserves the same engineering model — skills as executab
 - `references/` centralizes the Definition of Done, project constraints, component map, Delphi/FMX quality rules, testing/documentation policies, Method Toxicity baseline, orchestration patterns, and the explicit adaptation contract with `agent-skills`.
 - `templates/` contains reusable artifacts for specifications, change plans, iterative debugging Attempt Logs, ADRs, audits, and delivery reports.
 
-The governance applies to **all RickUIBuilder elements** — Factory, Label, Button, Badge, Divider, ComboBox, Composition, shared contracts, Sample/tests, and future components. The generic `component-maintenance` workflow discovers each component's real contracts and complexity instead of imposing the ComboBox architecture on simpler controls.
+The governance applies to **all RickUIBuilder elements** — Factory, Label, Button, Badge, Divider, ComboBox, Edit, Composition, shared contracts, Samples/tests, and future components. The generic `component-maintenance` workflow discovers each component's real contracts and complexity instead of imposing the ComboBox architecture on simpler controls.
 
-The ComboBox remains the first component with dedicated deep documentation under [`docs/combobox`](docs/combobox/README.md). Those documents are domain knowledge loaded only when a ComboBox task requires them; they are not the framework-wide engineering model.
+Component-specific documentation is organized under `docs/<component>`. ComboBox keeps the deepest technical set under [`docs/combobox`](docs/combobox/README.md); those documents are component-domain knowledge and are not the framework-wide engineering model.
 
 The adaptation policy and the differences intentionally kept from the upstream project are documented in [`.agents/references/agent-skills-adaptation.md`](.agents/references/agent-skills-adaptation.md).
 

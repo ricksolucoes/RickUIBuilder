@@ -17,17 +17,22 @@ Home
 Component Page do componente
   │
   ├── Factory
-  │      ├── Text / Label → TExampleTextLabelFactory [implementado]
-  │      ├── Button → TExampleButtonFactory [implementado]
-  │      └── demais componentes → futuro
+  │      ├── Text / Label → TExampleTextLabelFactory
+  │      ├── Button → TExampleButtonFactory
+  │      ├── Badge → TExampleBadgeFactory
+  │      ├── Divider → TExampleDividerFactory
+  │      └── ComboBox → TExampleComboBoxFactory
   │
   └── Fluent Builder
-         ├── Text / Label → TExampleTextLabelFluent [implementado]
-         ├── Button → TExampleButtonFluent [implementado]
-         └── demais componentes → futuro
+         ├── Text / Label → TExampleTextLabelFluent
+         ├── Button → TExampleButtonFluent
+         ├── Badge → TExampleBadgeFluent
+         ├── Divider → TExampleDividerFluent
+         ├── ComboBox → TExampleComboBoxFluent
+         └── Edit → TExampleEditFluent
 ```
 
-Callbacks só existem quando há destino real. No estado atual, Text / Label, Button, Badge, Divider e ComboBox possuem destinos Factory + Fluent Builder; Edit possui somente Fluent Builder. Abordagens sem destino permanecem somente visuais.
+Callbacks só existem quando há destino real. No estado atual, Text / Label, Button, Badge, Divider e ComboBox possuem destinos Factory + Fluent Builder; Edit possui somente Fluent Builder. Nenhuma abordagem sem destino é apresentada como opção funcional.
 
 ## Arquitetura da família de páginas
 
@@ -137,7 +142,7 @@ Quando somente Fluent Builder existe, como no Edit, o card permanece centralizad
 
 O card único é centralizado. Não existe placeholder de Factory.
 
-`Ver exemplos` permanece com `HitTest := False` e sem callback enquanto o destino real não existir. Quando existe destino, como nas duas abordagens de Text / Label e Button e em Badge Factory, a ação recebe `HitTest := True`, `crHandPoint` e callback real.
+`Ver exemplos` recebe `HitTest := True`, `crHandPoint` e callback somente quando existe destino real. A implementação atual expõe exatamente os onze destinos listados nesta especificação; não há card funcional apontando para página inexistente.
 
 ## Assets vetoriais
 
@@ -292,9 +297,9 @@ Fluent Builder possui callback real para `TExampleEditFluent`; a Component Page 
 └────────────────────────────────────────────────────────────┘
 ```
 
-## Próxima camada planejada
+## Integração com a terceira camada
 
-A ação `Ver exemplos` é conectada individualmente apenas a destinos reais. Text / Label, Button, Badge, Divider e ComboBox abrem Factory e Fluent Builder; Edit abre somente Fluent Builder. Destinos ainda não implementados permanecem sem callback. A terceira camada é especificada em `SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`.
+A ação `Ver exemplos` é conectada individualmente aos destinos reais. Text / Label, Button, Badge, Divider e ComboBox abrem Factory e Fluent Builder; Edit abre somente Fluent Builder, porque a API pública atual não expõe `Factory.CreateEdit`. A terceira camada implementada é especificada em `SAMPLE_EXAMPLE_PAGE_BASE_SPEC.md`.
 
 A Component Page continua tendo somente a responsabilidade de escolher a abordagem. Ela não deve absorver menu lateral, código Delphi, resultado executável ou qualquer sample real.
 
@@ -313,7 +318,7 @@ A Component Page continua tendo somente a responsabilidade de escolher a abordag
 - `TSampleComponent`;
 - arrays com conteúdo dos seis componentes;
 - regra específica `Edit não possui Factory`;
-- páginas Factory/Fluent ainda não implementadas;
+- catálogo global das páginas Factory/Fluent da terceira camada;
 - samples concretos pertencentes à terceira camada; no estado atual, Text / Label, Button, Badge, Divider e ComboBox possuem Factory + Fluent e Edit possui apenas Fluent.
 
 Cada página concreta pode conhecer somente o conteúdo e as abordagens do seu próprio componente.

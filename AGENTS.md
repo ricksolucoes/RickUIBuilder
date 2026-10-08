@@ -8,7 +8,7 @@ A governança detalhada fica em [`.agents/`](.agents/README.md). O projeto usa [
 
 ## Repository scope
 
-Estas regras valem para todo o framework: Facade, `Types`, `Interfaces`, Factory, Label, Button, Badge, Divider, ComboBox, Composition, Sample, testes, projetos Delphi, documentação e componentes futuros.
+Estas regras valem para todo o framework: Facade, `Types`, `Interfaces`, Factory, Label, Button, Badge, Divider, ComboBox, Edit, Composition, Samples, testes, projetos Delphi, documentação e componentes futuros.
 
 O ComboBox possui documentação profunda em `docs/combobox/`, mas não define a arquitetura obrigatória dos demais componentes.
 

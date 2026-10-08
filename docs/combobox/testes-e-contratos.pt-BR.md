@@ -2,9 +2,9 @@
 
 > [English](testes-e-contratos.md) | [Português do Brasil](testes-e-contratos.pt-BR.md)
 
-## Baseline validada
+## Cobertura atual no código e execução histórica
 
-O estado atualmente documentado foi executado com DUnitX em 2026-09-22: **197 testes encontrados, 197 aprovados, 0 ignorados, 0 leaks, 0 failures e 0 errors**. Essa é evidência de execução real para esta versão.
+O ZIP atual declara **240** métodos `[Test]` nas units de teste. Esse valor foi obtido por inspeção estática do código-fonte e não comprova que a suíte passa. A governança do projeto preserva uma baseline DUnitX real histórica de **197 encontrados / 197 aprovados / 0 ignorados / 0 leaks / 0 failures / 0 errors** para uma revisão anterior efetivamente executada. Uma nova execução DUnitX é necessária antes de atribuir contagens de aprovação ou falha à revisão atual.
 
 ## Contratos de Data
 
@@ -54,9 +54,9 @@ Os testes FullWindow validam hosting na Form raiz, estrutura completa de pesquis
 
 `TPathData.Data` do FireMonkey interpreta o path de entrada e pode serializá-lo novamente em forma canônica. Os testes não devem usar a string SVG/path original como identidade textual persistente. Os testes atuais normalizam o path esperado via `TPathData` antes da comparação.
 
-## O que a baseline de testes não significa
+## O que a baseline histórica não significa
 
-197/197 é evidência para a configuração executada e o escopo atual de testes. Não é garantia de zero defeitos, todas as plataformas, todos os temas, todos os DPIs ou mudanças futuras. Estilo visual, como aparência nativa do edit, ainda deve ser inspecionado nas plataformas target quando alterado.
+A execução histórica 197/197 é evidência apenas para a revisão e configuração que foram executadas. Ela não comprova que os 240 testes atualmente declarados passam, nem garante zero defeitos, todas as plataformas, todos os temas, todos os DPIs ou mudanças futuras. Estilo visual, como aparência nativa do edit, ainda deve ser inspecionado nas plataformas target quando alterado.
 
 ## Gate de regressão para mudanças futuras
 

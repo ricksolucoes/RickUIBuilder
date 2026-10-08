@@ -2,9 +2,9 @@
 
 > [English](testes-e-contratos.md) | [Português do Brasil](testes-e-contratos.pt-BR.md)
 
-## Validated baseline
+## Current source coverage and historical execution
 
-The current documented state was executed with DUnitX on 2026-09-22: **197 tests found, 197 passed, 0 ignored, 0 leaked, 0 failed, 0 errored**. This is real execution evidence for this version.
+The current ZIP declares **240** `[Test]` methods across the test units. This value was obtained by static inspection of the source and does not prove that the suite passes. Project governance preserves a historical real DUnitX baseline of **197 found / 197 passed / 0 ignored / 0 leaked / 0 failed / 0 errored** for an earlier measured revision. A new DUnitX execution is required before attributing pass/fail counts to the current revision.
 
 ## Data contracts
 
@@ -54,9 +54,9 @@ The FullWindow tests verify root-form hosting, complete search structure, Clear 
 
 FireMonkey `TPathData.Data` parses the input path and may serialize it back in canonical form. Tests must not use the original SVG/path input string as a persistent textual identity. The current tests normalize expected path data through `TPathData` before comparison.
 
-## What the test baseline does not mean
+## What the historical baseline does not mean
 
-197/197 is evidence for the executed configuration and current test scope. It is not a guarantee of zero defects, all platforms, all themes, all DPI values, or future changes. Visual styling such as native edit appearance should still be inspected on target platforms when changed.
+The historical 197/197 run is evidence only for the revision and configuration that were executed. It is not evidence that the current 240 declared tests pass, nor a guarantee of zero defects, all platforms, all themes, all DPI values, or future changes. Visual styling such as native edit appearance should still be inspected on target platforms when changed.
 
 ## Regression gate for future changes
 
