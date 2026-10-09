@@ -265,11 +265,14 @@ begin
       FUnderline.Fill.Color := FConfig.ReadOnlyUnderlineColor;
     Exit;
   end;
-  FContainer.Fill.Color := FConfig.BackgroundColor;
-  FContainer.Stroke.Color := FConfig.BorderColor;
+  if Assigned(FContainer.Fill) then
+    FContainer.Fill.Color := FConfig.BackgroundColor;
+
+  if Assigned(FContainer.Stroke) then
+    FContainer.Stroke.Color := FConfig.BorderColor;
   FLabel.TextSettings.FontColor := FConfig.LabelColor;
   FEdit.TextSettings.FontColor := FConfig.TextColor;
-  if Assigned(FUnderline) then
+  if Assigned(FUnderline.Fill) then
     FUnderline.Fill.Color := FConfig.UnderlineColor;
 end;
 
@@ -289,10 +292,12 @@ end;
 
 procedure TRickUIBuilderEditBehavior.ApplyInvalidState;
 begin
-  FContainer.Fill.Color := FConfig.InvalidBackgroundColor;
-  FContainer.Stroke.Color := FConfig.InvalidBorderColor;
+  if Assigned(FContainer.Fill) then
+    FContainer.Fill.Color := FConfig.InvalidBackgroundColor;
+  if Assigned(FContainer.Stroke) then
+    FContainer.Stroke.Color := FConfig.InvalidBorderColor;
   FLabel.TextSettings.FontColor := FConfig.InvalidLabelColor;
-  if Assigned(FUnderline) then
+  if Assigned(FUnderline.Fill) then
     FUnderline.Fill.Color := FConfig.InvalidUnderlineColor;
 end;
 
@@ -315,10 +320,12 @@ begin
   FInvalid := AValue;
   FInvalidFromInput := False;
   FErrorLabel.Text := AMessage;
+
   FErrorLabel.Visible := AValue and ShouldShowErrorLabel(AMessage);
-  if FErrorLabel.Visible and
-    (FContainer.Height < FErrorLabel.Position.Y + FErrorLabel.Height + 8) then
+
+  if FErrorLabel.Visible and (FContainer.Height < FErrorLabel.Position.Y + FErrorLabel.Height + 8) then
     FContainer.Height := FErrorLabel.Position.Y + FErrorLabel.Height + 8;
+  
   if Assigned(FAlertPath) then
     FAlertPath.Visible := AValue and ShouldShowAlertIcon;
   UpdateActionLayout;
@@ -371,7 +378,10 @@ procedure TRickUIBuilderEditBehavior.PlaceActionArea(AControl: TControl;
 begin
   if not Assigned(AControl) or not AControl.Visible then
     Exit;
-  AControl.Position.X := ALeft;
+
+  if Assigned(AControl.Position) then
+    AControl.Position.X := ALeft;
+
   ALeft := ALeft - 32;
 end;
 
@@ -380,7 +390,8 @@ procedure TRickUIBuilderEditBehavior.PlaceActionPath(AControl: TControl;
 begin
   if not Assigned(AControl) or not AControl.Visible then
     Exit;
-  AControl.Position.X := ALeft + ((32 - FConfig.IconSize) / 2);
+  if Assigned(AControl.Position) then
+    AControl.Position.X := ALeft + ((32 - FConfig.IconSize) / 2);
   ALeft := ALeft - 32;
 end;
 
