@@ -42,7 +42,7 @@ Quando uma alteração arquitetural modificar responsabilidade, boundary, depend
 ## Critérios específicos da Sample Page Base
 
 - Confirmar `TExamplePageLayout` em `.Common.Style`, defaults `620 × 510`/nav `142`/item `28`, métricas derivadas calculadas pela infraestrutura e especialização somente via hook protegido de `TExampleCommon`.
-- Confirmar que toda especialização permanece menor que a Home `644 × 534`; no estado atual Button - Fluent usa `640 × 530` e navegação `170`; Badge - Factory, Badge - Fluent, Divider - Fluent e Edit - Fluent usam `640 × 510` e navegação `170`; ComboBox - Fluent usa `640 × 510` e navegação `180`.
+- Confirmar que toda especialização permanece menor que a Home `644 × 534`; no estado atual Button - Fluent usa `640 × 530` e navegação `170`; Badge - Factory, Badge - Fluent, Divider - Fluent e Edit - Fluent usam `640 × 510` e navegação `170`; ComboBox - Factory e ComboBox - Fluent usam `640 × 510` e navegação `180`.
 
 - `TExampleCommon` deve coordenar somente a infraestrutura comum da terceira camada; header/back, navegação lateral, seletor Código/Resultado, painel de código e painel de resultado devem permanecer nas units especializadas `.Header`, `.Navigation`, `.View.Selector`, `.Code.Panel` e `.Result.Panel`, sem reabsorção monolítica dessas responsabilidades.
 - A base não pode conhecer `TSampleComponent`, componente concreto, Factory/Fluent como regra específica, categorias fixas ou catálogo global de exemplos.

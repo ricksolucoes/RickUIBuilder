@@ -42,7 +42,6 @@ type
     FOnOpen: TNotifyEvent;
     FOnClose: TNotifyEvent;
     FOnCustomizeItem: TRickUIBuilderComboBoxCustomizeItemEvent;
-    function ResolvedConfig: TRickUIBuilderComboBoxConfig;
     function BuildCore(AParent: TFmxObject;
       out AHandle: IRickUIBuilderComboBoxHandle): TRectangle;
   protected
@@ -101,10 +100,7 @@ uses
   System.Math,
   FMX.StdCtrls,
 
-  Rick.UIBuilder.Factory,
-  Rick.UIBuilder.ComboBox.Data,
-  Rick.UIBuilder.ComboBox.Handle,
-  Rick.UIBuilder.ComboBox.Style;
+  Rick.UIBuilder.Factory;
 
 constructor TRickUIBuilderComboBoxBuilder.Create;
 begin
@@ -371,53 +367,32 @@ begin
   Result := Self;
 end;
 
-function TRickUIBuilderComboBoxBuilder.ResolvedConfig:
-  TRickUIBuilderComboBoxConfig;
-var
-  LHeight: Single;
-  LItemHeight: Single;
-  LArrowSize: Single;
-begin
-  LHeight := FConfig.Height;
-  LItemHeight := FConfig.ItemHeight;
-  LArrowSize := FConfig.ArrowSize;
-  Result := TRickUIBuilderComboBoxStyleResolver.Resolve(FConfig);
-
-  if FHeightOverridden then
-    Result.Height := LHeight;
-  if FItemHeightOverridden then
-    Result.ItemHeight := LItemHeight;
-  if FArrowSizeOverridden then
-    Result.ArrowSize := LArrowSize;
-end;
-
 function TRickUIBuilderComboBoxBuilder.BuildCore(AParent: TFmxObject;
   out AHandle: IRickUIBuilderComboBoxHandle): TRectangle;
 var
-  LConfig: TRickUIBuilderComboBoxConfig;
-  LData: TRickUIBuilderComboBoxData;
-  LImplementation: TRickUIBuilderComboBoxHandle;
-  LTextLabel: TLabel;
-  LArrow: TPath;
+  LOptions: TRickUIBuilderComboBoxFactoryOptions;
 begin
-  LConfig := ResolvedConfig;
-  LData := TRickUIBuilderComboBoxData.Create;
-  LData.AddRange(FItems.ToArray);
+  LOptions := TRickUIBuilderComboBoxFactoryOptions.Default;
+  LOptions.Items := FItems.ToArray;
+  LOptions.Columns := FColumns.ToArray;
+  LOptions.Placeholder := FPlaceholder;
+  LOptions.ItemIndex := FInitialIndex;
+  LOptions.SelectedText := FInitialText;
+  LOptions.OnChange := FOnChange;
+  LOptions.OnOpen := FOnOpen;
+  LOptions.OnClose := FOnClose;
+  LOptions.OnCustomizeItem := FOnCustomizeItem;
+  LOptions.PreserveHeight := FHeightOverridden;
+  LOptions.PreserveItemHeight := FItemHeightOverridden;
+  LOptions.PreserveArrowSize := FArrowSizeOverridden;
+
   if FUseInitialText then
-    LData.TrySelectText(FInitialText)
-  else
-    LData.SelectIndex(FInitialIndex);
+    LOptions.SelectionMode := TRickUIBuilderComboBoxInitialSelectionMode.Text
+  else if FInitialIndex <> -1 then
+    LOptions.SelectionMode := TRickUIBuilderComboBoxInitialSelectionMode.Index;
 
-  AHandle := TRickUIBuilderComboBoxHandle.New(LConfig, LData,
-    LImplementation);
-  LImplementation.ConfigureColumns(FColumns.ToArray);
-  LImplementation.ConfigurePlaceholder(FPlaceholder);
-  LImplementation.ConfigureEvents(FOnChange, FOnOpen, FOnClose,
-    FOnCustomizeItem);
-
-  Result := TRickUIBuilderFactory.CreateComboBox(AParent, AParent, LConfig,
-    LTextLabel, LArrow);
-  LImplementation.AttachVisual(AParent, Result, LTextLabel, LArrow, AHandle);
+  Result := TRickUIBuilderFactory.CreateComboBox(AParent, AParent, FConfig,
+    LOptions, AHandle);
 end;
 
 function TRickUIBuilderComboBoxBuilder.Build(

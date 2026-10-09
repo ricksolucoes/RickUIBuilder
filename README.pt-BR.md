@@ -725,7 +725,19 @@ Abra:
 samples\RickUIBuilder.Samples.dproj
 ```
 
-O executável dos Samples também aceita o parâmetro opcional `-nodx`, que define `FMX.Types.GlobalUseDX := False` antes de `Application.Initialize`. A arquitetura e as decisões dos Samples estão documentadas em [`docs/samples`](docs/samples/SAMPLE_ARCHITECTURE.md).
+### Compatibilidade com acesso remoto (`-nodx`)
+
+O executável dos Samples aceita o parâmetro opcional `-nodx` para iniciar o FMX com DirectX desabilitado:
+
+```text
+RickUIBuilder.Samples.exe -nodx
+```
+
+Quando o switch é informado, o executável define `FMX.Types.GlobalUseDX := False` **antes** de `Application.Initialize`. Essa opção existe para ambientes de acesso remoto nos quais controles FMX criados em runtime podem não ser capturados ou exibidos corretamente quando o backend gráfico DirectX está ativo.
+
+A identificação do parâmetro não diferencia letras maiúsculas de minúsculas, portanto `-nodx`, `-NODX`, `-NoDx` e variações equivalentes são aceitas. Sem o switch, o código não altera `GlobalUseDX` e o comportamento gráfico padrão do FMX é mantido.
+
+O parâmetro pertence ao **executável dos Samples**; a biblioteca RickUIBuilder não desabilita DirectX automaticamente nas aplicações consumidoras. A arquitetura e as decisões dos Samples estão documentadas em [`docs/samples`](docs/samples/SAMPLE_ARCHITECTURE.md).
 
 <a name="testes"></a>
 ## ✅ Testes

@@ -2,55 +2,39 @@
 {                                                                              }
 {  RickUIBuilder.Samples.Example.ComboBox.Factory                              }
 {                                                                              }
-{ Esta unit coordena a página concreta ComboBox - Factory, criando a navegação }
-{ dos sete exemplos comprováveis e delegando ao Runner a materialização real   }
-{ do controle fechado no ResultHost.                                           }
+{ Coordena a página ComboBox - Factory com quinze exemplos funcionais.         }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
-{  Implementar a página concreta de exemplos do ComboBox usando a abordagem    }
-{  Factory disponível no código atual.                                         }
+{  Integrar navegação, conteúdo e execução dos exemplos Factory de ComboBox.   }
 {                                                                              }
 {  Funcionalidade                                                              }
 {  --------------                                                              }
-{  Configura a Sample Page Base, cria a navegação dos exemplos Factory,        }
-{  sincroniza conteúdo e solicita a execução real no ResultHost.               }
+{  Configura layout 640x510, navegação de 180 px, sincroniza snippet/resultado }
+{  e mantém o Runner durante callbacks of object.                              }
 {                                                                              }
-{  Dependências do projeto                                                     }
-{  -----------------------                                                     }
-{  - RickUIBuilder.Samples.App.Types                                           }
-{      Fornece TComboBoxFactoryExample compartilhado com Content e Runner.     }
-{  - RickUIBuilder.Samples.Example.Common                                      }
-{      Fornece TExampleCommon e a infraestrutura visual compartilhada.         }
-{  - RickUIBuilder.Samples.Example.Common.Navigation                           }
-{      Fornece TExampleNavigationItem retornado pela API protegida da base.    }
-{  - RickUIBuilder.Samples.Example.ComboBox.Factory.Content                    }
-{      Fornece captions, títulos, descrições e snippets dos exemplos.          }
-{  - RickUIBuilder.Samples.Example.ComboBox.Factory.Runner                     }
-{      Executa CreateComboBox diretamente no ResultHost.                       }
+{  Dependências internas                                                       }
+{  ---------------------                                                       }
+{  - App.Types fornece TComboBoxFactoryExample.                                }
+{  - Example.Common/Navigation/Style fornecem infraestrutura visual.           }
+{  - Factory.Content fornece textos/snippets; Factory.Runner executa a API.    }
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
-{  - O Coordinator cria esta página quando ComboBox solicita Factory.          }
-{  - A seleção lateral atualiza identidade, snippet e resultado executável.    }
-{  - Back é herdado da base e fecha somente esta modal.                        }
+{  Seleção lateral -> ShowExample -> Reset -> ClearResult -> Runner.Render.    }
 {                                                                              }
 {  Ownership / lifetime                                                        }
 {  --------------------                                                        }
-{  - O Coordinator cria a página sem Owner e a libera após ShowModal.          }
-{  - Os itens de navegação pertencem à árvore visual da base.                  }
-{  - Os resultados são owned por ResultHost e substituídos via ClearResult.    }
+{  A página owns FRunner; ResultHost owns os resultados. O Runner é liberado   }
+{  somente após inherited Destroy liberar a árvore visual e seus callbacks.    }
 {                                                                              }
-{  Restrições e responsabilidades                                              }
-{  -----------------------------                                               }
-{  - Esta page conhece somente ComboBox na abordagem Factory.                  }
-{  - A Factory atual cria o controle fechado; lista/popup não são simulados.   }
-{  - Conteúdo textual e execução permanecem separados em units próprias.       }
+{  Restrições                                                                  }
+{  ----------                                                                  }
+{  Não contém regras de materialização do ComboBox nem classes runtime internas.}
 {                                                                              }
 {  Manutenção                                                                  }
 {  ----------                                                                  }
-{  Atualizar esta unit quando navegação ou coordenação dos exemplos desta      }
-{  página mudar, sem antecipar capacidades ainda ausentes da Factory.          }
+{  Manter enum, Content, Runner e navegação sincronizados.                     }
 {                                                                              }
 {******************************************************************************}
 
@@ -60,45 +44,59 @@ interface
 
 uses
   System.Classes,
-
   RickUIBuilder.Samples.App.Types,
-
   RickUIBuilder.Samples.Example.Common,
   RickUIBuilder.Samples.Example.Common.Navigation,
-  RickUIBuilder.Samples.Example.ComboBox.Factory.Content;
+  RickUIBuilder.Samples.Example.Common.Style,
+  RickUIBuilder.Samples.Example.ComboBox.Factory.Content,
+  RickUIBuilder.Samples.Example.ComboBox.Factory.Runner;
 
 type
-  /// <summary>Página concreta de exemplos Factory de ComboBox.</summary>
   TExampleComboBoxFactory = class(TExampleCommon)
   strict private
+    FRunner: TComboBoxFactoryRunner;
     function BuildNavigation: TExampleNavigationItem;
-    function AddExampleItem(
-      const AExample: TComboBoxFactoryExample): TExampleNavigationItem;
+    function AddExampleItem(const AExample: TComboBoxFactoryExample): TExampleNavigationItem;
     procedure NavigationRequested(ASender: TObject);
-    procedure ShowExample(const AExample: TComboBoxFactoryExample;
-      const AItem: TExampleNavigationItem);
+    procedure ShowExample(const AExample: TComboBoxFactoryExample; const AItem: TExampleNavigationItem);
+  strict protected
+    procedure ConfigureLayout(var ALayout: TExamplePageLayout); override;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
   end;
 
 implementation
 
-uses
-  RickUIBuilder.Samples.Example.ComboBox.Factory.Runner;
-
 const
   _PARENT_TITLE_ = 'ComboBox';
   _PAGE_TITLE_ = 'ComboBox - Factory';
-  _PAGE_SUBTITLE_ = 'Criação direta do controle fechado com TRickUIBuilderFactory.CreateComboBox.';
+  _PAGE_SUBTITLE_ = 'Listas, seleção e runtime com TRickUIBuilderFactory.CreateComboBox.';
+  _PAGE_WIDTH_ = 640;
+  _NAV_WIDTH_ = 180;
+
+procedure TExampleComboBoxFactory.ConfigureLayout(var ALayout: TExamplePageLayout);
+begin
+  inherited ConfigureLayout(ALayout);
+  ALayout.PageWidth := _PAGE_WIDTH_;
+  ALayout.NavigationWidth := _NAV_WIDTH_;
+end;
 
 constructor TExampleComboBoxFactory.Create(AOwner: TComponent);
 var
   LInitialItem: TExampleNavigationItem;
 begin
   inherited Create(AOwner);
+  FRunner := TComboBoxFactoryRunner.Create;
   ConfigurePage(_PARENT_TITLE_, _PAGE_TITLE_, _PAGE_SUBTITLE_);
   LInitialItem := BuildNavigation;
   ShowExample(TComboBoxFactoryExample.Basic, LInitialItem);
+end;
+
+destructor TExampleComboBoxFactory.Destroy;
+begin
+  inherited Destroy;
+  FRunner.Free;
 end;
 
 function TExampleComboBoxFactory.BuildNavigation: TExampleNavigationItem;
@@ -107,16 +105,13 @@ var
 begin
   Result := nil;
   for LExample := Low(TComboBoxFactoryExample) to High(TComboBoxFactoryExample) do
-  begin
     if LExample = TComboBoxFactoryExample.Basic then
       Result := AddExampleItem(LExample)
     else
       AddExampleItem(LExample);
-  end;
 end;
 
-function TExampleComboBoxFactory.AddExampleItem(
-  const AExample: TComboBoxFactoryExample): TExampleNavigationItem;
+function TExampleComboBoxFactory.AddExampleItem(const AExample: TComboBoxFactoryExample): TExampleNavigationItem;
 begin
   Result := AddNavigationItem(TComboBoxFactoryContent.Caption(AExample));
   Result.Tag := Ord(AExample);
@@ -126,22 +121,20 @@ end;
 procedure TExampleComboBoxFactory.NavigationRequested(ASender: TObject);
 var
   LItem: TExampleNavigationItem;
-  LExample: TComboBoxFactoryExample;
 begin
   LItem := ASender as TExampleNavigationItem;
-  LExample := TComboBoxFactoryExample(LItem.Tag);
-  ShowExample(LExample, LItem);
+  ShowExample(TComboBoxFactoryExample(LItem.Tag), LItem);
 end;
 
-procedure TExampleComboBoxFactory.ShowExample(
-  const AExample: TComboBoxFactoryExample; const AItem: TExampleNavigationItem);
+procedure TExampleComboBoxFactory.ShowExample(const AExample: TComboBoxFactoryExample;
+  const AItem: TExampleNavigationItem);
 begin
   SelectNavigationItem(AItem);
-  SetExampleIdentity(TComboBoxFactoryContent.Title(AExample),
-    TComboBoxFactoryContent.Description(AExample));
+  SetExampleIdentity(TComboBoxFactoryContent.Title(AExample), TComboBoxFactoryContent.Description(AExample));
   SetCodeText(TComboBoxFactoryContent.Code(AExample));
+  FRunner.Reset;
   ClearResult;
-  TComboBoxFactoryRunner.Render(AExample, ResultHost);
+  FRunner.Render(AExample, ResultHost);
 end;
 
 end.

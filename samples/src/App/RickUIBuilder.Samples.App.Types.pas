@@ -22,7 +22,7 @@
 {    TBadgeFluentExample os onze exemplos Badge Fluent Builder.                }
 {  - TDividerFactoryExample identifica os quatro exemplos Divider - Factory e  }
 {    TDividerFluentExample os nove exemplos Divider Fluent Builder.            }
-{  - TComboBoxFactoryExample identifica os sete exemplos ComboBox - Factory.   }
+{  - TComboBoxFactoryExample identifica os quinze exemplos ComboBox - Factory. }
 {  - TComboBoxFluentExample identifica os quinze exemplos ComboBox Fluent.     }
 {  - TEditFluentExample identifica os vinte e nove exemplos Edit Fluent.       }
 {  - TExampleView identifica a view Código Delphi ou Resultado ativa.          }
@@ -91,8 +91,10 @@ type
     Appearance, State, CompleteDirect, CompleteInterfaces);
 
   /// <summary>Identifica os exemplos da página ComboBox - Factory.</summary>
-  TComboBoxFactoryExample = (Basic, GeometryShape, TypographyText, Colors,
-    Arrow, State, Complete);
+  TComboBoxFactoryExample = (Basic, DisplayValue, StructuredList,
+    InitialSelection, GeometryShape, TypographyText, Colors, Arrow, State,
+    DesktopAnchored, FullWindowSearch, Events, CustomizeItem, RuntimeHandle,
+    Complete);
 
   /// <summary>Identifica os exemplos da página ComboBox - Fluent Builder.</summary>
   TComboBoxFluentExample = (Basic, InterfaceUsage, DisplayValue, StructuredList,

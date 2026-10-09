@@ -260,7 +260,7 @@ Factory possui callback real para `TExampleDividerFactory` e Fluent Builder para
 
 **Abordagens:** Factory + Fluent Builder.
 
-**Sobre:** `Factory demonstra o controle fechado; Fluent Builder demonstra listas, seleção, apresentação, eventos e runtime do ComboBox.`
+**Sobre:** `Factory e Fluent Builder demonstram listas, seleção, apresentação, eventos e runtime do ComboBox por suas APIs públicas.`
 
 Factory possui callback real para `TExampleComboBoxFactory` e Fluent Builder para `TExampleComboBoxFluent`; a Component Page apenas emite as duas intenções.
 

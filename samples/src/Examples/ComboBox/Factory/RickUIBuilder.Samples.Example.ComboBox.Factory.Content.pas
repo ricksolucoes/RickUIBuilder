@@ -2,43 +2,36 @@
 {                                                                              }
 {  RickUIBuilder.Samples.Example.ComboBox.Factory.Content                      }
 {                                                                              }
-{ Esta unit centraliza o conteúdo textual de ComboBox - Factory, documentando  }
-{ sete exemplos comprováveis e a limitação atual: CreateComboBox materializa   }
-{ somente o controle fechado, sem lista/popup/seleção.                         }
+{ Centraliza captions, títulos, descrições e snippets dos quinze exemplos      }
+{ funcionais ComboBox - Factory.                                               }
 {                                                                              }
 {  Finalidade                                                                  }
 {  ----------                                                                  }
-{  Centralizar captions, títulos, descrições e snippets Delphi dos exemplos    }
-{  Factory de ComboBox exibidos pela página concreta do Samples.               }
+{  Fornecer exemplos Delphi completos o suficiente para implementação direta,  }
+{  sem depender dos helpers privados utilizados pelo Runner.                   }
 {                                                                              }
 {  Funcionalidade                                                              }
 {  --------------                                                              }
-{  Os seis exemplos focados demonstram somente efeitos executados pela Factory }
-{  atual. O Completo explicita os 58 campos públicos do config, distinguindo   }
-{  os 24 consumidos pelo controle fechado dos campos reservados ao runtime.    }
+{  Cobre dados, seleção, visual, presentation, callbacks, customização e       }
+{  handle. Cada snippet explicita config, options, handle e ordem de criação.   }
 {                                                                              }
-{  Dependências do projeto                                                     }
-{  -----------------------                                                     }
-{  - RickUIBuilder.Samples.App.Types                                           }
-{      Fornece TComboBoxFactoryExample compartilhado por page, Content e       }
-{      Runner.                                                                 }
+{  Dependências internas                                                       }
+{  ---------------------                                                       }
+{  App.Types fornece TComboBoxFactoryExample compartilhado com Page/Runner.    }
 {                                                                              }
 {  Fluxo / colaboração                                                         }
 {  -------------------                                                         }
-{  - TExampleComboBoxFactory consulta esta unit ao selecionar um exemplo.      }
-{  - TComboBoxFactoryRunner executa a configuração equivalente no ResultHost.  }
+{  A Page consulta esta unit e o Runner executa comportamento semanticamente   }
+{  equivalente no ResultHost.                                                  }
 {                                                                              }
-{  Restrições e responsabilidades                                              }
-{  -----------------------------                                               }
-{  - Não executa Factory, não cria controles e não conhece o Fluent Builder.   }
-{  - Não apresenta Items, popup, seleção ou pesquisa como recursos Factory.    }
-{  - Campos de runtime aparecem somente no Completo por exaustividade do       }
-{    record e são identificados como não consumidos por CreateComboBox.        }
+{  Restrições                                                                  }
+{  ----------                                                                  }
+{  Os snippets não podem depender de BasicOptions, TextItems ou outros helpers }
+{  internos do Runner que o leitor não vê na aba Código Delphi.                }
 {                                                                              }
 {  Manutenção                                                                  }
 {  ----------                                                                  }
-{  Atualizar esta unit quando a API Factory real mudar, mantendo snippets e    }
-{  Runner semanticamente sincronizados.                                        }
+{  Manter arrays na ordem do enum e snippets sincronizados com o Runner.       }
 {                                                                              }
 {******************************************************************************}
 
@@ -50,13 +43,16 @@ uses
   RickUIBuilder.Samples.App.Types;
 
 type
-  /// <summary>Conteúdo textual da página ComboBox - Factory.</summary>
   TComboBoxFactoryContent = class sealed
   public
-    class function Caption(const AExample: TComboBoxFactoryExample): string; static;
-    class function Title(const AExample: TComboBoxFactoryExample): string; static;
-    class function Description(const AExample: TComboBoxFactoryExample): string; static;
-    class function Code(const AExample: TComboBoxFactoryExample): string; static;
+    class function Caption(
+      const AExample: TComboBoxFactoryExample): string; static;
+    class function Title(
+      const AExample: TComboBoxFactoryExample): string; static;
+    class function Description(
+      const AExample: TComboBoxFactoryExample): string; static;
+    class function Code(
+      const AExample: TComboBoxFactoryExample): string; static;
   end;
 
 implementation
@@ -64,51 +60,190 @@ implementation
 const
   _CAPTIONS_: array[TComboBoxFactoryExample] of string = (
     'Básico',
+    'Texto + Value',
+    'Lista estruturada',
+    'Seleção inicial',
     'Geometria e forma',
     'Tipografia e texto',
     'Cores',
     'Seta',
     'Estado',
+    'Desktop / Anchored',
+    'FullWindow e pesquisa',
+    'Eventos',
+    'Customização de item',
+    'Handle runtime',
     'Completo');
 
   _TITLES_: array[TComboBoxFactoryExample] of string = (
-    'Controle fechado básico',
+    'Lista textual real',
+    'DisplayText e Value',
+    'Itens estruturados e colunas',
+    'Seleção por índice e texto',
     'Geometria e forma',
     'Tipografia e texto',
-    'Cores do controle fechado',
-    'Posição, margens e path da seta',
+    'Cores',
+    'Seta',
     'Estado desabilitado',
-    'Configuração pública completa');
+    'Desktop com Anchored',
+    'Mobile com FullWindow',
+    'Callbacks',
+    'OnCustomizeItem',
+    'Handle runtime',
+    'Referência exaustiva');
 
   _DESCRIPTIONS_: array[TComboBoxFactoryExample] of string = (
-    'Cria o TRectangle fechado e usa os retornos TLabel/TPath. A Factory atual não materializa lista.',
-    'Demonstra Left, Top, Width, Height, CornerRadius e HorizontalPadding aplicados pela Factory.',
-    'Demonstra FontSize, FontFamily, FontStyle, TextAlign e Trimming; a família depende da fonte instalada.',
-    'Demonstra BackgroundColor, BorderColor, TextColor e ArrowColor no controle fechado.',
-    'Demonstra ArrowSize, quatro margens, ArrowPosition e ClosedArrowPath, todos consumidos pela Factory.',
-    'Demonstra Enabled=False e DisabledOpacity aplicados ao TRectangle principal.',
-    'Atribui 58/58 campos públicos do config. CreateComboBox usa diretamente 24 deles; os demais pertencem ao runtime e não são apresentados como efeito Factory.');
+    'Criação completa com Items e Placeholder, sem helpers ocultos.',
+    'DisplayText, Value e seleção textual inicial.',
+    'Configuração explícita de Fixed, Proportional, Auto e itens estruturados.',
+    'Dois controles completos: seleção inicial por Index e por Text.',
+    'Geometria configurada sobre um ComboBox funcional.',
+    'Tipografia, alinhamento e trimming com itens reais.',
+    'Cores do controle fechado, popup, hover e seleção.',
+    'Path, posição, tamanho e margens da seta.',
+    'Enabled e DisabledOpacity com dados reais.',
+    'StyleType Desktop com PresentationMode Anchored.',
+    'Mobile + Auto com pesquisa, empty state e lista real.',
+    'Handlers OnOpen, OnClose e OnChange com assinatura e lifetime visíveis.',
+    'Callback OnCustomizeItem com criação completa do conteúdo adicional da row.',
+    'Criação antes do uso do IRickUIBuilderComboBoxHandle e operações públicas.',
+    '58/58 campos do config e 14/14 campos de FactoryOptions, sem helpers invisíveis.');
 
   _CODES_: array[TComboBoxFactoryExample] of string = (
-    '// Cria o controle fechado com os defaults públicos da Factory.'#13#10 +
-    '// ResultHost recebe o TRectangle; TLabel e TPath são retornados por out.'#13#10 +
+    '// Exemplo completo da API Factory: Básico.'#13#10 +
+    '// Confira o controle materializado na aba Resultado.'#13#10 +
     'var'#13#10 +
-    '  LTextLabel: TLabel;'#13#10 +
-    '  LArrow: TPath;'#13#10 +
     '  LConfig: TRickUIBuilderComboBoxConfig;'#13#10 +
+    '  LOptions: TRickUIBuilderComboBoxFactoryOptions;'#13#10 +
+    '  LHandle: IRickUIBuilderComboBoxHandle;'#13#10 +
     'begin'#13#10 +
     '  LConfig := TRickUIBuilderComboBoxConfig.Default;'#13#10 +
-    '  TRickUIBuilderFactory.CreateComboBox(ResultHost, ResultHost, LConfig,'#13#10 +
-    '    LTextLabel, LArrow);'#13#10 +
-    '  LTextLabel.Text := ''Selecione...'';'#13#10 +
+    ''#13#10 +
+    '  LOptions := TRickUIBuilderComboBoxFactoryOptions.Default;'#13#10 +
+    '  LOptions.Placeholder := ''Escolha um tamanho'';'#13#10 +
+    '  LOptions.Items := ['#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Pequeno''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Médio''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Grande''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Extra grande'')'#13#10 +
+    '  ];'#13#10 +
+    ''#13#10 +
+    '  TRickUIBuilderFactory.CreateComboBox('#13#10 +
+    '    ResultHost, ResultHost, LConfig, LOptions, LHandle);'#13#10 +
     'end;',
 
-    '// Configura posição, tamanho, raio e espaço interno do controle fechado.'#13#10 +
-    '// ResultHost exibe o resultado materializado pela Factory.'#13#10 +
+    '// Exemplo completo da API Factory: Texto + Value.'#13#10 +
+    '// Confira o controle materializado na aba Resultado.'#13#10 +
     'var'#13#10 +
-    '  LTextLabel: TLabel;'#13#10 +
-    '  LArrow: TPath;'#13#10 +
     '  LConfig: TRickUIBuilderComboBoxConfig;'#13#10 +
+    '  LOptions: TRickUIBuilderComboBoxFactoryOptions;'#13#10 +
+    '  LHandle: IRickUIBuilderComboBoxHandle;'#13#10 +
+    'begin'#13#10 +
+    '  LConfig := TRickUIBuilderComboBoxConfig.Default;'#13#10 +
+    ''#13#10 +
+    '  LOptions := TRickUIBuilderComboBoxFactoryOptions.Default;'#13#10 +
+    '  LOptions.Placeholder := ''Moeda'';'#13#10 +
+    '  LOptions.Items := ['#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Real brasileiro'', ''BRL''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Dólar americano'', ''USD''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Euro'', ''EUR'')'#13#10 +
+    '  ];'#13#10 +
+    '  LOptions.SelectionMode :='#13#10 +
+    '    TRickUIBuilderComboBoxInitialSelectionMode.Text;'#13#10 +
+    '  LOptions.SelectedText := ''Real brasileiro'';'#13#10 +
+    ''#13#10 +
+    '  TRickUIBuilderFactory.CreateComboBox('#13#10 +
+    '    ResultHost, ResultHost, LConfig, LOptions, LHandle);'#13#10 +
+    'end;',
+
+    '// Exemplo completo da API Factory: Lista estruturada.'#13#10 +
+    '// Confira o controle materializado na aba Resultado.'#13#10 +
+    'var'#13#10 +
+    '  LConfig: TRickUIBuilderComboBoxConfig;'#13#10 +
+    '  LOptions: TRickUIBuilderComboBoxFactoryOptions;'#13#10 +
+    '  LHandle: IRickUIBuilderComboBoxHandle;'#13#10 +
+    '  LCodeColumn: TRickUIBuilderComboBoxColumn;'#13#10 +
+    '  LNameColumn: TRickUIBuilderComboBoxColumn;'#13#10 +
+    '  LPriceColumn: TRickUIBuilderComboBoxColumn;'#13#10 +
+    'begin'#13#10 +
+    '  LConfig := TRickUIBuilderComboBoxConfig.Default;'#13#10 +
+    '  LConfig.Width := 360;'#13#10 +
+    ''#13#10 +
+    '  LCodeColumn := TRickUIBuilderComboBoxColumn.Create('#13#10 +
+    '    TRickUIBuilderComboBoxColumnSizeMode.Fixed, 72);'#13#10 +
+    '  LCodeColumn.Alignment := TTextAlign.Leading;'#13#10 +
+    '  LCodeColumn.Visible := True;'#13#10 +
+    ''#13#10 +
+    '  LNameColumn := TRickUIBuilderComboBoxColumn.Create('#13#10 +
+    '    TRickUIBuilderComboBoxColumnSizeMode.Proportional, 1);'#13#10 +
+    '  LNameColumn.Alignment := TTextAlign.Leading;'#13#10 +
+    '  LNameColumn.Visible := True;'#13#10 +
+    ''#13#10 +
+    '  LPriceColumn := TRickUIBuilderComboBoxColumn.Create('#13#10 +
+    '    TRickUIBuilderComboBoxColumnSizeMode.Auto);'#13#10 +
+    '  LPriceColumn.Alignment := TTextAlign.Trailing;'#13#10 +
+    '  LPriceColumn.Visible := True;'#13#10 +
+    ''#13#10 +
+    '  LOptions := TRickUIBuilderComboBoxFactoryOptions.Default;'#13#10 +
+    '  LOptions.Placeholder := ''Produto'';'#13#10 +
+    '  LOptions.Columns := [LCodeColumn, LNameColumn, LPriceColumn];'#13#10 +
+    '  LOptions.Items := ['#13#10 +
+    '    TRickUIBuilderComboBoxItem.Structured('#13#10 +
+    '      ''Notebook Core i7'', ''NBK'','#13#10 +
+    '      [''001'', ''Notebook Core i7'', ''R$ 4.999'']),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Structured('#13#10 +
+    '      ''Monitor 27'', ''MON'','#13#10 +
+    '      [''002'', ''Monitor 27 polegadas'', ''R$ 1.899''])'#13#10 +
+    '  ];'#13#10 +
+    ''#13#10 +
+    '  TRickUIBuilderFactory.CreateComboBox('#13#10 +
+    '    ResultHost, ResultHost, LConfig, LOptions, LHandle);'#13#10 +
+    'end;',
+
+    '// Exemplo completo da API Factory: Seleção inicial.'#13#10 +
+    '// Confira o controle materializado na aba Resultado.'#13#10 +
+    'var'#13#10 +
+    '  LConfig: TRickUIBuilderComboBoxConfig;'#13#10 +
+    '  LOptions: TRickUIBuilderComboBoxFactoryOptions;'#13#10 +
+    '  LHandle: IRickUIBuilderComboBoxHandle;'#13#10 +
+    'begin'#13#10 +
+    '  LConfig := TRickUIBuilderComboBoxConfig.Default;'#13#10 +
+    '  LConfig.Top := 12;'#13#10 +
+    '  LOptions := TRickUIBuilderComboBoxFactoryOptions.Default;'#13#10 +
+    '  LOptions.Placeholder := ''Pagamento'';'#13#10 +
+    '  LOptions.Items := ['#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Dinheiro''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Cartão''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''PIX'')'#13#10 +
+    '  ];'#13#10 +
+    '  LOptions.SelectionMode :='#13#10 +
+    '    TRickUIBuilderComboBoxInitialSelectionMode.Index;'#13#10 +
+    '  LOptions.ItemIndex := 2;'#13#10 +
+    '  TRickUIBuilderFactory.CreateComboBox('#13#10 +
+    '    ResultHost, ResultHost, LConfig, LOptions, LHandle);'#13#10 +
+    ''#13#10 +
+    '  LConfig := TRickUIBuilderComboBoxConfig.Default;'#13#10 +
+    '  LConfig.Top := 72;'#13#10 +
+    '  LOptions := TRickUIBuilderComboBoxFactoryOptions.Default;'#13#10 +
+    '  LOptions.Placeholder := ''Departamento'';'#13#10 +
+    '  LOptions.Items := ['#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Financeiro''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Tecnologia''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Operações'')'#13#10 +
+    '  ];'#13#10 +
+    '  LOptions.SelectionMode :='#13#10 +
+    '    TRickUIBuilderComboBoxInitialSelectionMode.Text;'#13#10 +
+    '  LOptions.SelectedText := ''Tecnologia'';'#13#10 +
+    '  TRickUIBuilderFactory.CreateComboBox('#13#10 +
+    '    ResultHost, ResultHost, LConfig, LOptions, LHandle);'#13#10 +
+    'end;',
+
+    '// Exemplo completo da API Factory: Geometria e forma.'#13#10 +
+    '// Confira o controle materializado na aba Resultado.'#13#10 +
+    'var'#13#10 +
+    '  LConfig: TRickUIBuilderComboBoxConfig;'#13#10 +
+    '  LOptions: TRickUIBuilderComboBoxFactoryOptions;'#13#10 +
+    '  LHandle: IRickUIBuilderComboBoxHandle;'#13#10 +
     'begin'#13#10 +
     '  LConfig := TRickUIBuilderComboBoxConfig.Default;'#13#10 +
     '  LConfig.Left := 20;'#13#10 +
@@ -117,182 +252,425 @@ const
     '  LConfig.Height := 44;'#13#10 +
     '  LConfig.CornerRadius := 10;'#13#10 +
     '  LConfig.HorizontalPadding := 16;'#13#10 +
-    '  TRickUIBuilderFactory.CreateComboBox(ResultHost, ResultHost, LConfig,'#13#10 +
-    '    LTextLabel, LArrow);'#13#10 +
-    '  LTextLabel.Text := ''Geometria e forma'';'#13#10 +
+    ''#13#10 +
+    '  LOptions := TRickUIBuilderComboBoxFactoryOptions.Default;'#13#10 +
+    '  LOptions.Placeholder := ''Mês'';'#13#10 +
+    '  LOptions.Items := ['#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Janeiro''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Fevereiro'')'#13#10 +
+    '  ];'#13#10 +
+    ''#13#10 +
+    '  TRickUIBuilderFactory.CreateComboBox('#13#10 +
+    '    ResultHost, ResultHost, LConfig, LOptions, LHandle);'#13#10 +
     'end;',
 
-    '// Configura fonte, estilo, alinhamento e trimming do TLabel interno.'#13#10 +
-    '// ResultHost exibe o texto aplicado ao controle fechado.'#13#10 +
+    '// Exemplo completo da API Factory: Tipografia e texto.'#13#10 +
+    '// Confira o controle materializado na aba Resultado.'#13#10 +
     'var'#13#10 +
-    '  LTextLabel: TLabel;'#13#10 +
-    '  LArrow: TPath;'#13#10 +
     '  LConfig: TRickUIBuilderComboBoxConfig;'#13#10 +
+    '  LOptions: TRickUIBuilderComboBoxFactoryOptions;'#13#10 +
+    '  LHandle: IRickUIBuilderComboBoxHandle;'#13#10 +
     'begin'#13#10 +
     '  LConfig := TRickUIBuilderComboBoxConfig.Default;'#13#10 +
-    '  LConfig.Width := 250;'#13#10 +
+    '  LConfig.Width := 300;'#13#10 +
     '  LConfig.FontSize := 16;'#13#10 +
     '  LConfig.FontFamily := ''Arial'';'#13#10 +
     '  LConfig.FontStyle := [TFontStyle.fsBold];'#13#10 +
     '  LConfig.TextAlign := TTextAlign.Center;'#13#10 +
     '  LConfig.Trimming := TTextTrimming.Character;'#13#10 +
-    '  TRickUIBuilderFactory.CreateComboBox(ResultHost, ResultHost, LConfig,'#13#10 +
-    '    LTextLabel, LArrow);'#13#10 +
-    '  LTextLabel.Text := ''Texto longo para demonstrar alinhamento e trimming'';'#13#10 +
+    ''#13#10 +
+    '  LOptions := TRickUIBuilderComboBoxFactoryOptions.Default;'#13#10 +
+    '  LOptions.Placeholder := ''Cliente'';'#13#10 +
+    '  LOptions.Items := ['#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create('#13#10 +
+    '      ''ACME Comércio e Distribuição Ltda.''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create('#13#10 +
+    '      ''Empresa Brasileira de Tecnologia Aplicada S.A.'')'#13#10 +
+    '  ];'#13#10 +
+    ''#13#10 +
+    '  TRickUIBuilderFactory.CreateComboBox('#13#10 +
+    '    ResultHost, ResultHost, LConfig, LOptions, LHandle);'#13#10 +
     'end;',
 
-    '// Configura as quatro cores efetivamente usadas pelo controle fechado.'#13#10 +
-    '// ResultHost exibe fundo, borda, texto e seta com as cores escolhidas.'#13#10 +
+    '// Exemplo completo da API Factory: Cores.'#13#10 +
+    '// Confira o controle materializado na aba Resultado.'#13#10 +
     'var'#13#10 +
-    '  LTextLabel: TLabel;'#13#10 +
-    '  LArrow: TPath;'#13#10 +
     '  LConfig: TRickUIBuilderComboBoxConfig;'#13#10 +
+    '  LOptions: TRickUIBuilderComboBoxFactoryOptions;'#13#10 +
+    '  LHandle: IRickUIBuilderComboBoxHandle;'#13#10 +
     'begin'#13#10 +
     '  LConfig := TRickUIBuilderComboBoxConfig.Default;'#13#10 +
     '  LConfig.BackgroundColor := TAlphaColors.Dodgerblue;'#13#10 +
     '  LConfig.BorderColor := TAlphaColors.Gray;'#13#10 +
     '  LConfig.TextColor := TAlphaColors.White;'#13#10 +
     '  LConfig.ArrowColor := TAlphaColors.White;'#13#10 +
-    '  TRickUIBuilderFactory.CreateComboBox(ResultHost, ResultHost, LConfig,'#13#10 +
-    '    LTextLabel, LArrow);'#13#10 +
-    '  LTextLabel.Text := ''Cores'';'#13#10 +
+    '  LConfig.PopupColor := $FF163A5F;'#13#10 +
+    '  LConfig.HoverColor := $FF245B8F;'#13#10 +
+    '  LConfig.SelectedColor := $FF2F80C9;'#13#10 +
+    ''#13#10 +
+    '  LOptions := TRickUIBuilderComboBoxFactoryOptions.Default;'#13#10 +
+    '  LOptions.Placeholder := ''Cor'';'#13#10 +
+    '  LOptions.Items := ['#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Azul''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Branco''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Cinza''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Verde'')'#13#10 +
+    '  ];'#13#10 +
+    '  LOptions.SelectionMode :='#13#10 +
+    '    TRickUIBuilderComboBoxInitialSelectionMode.Index;'#13#10 +
+    '  LOptions.ItemIndex := 1;'#13#10 +
+    ''#13#10 +
+    '  TRickUIBuilderFactory.CreateComboBox('#13#10 +
+    '    ResultHost, ResultHost, LConfig, LOptions, LHandle);'#13#10 +
     'end;',
 
-    '// Move a seta para a esquerda e configura tamanho, margens e path fechado.'#13#10 +
-    '// ResultHost permite observar também a área reservada ao texto.'#13#10 +
+    '// Exemplo completo da API Factory: Seta.'#13#10 +
+    '// Confira o controle materializado na aba Resultado.'#13#10 +
     'var'#13#10 +
-    '  LTextLabel: TLabel;'#13#10 +
-    '  LArrow: TPath;'#13#10 +
     '  LConfig: TRickUIBuilderComboBoxConfig;'#13#10 +
+    '  LOptions: TRickUIBuilderComboBoxFactoryOptions;'#13#10 +
+    '  LHandle: IRickUIBuilderComboBoxHandle;'#13#10 +
     'begin'#13#10 +
     '  LConfig := TRickUIBuilderComboBoxConfig.Default;'#13#10 +
-    '  LConfig.Width := 280;'#13#10 +
     '  LConfig.ArrowSize := 18;'#13#10 +
     '  LConfig.ArrowMarginLeft := 14;'#13#10 +
     '  LConfig.ArrowMarginTop := 4;'#13#10 +
     '  LConfig.ArrowMarginRight := 10;'#13#10 +
     '  LConfig.ArrowMarginBottom := 4;'#13#10 +
-    '  LConfig.ArrowPosition := TRickUIBuilderComboBoxArrowPosition.Left;'#13#10 +
-    '  LConfig.ClosedArrowPath := RICK_COMBOBOX_ARROW_UP_PATH;'#13#10 +
-    '  TRickUIBuilderFactory.CreateComboBox(ResultHost, ResultHost, LConfig,'#13#10 +
-    '    LTextLabel, LArrow);'#13#10 +
-    '  LTextLabel.Text := ''Seta à esquerda'';'#13#10 +
+    '  LConfig.ArrowPosition :='#13#10 +
+    '    TRickUIBuilderComboBoxArrowPosition.Left;'#13#10 +
+    '  LConfig.ClosedArrowPath := RICK_COMBOBOX_ARROW_DOWN_PATH;'#13#10 +
+    '  LConfig.OpenedArrowPath := RICK_COMBOBOX_ARROW_UP_PATH;'#13#10 +
+    ''#13#10 +
+    '  LOptions := TRickUIBuilderComboBoxFactoryOptions.Default;'#13#10 +
+    '  LOptions.Placeholder := ''Direção'';'#13#10 +
+    '  LOptions.Items := ['#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Norte''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Sul''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Leste'')'#13#10 +
+    '  ];'#13#10 +
+    ''#13#10 +
+    '  TRickUIBuilderFactory.CreateComboBox('#13#10 +
+    '    ResultHost, ResultHost, LConfig, LOptions, LHandle);'#13#10 +
     'end;',
 
-    '// Desabilita o controle e aplica a opacidade usada nesse estado.'#13#10 +
-    '// ResultHost exibe o efeito de Enabled=False no controle fechado.'#13#10 +
+    '// Exemplo completo da API Factory: Estado.'#13#10 +
+    '// Confira o controle materializado na aba Resultado.'#13#10 +
     'var'#13#10 +
-    '  LTextLabel: TLabel;'#13#10 +
-    '  LArrow: TPath;'#13#10 +
     '  LConfig: TRickUIBuilderComboBoxConfig;'#13#10 +
+    '  LOptions: TRickUIBuilderComboBoxFactoryOptions;'#13#10 +
+    '  LHandle: IRickUIBuilderComboBoxHandle;'#13#10 +
     'begin'#13#10 +
     '  LConfig := TRickUIBuilderComboBoxConfig.Default;'#13#10 +
     '  LConfig.Enabled := False;'#13#10 +
     '  LConfig.DisabledOpacity := 0.45;'#13#10 +
-    '  TRickUIBuilderFactory.CreateComboBox(ResultHost, ResultHost, LConfig,'#13#10 +
-    '    LTextLabel, LArrow);'#13#10 +
-    '  LTextLabel.Text := ''Desabilitado'';'#13#10 +
+    ''#13#10 +
+    '  LOptions := TRickUIBuilderComboBoxFactoryOptions.Default;'#13#10 +
+    '  LOptions.Placeholder := ''Plano indisponível'';'#13#10 +
+    '  LOptions.Items := ['#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Básico''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Profissional'')'#13#10 +
+    '  ];'#13#10 +
+    ''#13#10 +
+    '  TRickUIBuilderFactory.CreateComboBox('#13#10 +
+    '    ResultHost, ResultHost, LConfig, LOptions, LHandle);'#13#10 +
     'end;',
 
-    '// Configura os 58 campos públicos do record, como referência exaustiva.'#13#10 +
-    '// CreateComboBox usa o subconjunto do controle fechado; ResultHost mostra esse resultado.'#13#10 +
+    '// Exemplo completo da API Factory: Desktop / Anchored.'#13#10 +
+    '// Confira o controle materializado na aba Resultado.'#13#10 +
     'var'#13#10 +
-    '  LTextLabel: TLabel;'#13#10 +
-    '  LArrow: TPath;'#13#10 +
     '  LConfig: TRickUIBuilderComboBoxConfig;'#13#10 +
-    'procedure ConfigureCompleteGeometry(var AConfig: TRickUIBuilderComboBoxConfig);'#13#10 +
-    'begin'#13#10 +
-    '  AConfig.Left := 18;'#13#10 +
-    '  AConfig.Top := 20;'#13#10 +
-    '  AConfig.Width := 320;'#13#10 +
-    '  AConfig.Height := 44;'#13#10 +
-    '  AConfig.ItemHeight := 40;'#13#10 +
-    '  AConfig.PopupWidth := 340;'#13#10 +
-    '  AConfig.PopupWidthOffset := 12;'#13#10 +
-    '  AConfig.PopupMaxHeight := 280;'#13#10 +
-    '  AConfig.CornerRadius := 10;'#13#10 +
-    '  AConfig.HorizontalPadding := 16;'#13#10 +
-    'end;'#13#10 +
-    ''#13#10 +
-    'procedure ConfigureCompleteArrowTypography(var AConfig: TRickUIBuilderComboBoxConfig);'#13#10 +
-    'begin'#13#10 +
-    '  AConfig.ArrowSize := 18;'#13#10 +
-    '  AConfig.ArrowMarginLeft := 10;'#13#10 +
-    '  AConfig.ArrowMarginTop := 4;'#13#10 +
-    '  AConfig.ArrowMarginRight := 14;'#13#10 +
-    '  AConfig.ArrowMarginBottom := 4;'#13#10 +
-    '  AConfig.ArrowPosition := TRickUIBuilderComboBoxArrowPosition.Right;'#13#10 +
-    '  AConfig.FontSize := 15;'#13#10 +
-    '  AConfig.FontFamily := ''Arial'';'#13#10 +
-    '  AConfig.FontStyle := [TFontStyle.fsBold];'#13#10 +
-    '  AConfig.TextAlign := TTextAlign.Center;'#13#10 +
-    '  AConfig.Trimming := TTextTrimming.Character;'#13#10 +
-    'end;'#13#10 +
-    ''#13#10 +
-    'procedure ConfigureCompleteColors(var AConfig: TRickUIBuilderComboBoxConfig);'#13#10 +
-    'begin'#13#10 +
-    '  AConfig.BackgroundColor := TAlphaColors.Dodgerblue;'#13#10 +
-    '  AConfig.EditBackgroundColor := $FFF7F7F7;'#13#10 +
-    '  AConfig.BorderColor := TAlphaColors.Gray;'#13#10 +
-    '  AConfig.TextColor := TAlphaColors.White;'#13#10 +
-    '  AConfig.PlaceholderColor := $FFD0D5DD;'#13#10 +
-    '  AConfig.ArrowColor := TAlphaColors.White;'#13#10 +
-    '  AConfig.PopupColor := TAlphaColors.White;'#13#10 +
-    '  AConfig.HoverColor := $FFF2F4F7;'#13#10 +
-    '  AConfig.SelectedColor := $FFEFF8FF;'#13#10 +
-    '  AConfig.FocusColor := $FF2E90FA;'#13#10 +
-    '  AConfig.DisabledOpacity := 0.50;'#13#10 +
-    '  AConfig.SearchTimeout := 750;'#13#10 +
-    'end;'#13#10 +
-    ''#13#10 +
-    'procedure ConfigureCompleteFullWindowGeometry(var AConfig: TRickUIBuilderComboBoxConfig);'#13#10 +
-    'begin'#13#10 +
-    '  AConfig.FullWindowCornerRadius := 24;'#13#10 +
-    '  AConfig.FullWindowPadding := 16;'#13#10 +
-    '  AConfig.SearchHeaderHeight := 84;'#13#10 +
-    '  AConfig.SearchFieldHeight := 52;'#13#10 +
-    '  AConfig.SearchFieldCornerRadius := 14;'#13#10 +
-    '  AConfig.SearchIconSize := 22;'#13#10 +
-    '  AConfig.NoResultsIconSize := 60;'#13#10 +
-    'end;'#13#10 +
-    ''#13#10 +
-    'procedure ConfigureCompleteFullWindowColors(var AConfig: TRickUIBuilderComboBoxConfig);'#13#10 +
-    'begin'#13#10 +
-    '  AConfig.FullWindowBackgroundColor := TAlphaColors.White;'#13#10 +
-    '  AConfig.SearchFieldBackgroundColor := TAlphaColors.White;'#13#10 +
-    '  AConfig.SearchFieldBorderColor := $FF98A2B3;'#13#10 +
-    '  AConfig.SearchTextColor := $FF1D2939;'#13#10 +
-    '  AConfig.SearchIconColor := $FF1D2939;'#13#10 +
-    '  AConfig.NoResultsTextColor := $FF667085;'#13#10 +
-    '  AConfig.NoResultsIconColor := $FF98A2B3;'#13#10 +
-    'end;'#13#10 +
-    ''#13#10 +
-    'procedure ConfigureCompleteContentBehavior(var AConfig: TRickUIBuilderComboBoxConfig);'#13#10 +
-    'begin'#13#10 +
-    '  AConfig.SearchPlaceholder := ''Pesquisar item...'';'#13#10 +
-    '  AConfig.NoResultsText := ''Nenhum item encontrado'';'#13#10 +
-    '  AConfig.BackPath := RICK_COMBOBOX_BACK_PATH;'#13#10 +
-    '  AConfig.ClearPath := RICK_COMBOBOX_CLEAR_PATH;'#13#10 +
-    '  AConfig.NoResultsPath := RICK_COMBOBOX_NO_RESULTS_PATH;'#13#10 +
-    '  AConfig.Enabled := True;'#13#10 +
-    '  AConfig.RequestedStyleType := TRickUIBuilderComboBoxStyleType.Adaptive;'#13#10 +
-    '  AConfig.EffectiveStyleType := TRickUIBuilderComboBoxStyleType.Desktop;'#13#10 +
-    '  AConfig.PresentationMode := TRickUIBuilderComboBoxPresentationMode.Auto;'#13#10 +
-    '  AConfig.ClosedArrowPath := RICK_COMBOBOX_ARROW_DOWN_PATH;'#13#10 +
-    '  AConfig.OpenedArrowPath := RICK_COMBOBOX_ARROW_UP_PATH;'#13#10 +
-    'end;'#13#10 +
-    ''#13#10 +
+    '  LOptions: TRickUIBuilderComboBoxFactoryOptions;'#13#10 +
+    '  LHandle: IRickUIBuilderComboBoxHandle;'#13#10 +
     'begin'#13#10 +
     '  LConfig := TRickUIBuilderComboBoxConfig.Default;'#13#10 +
-    '  ConfigureCompleteGeometry(LConfig);'#13#10 +
-    '  ConfigureCompleteArrowTypography(LConfig);'#13#10 +
-    '  ConfigureCompleteColors(LConfig);'#13#10 +
-    '  ConfigureCompleteFullWindowGeometry(LConfig);'#13#10 +
-    '  ConfigureCompleteFullWindowColors(LConfig);'#13#10 +
-    '  ConfigureCompleteContentBehavior(LConfig);'#13#10 +
-    '  TRickUIBuilderFactory.CreateComboBox(ResultHost, ResultHost, LConfig,'#13#10 +
-    '    LTextLabel, LArrow);'#13#10 +
-    '  LTextLabel.Text := ''Configuração completa'';'#13#10 +
+    '  LConfig.RequestedStyleType :='#13#10 +
+    '    TRickUIBuilderComboBoxStyleType.Desktop;'#13#10 +
+    '  LConfig.PresentationMode :='#13#10 +
+    '    TRickUIBuilderComboBoxPresentationMode.Anchored;'#13#10 +
+    ''#13#10 +
+    '  LOptions := TRickUIBuilderComboBoxFactoryOptions.Default;'#13#10 +
+    '  LOptions.Placeholder := ''Categoria'';'#13#10 +
+    '  LOptions.Items := ['#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Eletrônicos''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Casa''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Escritório'')'#13#10 +
+    '  ];'#13#10 +
+    ''#13#10 +
+    '  TRickUIBuilderFactory.CreateComboBox('#13#10 +
+    '    ResultHost, ResultHost, LConfig, LOptions, LHandle);'#13#10 +
+    'end;',
+
+    '// Exemplo completo da API Factory: FullWindow e pesquisa.'#13#10 +
+    '// Confira o controle materializado na aba Resultado.'#13#10 +
+    'var'#13#10 +
+    '  LConfig: TRickUIBuilderComboBoxConfig;'#13#10 +
+    '  LOptions: TRickUIBuilderComboBoxFactoryOptions;'#13#10 +
+    '  LHandle: IRickUIBuilderComboBoxHandle;'#13#10 +
+    'begin'#13#10 +
+    '  LConfig := TRickUIBuilderComboBoxConfig.Default;'#13#10 +
+    '  LConfig.RequestedStyleType :='#13#10 +
+    '    TRickUIBuilderComboBoxStyleType.Mobile;'#13#10 +
+    '  LConfig.PresentationMode :='#13#10 +
+    '    TRickUIBuilderComboBoxPresentationMode.Auto;'#13#10 +
+    '  LConfig.SearchPlaceholder := ''Pesquisar cidade...'';'#13#10 +
+    '  LConfig.NoResultsText := ''Nenhuma cidade encontrada'';'#13#10 +
+    ''#13#10 +
+    '  LOptions := TRickUIBuilderComboBoxFactoryOptions.Default;'#13#10 +
+    '  LOptions.Placeholder := ''Cidade'';'#13#10 +
+    '  LOptions.Items := ['#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Rio de Janeiro''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''São Paulo''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Curitiba''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Belo Horizonte''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Recife'')'#13#10 +
+    '  ];'#13#10 +
+    ''#13#10 +
+    '  TRickUIBuilderFactory.CreateComboBox('#13#10 +
+    '    ResultHost, ResultHost, LConfig, LOptions, LHandle);'#13#10 +
+    'end;',
+
+    '// Exemplo completo da API Factory: Eventos.'#13#10 +
+    '// Confira o controle materializado na aba Resultado.'#13#10 +
+    '// Declare estes handlers na mesma classe que cria o ComboBox.'#13#10 +
+    'procedure TMyForm.ComboOpened(ASender: TObject);'#13#10 +
+    'begin'#13#10 +
+    '  // Lista aberta.'#13#10 +
+    'end;'#13#10 +
+    ''#13#10 +
+    'procedure TMyForm.ComboClosed(ASender: TObject);'#13#10 +
+    'begin'#13#10 +
+    '  // Lista fechada.'#13#10 +
+    'end;'#13#10 +
+    ''#13#10 +
+    'procedure TMyForm.ComboChanged(ASender: TObject);'#13#10 +
+    'var'#13#10 +
+    '  LHandle: IRickUIBuilderComboBoxHandle;'#13#10 +
+    'begin'#13#10 +
+    '  if Supports(ASender, IRickUIBuilderComboBoxHandle, LHandle) then'#13#10 +
+    '    Caption := LHandle.SelectedText + '' / '' + LHandle.SelectedValue;'#13#10 +
+    'end;'#13#10 +
+    ''#13#10 +
+    'var'#13#10 +
+    '  LConfig: TRickUIBuilderComboBoxConfig;'#13#10 +
+    '  LOptions: TRickUIBuilderComboBoxFactoryOptions;'#13#10 +
+    '  LHandle: IRickUIBuilderComboBoxHandle;'#13#10 +
+    'begin'#13#10 +
+    '  LConfig := TRickUIBuilderComboBoxConfig.Default;'#13#10 +
+    ''#13#10 +
+    '  LOptions := TRickUIBuilderComboBoxFactoryOptions.Default;'#13#10 +
+    '  LOptions.Placeholder := ''Status do processo'';'#13#10 +
+    '  LOptions.Items := ['#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Pendente'', ''PEN''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Aprovado'', ''APR'')'#13#10 +
+    '  ];'#13#10 +
+    '  LOptions.OnOpen := ComboOpened;'#13#10 +
+    '  LOptions.OnClose := ComboClosed;'#13#10 +
+    '  LOptions.OnChange := ComboChanged;'#13#10 +
+    ''#13#10 +
+    '  TRickUIBuilderFactory.CreateComboBox('#13#10 +
+    '    ResultHost, ResultHost, LConfig, LOptions, LHandle);'#13#10 +
+    'end;',
+
+    '// Exemplo completo da API Factory: Customização de item.'#13#10 +
+    '// Confira o controle materializado na aba Resultado.'#13#10 +
+    '// O callback deve pertencer a uma instância viva enquanto o ComboBox existir.'#13#10 +
+    'procedure TMyForm.CustomizeItem(ASender: TObject; AIndex: Integer;'#13#10 +
+    '  const AItem: TRickUIBuilderComboBoxItem; AContainer: TControl);'#13#10 +
+    'var'#13#10 +
+    '  LBadge: TRectangle;'#13#10 +
+    '  LLabel: TLabel;'#13#10 +
+    'begin'#13#10 +
+    '  LBadge := TRectangle.Create(AContainer);'#13#10 +
+    '  LBadge.Parent := AContainer;'#13#10 +
+    '  LBadge.Align := TAlignLayout.Right;'#13#10 +
+    '  LBadge.Width := 72;'#13#10 +
+    '  LBadge.Margins.Right := 8;'#13#10 +
+    '  LBadge.Margins.Top := 6;'#13#10 +
+    '  LBadge.Margins.Bottom := 6;'#13#10 +
+    '  LBadge.Fill.Color := TAlphaColors.Dodgerblue;'#13#10 +
+    '  LBadge.Stroke.Kind := TBrushKind.None;'#13#10 +
+    '  LBadge.XRadius := 8;'#13#10 +
+    '  LBadge.YRadius := 8;'#13#10 +
+    '  LBadge.HitTest := False;'#13#10 +
+    ''#13#10 +
+    '  LLabel := TLabel.Create(LBadge);'#13#10 +
+    '  LLabel.Parent := LBadge;'#13#10 +
+    '  LLabel.Align := TAlignLayout.Client;'#13#10 +
+    '  if SameText(AItem.Value, ''NOVO'') then'#13#10 +
+    '    LLabel.Text := ''Novo'''#13#10 +
+    '  else'#13#10 +
+    '    LLabel.Text := ''Ativo'';'#13#10 +
+    '  LLabel.TextSettings.HorzAlign := TTextAlign.Center;'#13#10 +
+    '  LLabel.TextSettings.VertAlign := TTextAlign.Center;'#13#10 +
+    '  LLabel.TextSettings.FontColor := TAlphaColors.White;'#13#10 +
+    '  LLabel.StyledSettings := LLabel.StyledSettings - [TStyledSetting.FontColor];'#13#10 +
+    '  LLabel.HitTest := False;'#13#10 +
+    'end;'#13#10 +
+    ''#13#10 +
+    'var'#13#10 +
+    '  LConfig: TRickUIBuilderComboBoxConfig;'#13#10 +
+    '  LOptions: TRickUIBuilderComboBoxFactoryOptions;'#13#10 +
+    '  LHandle: IRickUIBuilderComboBoxHandle;'#13#10 +
+    'begin'#13#10 +
+    '  LConfig := TRickUIBuilderComboBoxConfig.Default;'#13#10 +
+    '  LConfig.RequestedStyleType :='#13#10 +
+    '    TRickUIBuilderComboBoxStyleType.Desktop;'#13#10 +
+    '  LConfig.PresentationMode :='#13#10 +
+    '    TRickUIBuilderComboBoxPresentationMode.Anchored;'#13#10 +
+    ''#13#10 +
+    '  LOptions := TRickUIBuilderComboBoxFactoryOptions.Default;'#13#10 +
+    '  LOptions.Placeholder := ''Projeto'';'#13#10 +
+    '  LOptions.Items := ['#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Portal do cliente'', ''ATIVO''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Aplicativo mobile'', ''NOVO'')'#13#10 +
+    '  ];'#13#10 +
+    '  LOptions.OnCustomizeItem := CustomizeItem;'#13#10 +
+    ''#13#10 +
+    '  TRickUIBuilderFactory.CreateComboBox('#13#10 +
+    '    ResultHost, ResultHost, LConfig, LOptions, LHandle);'#13#10 +
+    'end;',
+
+    '// Exemplo completo da API Factory: Handle runtime.'#13#10 +
+    '// Confira o controle materializado na aba Resultado.'#13#10 +
+    'var'#13#10 +
+    '  LConfig: TRickUIBuilderComboBoxConfig;'#13#10 +
+    '  LOptions: TRickUIBuilderComboBoxFactoryOptions;'#13#10 +
+    '  LHandle: IRickUIBuilderComboBoxHandle;'#13#10 +
+    'begin'#13#10 +
+    '  LConfig := TRickUIBuilderComboBoxConfig.Default;'#13#10 +
+    '  LConfig.Top := 110;'#13#10 +
+    ''#13#10 +
+    '  LOptions := TRickUIBuilderComboBoxFactoryOptions.Default;'#13#10 +
+    '  LOptions.Placeholder := ''Periférico'';'#13#10 +
+    '  LOptions.Items := ['#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Impressora'', ''IMP''),'#13#10 +
+    '    TRickUIBuilderComboBoxItem.Create(''Scanner'', ''SCN'')'#13#10 +
+    '  ];'#13#10 +
+    ''#13#10 +
+    '  TRickUIBuilderFactory.CreateComboBox('#13#10 +
+    '    ResultHost, ResultHost, LConfig, LOptions, LHandle);'#13#10 +
+    ''#13#10 +
+    '  LHandle.Add(''Leitor biométrico'');'#13#10 +
+    '  LHandle.Add(''Mesa digitalizadora'', ''MESA'');'#13#10 +
+    '  LHandle.AddRange([''Microfone USB'', ''Webcam 4K'']);'#13#10 +
+    '  LHandle.SelectIndex(0);'#13#10 +
+    '  LHandle.SelectText(''Mesa digitalizadora'');'#13#10 +
+    '  LHandle.SetArrowColor(TAlphaColors.Dodgerblue);'#13#10 +
+    '  LHandle.SetArrowSize(18, 12);'#13#10 +
+    '  LHandle.SetClosedArrowPath(RICK_COMBOBOX_ARROW_DOWN_PATH);'#13#10 +
+    '  LHandle.SetOpenedArrowPath(RICK_COMBOBOX_ARROW_UP_PATH);'#13#10 +
+    '  LHandle.Open;'#13#10 +
+    '  LHandle.Close;'#13#10 +
+    '  LHandle.Open;'#13#10 +
+    'end;',
+
+    '// Exemplo completo da API Factory: Completo.'#13#10 +
+    '// Confira o controle materializado na aba Resultado.'#13#10 +
+    'var'#13#10 +
+    '  LConfig: TRickUIBuilderComboBoxConfig;'#13#10 +
+    '  LOptions: TRickUIBuilderComboBoxFactoryOptions;'#13#10 +
+    '  LHandle: IRickUIBuilderComboBoxHandle;'#13#10 +
+    '  LCodeColumn: TRickUIBuilderComboBoxColumn;'#13#10 +
+    '  LNameColumn: TRickUIBuilderComboBoxColumn;'#13#10 +
+    '  LPriceColumn: TRickUIBuilderComboBoxColumn;'#13#10 +
+    'begin'#13#10 +
+    '  LConfig := TRickUIBuilderComboBoxConfig.Default;'#13#10 +
+    '  LConfig.Left := 16;'#13#10 +
+    '  LConfig.Top := 16;'#13#10 +
+    '  LConfig.Width := 360;'#13#10 +
+    '  LConfig.Height := 44;'#13#10 +
+    '  LConfig.ItemHeight := 40;'#13#10 +
+    '  LConfig.PopupWidth := 380;'#13#10 +
+    '  LConfig.PopupWidthOffset := 12;'#13#10 +
+    '  LConfig.PopupMaxHeight := 260;'#13#10 +
+    '  LConfig.CornerRadius := 10;'#13#10 +
+    '  LConfig.HorizontalPadding := 14;'#13#10 +
+    '  LConfig.ArrowSize := 18;'#13#10 +
+    '  LConfig.ArrowMarginLeft := 8;'#13#10 +
+    '  LConfig.ArrowMarginTop := 4;'#13#10 +
+    '  LConfig.ArrowMarginRight := 12;'#13#10 +
+    '  LConfig.ArrowMarginBottom := 4;'#13#10 +
+    '  LConfig.ArrowPosition := TRickUIBuilderComboBoxArrowPosition.Right;'#13#10 +
+    '  LConfig.FontSize := 14;'#13#10 +
+    '  LConfig.FontFamily := '''';'#13#10 +
+    '  LConfig.FontStyle := [TFontStyle.fsBold];'#13#10 +
+    '  LConfig.TextAlign := TTextAlign.Leading;'#13#10 +
+    '  LConfig.Trimming := TTextTrimming.Character;'#13#10 +
+    '  LConfig.BackgroundColor := TAlphaColors.White;'#13#10 +
+    '  LConfig.EditBackgroundColor := TAlphaColors.White;'#13#10 +
+    '  LConfig.BorderColor := TAlphaColors.Gray;'#13#10 +
+    '  LConfig.TextColor := TAlphaColors.Black;'#13#10 +
+    '  LConfig.PlaceholderColor := TAlphaColors.Gray;'#13#10 +
+    '  LConfig.ArrowColor := TAlphaColors.Dodgerblue;'#13#10 +
+    '  LConfig.PopupColor := $FF163A5F;'#13#10 +
+    '  LConfig.HoverColor := $FF245B8F;'#13#10 +
+    '  LConfig.SelectedColor := $FF2F80C9;'#13#10 +
+    '  LConfig.FocusColor := TAlphaColors.Dodgerblue;'#13#10 +
+    '  LConfig.DisabledOpacity := 0.50;'#13#10 +
+    '  LConfig.SearchTimeout := 900;'#13#10 +
+    '  LConfig.FullWindowCornerRadius := 24;'#13#10 +
+    '  LConfig.FullWindowPadding := 16;'#13#10 +
+    '  LConfig.SearchHeaderHeight := 84;'#13#10 +
+    '  LConfig.SearchFieldHeight := 52;'#13#10 +
+    '  LConfig.SearchFieldCornerRadius := 14;'#13#10 +
+    '  LConfig.SearchIconSize := 22;'#13#10 +
+    '  LConfig.NoResultsIconSize := 60;'#13#10 +
+    '  LConfig.FullWindowBackgroundColor := TAlphaColors.White;'#13#10 +
+    '  LConfig.SearchFieldBackgroundColor := TAlphaColors.White;'#13#10 +
+    '  LConfig.SearchFieldBorderColor := TAlphaColors.Gray;'#13#10 +
+    '  LConfig.SearchTextColor := TAlphaColors.Black;'#13#10 +
+    '  LConfig.SearchIconColor := TAlphaColors.Dodgerblue;'#13#10 +
+    '  LConfig.NoResultsTextColor := TAlphaColors.Gray;'#13#10 +
+    '  LConfig.NoResultsIconColor := TAlphaColors.Gray;'#13#10 +
+    '  LConfig.SearchPlaceholder := ''Pesquisar produto...'';'#13#10 +
+    '  LConfig.NoResultsText := ''Nenhum produto encontrado'';'#13#10 +
+    '  LConfig.BackPath := RICK_COMBOBOX_BACK_PATH;'#13#10 +
+    '  LConfig.ClearPath := RICK_COMBOBOX_CLEAR_PATH;'#13#10 +
+    '  LConfig.NoResultsPath := RICK_COMBOBOX_NO_RESULTS_PATH;'#13#10 +
+    '  LConfig.Enabled := True;'#13#10 +
+    '  LConfig.RequestedStyleType := TRickUIBuilderComboBoxStyleType.Custom;'#13#10 +
+    '  LConfig.EffectiveStyleType := TRickUIBuilderComboBoxStyleType.Custom;'#13#10 +
+    '  LConfig.PresentationMode := TRickUIBuilderComboBoxPresentationMode.Anchored;'#13#10 +
+    '  LConfig.ClosedArrowPath := RICK_COMBOBOX_ARROW_DOWN_PATH;'#13#10 +
+    '  LConfig.OpenedArrowPath := RICK_COMBOBOX_ARROW_UP_PATH;'#13#10 +
+    ''#13#10 +
+    '  LCodeColumn := TRickUIBuilderComboBoxColumn.Create('#13#10 +
+    '    TRickUIBuilderComboBoxColumnSizeMode.Fixed, 72);'#13#10 +
+    '  LCodeColumn.Alignment := TTextAlign.Leading;'#13#10 +
+    '  LCodeColumn.Visible := True;'#13#10 +
+    '  LNameColumn := TRickUIBuilderComboBoxColumn.Create('#13#10 +
+    '    TRickUIBuilderComboBoxColumnSizeMode.Proportional, 1);'#13#10 +
+    '  LNameColumn.Alignment := TTextAlign.Leading;'#13#10 +
+    '  LNameColumn.Visible := True;'#13#10 +
+    '  LPriceColumn := TRickUIBuilderComboBoxColumn.Create('#13#10 +
+    '    TRickUIBuilderComboBoxColumnSizeMode.Auto);'#13#10 +
+    '  LPriceColumn.Alignment := TTextAlign.Trailing;'#13#10 +
+    '  LPriceColumn.Visible := True;'#13#10 +
+    ''#13#10 +
+    '  LOptions := TRickUIBuilderComboBoxFactoryOptions.Default;'#13#10 +
+    '  LOptions.Items := ['#13#10 +
+    '    TRickUIBuilderComboBoxItem.Structured('#13#10 +
+    '      ''Servidor compacto'', ''SRV'','#13#10 +
+    '      [''900'', ''Servidor compacto'', ''R$ 8.499''])'#13#10 +
+    '  ];'#13#10 +
+    '  LOptions.Columns := [LCodeColumn, LNameColumn, LPriceColumn];'#13#10 +
+    '  LOptions.Placeholder := ''Catálogo completo'';'#13#10 +
+    '  LOptions.SelectionMode :='#13#10 +
+    '    TRickUIBuilderComboBoxInitialSelectionMode.Text;'#13#10 +
+    '  LOptions.ItemIndex := 1;'#13#10 +
+    '  LOptions.SelectedText := ''Servidor compacto'';'#13#10 +
+    '  LOptions.OnChange := nil;'#13#10 +
+    '  LOptions.OnOpen := nil;'#13#10 +
+    '  LOptions.OnClose := nil;'#13#10 +
+    '  LOptions.OnCustomizeItem := nil;'#13#10 +
+    '  LOptions.PreserveHeight := True;'#13#10 +
+    '  LOptions.PreserveItemHeight := True;'#13#10 +
+    '  LOptions.PreserveHorizontalPadding := True;'#13#10 +
+    '  LOptions.PreserveArrowSize := True;'#13#10 +
+    ''#13#10 +
+    '  TRickUIBuilderFactory.CreateComboBox('#13#10 +
+    '    ResultHost, ResultHost, LConfig, LOptions, LHandle);'#13#10 +
     'end;');
 
 class function TComboBoxFactoryContent.Caption(

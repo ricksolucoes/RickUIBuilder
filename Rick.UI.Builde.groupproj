@@ -9,9 +9,6 @@
         <Projects Include="RickUIBuilder.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="sample\RickUIBuilder.Sample.dproj">
-            <Dependencies/>
-        </Projects>
         <Projects Include="samples\RickUIBuilder.Samples.dproj">
             <Dependencies/>
         </Projects>
@@ -41,15 +38,6 @@
     <Target Name="RickUIBuilder:Make">
         <MSBuild Projects="RickUIBuilder.dproj" Targets="Make"/>
     </Target>
-    <Target Name="RickUIBuilder_Sample">
-        <MSBuild Projects="sample\RickUIBuilder.Sample.dproj"/>
-    </Target>
-    <Target Name="RickUIBuilder_Sample:Clean">
-        <MSBuild Projects="sample\RickUIBuilder.Sample.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="RickUIBuilder_Sample:Make">
-        <MSBuild Projects="sample\RickUIBuilder.Sample.dproj" Targets="Make"/>
-    </Target>
     <Target Name="RickUIBuilder_Samples">
         <MSBuild Projects="samples\RickUIBuilder.Samples.dproj"/>
     </Target>
@@ -60,13 +48,13 @@
         <MSBuild Projects="samples\RickUIBuilder.Samples.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="RickUIBuilder_Test;RickUIBuilder;RickUIBuilder_Sample;RickUIBuilder_Samples"/>
+        <CallTarget Targets="RickUIBuilder_Test;RickUIBuilder;RickUIBuilder_Samples"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="RickUIBuilder_Test:Clean;RickUIBuilder:Clean;RickUIBuilder_Sample:Clean;RickUIBuilder_Samples:Clean"/>
+        <CallTarget Targets="RickUIBuilder_Test:Clean;RickUIBuilder:Clean;RickUIBuilder_Samples:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="RickUIBuilder_Test:Make;RickUIBuilder:Make;RickUIBuilder_Sample:Make;RickUIBuilder_Samples:Make"/>
+        <CallTarget Targets="RickUIBuilder_Test:Make;RickUIBuilder:Make;RickUIBuilder_Samples:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

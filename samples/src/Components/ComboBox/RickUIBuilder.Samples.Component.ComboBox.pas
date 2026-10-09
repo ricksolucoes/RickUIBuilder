@@ -75,7 +75,7 @@ implementation
 const
   _TITLE_ = 'ComboBox';
   _SUBTITLE_ = 'Crie seleções FireMonkey configuráveis com Rick.UIBuilder.';
-  _INFO_ = 'Factory demonstra o controle fechado; Fluent Builder demonstra listas, seleção, apresentação, eventos e runtime do ComboBox.';
+  _INFO_ = 'Factory e Fluent Builder demonstram listas, seleção, apresentação, eventos e runtime do ComboBox por suas APIs públicas.';
 
 constructor TComponentComboBox.Create(AOwner: TComponent);
 begin

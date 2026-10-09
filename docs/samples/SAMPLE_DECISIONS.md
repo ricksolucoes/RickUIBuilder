@@ -123,7 +123,7 @@ Textos técnicos da imagem não são copiados quando divergirem da implementaç�
 
 A Component Page reutiliza a escala semântica de `App.Typography`: 24 para título, 14 para subtítulo, 16 para título de card, 14 para corpo, 14 para ação e 13 para navegação. Geometria e espaçamento devem acomodar esses tokens sem redução de fonte para mascarar clipping.
 
-### DEC-030 — O painel “Sobre este componente” é obrigatório nas seis páginas
+### DEC-030 — O painel “Sobre este componente” é obrigatório nas sete páginas
 
 Cada página concreta possui painel informativo inferior com ícone oficial, título `Sobre este componente` e texto curto baseado no comportamento real do componente. O painel não deve antecipar APIs inexistentes nem simplificar detalhes de modo a produzir afirmação tecnicamente falsa.
 
@@ -261,9 +261,9 @@ Páginas reais da terceira camada seguem `samples/src/Examples/<Componente>/<Abo
 `TExampleDividerFluent` herda de `TExampleCommon` e fica em `src/Examples/Divider/Fluent`, separando coordenação (`Fluent`), conteúdo/snippets (`Fluent.Content`) e execução (`Fluent.Runner`). A página possui nove exemplos: Básico, Interface, Geometria, Orientação, Layout, Aparência, Estado, Completo - Direto e Completo - Interfaces. `IRickUIBuilderDivider` é a API principal documentada; `TOrientation` e `TRickUIBuilderSpacing` aparecem apenas como tipos auxiliares dos métodos públicos. Os dois exemplos completos cobrem os oito métodos configuráveis, e a Component Page encaminha Factory e Fluent Builder por callbacks distintos ao Coordinator.
 
 
-### DEC-063 — ComboBox - Factory comprova somente o controle fechado
+### DEC-063 — ComboBox - Factory demonstra o runtime funcional público
 
-`TExampleComboBoxFactory` herda de `TExampleCommon` e fica em `src/Examples/ComboBox/Factory`, separando coordenação (`Factory`), conteúdo/snippets (`Factory.Content`) e execução (`Factory.Runner`). A página possui sete exemplos: Básico, Geometria e forma, Tipografia e texto, Cores, Seta, Estado e Completo. Os exemplos focados demonstram somente o que `TRickUIBuilderFactory.CreateComboBox` materializa no estado atual: `TRectangle`, `TLabel`, `TPath` e as opções consumidas pelo controle fechado. Lista, popup, seleção e runtime não são simulados como capacidades Factory. O exemplo `Completo` atribui os 58 campos públicos de `TRickUIBuilderComboBoxConfig` por exaustividade do contrato, mas identifica que somente o subconjunto usado por `CreateComboBox` produz efeito nessa chamada. A evolução futura de listas na Factory é uma feature da biblioteca e está especificada separadamente em `specs/combobox-factory-listas.pt-BR.md`.
+`TExampleComboBoxFactory` herda de `TExampleCommon` e fica em `src/Examples/ComboBox/Factory`, separando coordenação (`Factory`), conteúdo/snippets (`Factory.Content`) e execução (`Factory.Runner`). A página possui quinze exemplos: Básico, Texto + Value, Lista estruturada, Seleção inicial, Geometria e forma, Tipografia e texto, Cores, Seta, Estado, Desktop / Anchored, FullWindow e pesquisa, Eventos, Customização de item, Handle runtime e Completo. Todos usam a API Factory funcional real com `TRickUIBuilderComboBoxFactoryOptions` e `IRickUIBuilderComboBoxHandle`; o Runner é uma instância mantida pela página para callbacks `of object`. O exemplo `Completo` atribui 58/58 campos públicos de `TRickUIBuilderComboBoxConfig` e todos os campos públicos de `TRickUIBuilderComboBoxFactoryOptions`.
 
 ### DEC-064 — ComboBox - Fluent Builder demonstra dados, apresentação e runtime reais
 
@@ -280,5 +280,18 @@ Páginas reais da terceira camada seguem `samples/src/Examples/<Componente>/<Abo
 
 `TExampleCommon` inicializa `TExamplePageLayout.Default` (`620 × 510`, navegação `142`, item `28`) e chama o hook protegido virtual `ConfigureLayout(var ALayout)` antes de construir controles. A base não altera esses defaults. Derivadas podem sobrescrever o hook somente quando houver necessidade concreta de UI/UX, sem depender de campos próprios ainda não inicializados e mantendo a janela estritamente menor que a Home de `644 × 534`.
 
-No estado atual, `TExampleButtonFluent` especializa a geometria para `640 × 530` com navegação de `170` px, enquanto `TExampleBadgeFactory`, `TExampleBadgeFluent`, `TExampleDividerFluent` e `TExampleEditFluent` usam `640 × 510` com navegação de `170` px; `TExampleComboBoxFluent` usa `640 × 510` com navegação de `180` px; nas seis páginas o item permanece com `28` px. As demais Sample Pages não sobrescrevem o hook e preservam exatamente o layout padrão. A especialização não autoriza cada derivada a manipular diretamente controles internos ou métricas derivadas da base.
+No estado atual, `TExampleButtonFluent` especializa a geometria para `640 × 530` com navegação de `170` px, enquanto `TExampleBadgeFactory`, `TExampleBadgeFluent`, `TExampleDividerFluent` e `TExampleEditFluent` usam `640 × 510` com navegação de `170` px; `TExampleComboBoxFactory` e `TExampleComboBoxFluent` usam `640 × 510` com navegação de `180` px; nas sete páginas o item permanece com `28` px. As demais Sample Pages não sobrescrevem o hook e preservam exatamente o layout padrão. A especialização não autoriza cada derivada a manipular diretamente controles internos ou métricas derivadas da base.
 
+### DEC-067 — Snippets concretos devem ser reproduzíveis sem helpers privados
+
+Os snippets exibidos em `Código Delphi` devem conter as inicializações necessárias para reproduzir o exemplo e respeitar a ordem real de uso da API. Helpers privados do Runner podem existir para manter a implementação interna dos Samples coesa, mas não podem ser pré-requisito invisível do código apresentado ao leitor. Para ComboBox - Factory, isso inclui inicializar `TRickUIBuilderComboBoxConfig`, `TRickUIBuilderComboBoxFactoryOptions` e o `IRickUIBuilderComboBoxHandle` quando usados, configurar diretamente dados/columns relevantes e somente operar o handle depois de `CreateComboBox`. Callbacks `of object` devem deixar explícito que pertencem a uma instância cujo lifetime cobre o controle.
+
+
+
+### DEC-068 — Snippets preservam o contexto real da página e indentação Delphi legível
+
+Os snippets de `Código Delphi` usam o mesmo contexto estrutural do Sample executado. Quando a implementação da página materializa o controle em `ResultHost`, o snippet também usa `ResultHost`; wrappers artificiais como `procedure ... (AHost: TLayout)` não são adicionados somente para tornar o trecho isolado. O objetivo é manter equivalência entre conteúdo exibido e Runner sem introduzir uma API/contexto que não existe na tela.
+
+A formatação do snippet faz parte do contrato documental: indentação de 2 espaços por nível, uma instrução por linha, blocos `var`/`begin`/`end` alinhados e recuo consistente para arrays e chamadas multilinha. Não se usa compactação de múltiplas instruções, espaços artificiais ou escapes para corrigir visualmente a apresentação. O `Content.Code` já deve fornecer texto Delphi corretamente formatado.
+
+No exemplo `ComboBox - Factory / Cores`, `TextColor` é compartilhado pelo controle fechado e pelas rows do popup. Por isso o sample usa `PopupColor`, `HoverColor` e `SelectedColor` com contraste suficiente para o mesmo `TextColor`, vários itens e seleção inicial; assim os estados normal, hover e selecionado podem ser observados de forma funcional sem alterar a biblioteca.

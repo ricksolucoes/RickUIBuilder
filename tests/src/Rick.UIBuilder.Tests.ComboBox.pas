@@ -635,24 +635,25 @@ end;
 procedure TRickUIBuilderComboBoxIntegrationTests.Factory_DeveCriarControleFechadoNoScrollBox;
 var
   LConfig: TRickUIBuilderComboBoxConfig;
+  LOptions: TRickUIBuilderComboBoxFactoryOptions;
+  LHandle: IRickUIBuilderComboBoxHandle;
   LContainer: TRectangle;
-  LLabel: TLabel;
-  LArrow: TPath;
 begin
   LConfig := TRickUIBuilderComboBoxConfig.Default;
+  LOptions := TRickUIBuilderComboBoxFactoryOptions.Default;
   LConfig.Left := 24;
   LConfig.Top := 80;
   LConfig.Width := 260;
   LConfig.Height := 42;
   LContainer := TRickUIBuilder.Factory.CreateComboBox(FScroll, FScroll,
-    LConfig, LLabel, LArrow);
+    LConfig, LOptions, LHandle);
 
   Assert.AreEqual<TFmxObject>(FScroll.Content, LContainer.Parent);
   Assert.IsTrue(LContainer.Visible);
   Assert.AreEqual<Single>(260, LContainer.Width);
   Assert.AreEqual<Single>(42, LContainer.Height);
-  Assert.AreEqual<TFmxObject>(LContainer, LLabel.Parent);
-  Assert.AreEqual<TFmxObject>(LContainer, LArrow.Parent);
+  Assert.IsNotNull(LHandle);
+  AssertClosedVisualTree(LContainer);
 end;
 
 procedure TRickUIBuilderComboBoxIntegrationTests.Builder_DevePermanecerVisivelNoScrollBox;
@@ -800,11 +801,14 @@ end;
 procedure TRickUIBuilderComboBoxIntegrationTests.SetaDireita_DeveRespeitarMargensCustomizadas;
 var
   LConfig: TRickUIBuilderComboBoxConfig;
+  LOptions: TRickUIBuilderComboBoxFactoryOptions;
+  LHandle: IRickUIBuilderComboBoxHandle;
   LContainer: TRectangle;
   LLabel: TLabel;
   LArrow: TPath;
 begin
   LConfig := TRickUIBuilderComboBoxConfig.Default;
+  LOptions := TRickUIBuilderComboBoxFactoryOptions.Default;
   LConfig.Width := 300;
   LConfig.Height := 42;
   LConfig.ArrowSize := 14;
@@ -812,8 +816,11 @@ begin
   LConfig.ArrowMarginLeft := 8;
   LConfig.ArrowMarginRight := 16;
   LContainer := TRickUIBuilder.Factory.CreateComboBox(FScroll, FScroll,
-    LConfig, LLabel, LArrow);
+    LConfig, LOptions, LHandle);
+  LLabel := TLabel(LContainer.Children[0]);
+  LArrow := FindArrow(LContainer);
 
+  Assert.IsNotNull(LHandle);
   Assert.AreEqual<Single>(270, LArrow.Position.X);
   Assert.AreEqual<Single>(16, LContainer.Width - LArrow.Position.X - LArrow.Width);
   Assert.IsTrue(LLabel.Position.X + LLabel.Width <= LArrow.Position.X - 8);

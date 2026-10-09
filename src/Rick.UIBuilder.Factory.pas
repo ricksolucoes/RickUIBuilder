@@ -1,4 +1,5 @@
-unit Rick.UIBuilder.Factory;
+﻿unit Rick.UIBuilder.Factory;
+{$SCOPEDENUMS ON}
 (*
   ==============================================================================
   Unit: Rick.UIBuilder.Factory
@@ -8,8 +9,8 @@ unit Rick.UIBuilder.Factory;
 
   Implementa a abordagem de criacao direta (Opcao A) do framework
   Rick.UIBuilder: TRickUIBuilderFactory, com metodos estaticos que
-  recebem um record de configuracao (Rick.UIBuilder.Types) e devolvem
-  o controle FMX ja criado e anexado ao Parent informado.
+  recebem configuracao publica e os dados necessarios a cada operacao,
+  devolvendo o controle FMX criado e anexado ao Parent informado.
 
   Esta unit e a extracao direta da logica que antes vivia em
   EFCompras.View.Main (CreateText, CreateDivider, CreateBadge,
@@ -36,9 +37,41 @@ uses
   FMX.Controls,
   FMX.Objects,
   FMX.StdCtrls,
-  Rick.UIBuilder.Types;
+  Rick.UIBuilder.Types,
+  Rick.UIBuilder.Interfaces;
 
 type
+  /// <summary>
+  ///    Define como a selecao inicial sera aplicada pela Factory.
+  /// </summary>
+  TRickUIBuilderComboBoxInitialSelectionMode = (
+    None,
+    Index,
+    Text
+  );
+
+  /// <summary>
+  ///    Dados e comportamento runtime usados pela criacao Factory do ComboBox.
+  ///    Configuracao visual permanece em TRickUIBuilderComboBoxConfig.
+  /// </summary>
+  TRickUIBuilderComboBoxFactoryOptions = record
+    Items: TArray<TRickUIBuilderComboBoxItem>;
+    Columns: TArray<TRickUIBuilderComboBoxColumn>;
+    Placeholder: string;
+    SelectionMode: TRickUIBuilderComboBoxInitialSelectionMode;
+    ItemIndex: Integer;
+    SelectedText: string;
+    OnChange: TNotifyEvent;
+    OnOpen: TNotifyEvent;
+    OnClose: TNotifyEvent;
+    OnCustomizeItem: TRickUIBuilderComboBoxCustomizeItemEvent;
+    PreserveHeight: Boolean;
+    PreserveItemHeight: Boolean;
+    PreserveHorizontalPadding: Boolean;
+    PreserveArrowSize: Boolean;
+    class function Default: TRickUIBuilderComboBoxFactoryOptions; static;
+  end;
+
   /// <summary>
   ///    Fabrica estatica responsavel por criar controles FMX a partir
   ///    dos records de configuracao definidos em Rick.UIBuilder.Types.
@@ -61,6 +94,13 @@ type
       const AConfig: TRickUIBuilderComboBoxConfig); static;
     class procedure ConfigureComboBoxArrow(AArrow: TPath;
       const AConfig: TRickUIBuilderComboBoxConfig); static;
+    class function CreateComboBoxVisual(AOwner: TComponent;
+      AParent: TFmxObject; const AConfig: TRickUIBuilderComboBoxConfig;
+      out ATextLabel: TLabel; out AArrow: TPath): TRectangle; static;
+    class function ResolveComboBoxConfig(
+      const AConfig: TRickUIBuilderComboBoxConfig;
+      const AOptions: TRickUIBuilderComboBoxFactoryOptions):
+      TRickUIBuilderComboBoxConfig; static;
   public
     /// <summary>
     ///    Cria um TLabel a partir de um TRickUIBuilderTextConfig.
@@ -84,19 +124,19 @@ type
       const AText: string; const AConfig: TRickUIBuilderTextConfig): TLabel; static;
 
     /// <summary>
-    ///    Cria o controle principal fechado do ComboBox usando somente
-    ///    TRectangle, TLabel e TPath. A lista/popup e criada posteriormente
-    ///    pelo runtime quando realmente utilizada.
+    ///    Cria o ComboBox funcional, materializando o visual fechado e o
+    ///    runtime associado ao handle publico.
     /// </summary>
     /// <param name="AOwner">Owner dos controles materializados.</param>
     /// <param name="AParent">Parent visual do container principal.</param>
-    /// <param name="AConfig">Configuracao efetiva do ComboBox.</param>
-    /// <param name="ATextLabel">TLabel interno non-owning devolvido ao runtime.</param>
-    /// <param name="AArrow">TPath interno non-owning devolvido ao runtime.</param>
+    /// <param name="AConfig">Configuracao solicitada do ComboBox; style e presentation sao resolvidos pela Factory.</param>
+    /// <param name="AOptions">Itens, selecao inicial e comportamento runtime.</param>
+    /// <param name="AHandle">Handle runtime criado para o ComboBox.</param>
     /// <returns>TRectangle principal ja anexado ao Parent.</returns>
     class function CreateComboBox(AOwner: TComponent; AParent: TFmxObject;
-      const AConfig: TRickUIBuilderComboBoxConfig; out ATextLabel: TLabel;
-      out AArrow: TPath): TRectangle; static;
+      const AConfig: TRickUIBuilderComboBoxConfig;
+      const AOptions: TRickUIBuilderComboBoxFactoryOptions;
+      out AHandle: IRickUIBuilderComboBoxHandle): TRectangle; static;
 
     /// <summary>
     ///    Cria um divisor (TRectangle de 1px de altura) a partir de
@@ -243,7 +283,10 @@ implementation
 
 uses
   System.Math,
-  FMX.Graphics;
+  FMX.Graphics,
+  Rick.UIBuilder.ComboBox.Data,
+  Rick.UIBuilder.ComboBox.Handle,
+  Rick.UIBuilder.ComboBox.Style;
 
 { TRickUIBuilderFactory }
 
@@ -336,7 +379,48 @@ begin
   AArrow.HitTest := False;
 end;
 
-class function TRickUIBuilderFactory.CreateComboBox(AOwner: TComponent;
+class function TRickUIBuilderComboBoxFactoryOptions.Default:
+  TRickUIBuilderComboBoxFactoryOptions;
+begin
+  Result.Items := nil;
+  Result.Columns := nil;
+  Result.Placeholder := '';
+  Result.SelectionMode := TRickUIBuilderComboBoxInitialSelectionMode.None;
+  Result.ItemIndex := -1;
+  Result.SelectedText := '';
+  Result.OnChange := nil;
+  Result.OnOpen := nil;
+  Result.OnClose := nil;
+  Result.OnCustomizeItem := nil;
+  Result.PreserveHeight := False;
+  Result.PreserveItemHeight := False;
+  Result.PreserveHorizontalPadding := False;
+  Result.PreserveArrowSize := False;
+end;
+
+
+class function TRickUIBuilderFactory.ResolveComboBoxConfig(
+  const AConfig: TRickUIBuilderComboBoxConfig;
+  const AOptions: TRickUIBuilderComboBoxFactoryOptions):
+  TRickUIBuilderComboBoxConfig;
+var
+  LDefault: TRickUIBuilderComboBoxConfig;
+begin
+  LDefault := TRickUIBuilderComboBoxConfig.Default;
+  Result := TRickUIBuilderComboBoxStyleResolver.Resolve(AConfig);
+
+  if AOptions.PreserveHeight or (not SameValue(AConfig.Height, LDefault.Height)) then
+    Result.Height := AConfig.Height;
+  if AOptions.PreserveItemHeight or (not SameValue(AConfig.ItemHeight, LDefault.ItemHeight)) then
+    Result.ItemHeight := AConfig.ItemHeight;
+  if AOptions.PreserveHorizontalPadding or
+    (not SameValue(AConfig.HorizontalPadding, LDefault.HorizontalPadding)) then
+    Result.HorizontalPadding := AConfig.HorizontalPadding;
+  if AOptions.PreserveArrowSize or (not SameValue(AConfig.ArrowSize, LDefault.ArrowSize)) then
+    Result.ArrowSize := AConfig.ArrowSize;
+end;
+
+class function TRickUIBuilderFactory.CreateComboBoxVisual(AOwner: TComponent;
   AParent: TFmxObject; const AConfig: TRickUIBuilderComboBoxConfig;
   out ATextLabel: TLabel; out AArrow: TPath): TRectangle;
 begin
@@ -351,6 +435,38 @@ begin
   AArrow := TPath.Create(AOwner);
   AArrow.Parent := Result;
   ConfigureComboBoxArrow(AArrow, AConfig);
+end;
+
+class function TRickUIBuilderFactory.CreateComboBox(AOwner: TComponent;
+  AParent: TFmxObject; const AConfig: TRickUIBuilderComboBoxConfig;
+  const AOptions: TRickUIBuilderComboBoxFactoryOptions;
+  out AHandle: IRickUIBuilderComboBoxHandle): TRectangle;
+var
+  LData: TRickUIBuilderComboBoxData;
+  LImplementation: TRickUIBuilderComboBoxHandle;
+  LTextLabel: TLabel;
+  LArrow: TPath;
+  LConfig: TRickUIBuilderComboBoxConfig;
+begin
+  LConfig := ResolveComboBoxConfig(AConfig, AOptions);
+  LData := TRickUIBuilderComboBoxData.Create;
+  LData.AddRange(AOptions.Items);
+  case AOptions.SelectionMode of
+    TRickUIBuilderComboBoxInitialSelectionMode.Index:
+      LData.SelectIndex(AOptions.ItemIndex);
+    TRickUIBuilderComboBoxInitialSelectionMode.Text:
+      LData.TrySelectText(AOptions.SelectedText);
+  end;
+
+  AHandle := TRickUIBuilderComboBoxHandle.New(LConfig, LData,
+    LImplementation);
+  LImplementation.ConfigureColumns(AOptions.Columns);
+  LImplementation.ConfigurePlaceholder(AOptions.Placeholder);
+  LImplementation.ConfigureEvents(AOptions.OnChange, AOptions.OnOpen,
+    AOptions.OnClose, AOptions.OnCustomizeItem);
+
+  Result := CreateComboBoxVisual(AOwner, AParent, LConfig, LTextLabel, LArrow);
+  LImplementation.AttachVisual(AParent, Result, LTextLabel, LArrow, AHandle);
 end;
 
 class function TRickUIBuilderFactory.CreateText(AOwner: TComponent;

@@ -1,4 +1,4 @@
-# Especificação da Sample Page Base
+﻿# Especificação da Sample Page Base
 
 ## Status
 
@@ -52,7 +52,7 @@ O layout padrão continua `620 × 510`, mantendo simultaneamente `620 < 644` e `
 
 `TExampleCommon` inicializa `TExamplePageLayout.Default` antes da construção visual e chama o hook protegido virtual `ConfigureLayout(var ALayout)`. A implementação da base não altera o default. Uma derivada que sobrescreva o hook deve modificar somente o record recebido e não depender de campos próprios inicializados depois de `inherited Create`. As métricas derivadas continuam responsabilidade da infraestrutura, evitando que a filha configure combinações geométricas inconsistentes.
 
-Nesta implementação, `TExampleButtonFluent` especializa o layout para `640 × 530` com navegação de `170` px, enquanto `TExampleBadgeFactory`, `TExampleBadgeFluent`, `TExampleDividerFluent` e `TExampleEditFluent` usam `640 × 510` com navegação de `170` px; `TExampleComboBoxFluent` usa `640 × 510` com navegação de `180` px; `NavigationItemHeight` permanece no default de `28` px nas seis páginas. As demais páginas concretas não sobrescrevem o hook e continuam em `620 × 510`, com navegação de `142` px. Todas as dimensões efetivas permanecem menores que a Home de `644 × 534`.
+Nesta implementação, `TExampleButtonFluent` especializa o layout para `640 × 530` com navegação de `170` px, enquanto `TExampleBadgeFactory`, `TExampleBadgeFluent`, `TExampleDividerFluent` e `TExampleEditFluent` usam `640 × 510` com navegação de `170` px; `TExampleComboBoxFactory` e `TExampleComboBoxFluent` usam `640 × 510` com navegação de `180` px; `NavigationItemHeight` permanece no default de `28` px nas sete páginas. As demais páginas concretas não sobrescrevem o hook e continuam em `620 × 510`, com navegação de `142` px. Todas as dimensões efetivas permanecem menores que a Home de `644 × 534`.
 
 A navegação lateral utiliza `TVertScrollBox`. A superfície de código utiliza `TMemo` read-only e selecionável, com `WordWrap = False` e scrollbars em comportamento AutoHide: a rolagem pertence ao overflow real do conteúdo, sem canvas artificialmente maior que o viewport. Não aumentar a Sample Page acima da Home e não reduzir tipografia para esconder clipping.
 
@@ -158,7 +158,7 @@ Cobertura da API pública `TRickUIBuilder.Label_` / `IRickUIBuilderLabel`:
 | `Estado` | `Opacity`, `Visible`, `HitTest`, `Tag` |
 | `Completo` | todos os métodos públicos configuráveis de `IRickUIBuilderLabel`, incluindo `Build`; `Margin` e `Padding` usam `TRickUIBuilderSpacing.Create` com os quatro lados explícitos |
 
-O exemplo `Completo` é deliberadamente exaustivo. Para Factory, explicita todos os campos públicos do record de configuração usado pela abordagem; para Fluent, chama todos os métodos públicos configuráveis da interface principal, preservando as particularidades documentadas de cada componente. ComboBox Factory explicita 58/58 campos do config sem atribuir efeito aos campos não consumidos pelo controle fechado; ComboBox Fluent cobre 32/32 métodos e 58/58 campos do config; Edit Fluent cobre 62/62 métodos configuráveis de `IRickUIBuilderEdit` e finaliza com `Build`. Se a API ou um record público usado por esses exemplos ganhar nova opção configurável, snippet, Runner e matriz devem ser atualizados em conjunto.
+O exemplo `Completo` é deliberadamente exaustivo. Para Factory, explicita todos os campos públicos do record de configuração usado pela abordagem; para Fluent, chama todos os métodos públicos configuráveis da interface principal, preservando as particularidades documentadas de cada componente. ComboBox Factory explicita 58/58 campos do config e todos os campos públicos de `TRickUIBuilderComboBoxFactoryOptions`; ComboBox Fluent cobre 32/32 métodos e 58/58 campos do config; Edit Fluent cobre 62/62 métodos configuráveis de `IRickUIBuilderEdit` e finaliza com `Build`. Se a API ou um record público usado por esses exemplos ganhar nova opção configurável, snippet, Runner e matriz devem ser atualizados em conjunto.
 
 ## Página concreta — Button - Factory
 
@@ -208,7 +208,7 @@ Divider Fluent segue `src/Examples/Divider/Fluent/` com Page, Content e Runner s
 
 ## Página concreta — ComboBox - Factory
 
-ComboBox Factory segue `src/Examples/ComboBox/Factory/` com Page, Content e Runner separados. A página possui sete exemplos comprováveis do controle fechado. `CreateComboBox` materializa `TRectangle`, `TLabel` e `TPath`; lista, popup e seleção não são simulados. O Completo explicita os 58 campos públicos de `TRickUIBuilderComboBoxConfig`, distinguindo o subconjunto efetivamente consumido por essa Factory.
+ComboBox Factory segue `src/Examples/ComboBox/Factory/` com Page, Content e Runner separados. A página possui quinze exemplos funcionais com listas textuais, `DisplayText/Value`, itens estruturados/colunas, seleção inicial, configuração visual, Desktop/Anchored, Mobile/FullWindow com pesquisa, callbacks, `OnCustomizeItem` e runtime handle. O Runner é mantido pela página para preservar callbacks `of object`. O Completo explicita 58/58 campos de `TRickUIBuilderComboBoxConfig` e todos os campos públicos de `TRickUIBuilderComboBoxFactoryOptions`. A página usa `640 × 510` com navegação de `180` px.
 
 ## Página concreta — ComboBox - Fluent Builder
 

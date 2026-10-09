@@ -726,7 +726,19 @@ Open:
 samples\RickUIBuilder.Samples.dproj
 ```
 
-The sample executable also accepts the optional `-nodx` switch, which sets `FMX.Types.GlobalUseDX := False` before `Application.Initialize`. Sample architecture and decisions are documented under [`docs/samples`](docs/samples/SAMPLE_ARCHITECTURE.md).
+### Remote-access compatibility (`-nodx`)
+
+The sample executable accepts the optional `-nodx` switch to start FMX with DirectX disabled:
+
+```text
+RickUIBuilder.Samples.exe -nodx
+```
+
+When the switch is present, the executable sets `FMX.Types.GlobalUseDX := False` **before** `Application.Initialize`. This option is intended for remote-access environments where runtime-created FMX controls may not be captured or displayed correctly while the DirectX graphics backend is active.
+
+Switch detection is case-insensitive, so `-nodx`, `-NODX`, `-NoDx`, and equivalent variants are accepted. Without the switch, the code does not change `GlobalUseDX`, preserving FMX's default graphics behavior.
+
+This switch belongs to the **sample executable**; the RickUIBuilder library does not disable DirectX automatically in consuming applications. Sample architecture and decisions are documented under [`docs/samples`](docs/samples/SAMPLE_ARCHITECTURE.md).
 
 <a name="tests"></a>
 ## ✅ Tests
