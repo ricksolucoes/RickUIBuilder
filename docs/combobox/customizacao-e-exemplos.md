@@ -4,7 +4,37 @@
 
 ## Source of truth
 
-Examples in this document use the implemented fluent API and patterns already exercised by the project Sample. They intentionally avoid APIs that do not exist in the current contracts.
+Examples in this document use the implemented Factory and Fluent APIs and patterns exercised by the project Samples. They intentionally avoid APIs that do not exist in the current contracts.
+
+## Direct ComboBox through the Factory
+
+```pascal
+var
+  LConfig: TRickUIBuilderComboBoxConfig;
+  LOptions: TRickUIBuilderComboBoxFactoryOptions;
+  LHandle: IRickUIBuilderComboBoxHandle;
+begin
+  LConfig := TRickUIBuilderComboBoxConfig.Default;
+  LOptions := TRickUIBuilderComboBoxFactoryOptions.Default;
+  LOptions.Placeholder := 'Select a product';
+  LOptions.Items := [
+    TRickUIBuilderComboBoxItem.Create('Notebook', '001'),
+    TRickUIBuilderComboBoxItem.Create('Monitor', '002')
+  ];
+  LOptions.SelectionMode := TRickUIBuilderComboBoxInitialSelectionMode.Index;
+  LOptions.ItemIndex := 0;
+
+  TRickUIBuilderFactory.CreateComboBox(
+    AParent,
+    AParent,
+    LConfig,
+    LOptions,
+    LHandle
+  );
+end;
+```
+
+Direct Factory creation uses the same `Data`, handle, presentation, and virtualizer as the Fluent API. `FactoryOptions.Placeholder` is independent from the config's `SearchPlaceholder`.
 
 ## Minimal ComboBox
 

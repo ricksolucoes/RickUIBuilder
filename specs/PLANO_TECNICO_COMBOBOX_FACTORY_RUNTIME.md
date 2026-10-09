@@ -2,14 +2,15 @@
 
 **Projeto:** RickUIBuilder\
 **Feature:** ComboBox Factory funcional\
-**Status:** implementação incremental em andamento\
+**Status:** implementação concluída e validada\
 **Base funcional:** `specs/combobox-factory-listas.pt-BR.md`\
 **Backlog:** `specs/BACKLOG_COMBOBOX_FACTORY_RUNTIME.md`
 
-> Este plano transforma o contrato aprovado em incrementos verificáveis. O
-> Slice 1 possui build/teste informados pelo usuário e DUnitX comprovado por XML;
-> o Slice 2 permanece sem execução confirmada. Method Toxicity real ainda não
-> foi fornecido.
+> Este plano foi executado em slices verificáveis. A revisão final fornecida em
+> 2026-10-08 possui 260/260 testes DUnitX aprovados, sem failures/errors/ignored,
+> e os Samples Factory foram confirmados visualmente pelo usuário. Method Toxicity
+> composta desta revisão permanece não medida por ausência de CSV/ferramenta RAD
+> Studio correspondente.
 
 ## 1. Objetivo técnico
 

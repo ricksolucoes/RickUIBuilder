@@ -2,7 +2,7 @@
 
 ## Resultado
 
-**PASS estático com validações executáveis pendentes.**
+**PASS — validação estática consolidada e execução funcional confirmada pelo usuário.**
 
 ## Escopo auditado
 
@@ -27,14 +27,14 @@
 - parâmetros/locais/fields/constantes novos seguem A/L/F/_UPPER_CASE_;
 - avaliação estática dos métodos novos não identificou violação dos baselines `Length <= 20`, `Parameters <= 6`, `If Depth <= 5` e `Cyclomatic Complexity <= 6` após a separação dos dispatches.
 
-## Validações não executadas
+## Validações finais
 
-- build Delphi: **NOT_EXECUTED**;
-- execução do Samples: **NOT_EXECUTED**;
-- DUnitX após alteração dos Samples: **NOT_EXECUTED**;
+- build/execução no ambiente do usuário: **confirmados pelo fluxo fornecido; toolchain exata não anexada**;
+- execução dos Samples: **confirmada visualmente pelo usuário**;
+- DUnitX da revisão final: **260/260 aprovados, 0 failures, 0 errors, 0 ignored**;
 - `Toxicity` composta RAD Studio/CSV: **NOT_EXECUTED**.
 
-Nenhuma dessas validações é declarada como aprovada sem execução real.
+As validações acima são reportadas conforme a evidência fornecida. `Toxicity` composta permanece não executada e não é apresentada como aprovada.
 
 
 ## Auditoria da revisão dos snippets
@@ -47,4 +47,4 @@ Nenhuma dessas validações é declarada como aprovada sem execução real.
 - o exemplo `Completo` mantém cobertura 58/58 + 14/14 após a revisão;
 - nenhuma alteração foi feita em `src/` da biblioteca para acomodar o Sample.
 
-Status: **PASS estático; build e inspeção visual pós-ajuste permanecem pendentes**.
+Status: **PASS; inspeção visual pós-ajuste confirmada e DUnitX final 260/260**.

@@ -1,15 +1,17 @@
 # Especificação — listas no ComboBox Factory
 
 **Projeto:** RickUIBuilder\
-**Status:** contrato aprovado — implementação incremental em andamento\
+**Status:** implementado e validado — documentação final consolidada\
 **Escopo:** evolução da abordagem Factory do `ComboBox`\
 **Plano técnico:** `specs/PLANO_TECNICO_COMBOBOX_FACTORY_RUNTIME.md`\
 **Backlog:** `specs/BACKLOG_COMBOBOX_FACTORY_RUNTIME.md`
 
 > Este documento define o contrato aprovado para a evolução do ComboBox Factory.
-> O primeiro slice de implementação já introduz o contrato público, Items, seleção
-> inicial e convergência básica do Fluent para a Factory. Style/Presentation,
-> ampliação funcional dos Samples e quality gates completos permanecem pendentes.
+> A implementação funcional foi concluída. Factory e Fluent compartilham o mesmo
+> pipeline de materialização; Style/Presentation, Samples e contratos runtime estão
+> implementados. A revisão atual possui evidência DUnitX real de 260/260 testes
+> aprovados em 2026-10-08. Method Toxicity composta desta revisão permanece não
+> medida por ausência de CSV/ferramenta RAD Studio correspondente.
 
 ## 1. Objetivo
 

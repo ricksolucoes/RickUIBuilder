@@ -4,7 +4,7 @@
 
 ## Fonte de verdade
 
-Os contratos públicos são definidos em `Rick.UIBuilder.Interfaces.pas` e `Rick.UIBuilder.Types.pas`. A implementação fluente está em `Rick.UIBuilder.ComboBox.pas`. O ponto de entrada da facade é `TRickUIBuilder.ComboBox`.
+Os contratos públicos são definidos em `Rick.UIBuilder.Interfaces.pas`, `Rick.UIBuilder.Types.pas` e, para a criação direta do ComboBox, em `Rick.UIBuilder.Factory.pas`. A implementação fluente está em `Rick.UIBuilder.ComboBox.pas`. Os pontos de entrada são `TRickUIBuilder.ComboBox` e `TRickUIBuilderFactory.CreateComboBox`.
 
 ## Ponto de entrada do builder
 
@@ -18,6 +18,24 @@ TRickUIBuilder.ComboBox
 ```
 
 Cada chamada a `TRickUIBuilder.ComboBox` retorna uma nova instância independente do builder. O builder acumula estado até a chamada de `Build` ou `BuildHandle`.
+
+## Factory direta
+
+```pascal
+TRickUIBuilderFactory.CreateComboBox(
+  AOwner,
+  AParent,
+  AConfig,
+  AOptions,
+  AHandle
+);
+```
+
+`AConfig` contém configuração visual/style/presentation. `AOptions` é `TRickUIBuilderComboBoxFactoryOptions` e contém `Items`, `Columns`, `Placeholder`, seleção inicial, callbacks e flags `Preserve...`. O método retorna o `TRectangle` principal e entrega o mesmo contrato runtime `IRickUIBuilderComboBoxHandle` usado pela API Fluent.
+
+`TRickUIBuilderComboBoxInitialSelectionMode` possui `None`, `Index` e `Text`. `Index` inválido e `Text` sem correspondência não lançam exception e deixam a seleção em `-1`. A busca de `Text` é exata sobre `DisplayText`, case-insensitive, e usa a primeira ocorrência.
+
+O runtime permanece ativo mesmo que o consumidor não retenha `AHandle`, porque o behavior anexado ao visual mantém uma referência enquanto a árvore visual estiver viva. Depois da destruição do visual, um handle externo ainda pode preservar os dados lógicos, mas passa a reportar `IsAttached = False`.
 
 ## IRickUIBuilderComboBox
 
@@ -59,6 +77,7 @@ Cada chamada a `TRickUIBuilder.ComboBox` retorna uma nova instância independent
 - `TRickUIBuilderComboBoxPresentationMode`: `Auto`, `Anchored`, `Overlay`, `FullWindow`.
 - `TRickUIBuilderComboBoxArrowPosition`: `Left`, `Right`.
 - `TRickUIBuilderComboBoxColumnSizeMode`: `Auto`, `Fixed`, `Proportional`.
+- `TRickUIBuilderComboBoxInitialSelectionMode`: `None`, `Index`, `Text` (declarado em `Rick.UIBuilder.Factory.pas`).
 
 A sintaxe de scoped enums é utilizada: referencie membros como `Type.Member`.
 
@@ -173,7 +192,7 @@ A busca incremental usa `SearchTimeout` para limpar o buffer acumulado; o defaul
 
 ## CustomConfig e defaults de style
 
-`CustomConfig` copia o record inteiro, força `RequestedStyleType = Custom` e marca height, item height e arrow size como overrides explícitos. Uma chamada posterior de `StyleType(...)` pode alterar o style solicitado, como demonstrado no Sample. Durante `ResolvedConfig`, defaults Desktop/Mobile são aplicados pelo resolver e, depois, overrides explícitos do builder para height, item height e arrow size são restaurados.
+`CustomConfig` copia o record inteiro, força `RequestedStyleType = Custom` e marca height, item height e arrow size como overrides explícitos do builder. Uma chamada posterior de `StyleType(...)` pode alterar o style solicitado. A resolução efetiva ocorre na Factory: o resolver aplica defaults Desktop/Mobile e `ResolveComboBoxConfig` reaplica customizações diretas não-default de `Height`, `ItemHeight`, `HorizontalPadding` e `ArrowSize`. As flags `Preserve...` cobrem o caso em que um override explícito é igual ao valor de `TRickUIBuilderComboBoxConfig.Default`.
 
 ## Exemplo runtime
 

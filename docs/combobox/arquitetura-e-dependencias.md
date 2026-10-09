@@ -32,8 +32,8 @@ The dependency direction is intentionally asymmetric. The data model is independ
 | `Rick.UIBuilder.pas` | Framework facade; exposes `TRickUIBuilder.ComboBox`. | ComboBox implementation unit. |
 | `Rick.UIBuilder.Types.pas` | Public enums, item/column/config records, default path constants. | Runtime state holder. |
 | `Rick.UIBuilder.Interfaces.pas` | Public builder and handle contracts, customize-item callback type. | Implementation layer. |
-| `Rick.UIBuilder.Factory.pas` | Creates the closed `TRectangle`, text label, and arrow path. | Popup or filtering service. |
-| `Rick.UIBuilder.ComboBox.pas` | Fluent builder; resolves configuration and materializes the runtime graph. | Long-lived runtime controller. |
+| `Rick.UIBuilder.Factory.pas` | Public direct-creation contract (`FactoryOptions`, selection mode) and shared materialization boundary: resolves style/presentation, creates Data/Handle, the closed visual, and attaches runtime behavior. | Parallel popup, filtering, or virtualization implementation. |
+| `Rick.UIBuilder.ComboBox.pas` | Fluent builder; accumulates state, converts it to `FactoryOptions`, and delegates materialization to the Factory. | A second runtime materialization pipeline. |
 | `Rick.UIBuilder.ComboBox.Data.pas` | Source items, confirmed selection, filter text, filtered index view. | FMX rendering layer. |
 | `Rick.UIBuilder.ComboBox.State.pas` | Open/close phase and transient target index. | Confirmed selection store. |
 | `Rick.UIBuilder.ComboBox.Style.pas` | Resolves requested/effective style and `Auto` presentation. | Stateful runtime service. |
@@ -47,20 +47,18 @@ The dependency direction is intentionally asymmetric. The data model is independ
 ```text
 Consumer
 ↓
-TRickUIBuilder.ComboBox
+Builder (optional)
 ↓
-Builder
+Config + FactoryOptions
 ↓
-Style Resolver
+TRickUIBuilderFactory.CreateComboBox
 ↓
-Data + Factory
-↓
-Handle + Behavior
+Style Resolver + Data + Handle + visual + Behavior
 ↓
 Presentation + Virtualizer (lazy when opened)
 ```
 
-`TRickUIBuilderComboBoxBuilder.BuildCore` creates `TRickUIBuilderComboBoxData`, copies builder items into it, applies the initial selection, creates the handle, creates the closed visual control through `TRickUIBuilderFactory.CreateComboBox`, and then attaches runtime behavior.
+`TRickUIBuilderComboBoxBuilder.BuildCore` only translates accumulated builder state into `TRickUIBuilderComboBoxFactoryOptions` and calls `TRickUIBuilderFactory.CreateComboBox`. The Factory resolves the effective config, creates `Data`, applies initial selection, creates/configures the handle, creates the closed visual, and attaches behavior. Direct Factory and Fluent usage therefore share one materialization pipeline.
 
 ## Runtime dependency flow
 
@@ -68,7 +66,7 @@ When the control opens, the handle asks `Presentation` to create/show the select
 
 ## Public versus internal boundaries
 
-Only types/interfaces in the centralized public units are part of the public contract. `Data`, `State`, `Style`, `Handle`, `Behavior`, `Presentation`, and `Virtualization` are implementation units. Future public capabilities should be added to the centralized contracts only when a real external consumer needs them.
+Public contracts live in `Types`, `Interfaces`, and `Factory`: `Types` holds shared domain models, `Interfaces` holds builder/handle/callback contracts, and `Factory` exposes direct-creation-specific contracts. `Data`, `State`, `Style`, `Handle`, `Behavior`, `Presentation`, and `Virtualization` are implementation units. Future public capabilities should be placed at the boundary that matches their actual responsibility without creating cycles or parallel contracts.
 
 ## Architectural invariants
 

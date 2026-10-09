@@ -2,9 +2,9 @@
 
 > [English](testes-e-contratos.md) | [Português do Brasil](testes-e-contratos.pt-BR.md)
 
-## Cobertura atual no código e execução histórica
+## Cobertura atual no código e execução real
 
-O ZIP atual declara **240** métodos `[Test]` nas units de teste. Esse valor foi obtido por inspeção estática do código-fonte e não comprova que a suíte passa. A governança do projeto preserva uma baseline DUnitX real histórica de **197 encontrados / 197 aprovados / 0 ignorados / 0 leaks / 0 failures / 0 errors** para uma revisão anterior efetivamente executada. Uma nova execução DUnitX é necessária antes de atribuir contagens de aprovação ou falha à revisão atual.
+O ZIP atual declara **260** métodos `[Test]` nas units de teste. Para esta revisão foi fornecido relatório DUnitX real de **260 executados / 260 aprovados / 0 ignored / 0 failures / 0 errors** em 2026-10-08. A fixture `TRickUIBuilderFactoryCreateComboBoxTests` cobre criação direta, items, DisplayText/Value, seleção, placeholder, columns, callbacks, lifetime, paridade Factory × Fluent, style/presentation e preservação de overrides.
 
 ## Contratos de Data
 
@@ -54,9 +54,9 @@ Os testes FullWindow validam hosting na Form raiz, estrutura completa de pesquis
 
 `TPathData.Data` do FireMonkey interpreta o path de entrada e pode serializá-lo novamente em forma canônica. Os testes não devem usar a string SVG/path original como identidade textual persistente. Os testes atuais normalizam o path esperado via `TPathData` antes da comparação.
 
-## O que a baseline histórica não significa
+## Limites da evidência
 
-A execução histórica 197/197 é evidência apenas para a revisão e configuração que foram executadas. Ela não comprova que os 240 testes atualmente declarados passam, nem garante zero defeitos, todas as plataformas, todos os temas, todos os DPIs ou mudanças futuras. Estilo visual, como aparência nativa do edit, ainda deve ser inspecionado nas plataformas target quando alterado.
+A execução 260/260 comprova a revisão e configuração efetivamente executadas. Ela não garante ausência de defeitos fora da cobertura, todas as plataformas, temas, DPIs ou mudanças futuras. Alterações visuais continuam exigindo inspeção nas plataformas target quando aplicável.
 
 ## Gate de regressão para mudanças futuras
 

@@ -41,15 +41,8 @@ assertions que validam scroll e row.
 **Motivo:** corrigir a produção para satisfazer um helper que observa a árvore
 FMX de forma incorreta mascararia a causa real e poderia introduzir regressão.
 
-**Resultado:** não executado neste ambiente. A confirmação depende de nova
-execução real do DUnitX.
+**Resultado:** confirmado em execução real posterior; o Slice 2 passou integralmente após a correção da instrumentação do teste.
 
-## Próxima validação
+## Validação concluída
 
-Executar novamente a suíte completa. Esperado:
-
-- o teste deve avançar além da localização da row;
-- as assertions de quantidade de labels, largura e alinhamento devem validar a
-  implementação real de columns;
-- qualquer nova falha deve ser diagnosticada separadamente, sem alterar
-  produção apenas para obter verde.
+A execução posterior confirmou que o teste avançou pela row correta e validou a implementação real de columns. A produção permaneceu inalterada nessa correção.

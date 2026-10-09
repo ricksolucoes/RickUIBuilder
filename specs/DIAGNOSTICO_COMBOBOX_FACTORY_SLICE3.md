@@ -70,8 +70,10 @@ devem prevalecer.
 5. nenhum teste antigo foi relaxado e nenhuma geometria foi hardcoded para os
    valores esperados pelos testes.
 
-**Status:** implementada; execução DUnitX pendente.
+**Status:** concluída e validada em execução real.
 
 **Validação estática:** a regra cobre integralmente os campos atualmente
 sobrescritos por `ApplyDesktopDefaults`/`ApplyMobileDefaults` e preserva o
 contrato direto da Factory sem devolver a resolução ao Builder.
+
+**Resultado real final:** 260/260 testes aprovados, 0 failures, 0 errors e 0 ignored na revisão final de 2026-10-08.

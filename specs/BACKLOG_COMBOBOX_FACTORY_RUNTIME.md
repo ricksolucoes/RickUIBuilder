@@ -2,7 +2,7 @@
 
 **Projeto:** RickUIBuilder\
 **Feature:** ComboBox Factory funcional\
-**Status:** implementação incremental em andamento\
+**Status:** implementação concluída — fechamento documental e quality gate consolidados\
 **Spec:** `specs/combobox-factory-listas.pt-BR.md`\
 **Plano:** `specs/PLANO_TECNICO_COMBOBOX_FACTORY_RUNTIME.md`
 
@@ -27,6 +27,8 @@
 - Slice 2 validado pelo usuário: **255/255 aprovados / 0 failures / 0 errors** após correção da instrumentação do teste de Columns.
 - Slice 3 / Tentativa 2: **259 testes / 2 failures / 0 errors**; regressão de precedência de style identificada.
 - Slice 3 / Tentativa 3 validada pelo usuário: **260/260 aprovados / 0 failures / 0 errors**.
+- Revisão final recebida em 2026-10-08: **260 executados / 260 aprovados / 0 failures / 0 errors / 0 ignored**.
+- Samples Factory revisados e confirmados visualmente pelo usuário após os ajustes de snippets/indentação e do exemplo de cores.
 
 # E00 — Baseline e characterization
 
@@ -89,13 +91,13 @@ privado somente se tecnicamente necessário.
 
 ## CBF-02.01 — Materializar Data com `Items`
 
-**Estado:** Em auditoria — cobertura estruturada adicionada no Slice 2; execução pendente
+**Estado:** Concluído
 
 **Aceite:** vazio, textual, Display/Value e estruturado cobertos.
 
 ## CBF-02.02 — Configurar Columns
 
-**Estado:** Em auditoria — teste direto Factory adicionado no Slice 2; execução pendente
+**Estado:** Concluído
 
 **Aceite:** Auto/Fixed/Proportional e fields relevantes chegam ao handle/runtime
 existente.
@@ -122,7 +124,7 @@ mantém sem seleção.
 
 ## CBF-02.06 — Aplicar Placeholder
 
-**Estado:** Em auditoria — teste direto Factory adicionado no Slice 2; execução pendente
+**Estado:** Concluído
 
 **Aceite:** não confundir com `SearchPlaceholder`.
 
@@ -137,28 +139,28 @@ nova.
 
 ## CBF-03.02 — Configurar callbacks
 
-**Estado:** Em auditoria — callbacks cobertos diretamente no Slice 2; execução pendente
+**Estado:** Concluído
 
 **Aceite:** `OnChange`, `OnOpen`, `OnClose`, `OnCustomizeItem` encaminhados ao
 runtime existente.
 
 ## CBF-03.03 — Attach visual e Behavior
 
-**Estado:** Em auditoria — lifetime sem handle externo coberto no Slice 2; execução pendente
+**Estado:** Concluído
 
 **Aceite:** runtime permanece vivo sem referência externa ao handle enquanto
 visual estiver vivo.
 
 ## CBF-03.04 — Testar detach/destruction
 
-**Estado:** Em auditoria — Parent/sibling cobertos diretamente no Slice 2; execução pendente
+**Estado:** Concluído
 
 **Aceite:** Parent antes do handle, handle antes dos controls, sibling
 irrelevante e `IsAttached` cobertos conforme harness disponível.
 
 ## CBF-03.05 — Testar presentation aberta durante destruição
 
-**Estado:** Em auditoria — popup aberto durante destruição coberto no Slice 2; execução pendente
+**Estado:** Concluído
 
 **Aceite:** cenário coberto quando harness permitir; caso contrário registrar
 limitação sem inventar resultado.
@@ -179,14 +181,14 @@ limitação sem inventar resultado.
 
 ## CBF-04.03 — Preservar overrides de style
 
-**Estado:** Pendente — próximo slice dedicado a style/overrides
+**Estado:** Concluído
 
 **Aceite:** `Height`, `ItemHeight`, `ArrowSize` e demais regras existentes não
 regredirem; resolução não ocorre duas vezes com efeitos divergentes.
 
 ## CBF-04.04 — Paridade Factory × Fluent
 
-**Estado:** Em andamento — paridade básica adicionada; style/presentation permanecem para E05
+**Estado:** Concluído
 
 **Aceite:** contratos observáveis compartilhados equivalentes para entradas
 equivalentes.
@@ -209,39 +211,39 @@ equivalentes.
 
 ## CBF-06.01 — Reavaliar regras locais dos Samples
 
-**Estado:** Em auditoria — implementação de Samples concluída; build/execução real pendente
+**Estado:** Concluído
 
 **Aceite:** remover somente restrições que descrevem a limitação antiga da
 Factory; manter/fortalecer quality gates.
 
 ## CBF-06.02 — Definir matriz final de exemplos
 
-**Estado:** Em auditoria — implementação de Samples concluída; build/execução real pendente
+**Estado:** Concluído
 
 **Aceite:** quantidade decorre da API implementada; sem contagem arbitrária.
 
 ## CBF-06.03 — Atualizar Types/Page
 
-**Estado:** Em auditoria — implementação de Samples concluída; build/execução real pendente
+**Estado:** Concluído
 
 **Aceite:** navegação representa a matriz final.
 
 ## CBF-06.04 — Atualizar `Factory.Content`
 
-**Estado:** Em auditoria — implementação de Samples concluída; build/execução real pendente
+**Estado:** Concluído
 
 **Aceite:** snippets usam somente API pública real.
 
 ## CBF-06.05 — Atualizar `Factory.Runner`
 
-**Estado:** Em auditoria — implementação de Samples concluída; build/execução real pendente
+**Estado:** Concluído
 
 **Aceite:** código executado é semanticamente equivalente ao snippet; lifetime
 dos callbacks válido.
 
 ## CBF-06.06 — Atualizar página Factory
 
-**Estado:** Em auditoria — implementação de Samples concluída; build/execução real pendente
+**Estado:** Concluído
 
 **Aceite:** `ClearResult`, ResultHost, títulos/descrições e exemplo Completo
 seguem governança local.
@@ -250,14 +252,14 @@ seguem governança local.
 
 ## CBF-07.01 — Atualizar docs do ComboBox
 
-**Estado:** Em auditoria — implementação de Samples concluída; build/execução real pendente/E06
+**Estado:** Concluído
 
 **Aceite:** API, runtime, lifecycle, testes e exemplos correspondem ao código
 final.
 
 ## CBF-07.02 — Atualizar README sobre Factory
 
-**Estado:** Em auditoria — implementação de Samples concluída; build/execução real pendente/E06
+**Estado:** Concluído
 
 **Aceite:** README não descreve capacidade inexistente nem mantém limitação
 obsoleta.
@@ -273,31 +275,31 @@ case-insensitive, default sem switch e escopo do Samples executable.
 
 ## CBF-08.01 — DelphiNamingGuard
 
-**Estado:** Bloqueado por alteração `.pas`
+**Estado:** Concluído por auditoria estática do código final
 
 ## CBF-08.02 — Method Toxicity/static quality
 
-**Estado:** Bloqueado por alteração `.pas`
+**Estado:** Concluído por auditoria estática do código final
 
 **Aceite:** nenhuma nova violação conhecida; Toxicity real somente com ferramenta.
 
 ## CBF-08.03 — Contract & Lifetime audit
 
-**Estado:** Em auditoria — implementação de Samples concluída; build/execução real pendente
+**Estado:** Concluído
 
 ## CBF-08.04 — Documentation audit
 
-**Estado:** Bloqueado por E07
+**Estado:** Concluído
 
 ## CBF-08.05 — DUnitX/build
 
-**Estado:** Em andamento — Slice 1: 247/247 DUnitX aprovados; Slice 2: 255 executados, 254 aprovados, 1 falha de instrumentação de teste identificada
+**Estado:** Concluído — revisão final: 260/260 DUnitX, 0 failures, 0 errors, 0 ignored
 
 **Aceite:** reportar execução real ou **Não confirmado**.
 
 ## CBF-08.06 — Final Quality Gate
 
-**Estado:** Bloqueado por E08.01–05
+**Estado:** Concluído com limitação declarada: Toxicity composta atual não medida no RAD Studio
 
 **Aceite:** requisito, spec, código, testes, Samples e docs coerentes; sem
 pendência bloqueante.
@@ -333,8 +335,7 @@ e alinhamento de colunas.
 `AScrollBox.Content.Children`, mantendo produção inalterada. Adicionar mensagens
 às assertions de presença do scroll e da row para melhorar diagnóstico futuro.
 
-**Status após correção:** aguardando nova execução real do DUnitX. Não considerar
-aprovado até receber novo relatório de execução.
+**Status após correção:** confirmado em execução posterior; Slice 2 passou integralmente.
 
 
 ## Registro de execução — Slice 3 (Style / Presentation / overrides)
@@ -360,7 +361,7 @@ falharam porque a Factory direta perdeu customizações de `AConfig` (`Height` e
 
 ### Tentativa 3 — merge correto entre style defaults e `AConfig`
 
-**Status:** implementada; nova execução DUnitX pendente.
+**Status:** concluída e validada em execução real.
 
 Alterações:
 
@@ -388,4 +389,4 @@ Alterações:
 - foram adicionados testes de Desktop defaults, Mobile+Auto/FullWindow,
   overrides diretos da Factory e preservação dos overrides Fluent.
 
-**Resultado real:** Não confirmado até nova execução do DUnitX.
+**Resultado real:** 260/260 testes aprovados, 0 failures, 0 errors, 0 ignored na revisão final de 2026-10-08.

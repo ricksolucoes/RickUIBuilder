@@ -66,7 +66,7 @@ Usar explicitamente uma interface `IRickUIBuilder*` **não representa uma quarta
 <a name="recursos"></a>
 ## ✨ Recursos
 
-- Criação direta de textos, buttons, badges, dividers e da visualização fechada do ComboBox por `TRickUIBuilderFactory`.
+- Criação direta de textos, buttons, badges, dividers e ComboBox funcional por `TRickUIBuilderFactory`, incluindo items, seleção inicial, columns, callbacks, presentation e acesso runtime por handle.
 - Label, Button, Badge, Divider, ComboBox e Edit Builders fluentes.
 - Composition por `TRickUIBuilder.On(AParent)`.
 - Records de configuração com defaults reutilizáveis para criação direta via Factory.
@@ -143,7 +143,7 @@ TRickUIBuilder.Factory
 | Método | Resultado |
 | --- | --- |
 | `CreateText` | `TLabel` |
-| `CreateComboBox` | `TRectangle` da visualização fechada do ComboBox, com `TLabel` e `TPath` internos retornados por parâmetros `out` |
+| `CreateComboBox` | ComboBox funcional: retorna o `TRectangle` principal e entrega `IRickUIBuilderComboBoxHandle` por `out`; recebe `TRickUIBuilderComboBoxConfig` + `TRickUIBuilderComboBoxFactoryOptions` |
 | `CreateBadgeContainer` | Container `TRectangle` do Badge sem criar o text label interno |
 | `BuildBadgeTextConfig` | Deriva o `TRickUIBuilderTextConfig` interno do Badge a partir de `TRickUIBuilderBadgeConfig` |
 | `CreateDivider` | `TRectangle` |
@@ -152,13 +152,14 @@ TRickUIBuilder.Factory
 
 ### Records de configuração
 
-A criação com `Factory` utiliza os records definidos em `Rick.UIBuilder.Types`. A forma mais simples de usar é partir de `Default`, alterar apenas o que a tela precisa e passar o record resultante para a `Factory`.
+A criação com `Factory` utiliza os records de configuração compartilhados de `Rick.UIBuilder.Types`; no caso do ComboBox, `TRickUIBuilderComboBoxFactoryOptions` pertence a `Rick.UIBuilder.Factory`. A forma mais simples é partir de `Default`, alterar apenas o que a tela precisa e passar os records resultantes para a `Factory`.
 
 | Record | Opções disponíveis |
 | --- | --- |
 | `TRickUIBuilderTextConfig` | `Left`, `Top`, `Width`, `Height`, `FontSize`, `FontColor`, `HorizontalAlign`, `Bold` |
 | `TRickUIBuilderButtonConfig` | `Left`, `Top`, `Width`, `Height`, `FillColor`, `BorderColor`, `TextColor`, `Tag`, `FontSize` |
-| `TRickUIBuilderComboBoxConfig` | Configuração pública de geometria, tipografia, cores, lista/pesquisa, estilo/apresentação, seta, virtualização e customização; a Factory direta consome apenas o subconjunto necessário à visualização fechada |
+| `TRickUIBuilderComboBoxConfig` | Geometria, tipografia, cores, style/presentation, pesquisa, seta, virtualização e aparência do ComboBox. |
+| `TRickUIBuilderComboBoxFactoryOptions` | Items, columns, placeholder, seleção inicial, callbacks e metadados de preservação usados pela criação direta do ComboBox. |
 | `TRickUIBuilderBadgeConfig` | `Left`, `Top`, `Width`, `Height`, `BackgroundColor`, `TextColor`, `FontSize` |
 | `TRickUIBuilderDividerConfig` | `Left`, `Top`, `Width`, `Color` |
 
@@ -169,6 +170,7 @@ uses
   System.UITypes,
   FMX.StdCtrls,
   Rick.UIBuilder.Factory,
+  Rick.UIBuilder.Interfaces,
   Rick.UIBuilder.Types;
 
 procedure TMainForm.BuildWithFactory;
@@ -220,6 +222,42 @@ begin
   );
 end;
 ```
+
+### ComboBox funcional via Factory
+
+O ComboBox direto usa dois records com responsabilidades distintas: `TRickUIBuilderComboBoxConfig` descreve aparência/style/presentation; `TRickUIBuilderComboBoxFactoryOptions` descreve dados, seleção inicial e callbacks. A Factory materializa o mesmo runtime usado pelo Fluent Builder e devolve `IRickUIBuilderComboBoxHandle` para operações posteriores.
+
+```pascal
+var
+  LConfig: TRickUIBuilderComboBoxConfig;
+  LOptions: TRickUIBuilderComboBoxFactoryOptions;
+  LHandle: IRickUIBuilderComboBoxHandle;
+begin
+  LConfig := TRickUIBuilderComboBoxConfig.Default;
+  LConfig.RequestedStyleType := TRickUIBuilderComboBoxStyleType.Desktop;
+
+  LOptions := TRickUIBuilderComboBoxFactoryOptions.Default;
+  LOptions.Placeholder := 'Selecione um estado';
+  LOptions.Items := [
+    TRickUIBuilderComboBoxItem.Create('Rio de Janeiro', 'RJ'),
+    TRickUIBuilderComboBoxItem.Create('São Paulo', 'SP')
+  ];
+  LOptions.SelectionMode := TRickUIBuilderComboBoxInitialSelectionMode.Index;
+  LOptions.ItemIndex := 0;
+
+  TRickUIBuilderFactory.CreateComboBox(
+    Self,
+    Self,
+    LConfig,
+    LOptions,
+    LHandle
+  );
+end;
+```
+
+`SelectionMode.None` mantém `ItemIndex = -1`; `Index` seleciona um índice válido; `Text` seleciona a primeira correspondência exata de `DisplayText` sem diferenciar maiúsculas/minúsculas. Índice inválido ou texto ausente não lança exception e mantém ausência de seleção. `Placeholder` é o texto do controle fechado sem seleção e é independente de `SearchPlaceholder`, usado na pesquisa FullWindow.
+
+A Factory resolve `RequestedStyleType` e `PresentationMode.Auto` no mesmo ponto usado pelo Fluent Builder. Customizações diretas não-default de `Height`, `ItemHeight`, `HorizontalPadding` e `ArrowSize` prevalecem sobre os defaults de style. Os campos `PreserveHeight`, `PreserveItemHeight`, `PreserveHorizontalPadding` e `PreserveArrowSize` existem para o caso ambíguo em que um override explícito coincide com o valor de `TRickUIBuilderComboBoxConfig.Default`.
 
 `AOwner` controla o lifetime dos controles criados, enquanto `AParent` define onde eles serão inseridos na árvore visual do FMX.
 
@@ -742,12 +780,12 @@ O parâmetro pertence ao **executável dos Samples**; a biblioteca RickUIBuilder
 <a name="testes"></a>
 ## ✅ Testes
 
-O repositório possui dez units de testes DUnitX cobrindo Types, Factory, Label, Button, Badge, Divider, Composition, Facade, ComboBox e Edit. A inspeção estática do código-fonte deste ZIP encontra **240** declarações `[Test]`:
+O repositório possui dez units de testes DUnitX cobrindo Types, Factory, Label, Button, Badge, Divider, Composition, Facade, ComboBox e Edit. A inspeção estática do código-fonte deste ZIP encontra **260** declarações `[Test]`:
 
 | Unit de testes | Métodos `[Test]` declarados |
 | --- | ---: |
 | Types | 18 |
-| Factory | 20 |
+| Factory | 40 |
 | Label | 17 |
 | Button | 56 |
 | Badge | 21 |
@@ -756,9 +794,9 @@ O repositório possui dez units de testes DUnitX cobrindo Types, Factory, Label,
 | Facade | 7 |
 | ComboBox | 36 |
 | Edit | 43 |
-| **Total** | **240** |
+| **Total** | **260** |
 
-Esse número é uma **contagem estática do código-fonte**, não um resultado de execução. O ZIP atual não contém arquivo de resultado DUnitX/NUnit que comprove o status pass/fail desses 240 testes. A governança do projeto preserva uma baseline real histórica de **197 encontrados / 197 aprovados / 0 falhas / 0 erros / 0 leaks**, explicitamente classificada como histórica e não como evidência para revisões posteriores.
+Para esta revisão, foi fornecido um resultado DUnitX real de **260 executados / 260 aprovados / 0 failures / 0 errors / 0 ignored** em 2026-10-08. Esse resultado comprova a suíte na revisão/configuração executada; não constitui garantia sobre plataformas, temas, DPIs ou alterações futuras.
 
 ### Method Toxicity Metrics
 

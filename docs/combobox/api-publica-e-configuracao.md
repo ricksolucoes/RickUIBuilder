@@ -19,6 +19,24 @@ TRickUIBuilder.ComboBox
 
 Every call to `TRickUIBuilder.ComboBox` returns a new independent builder instance. The builder accumulates state until `Build` or `BuildHandle` is called.
 
+## Direct Factory
+
+```pascal
+TRickUIBuilderFactory.CreateComboBox(
+  AOwner,
+  AParent,
+  AConfig,
+  AOptions,
+  AHandle
+);
+```
+
+`AConfig` contains visual/style/presentation configuration. `AOptions` is `TRickUIBuilderComboBoxFactoryOptions` and contains `Items`, `Columns`, `Placeholder`, initial selection, callbacks, and `Preserve...` flags. The method returns the main `TRectangle` and exposes the same `IRickUIBuilderComboBoxHandle` runtime contract used by the Fluent API.
+
+`TRickUIBuilderComboBoxInitialSelectionMode` has `None`, `Index`, and `Text`. An invalid `Index` or missing `Text` does not raise an exception and leaves selection at `-1`. `Text` matching is exact on `DisplayText`, case-insensitive, and uses the first occurrence.
+
+The runtime stays alive even if the caller does not retain `AHandle`, because the behavior attached to the visual tree keeps a reference while that tree is alive. After visual destruction, an externally retained handle can still preserve logical data but reports `IsAttached = False`.
+
 ## IRickUIBuilderComboBox
 
 | Group | Methods | Effect |
@@ -173,7 +191,7 @@ Incremental search uses `SearchTimeout` to clear its accumulated buffer; the cur
 
 ## CustomConfig and style defaults
 
-`CustomConfig` copies the entire record, forces `RequestedStyleType = Custom`, and marks height, item height, and arrow size as explicit overrides. A later `StyleType(...)` call may change the requested style, as demonstrated by the Sample. During `ResolvedConfig`, Desktop/Mobile defaults are applied by the resolver, then explicit builder overrides for height, item height, and arrow size are restored.
+`CustomConfig` copies the entire record, forces `RequestedStyleType = Custom`, and marks height, item height, and arrow size as explicit builder overrides. A later `StyleType(...)` call may change the requested style. Effective resolution now happens in the Factory: the resolver applies Desktop/Mobile defaults and `ResolveComboBoxConfig` reapplies direct non-default customizations of `Height`, `ItemHeight`, `HorizontalPadding`, and `ArrowSize`. The `Preserve...` flags cover the case where an explicit override is equal to `TRickUIBuilderComboBoxConfig.Default`.
 
 ## Runtime example
 

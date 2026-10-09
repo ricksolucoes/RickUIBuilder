@@ -9,20 +9,19 @@ This directory is the technical reference for the RickUIBuilder ComboBox impleme
 ## Architecture at a glance
 
 ```text
-TRickUIBuilder.ComboBox
-        ↓
-TRickUIBuilderComboBoxBuilder
-        ↓
-TRickUIBuilderComboBoxConfig + TRickUIBuilderComboBoxData
-        ↓
-TRickUIBuilderFactory + TRickUIBuilderComboBoxHandle
+TRickUIBuilder.ComboBox ──┐
+                            ├─→ TRickUIBuilderFactory.CreateComboBox
+Direct Factory ─────────────┘        ↓
+TRickUIBuilderComboBoxConfig + TRickUIBuilderComboBoxFactoryOptions
+                                      ↓
+TRickUIBuilderComboBoxData + TRickUIBuilderComboBoxHandle
         ↓
 TRickUIBuilderComboBoxState
 TRickUIBuilderComboBoxPresentation
 TRickUIBuilderComboBoxVirtualizer
 ```
 
-The builder accumulates configuration and logical items. `Build` or `BuildHandle` resolves the style, creates the closed control through the factory, creates the data model and runtime handle, and attaches a behavior component that keeps the runtime alive while the visual tree exists.
+The builder accumulates state and, in `Build`/`BuildHandle`, translates it into `TRickUIBuilderComboBoxConfig` + `TRickUIBuilderComboBoxFactoryOptions`. The Factory is the shared materialization boundary: it resolves style/presentation, creates `Data` and `Handle`, creates the closed control, and attaches the behavior that keeps the runtime alive while the visual tree exists. Direct Factory usage reaches the same boundary without the builder.
 
 ## Documentation map
 
@@ -45,11 +44,11 @@ For API work, read **Public API and configuration** first. For filtering or sele
 
 ## Public entry points
 
-The public fluent entry point is `TRickUIBuilder.ComboBox`, which returns `IRickUIBuilderComboBox`. Runtime control after materialization is exposed through `IRickUIBuilderComboBoxHandle` when `BuildHandle` is used.
+There are two public entry points to the same runtime: `TRickUIBuilder.ComboBox`, which returns `IRickUIBuilderComboBox`, and `TRickUIBuilderFactory.CreateComboBox`, which receives `TRickUIBuilderComboBoxConfig` + `TRickUIBuilderComboBoxFactoryOptions`. In both cases, the materialized runtime can be accessed through `IRickUIBuilderComboBoxHandle`.
 
 ## Implementation invariants
 
-- Public ComboBox types remain in `Rick.UIBuilder.Types.pas`.
+- Shared ComboBox domain models/enums remain in `Rick.UIBuilder.Types.pas`; `TRickUIBuilderComboBoxFactoryOptions` and `TRickUIBuilderComboBoxInitialSelectionMode` belong to the direct-creation contract in `Rick.UIBuilder.Factory.pas`.
 - Public ComboBox interfaces remain in `Rick.UIBuilder.Interfaces.pas`.
 - `Data` does not own or manipulate FMX controls.
 - `Presentation` does not filter the logical item collection.
@@ -60,4 +59,4 @@ The public fluent entry point is `TRickUIBuilder.ComboBox`, which returns `IRick
 
 ## Test evidence
 
-The current ZIP declares **240** `[Test]` methods across the DUnitX test units; this is a static source count, not an execution result. Project governance records an older real DUnitX baseline of **197 found / 197 passed / 0 failed / 0 errored / 0 leaked**. That historical run must not be treated as validation of the current revision without a new execution.
+The current ZIP declares **260** `[Test]` methods across the DUnitX test units. A real result for this revision was supplied with **260 executed / 260 passed / 0 failures / 0 errors / 0 ignored** on 2026-10-08. This evidence applies to the executed revision/configuration and does not replace target-platform validation or future regression runs.

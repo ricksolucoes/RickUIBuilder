@@ -2,7 +2,7 @@
 
 ## Tentativa 1 — ampliação funcional dos Samples
 
-Status: **IMPLEMENTADA — execução real pendente**.
+Status: **CONCLUÍDA — validada na revisão final**.
 
 Base: Slice 3 / Tentativa 3 validado com 260/260 testes DUnitX.
 
@@ -14,18 +14,18 @@ Alterações executadas:
 - o exemplo `Completo` cobre 58/58 campos do config e todos os campos públicos atuais de `TRickUIBuilderComboBoxFactoryOptions`;
 - governança e documentação dos Samples foram atualizadas para remover a limitação antiga de Factory visual-only.
 
-Resultado de build: **Não confirmado**.
+Resultado de build no ambiente do usuário: **confirmado pelo fluxo executado; detalhes do compilador não foram anexados**.
 
-Resultado de execução do Samples: **Não confirmado**.
+Resultado de execução dos Samples: **confirmado visualmente pelo usuário após os ajustes**.
 
-DUnitX após esta alteração: **Não executado neste ambiente**.
+DUnitX da revisão final fornecida pelo usuário: **260/260 aprovados, 0 failures, 0 errors, 0 ignored**.
 
 Method Toxicity composta: **Não executada**; depende de RAD Studio/CSV real.
 
 
 ## Tentativa 2 — revisão didática e indentação dos 15 snippets
 
-Status: **IMPLEMENTADA — execução real pendente**.
+Status: **CONCLUÍDA — validada na revisão final**.
 
 Evidência de entrada: a execução visual do Samples mostrou que os snippets da aba `Código Delphi` não continham as declarações/inicializações necessárias para reprodução independente. Também foi identificado um defeito semântico no exemplo `Handle runtime`: o snippet exibido operava `LHandle` antes de `TRickUIBuilderFactory.CreateComboBox`.
 
@@ -46,10 +46,10 @@ Validação estática:
 - `Completo`: 58/58 campos de `TRickUIBuilderComboBoxConfig` e 14/14 campos de `TRickUIBuilderComboBoxFactoryOptions`;
 - arquivos `.pas` modificados permanecem UTF-8 com BOM.
 
-Resultado de build: **Não confirmado**.
+Resultado de build no ambiente do usuário: **confirmado pelo fluxo executado; detalhes do compilador não foram anexados**.
 
-Resultado de execução do Samples após o ajuste: **Não confirmado**.
+Resultado de execução do Samples após o ajuste: **confirmado visualmente pelo usuário**.
 
-DUnitX após esta alteração: **Não executado neste ambiente**.
+DUnitX da revisão final fornecida pelo usuário: **260/260 aprovados, 0 failures, 0 errors, 0 ignored**.
 
 Method Toxicity composta: **Não executada**; depende de RAD Studio/CSV real.
