@@ -89,7 +89,7 @@
         <UsingDelphiRTL>true</UsingDelphiRTL>
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
-        <DCC_UnitSearchPath>$(DUnitX);.\..\src;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>$(DUnitX);.\..\src;.\..\src\Edit;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <SanitizedProjectName>RickUIBuilder_Test</SanitizedProjectName>
         <VerInfo_Locale>1046</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
@@ -289,6 +289,8 @@
         <DCCReference Include="src\Rick.UIBuilder.Tests.Facade.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.Tests.ComboBox.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.Tests.Edit.pas"/>
+        <DCCReference Include="..\src\Edit\Rick.UIBuilder.Edit.Interfaces.pas"/>
+        <DCCReference Include="..\src\Edit\Rick.UIBuilder.Edit.Types.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -333,6 +335,12 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="..\APP\Debug\RickUIBuilder.Test.exe" Configuration="Debug" Class="ProjectOutput"/>
+                <DeployFile LocalName="..\APP\Debug\RickUIBuilder.Test.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>RickUIBuilder.Test.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployClass Name="AdditionalDebugSymbols">
                     <Platform Name="OSX32">
                         <Operation>1</Operation>

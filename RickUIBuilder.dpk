@@ -56,6 +56,10 @@ contains
   Rick.UIBuilder.Edit.Behavior in 'src\Rick.UIBuilder.Edit.Behavior.pas',
   Rick.UIBuilder.Edit.State in 'src\Rick.UIBuilder.Edit.State.pas',
   Rick.UIBuilder.Edit.Handle in 'src\Rick.UIBuilder.Edit.Handle.pas',
-  Rick.UIBuilder.Edit in 'src\Rick.UIBuilder.Edit.pas';
+  Rick.UIBuilder.Edit in 'src\Rick.UIBuilder.Edit.pas',
+  Rick.UIBuilder.Edit.Interfaces in 'src\Edit\Rick.UIBuilder.Edit.Interfaces.pas',
+  Rick.UIBuilder.Edit.Types in 'src\Edit\Rick.UIBuilder.Edit.Types.pas';
+
+Rick.UIBuilder.Edit.Types in 'src\Edit\Rick.UIBuilder.Edit.Types.pas';
 
 end.

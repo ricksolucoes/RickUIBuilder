@@ -1,4 +1,4 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{7F77334B-6594-447E-819C-E20CD5CACF7F}</ProjectGuid>
         <MainSource>RickUIBuilder.dpk</MainSource>
@@ -186,6 +186,8 @@
         <DCCReference Include="src\Rick.UIBuilder.Edit.State.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.Edit.Handle.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.Edit.pas"/>
+        <DCCReference Include="src\Edit\Rick.UIBuilder.Edit.Interfaces.pas"/>
+        <DCCReference Include="src\Edit\Rick.UIBuilder.Edit.Types.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

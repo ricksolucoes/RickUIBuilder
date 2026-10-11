@@ -27,10 +27,20 @@
 interface
 
 uses
+  Rick.UIBuilder.Edit.Types,
+
   System.UITypes,
   FMX.Types;
 
 type
+{$SCOPEDENUMS ON}
+  TRickUIBuilderEditPreset = Rick.UIBuilder.Edit.Types.TRickUIBuilderEditPreset;
+  TRickUIBuilderEditNumberFormatMode = Rick.UIBuilder.Edit.Types.TRickUIBuilderEditNumberFormatMode;
+  TRickUIBuilderEditCaseMode = Rick.UIBuilder.Edit.Types.TRickUIBuilderEditCaseMode;
+  TRickUIBuilderEditUrlCaseMode = Rick.UIBuilder.Edit.Types.TRickUIBuilderEditUrlCaseMode;
+  TRickUIBuilderEditInvalidFeedback = Rick.UIBuilder.Edit.Types.TRickUIBuilderEditInvalidFeedback;
+  TRickUIBuilderEditAppearance = Rick.UIBuilder.Edit.Types.TRickUIBuilderEditAppearance;
+
   /// <summary>
   ///    Agrupa as configuracoes necessarias para criar um controle de
   ///    texto (TLabel) atraves de TRickUIBuilderFactory.CreateText.
@@ -300,51 +310,6 @@ type
     /// </summary>
     class function Default: TRickUIBuilderComboBoxConfig; static;
   end;
-
-
-  TRickUIBuilderEditPreset = (
-    AllCharacters,
-    CPF,
-    CNPJ,
-    CEP,
-    Email,
-    URL,
-    Phone,
-    Mobile,
-    IntegerNumber,
-    FloatNumber,
-    TextNoAccents,
-    TextPunctuationNoAccents,
-    TextWithAccents,
-    TextPunctuationWithAccents
-  );
-
-  TRickUIBuilderEditCaseMode = (
-    Preserve,
-    Uppercase,
-    Lowercase
-  );
-
-  TRickUIBuilderEditUrlCaseMode = (
-    SchemeAndHost,
-    EntireValue
-  );
-
-  TRickUIBuilderEditNumberFormatMode = (
-    Locale,
-    Custom
-  );
-
-  TRickUIBuilderEditInvalidFeedback = (
-    AlertOnly,
-    IconOnly,
-    AlertAndIcon
-  );
-
-  TRickUIBuilderEditAppearance = (
-    Outlined,
-    Underline
-  );
 
   TRickUIBuilderEditConfig = record
   private
