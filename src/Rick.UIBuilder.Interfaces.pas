@@ -10,7 +10,8 @@
   Rick.UIBuilder (Opcao B): IRickUIBuilderLabel, IRickUIBuilderButton
   (com seu IRickUIBuilderButtonHandle), IRickUIBuilderButtonHoverState,
   IRickUIBuilderBadge (com seu IRickUIBuilderBadgeHandle),
-  IRickUIBuilderDivider e IRickUIBuilderComboBox com seu handle runtime.
+  IRickUIBuilderDivider, IRickUIBuilderComboBox e IRickUIBuilderEdit com seus
+  contratos auxiliares de configuracao e runtime.
 
   Cada interface e autocontida (sem heranca entre interfaces): em Object
   Pascal, encadeamento fluente com heranca de interface obrigaria a
@@ -19,8 +20,8 @@
 
   Esta unit NAO contem implementacao. As implementacoes concretas vivem
   em Rick.UIBuilder.Label, Rick.UIBuilder.Button, Rick.UIBuilder.Badge,
-  Rick.UIBuilder.Divider e Rick.UIBuilder.ComboBox, delegando a criacao
-  fundamental dos controles para Rick.UIBuilder.Factory.
+  Rick.UIBuilder.Divider, Rick.UIBuilder.ComboBox e Rick.UIBuilder.Edit,
+  cada uma respeitando o fluxo de materializacao definido pelo componente.
 
   ==============================================================================
 *)
@@ -1282,6 +1283,22 @@ type
     function BuildHandle(AParent: TFmxObject): IRickUIBuilderComboBoxHandle;
   end;
 
+  IRickUIBuilderEdit = interface;
+
+  /// <summary>
+  ///    Configuracao especializada do estado inicial do Edit antes de Build.
+  ///    Retorna ao contrato principal para continuidade da cadeia fluente.
+  /// </summary>
+  IRickUIBuilderEditState = interface
+    ['{6EA31029-7563-4034-AD7A-29F77072D4D0}']
+    function Text(const AValue: string): IRickUIBuilderEditState;
+    function Invalid(AValue: Boolean): IRickUIBuilderEditState; overload;
+    function Invalid(const AMessage: string): IRickUIBuilderEditState; overload;
+    function Invalid(AValue: Boolean; const AMessage: string): IRickUIBuilderEditState; overload;
+    function RequirementMet(AValue: Boolean): IRickUIBuilderEditState;
+    function ToBack: IRickUIBuilderEdit;
+  end;
+
   /// <summary>
   ///    Handle runtime non-owning do Edit materializado. Expoe o container e
   ///    o TEdit internos para consulta/operacoes enquanto o Parent que possui
@@ -1362,6 +1379,7 @@ type
     function VisibilityOffPath(const AValue: string): IRickUIBuilderEdit;
     function RequirementMetPath(const AValue: string): IRickUIBuilderEdit;
     function RequirementNotMetPath(const AValue: string): IRickUIBuilderEdit;
+    function State: IRickUIBuilderEditState;
     function Build(AParent: TFmxObject): IRickUIBuilderEditHandle;
   end;
 

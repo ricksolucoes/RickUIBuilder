@@ -59,6 +59,14 @@ type
     [Setup] procedure Setup;
     [TearDown] procedure TearDown;
     [Test] procedure Facade_DeveCriarEditSingleLine;
+    [Test] procedure State_DeveSerCacheadoERetornarParent;
+    [Test] procedure State_MutadoresDevemRetornarMesmoState;
+    [Test] procedure State_TextDeveSerAplicadoNoBuild;
+    [Test] procedure State_InvalidBooleanDeveSerAplicadoNoBuild;
+    [Test] procedure State_InvalidMensagemDeveSerAplicadoNoBuild;
+    [Test] procedure State_InvalidCompletoDeveRespeitarBoolean;
+    [Test] procedure State_RequirementMetDeveSerAplicadoNoBuild;
+    [Test] procedure State_WeakParentNaoDeveCriarCiclo;
     [Test] procedure Handle_DeveAlterarTextoELimpar;
     [Test] procedure Edit_DeveFiltrarDuranteChangeTracking;
     [Test] procedure Edit_ReadOnlyDeveBloquearEdicao;
@@ -71,8 +79,55 @@ type
 implementation
 
 uses
+  System.SysUtils,
+  System.UITypes,
+
+  FMX.Objects,
+  FMX.StdCtrls,
+  FMX.Types,
+
   Rick.UIBuilder,
-  Rick.UIBuilder.Edit.Input, System.SysUtils;
+  Rick.UIBuilder.Edit.Input;
+
+function FindLabelByText(AContainer: TRectangle; const AText: string): TLabel;
+var
+  I: Integer;
+  LChild: TFmxObject;
+begin
+  Result := nil;
+  for I := 0 to AContainer.ChildrenCount - 1 do
+  begin
+    LChild := AContainer.Children[I];
+    if (LChild is TLabel) and (TLabel(LChild).Text = AText) then
+      Exit(TLabel(LChild));
+  end;
+end;
+
+function FindVisiblePath(AContainer: TRectangle): TPath;
+var
+  I: Integer;
+  LChild: TFmxObject;
+begin
+  Result := nil;
+  for I := 0 to AContainer.ChildrenCount - 1 do
+  begin
+    LChild := AContainer.Children[I];
+    if (LChild is TPath) and TPath(LChild).Visible then
+      Exit(TPath(LChild));
+  end;
+end;
+
+function BuildRequirementState(AHost: TFmxObject; AValue: Boolean): IRickUIBuilderEditHandle;
+begin
+  Result := TRickUIBuilder.Edit
+    .RequirementIndicator(True)
+    .RequirementMetPath('M 0 0 L 10 0')
+    .RequirementNotMetPath('M 0 0 L 0 10')
+    .State
+      .RequirementMet(AValue)
+    .ToBack
+    .Build(AHost);
+end;
 
 function Config(APreset: TRickUIBuilderEditPreset): TRickUIBuilderEditConfig;
 begin
@@ -397,6 +452,132 @@ begin
   LHandle := TRickUIBuilder.Edit.LabelText('Nome').Build(FHostForm);
   Assert.IsNotNull(LHandle);
   Assert.IsNotNull(LHandle.EditControl);
+end;
+
+procedure TRickUIBuilderEditIntegrationTests.State_DeveSerCacheadoERetornarParent;
+var
+  LEdit, LBack: IRickUIBuilderEdit;
+  LState1, LState2: IRickUIBuilderEditState;
+begin
+  LEdit := TRickUIBuilder.Edit;
+  LState1 := LEdit.State;
+  LState2 := LEdit.State;
+  LBack := LState1.ToBack;
+
+  Assert.IsTrue(LState1 = LState2);
+  Assert.IsTrue(LEdit = LBack);
+end;
+
+procedure TRickUIBuilderEditIntegrationTests.State_MutadoresDevemRetornarMesmoState;
+var
+  LEdit: IRickUIBuilderEdit;
+  LState, LResult: IRickUIBuilderEditState;
+begin
+  LEdit := TRickUIBuilder.Edit;
+  LState := LEdit.State;
+  LResult := LState.Text('Texto').Invalid(True).RequirementMet(True);
+
+  Assert.IsTrue(LState = LResult);
+end;
+
+procedure TRickUIBuilderEditIntegrationTests.State_TextDeveSerAplicadoNoBuild;
+var
+  LHandle: IRickUIBuilderEditHandle;
+begin
+  LHandle := TRickUIBuilder.Edit
+    .State
+      .Text('Texto configurado no State')
+    .ToBack
+    .Build(FHostForm);
+
+  Assert.AreEqual('Texto configurado no State', LHandle.Text);
+end;
+
+procedure TRickUIBuilderEditIntegrationTests.State_InvalidBooleanDeveSerAplicadoNoBuild;
+var
+  LConfig: TRickUIBuilderEditConfig;
+  LHandle: IRickUIBuilderEditHandle;
+begin
+  LConfig := TRickUIBuilderEditConfig.Default;
+  LHandle := TRickUIBuilder.Edit
+    .State
+      .Invalid(True)
+    .ToBack
+    .Build(FHostForm);
+
+  Assert.AreEqual<TAlphaColor>(LConfig.InvalidBackgroundColor, LHandle.Container.Fill.Color);
+end;
+
+procedure TRickUIBuilderEditIntegrationTests.State_InvalidMensagemDeveSerAplicadoNoBuild;
+var
+  LHandle: IRickUIBuilderEditHandle;
+  LLabel: TLabel;
+begin
+  LHandle := TRickUIBuilder.Edit
+    .InvalidFeedback(TRickUIBuilderEditInvalidFeedback.AlertOnly)
+    .State
+      .Invalid('Erro configurado no State')
+    .ToBack
+    .Build(FHostForm);
+  LLabel := FindLabelByText(LHandle.Container, 'Erro configurado no State');
+
+  Assert.IsNotNull(LLabel);
+  Assert.IsTrue(LLabel.Visible);
+end;
+
+procedure TRickUIBuilderEditIntegrationTests.State_InvalidCompletoDeveRespeitarBoolean;
+var
+  LConfig: TRickUIBuilderEditConfig;
+  LHandle: IRickUIBuilderEditHandle;
+  LLabel: TLabel;
+begin
+  LConfig := TRickUIBuilderEditConfig.Default;
+  LHandle := TRickUIBuilder.Edit
+    .InvalidFeedback(TRickUIBuilderEditInvalidFeedback.AlertOnly)
+    .State
+      .Invalid(False, 'Mensagem inativa')
+    .ToBack
+    .Build(FHostForm);
+  LLabel := FindLabelByText(LHandle.Container, 'Mensagem inativa');
+
+  Assert.AreEqual<TAlphaColor>(LConfig.BackgroundColor, LHandle.Container.Fill.Color);
+  Assert.IsNotNull(LLabel);
+  Assert.IsFalse(LLabel.Visible);
+end;
+
+procedure TRickUIBuilderEditIntegrationTests.State_RequirementMetDeveSerAplicadoNoBuild;
+var
+  LMetHandle, LNotMetHandle: IRickUIBuilderEditHandle;
+  LMetPath, LNotMetPath: TPath;
+begin
+  LMetHandle := BuildRequirementState(FHostForm, True);
+  LNotMetHandle := BuildRequirementState(FHostForm, False);
+  LMetPath := FindVisiblePath(LMetHandle.Container);
+  LNotMetPath := FindVisiblePath(LNotMetHandle.Container);
+
+  Assert.IsNotNull(LMetPath);
+  Assert.IsNotNull(LNotMetPath);
+  Assert.AreNotEqual(LMetPath.Data.Data, LNotMetPath.Data.Data);
+end;
+
+procedure TRickUIBuilderEditIntegrationTests.State_WeakParentNaoDeveCriarCiclo;
+var
+  LEdit: IRickUIBuilderEdit;
+  LMessage: string;
+  LState: IRickUIBuilderEditState;
+begin
+  LEdit := TRickUIBuilder.Edit;
+  LState := LEdit.State;
+  LEdit := nil;
+  LMessage := EmptyStr;
+  try
+    LState.ToBack;
+  except
+    on E: Exception do
+      LMessage := E.Message;
+  end;
+
+  Assert.AreEqual('O Parent da interface não foi informado para retornar.', LMessage);
 end;
 
 procedure TRickUIBuilderEditIntegrationTests.Handle_DeveAlterarTextoELimpar;

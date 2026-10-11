@@ -30,6 +30,9 @@ type
     end;
   strict private
     FConfig: TRickUIBuilderEditConfig;
+    FState: IRickUIBuilderEditState;
+    procedure ApplyInitialState(ABehavior: TRickUIBuilderEditBehavior);
+    procedure InitializeBehavior(ABehavior: TRickUIBuilderEditBehavior; const AActions: TActionControls);
     function CreateContainer(AParent: TFmxObject): TRectangle;
     function CreateLabel(AContainer: TRectangle): TLabel;
     function CreateEditBackground(AContainer: TRectangle): TRectangle;
@@ -119,6 +122,7 @@ type
     function VisibilityOffPath(const AValue: string): IRickUIBuilderEdit;
     function RequirementMetPath(const AValue: string): IRickUIBuilderEdit;
     function RequirementNotMetPath(const AValue: string): IRickUIBuilderEdit;
+    function State: IRickUIBuilderEditState;
     function Build(AParent: TFmxObject): IRickUIBuilderEditHandle;
 
     constructor Create;
@@ -132,11 +136,13 @@ implementation
 uses
   System.Classes,
   System.Math,
+  System.SysUtils,
 
   FMX.Graphics,
 
   Rick.UIBuilder.Edit.Input,
-  Rick.UIBuilder.Edit.Handle;
+  Rick.UIBuilder.Edit.Handle,
+  Rick.UIBuilder.Edit.State;
 
 type
   TRickUIBuilderRuntimeEdit = class(TEdit)
@@ -293,6 +299,14 @@ end;
 class function TRickUIBuilderEditBuilder.New: IRickUIBuilderEdit;
 begin
   Result := TRickUIBuilderEditBuilder.Create;
+end;
+
+function TRickUIBuilderEditBuilder.State: IRickUIBuilderEditState;
+begin
+  if not Assigned(FState) then
+    FState := TRickUIBuilderEditState.New(Self);
+
+  Result := FState;
 end;
 
 function TRickUIBuilderEditBuilder.Text(const AValue: string)
@@ -955,8 +969,28 @@ begin
     ALabel, ACounter, AError, AUnderline);
 end;
 
-function TRickUIBuilderEditBuilder.Build(AParent: TFmxObject)
-: IRickUIBuilderEditHandle;
+procedure TRickUIBuilderEditBuilder.ApplyInitialState(ABehavior: TRickUIBuilderEditBehavior);
+var
+  LState: IRickUIBuilderEditStateSnapshot;
+begin
+  if not Supports(FState, IRickUIBuilderEditStateSnapshot, LState) then
+    Exit;
+
+  if LState.HasInvalid then
+    ABehavior.SetInvalid(LState.InvalidValue, LState.InvalidMessage);
+  if LState.HasRequirementMet then
+    ABehavior.SetRequirementMet(LState.RequirementMetValue);
+end;
+
+procedure TRickUIBuilderEditBuilder.InitializeBehavior(ABehavior: TRickUIBuilderEditBehavior; const AActions: TActionControls);
+begin
+  ABehavior.ConfigureIcons(AActions.Alert, AActions.ClearArea, AActions.ClearIcon,
+    AActions.PasswordArea, AActions.PasswordIcon, AActions.Requirement);
+  ABehavior.SetText(FConfig.Text);
+  ApplyInitialState(ABehavior);
+end;
+
+function TRickUIBuilderEditBuilder.Build(AParent: TFmxObject): IRickUIBuilderEditHandle;
 var
   LContainer, LEditBackground, LUnderline: TRectangle;
   LEdit: TEdit;
@@ -976,9 +1010,7 @@ begin
   LActions := CreateActions(LContainer);
   LBehavior := CreateBehavior(AParent, LContainer, LEditBackground, LEdit, LLabel, LCounter, LError,
     LUnderline);
-  LBehavior.ConfigureIcons(LActions.Alert, LActions.ClearArea, LActions.ClearIcon,
-    LActions.PasswordArea, LActions.PasswordIcon, LActions.Requirement);
-  LBehavior.SetText(FConfig.Text);
+  InitializeBehavior(LBehavior, LActions);
   Result := TRickUIBuilderEditHandle.New(LContainer, LEdit, LBehavior);
 end;
 

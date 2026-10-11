@@ -183,6 +183,7 @@
         <DCCReference Include="src\Rick.UIBuilder.ComboBox.Behavior.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.Edit.Input.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.Edit.Behavior.pas"/>
+        <DCCReference Include="src\Rick.UIBuilder.Edit.State.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.Edit.Handle.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.Edit.pas"/>
         <BuildConfiguration Include="Base">
