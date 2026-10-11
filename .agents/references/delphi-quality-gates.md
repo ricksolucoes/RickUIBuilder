@@ -23,7 +23,9 @@ Referência compartilhada para critérios técnicos de alterações Delphi/Objec
 - quando a interface especializada precisa retornar ao contrato de origem, a implementação deve manter `FParent` com o contrato pai e o lifetime dessa referência deve ser explicitamente modelado;
 - pai mantendo a especializada e especializada mantendo o pai exige análise de ciclo forte; referência de retorno proprietária que produz ciclo é finding bloqueante;
 - service locator, lookup global ou reconstrução do pai no lugar de uma dependência diretamente injetável é não conforme, salvo justificativa técnica comprovada;
-- contratos públicos e implementações concretas devem respeitar as units/boundaries definidos pelo projeto.
+- toda interface do framework deve estar em `Rick.UIBuilder.Interfaces.pas`; declarar tipo `interface` em unit concreta de implementação é finding de conformidade;
+- contratos e implementações concretas devem respeitar os boundaries definidos pelo projeto;
+- uma implementação direta deve manter correspondência clara entre `I<Nome>` e `T<Nome>`; interface auxiliar duplicando o mesmo papel exige justificativa arquitetural explícita.
 
 ### Records e enums
 
@@ -109,7 +111,8 @@ Consulte `method-toxicity-baseline.md` e a skill `method-toxicity` para workflow
 - não quebre parâmetros/retorno mecanicamente;
 - quebre somente quando o comprimento realmente justificar;
 - não compacte múltiplas instruções em uma linha para manipular `Length`;
-- quebra desnecessária de assinatura em código criado/alterado é finding de conformidade.
+- quebra desnecessária de assinatura em código criado/alterado é finding de conformidade;
+- declaração `T... = class(...)` quebrada em múltiplas linhas é finding de conformidade.
 
 ## 9. Encoding
 

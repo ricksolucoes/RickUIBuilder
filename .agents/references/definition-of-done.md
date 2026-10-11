@@ -24,6 +24,8 @@ Uma tarefa está concluída somente quando **os critérios específicos** e **os
 
 - [ ] Responsabilidades permanecem coesas.
 - [ ] Dependências novas são justificadas.
+- [ ] Todas as interfaces novas/alteradas do framework estão declaradas em `Rick.UIBuilder.Interfaces.pas`, e nenhuma unit concreta introduziu tipo `interface`.
+- [ ] Implementações diretas preservam correspondência nominal clara `I<Nome>` / `T<Nome>` sem interface auxiliar redundante.
 - [ ] Dependências entre interfaces foram avaliadas quanto a Dependency Injection e direction.
 - [ ] Quando uma interface especializada depende do contrato pai, o contexto necessário é injetado em vez de recuperado por acoplamento concreto/lookup global.
 - [ ] Relações pai/especializada não introduzem ciclo forte de reference counting.
@@ -62,6 +64,7 @@ Uma tarefa está concluída somente quando **os critérios específicos** e **os
 - [ ] Builders preservam chaining quando aplicável.
 - [ ] Operações mutáveis/configuradoras de interfaces fluent retornam o contrato apropriado e não usam `procedure` quando precisam continuar a cadeia.
 - [ ] Navegação entre interface principal e especializada mantém continuidade fluent e lifetime corretos quando aplicável.
+- [ ] Assinaturas permanecem em uma única linha quando couberem de forma legível, e toda declaração `T... = class(...)` permanece integralmente em uma única linha, incluindo ancestral e interfaces.
 - [ ] Handles preservam lifecycle e ownership documentados.
 - [ ] Facade/Types/Interfaces foram atualizados somente quando necessário.
 - [ ] Consumidores, Sample e docs foram revisados quando a API mudou.

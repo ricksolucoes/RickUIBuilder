@@ -42,7 +42,10 @@ Sem esses inputs, marque review como evidence-incomplete em vez de presumir.
 ### 3. Architecture
 
 - responsabilidade está na unit certa?;
-- contratos públicos permanecem separados das implementações concretas?;
+- todas as interfaces do framework permanecem em `Rick.UIBuilder.Interfaces.pas`?;
+- alguma unit concreta declarou tipo `interface`?;
+- implementação direta preserva correspondência `I<Nome>` / `T<Nome>` sem interface auxiliar redundante?;
+- contratos permanecem separados das implementações concretas?;
 - shared layer recebeu feature-specific logic?;
 - componente simples ganhou camadas por simetria?;
 - dependency direction continua coerente?;
@@ -71,6 +74,7 @@ Sem esses inputs, marque review como evidence-incomplete em vez de presumir.
 - operação mutável/configuradora fluent usa retorno de interface em vez de `procedure`?;
 - navegação entre interface principal e especializada preserva o contrato da cadeia?;
 - assinaturas foram quebradas sem necessidade apesar de caberem legivelmente em uma linha?;
+- alguma declaração `T... = class(...)` foi quebrada em múltiplas linhas?;
 - Build/BuildHandle semantics?;
 - mudança aditiva ou breaking?;
 - docs/Sample consumers atualizados?

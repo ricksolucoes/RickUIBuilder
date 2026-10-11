@@ -8,16 +8,7 @@ uses
   Rick.UIBuilder.Interfaces;
 
 type
-  IRickUIBuilderEditStateSnapshot = interface
-    ['{8719DC17-6B78-4C8E-8714-E4E062539515}']
-    function HasInvalid: Boolean;
-    function InvalidValue: Boolean;
-    function InvalidMessage: string;
-    function HasRequirementMet: Boolean;
-    function RequirementMetValue: Boolean;
-  end;
-
-  TRickUIBuilderEditState = class(TInterfacedObject, IRickUIBuilderEditState, IRickUIBuilderEditStateSnapshot)
+  TRickUIBuilderEditState = class(TInterfacedObject, IRickUIBuilderEditState)
   strict private
     [weak]
     FParent: IRickUIBuilderEdit;
@@ -32,12 +23,15 @@ type
     function Invalid(const AMessage: string): IRickUIBuilderEditState; overload;
     function Invalid(AValue: Boolean; const AMessage: string): IRickUIBuilderEditState; overload;
     function RequirementMet(AValue: Boolean): IRickUIBuilderEditState;
-    function ToBack: IRickUIBuilderEdit;
+
     function HasInvalid: Boolean;
     function InvalidValue: Boolean;
     function InvalidMessage: string;
     function HasRequirementMet: Boolean;
     function RequirementMetValue: Boolean;
+
+    function ToBack: IRickUIBuilderEdit;
+
     constructor Create(const AValue: IRickUIBuilderEdit);
   public
     destructor Destroy; override;
@@ -66,7 +60,6 @@ class function TRickUIBuilderEditState.New(const AValue: IRickUIBuilderEdit): IR
 begin
   Result := Self.Create(AValue);
 end;
-
 
 function TRickUIBuilderEditState.Text(const AValue: string): IRickUIBuilderEditState;
 begin

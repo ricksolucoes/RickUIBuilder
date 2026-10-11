@@ -1290,12 +1290,19 @@ type
   ///    Retorna ao contrato principal para continuidade da cadeia fluente.
   /// </summary>
   IRickUIBuilderEditState = interface
-    ['{6EA31029-7563-4034-AD7A-29F77072D4D0}']
+    ['{B4A586E1-6A0B-49D8-9C25-0F55370DBDFD}']
     function Text(const AValue: string): IRickUIBuilderEditState;
     function Invalid(AValue: Boolean): IRickUIBuilderEditState; overload;
     function Invalid(const AMessage: string): IRickUIBuilderEditState; overload;
     function Invalid(AValue: Boolean; const AMessage: string): IRickUIBuilderEditState; overload;
     function RequirementMet(AValue: Boolean): IRickUIBuilderEditState;
+
+    function HasInvalid: Boolean;
+    function InvalidValue: Boolean;
+    function InvalidMessage: string;
+    function HasRequirementMet: Boolean;
+    function RequirementMetValue: Boolean;
+
     function ToBack: IRickUIBuilderEdit;
   end;
 

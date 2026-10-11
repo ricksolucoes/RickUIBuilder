@@ -53,11 +53,11 @@ Quando uma interface especializada depende do contexto de uma interface pai, mod
 
 ### Templates describe structure, not names or unit placement
 
-Nomes apresentados nesta skill são placeholders didáticos. Adapte-os ao domínio real. Interfaces públicas permanecem nas units de contratos/interfaces definidas pelo projeto; classes concretas permanecem nas units de implementação apropriadas.
+Nomes apresentados nesta skill são placeholders didáticos. Adapte-os ao domínio real. Toda interface do framework permanece em `Rick.UIBuilder.Interfaces.pas`, inclusive contratos auxiliares. Units concretas de implementação não declaram tipos `interface`; nelas ficam as classes concretas correspondentes. Quando existir implementação direta, preserve o par nominal `I<Nome>` / `T<Nome>` e não crie uma interface auxiliar redundante para o mesmo papel.
 
-### Natural Delphi signature formatting
+### Natural Delphi signature and class declaration formatting
 
-Mantenha a assinatura em uma única linha enquanto couber de forma legível. Não quebre parâmetro ou retorno mecanicamente. Quebre somente quando o comprimento realmente exigir.
+Mantenha a assinatura em uma única linha enquanto couber de forma legível. Não quebre parâmetro ou retorno mecanicamente. Declarações de classe são sempre escritas integralmente em uma única linha, incluindo ancestral e lista de interfaces, por exemplo `TImplementation = class(TInterfacedObject, IImplementation)`. Para assinaturas de métodos, quebre somente quando o comprimento realmente exigir.
 
 ## Process
 
@@ -203,7 +203,7 @@ Use este padrão quando uma interface especializada precisa do contexto da inter
 
 ### 1. Contratos ficam fora da implementação concreta
 
-Os contratos públicos devem permanecer na unit de interfaces/contratos definida pela arquitetura. O exemplo abaixo mostra somente a forma dos contratos:
+Os contratos do framework devem permanecer em `Rick.UIBuilder.Interfaces.pas`. Isso vale também para interfaces auxiliares usadas internamente entre implementações. Uma unit concreta de implementação não declara tipo `interface`. O exemplo abaixo mostra somente a forma dos contratos:
 
 ```delphi
 type
@@ -416,7 +416,7 @@ end;
 
 Não substitua esse contrato por parâmetro default apenas para reduzir a quantidade de assinaturas.
 
-### 9. Formatação das assinaturas
+### 9. Formatação das assinaturas e declarações de classe
 
 Correto quando couber de forma legível:
 
@@ -435,7 +435,7 @@ function Configure(
 ): iPadrao;
 ```
 
-A quebra só é válida quando o comprimento real prejudicar a leitura.
+A quebra de assinatura só é válida quando o comprimento real prejudicar a leitura. Declaração de classe não segue essa exceção: `TControllerPadrao = class(TInterfacedObject, iPadrao)` deve permanecer integralmente em uma linha; não coloque ancestral e interfaces em linhas separadas.
 
 ## Interface Design Questions
 

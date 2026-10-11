@@ -40,8 +40,7 @@ type
     function CreateCounter(AContainer: TRectangle): TLabel;
     function CreateErrorLabel(AContainer: TRectangle): TLabel;
     function CreateUnderline(AContainer: TRectangle): TRectangle;
-    function CreatePath(AParent: TFmxObject; const AData: string;
-      AColor: TAlphaColor): TPath;
+    function CreatePath(AParent: TFmxObject; const AData: string; AColor: TAlphaColor): TPath;
     function CreateActionArea(AContainer: TRectangle; ALeft: Single): TLayout;
     function CreateAlert(AContainer: TRectangle): TPath;
     function CreateRequirement(AContainer: TRectangle; ALeft: Single): TPath;
@@ -63,22 +62,19 @@ type
     function Size(AWidth, AHeight: Single): IRickUIBuilderEdit;
     function Preset(AValue: TRickUIBuilderEditPreset): IRickUIBuilderEdit;
     function CaseMode(AValue: TRickUIBuilderEditCaseMode): IRickUIBuilderEdit;
-    function UrlCaseMode(AValue: TRickUIBuilderEditUrlCaseMode)
-    : IRickUIBuilderEdit;
+    function UrlCaseMode(AValue: TRickUIBuilderEditUrlCaseMode): IRickUIBuilderEdit;
     function MaxLength(AValue: Integer): IRickUIBuilderEdit;
     function CharacterCounter(AValue: Boolean = True): IRickUIBuilderEdit;
     function AllowNegative(AValue: Boolean = True): IRickUIBuilderEdit;
     function DecimalPlaces(AValue: Integer): IRickUIBuilderEdit;
-    function NumberFormatMode(AValue: TRickUIBuilderEditNumberFormatMode)
-    : IRickUIBuilderEdit;
+    function NumberFormatMode(AValue: TRickUIBuilderEditNumberFormatMode): IRickUIBuilderEdit;
     function DecimalSeparator(AValue: Char): IRickUIBuilderEdit;
     function ThousandSeparator(AValue: Char): IRickUIBuilderEdit;
     function UseThousandSeparator(AValue: Boolean = True): IRickUIBuilderEdit;
     function ClearButton(AValue: Boolean = True): IRickUIBuilderEdit;
     function RequirementIndicator(AValue: Boolean = True): IRickUIBuilderEdit;
     function Password(AValue: Boolean = True): IRickUIBuilderEdit;
-    function InvalidFeedback(AValue: TRickUIBuilderEditInvalidFeedback)
-    : IRickUIBuilderEdit;
+    function InvalidFeedback(AValue: TRickUIBuilderEditInvalidFeedback): IRickUIBuilderEdit;
     function InvalidMessage(const AValue: string): IRickUIBuilderEdit;
     function Appearance(AValue: TRickUIBuilderEditAppearance): IRickUIBuilderEdit;
     function ReadOnly(AValue: Boolean = True): IRickUIBuilderEdit;
@@ -156,20 +152,16 @@ type
     procedure ApplyPendingCaret;
     procedure QueueCaretUpdate(ACaret: Integer; AGoToEnd: Boolean = False);
     function IsAppendingAtEnd(const AOldText, ANewText: string): Boolean;
-    function ChangedCaretPosition(const AOldText, ANewText: string;
-      AOldCaret: Integer): Integer;
-    function FormattedCaretPosition(const AValue: string;
-      ARawCaret: Integer): Integer;
-    procedure ApplyResolvedText(const AValue, AResolved: string;
-      ACaret: Integer; AAppendAtEnd: Boolean);
+    function ChangedCaretPosition(const AOldText, ANewText: string; AOldCaret: Integer): Integer;
+    function FormattedCaretPosition(const AValue: string; ARawCaret: Integer): Integer;
+    procedure ApplyResolvedText(const AValue, AResolved: string; ACaret: Integer; AAppendAtEnd: Boolean);
   protected
     procedure SetText(const AValue: string); override;
   public
     procedure ConfigureInput(const AConfig: TRickUIBuilderEditConfig);
   end;
 
-procedure TRickUIBuilderRuntimeEdit.ConfigureInput(
-  const AConfig: TRickUIBuilderEditConfig);
+procedure TRickUIBuilderRuntimeEdit.ConfigureInput(const AConfig: TRickUIBuilderEditConfig);
 begin
   FInputConfig := AConfig;
   FInputConfigured := True;
@@ -192,8 +184,7 @@ begin
   SelLength := 0;
 end;
 
-procedure TRickUIBuilderRuntimeEdit.QueueCaretUpdate(ACaret: Integer;
-  AGoToEnd: Boolean);
+procedure TRickUIBuilderRuntimeEdit.QueueCaretUpdate(ACaret: Integer; AGoToEnd: Boolean);
 begin
   FPendingCaret := ACaret;
   FPendingGoToEnd := FPendingGoToEnd or AGoToEnd;
@@ -207,8 +198,7 @@ begin
     end, Self);
 end;
 
-function TRickUIBuilderRuntimeEdit.IsAppendingAtEnd(const AOldText,
-  ANewText: string): Boolean;
+function TRickUIBuilderRuntimeEdit.IsAppendingAtEnd(const AOldText, ANewText: string): Boolean;
 begin
   Result := IsFocused and (SelLength = 0) and
     (CaretPosition = Length(AOldText)) and
@@ -216,8 +206,7 @@ begin
     (Copy(ANewText, 1, Length(AOldText)) = AOldText);
 end;
 
-function TRickUIBuilderRuntimeEdit.ChangedCaretPosition(const AOldText,
-  ANewText: string; AOldCaret: Integer): Integer;
+function TRickUIBuilderRuntimeEdit.ChangedCaretPosition(const AOldText, ANewText: string; AOldCaret: Integer): Integer;
 var
   LPrefix, LSuffix: Integer;
 begin
@@ -236,8 +225,7 @@ begin
   Result := Length(ANewText) - LSuffix;
 end;
 
-function TRickUIBuilderRuntimeEdit.FormattedCaretPosition(const AValue: string;
-  ARawCaret: Integer): Integer;
+function TRickUIBuilderRuntimeEdit.FormattedCaretPosition(const AValue: string; ARawCaret: Integer): Integer;
 var
   LPrefix: string;
 begin
@@ -250,8 +238,7 @@ begin
     FInputConfig));
 end;
 
-procedure TRickUIBuilderRuntimeEdit.ApplyResolvedText(const AValue,
-  AResolved: string; ACaret: Integer; AAppendAtEnd: Boolean);
+procedure TRickUIBuilderRuntimeEdit.ApplyResolvedText(const AValue, AResolved: string; ACaret: Integer; AAppendAtEnd: Boolean);
 begin
   FApplyingText := True;
   try
@@ -309,150 +296,129 @@ begin
   Result := FState;
 end;
 
-function TRickUIBuilderEditBuilder.Text(const AValue: string)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.Text(const AValue: string): IRickUIBuilderEdit;
 begin
   FConfig.Text := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.LabelText(const AValue: string)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.LabelText(const AValue: string): IRickUIBuilderEdit;
 begin
   FConfig.LabelText := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.Position(ALeft, ATop: Single)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.Position(ALeft, ATop: Single): IRickUIBuilderEdit;
 begin
   FConfig.Left := ALeft;
   FConfig.Top := ATop;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.Size(AWidth, AHeight: Single)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.Size(AWidth, AHeight: Single): IRickUIBuilderEdit;
 begin
   FConfig.Width := AWidth;
   FConfig.Height := AHeight;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.Preset(AValue: TRickUIBuilderEditPreset)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.Preset(AValue: TRickUIBuilderEditPreset): IRickUIBuilderEdit;
 begin
   FConfig.Preset := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.CaseMode(AValue: TRickUIBuilderEditCaseMode)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.CaseMode(AValue: TRickUIBuilderEditCaseMode): IRickUIBuilderEdit;
 begin
   FConfig.CaseMode := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.UrlCaseMode
-(AValue: TRickUIBuilderEditUrlCaseMode): IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.UrlCaseMode(AValue: TRickUIBuilderEditUrlCaseMode): IRickUIBuilderEdit;
 begin
   FConfig.UrlCaseMode := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.MaxLength(AValue: Integer)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.MaxLength(AValue: Integer): IRickUIBuilderEdit;
 begin
   FConfig.MaxLength := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.CharacterCounter(AValue: Boolean)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.CharacterCounter(AValue: Boolean): IRickUIBuilderEdit;
 begin
   FConfig.ShowCounter := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.AllowNegative(AValue: Boolean)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.AllowNegative(AValue: Boolean): IRickUIBuilderEdit;
 begin
   FConfig.AllowNegative := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.DecimalPlaces(AValue: Integer)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.DecimalPlaces(AValue: Integer): IRickUIBuilderEdit;
 begin
   FConfig.DecimalPlaces := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.NumberFormatMode
-(AValue: TRickUIBuilderEditNumberFormatMode): IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.NumberFormatMode(AValue: TRickUIBuilderEditNumberFormatMode): IRickUIBuilderEdit;
 begin
   FConfig.NumberFormatMode := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.DecimalSeparator(AValue: Char)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.DecimalSeparator(AValue: Char): IRickUIBuilderEdit;
 begin
   FConfig.DecimalSeparator := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.ThousandSeparator(AValue: Char)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.ThousandSeparator(AValue: Char): IRickUIBuilderEdit;
 begin
   FConfig.ThousandSeparator := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.UseThousandSeparator(AValue: Boolean)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.UseThousandSeparator(AValue: Boolean): IRickUIBuilderEdit;
 begin
   FConfig.UseThousandSeparator := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.ClearButton(AValue: Boolean)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.ClearButton(AValue: Boolean): IRickUIBuilderEdit;
 begin
   FConfig.ShowClearButton := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.RequirementIndicator(AValue: Boolean)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.RequirementIndicator(AValue: Boolean): IRickUIBuilderEdit;
 begin
   FConfig.ShowRequirementIndicator := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.Password(AValue: Boolean)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.Password(AValue: Boolean): IRickUIBuilderEdit;
 begin
   FConfig.Password := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.InvalidFeedback
-(AValue: TRickUIBuilderEditInvalidFeedback): IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.InvalidFeedback(AValue: TRickUIBuilderEditInvalidFeedback): IRickUIBuilderEdit;
 begin
   FConfig.InvalidFeedback := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.InvalidMessage(const AValue: string)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.InvalidMessage(const AValue: string): IRickUIBuilderEdit;
 begin
   FConfig.InvalidMessage := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.Appearance(AValue: TRickUIBuilderEditAppearance)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.Appearance(AValue: TRickUIBuilderEditAppearance): IRickUIBuilderEdit;
 begin
   FConfig.Appearance := AValue;
   Result := Self;
@@ -470,169 +436,145 @@ begin
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.BackgroundColor(AValue: TAlphaColor)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.BackgroundColor(AValue: TAlphaColor): IRickUIBuilderEdit;
 begin
   FConfig.BackgroundColor := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.EditBackgroundColor(AValue: TAlphaColor)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.EditBackgroundColor(AValue: TAlphaColor): IRickUIBuilderEdit;
 begin
   FConfig.EditBackgroundColor := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.BorderColor(AValue: TAlphaColor)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.BorderColor(AValue: TAlphaColor): IRickUIBuilderEdit;
 begin
   FConfig.BorderColor := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.FocusBorderColor(AValue: TAlphaColor)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.FocusBorderColor(AValue: TAlphaColor): IRickUIBuilderEdit;
 begin
   FConfig.FocusBorderColor := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.InvalidBorderColor(AValue: TAlphaColor)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.InvalidBorderColor(AValue: TAlphaColor): IRickUIBuilderEdit;
 begin
   FConfig.InvalidBorderColor := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.InvalidBackgroundColor(AValue: TAlphaColor)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.InvalidBackgroundColor(AValue: TAlphaColor): IRickUIBuilderEdit;
 begin
   FConfig.InvalidBackgroundColor := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.TextColor(AValue: TAlphaColor)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.TextColor(AValue: TAlphaColor): IRickUIBuilderEdit;
 begin
   FConfig.TextColor := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.LabelColor(AValue: TAlphaColor)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.LabelColor(AValue: TAlphaColor): IRickUIBuilderEdit;
 begin
   FConfig.LabelColor := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.InvalidLabelColor(AValue: TAlphaColor)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.InvalidLabelColor(AValue: TAlphaColor): IRickUIBuilderEdit;
 begin
   FConfig.InvalidLabelColor := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.ErrorTextColor(AValue: TAlphaColor)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.ErrorTextColor(AValue: TAlphaColor): IRickUIBuilderEdit;
 begin
   FConfig.ErrorTextColor := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.ErrorFontFamily(const AValue: string)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.ErrorFontFamily(const AValue: string): IRickUIBuilderEdit;
 begin
   FConfig.ErrorFontFamily := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.ErrorFontSize(AValue: Single)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.ErrorFontSize(AValue: Single): IRickUIBuilderEdit;
 begin
   FConfig.ErrorFontSize := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.ErrorFontStyles(AValue: TFontStyles)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.ErrorFontStyles(AValue: TFontStyles): IRickUIBuilderEdit;
 begin
   FConfig.ErrorFontStyles := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.ErrorSpacing(AValue: Single)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.ErrorSpacing(AValue: Single): IRickUIBuilderEdit;
 begin
   FConfig.ErrorSpacing := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.ReadOnlyBackgroundColor(AValue: TAlphaColor)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.ReadOnlyBackgroundColor(AValue: TAlphaColor): IRickUIBuilderEdit;
 begin
   FConfig.ReadOnlyBackgroundColor := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.ReadOnlyBorderColor(AValue: TAlphaColor)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.ReadOnlyBorderColor(AValue: TAlphaColor): IRickUIBuilderEdit;
 begin
   FConfig.ReadOnlyBorderColor := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.ReadOnlyTextColor(AValue: TAlphaColor)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.ReadOnlyTextColor(AValue: TAlphaColor): IRickUIBuilderEdit;
 begin
   FConfig.ReadOnlyTextColor := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.ReadOnlyLabelColor(AValue: TAlphaColor)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.ReadOnlyLabelColor(AValue: TAlphaColor): IRickUIBuilderEdit;
 begin
   FConfig.ReadOnlyLabelColor := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.UnderlineColor(AValue: TAlphaColor)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.UnderlineColor(AValue: TAlphaColor): IRickUIBuilderEdit;
 begin
   FConfig.UnderlineColor := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.FocusUnderlineColor(AValue: TAlphaColor)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.FocusUnderlineColor(AValue: TAlphaColor): IRickUIBuilderEdit;
 begin
   FConfig.FocusUnderlineColor := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.InvalidUnderlineColor(AValue: TAlphaColor)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.InvalidUnderlineColor(AValue: TAlphaColor): IRickUIBuilderEdit;
 begin
   FConfig.InvalidUnderlineColor := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.ReadOnlyUnderlineColor(AValue: TAlphaColor)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.ReadOnlyUnderlineColor(AValue: TAlphaColor): IRickUIBuilderEdit;
 begin
   FConfig.ReadOnlyUnderlineColor := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.UnderlineThickness(AValue: Single)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.UnderlineThickness(AValue: Single): IRickUIBuilderEdit;
 begin
   FConfig.UnderlineThickness := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.IconColor(AValue: TAlphaColor)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.IconColor(AValue: TAlphaColor): IRickUIBuilderEdit;
 begin
   FConfig.IconColor := AValue;
   FConfig.AlertIconColor := AValue;
@@ -642,43 +584,37 @@ begin
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.AlertIconColor(AValue: TAlphaColor)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.AlertIconColor(AValue: TAlphaColor): IRickUIBuilderEdit;
 begin
   FConfig.AlertIconColor := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.ClearIconColor(AValue: TAlphaColor)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.ClearIconColor(AValue: TAlphaColor): IRickUIBuilderEdit;
 begin
   FConfig.ClearIconColor := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.PasswordIconColor(AValue: TAlphaColor)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.PasswordIconColor(AValue: TAlphaColor): IRickUIBuilderEdit;
 begin
   FConfig.PasswordIconColor := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.RequirementIconColor(AValue: TAlphaColor)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.RequirementIconColor(AValue: TAlphaColor): IRickUIBuilderEdit;
 begin
   FConfig.RequirementIconColor := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.CornerRadius(AValue: Single)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.CornerRadius(AValue: Single): IRickUIBuilderEdit;
 begin
   FConfig.CornerRadius := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.BorderThickness(AValue: Single)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.BorderThickness(AValue: Single): IRickUIBuilderEdit;
 begin
   FConfig.BorderThickness := AValue;
   Result := Self;
@@ -690,8 +626,7 @@ begin
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.LabelFontSize(
-  AValue: Single): IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.LabelFontSize(AValue: Single): IRickUIBuilderEdit;
 begin
   FConfig.LabelFontSize := AValue;
   Result := Self;
@@ -703,50 +638,43 @@ begin
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.AlertPath(const AValue: string)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.AlertPath(const AValue: string): IRickUIBuilderEdit;
 begin
   FConfig.AlertPath := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.ClearPath(const AValue: string)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.ClearPath(const AValue: string): IRickUIBuilderEdit;
 begin
   FConfig.ClearPath := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.VisibilityPath(const AValue: string)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.VisibilityPath(const AValue: string): IRickUIBuilderEdit;
 begin
   FConfig.VisibilityPath := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.VisibilityOffPath(const AValue: string)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.VisibilityOffPath(const AValue: string): IRickUIBuilderEdit;
 begin
   FConfig.VisibilityOffPath := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.RequirementMetPath(const AValue: string)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.RequirementMetPath(const AValue: string): IRickUIBuilderEdit;
 begin
   FConfig.RequirementMetPath := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.RequirementNotMetPath(const AValue: string)
-: IRickUIBuilderEdit;
+function TRickUIBuilderEditBuilder.RequirementNotMetPath(const AValue: string): IRickUIBuilderEdit;
 begin
   FConfig.RequirementNotMetPath := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditBuilder.CreateContainer(AParent: TFmxObject)
-: TRectangle;
+function TRickUIBuilderEditBuilder.CreateContainer(AParent: TFmxObject): TRectangle;
 begin
   Result := TRectangle.Create(AParent);
   Result.Parent := AParent;
@@ -815,8 +743,7 @@ begin
     Result := Result + FConfig.ErrorSpacing + ErrorHeight;
 end;
 
-function TRickUIBuilderEditBuilder.CreateEditBackground(
-  AContainer: TRectangle): TRectangle;
+function TRickUIBuilderEditBuilder.CreateEditBackground(AContainer: TRectangle): TRectangle;
 begin
   Result := TRectangle.Create(AContainer);
   Result.Parent := AContainer;
@@ -844,8 +771,7 @@ begin
   Result.ReadOnly := FConfig.ReadOnly;
 end;
 
-function TRickUIBuilderEditBuilder.CreateCounter
-(AContainer: TRectangle): TLabel;
+function TRickUIBuilderEditBuilder.CreateCounter(AContainer: TRectangle): TLabel;
 begin
   Result := TLabel.Create(AContainer);
   Result.Parent := AContainer;
@@ -855,8 +781,7 @@ begin
   Result.HitTest := False;
 end;
 
-function TRickUIBuilderEditBuilder.CreateErrorLabel
-(AContainer: TRectangle): TLabel;
+function TRickUIBuilderEditBuilder.CreateErrorLabel(AContainer: TRectangle): TLabel;
 begin
   Result := TLabel.Create(AContainer);
   Result.Parent := AContainer;
@@ -874,8 +799,7 @@ begin
   Result.HitTest := False;
 end;
 
-function TRickUIBuilderEditBuilder.CreateUnderline(
-  AContainer: TRectangle): TRectangle;
+function TRickUIBuilderEditBuilder.CreateUnderline(AContainer: TRectangle): TRectangle;
 begin
   Result := TRectangle.Create(AContainer);
   Result.Parent := AContainer;
@@ -887,8 +811,7 @@ begin
   Result.Visible := FConfig.Appearance = TRickUIBuilderEditAppearance.Underline;
 end;
 
-function TRickUIBuilderEditBuilder.CreatePath(AParent: TFmxObject;
-  const AData: string; AColor: TAlphaColor): TPath;
+function TRickUIBuilderEditBuilder.CreatePath(AParent: TFmxObject; const AData: string; AColor: TAlphaColor): TPath;
 begin
   Result := TPath.Create(AParent);
   Result.Parent := AParent;
@@ -902,8 +825,7 @@ begin
   Result.HitTest := False;
 end;
 
-function TRickUIBuilderEditBuilder.CreateActionArea(AContainer: TRectangle;
-  ALeft: Single): TLayout;
+function TRickUIBuilderEditBuilder.CreateActionArea(AContainer: TRectangle; ALeft: Single): TLayout;
 begin
   Result := TLayout.Create(AContainer);
   Result.Parent := AContainer;
@@ -923,8 +845,7 @@ begin
   Result.Visible := False;
 end;
 
-function TRickUIBuilderEditBuilder.CreateRequirement(AContainer: TRectangle;
-  ALeft: Single): TPath;
+function TRickUIBuilderEditBuilder.CreateRequirement(AContainer: TRectangle; ALeft: Single): TPath;
 begin
   Result := CreatePath(AContainer, FConfig.RequirementNotMetPath,
     FConfig.RequirementIconColor);
@@ -934,8 +855,7 @@ begin
     FConfig.IconSize, FConfig.IconSize);
 end;
 
-function TRickUIBuilderEditBuilder.CreateActions(
-  AContainer: TRectangle): TActionControls;
+function TRickUIBuilderEditBuilder.CreateActions(AContainer: TRectangle): TActionControls;
 var
   LLeft: Single;
 begin
@@ -970,16 +890,14 @@ begin
 end;
 
 procedure TRickUIBuilderEditBuilder.ApplyInitialState(ABehavior: TRickUIBuilderEditBehavior);
-var
-  LState: IRickUIBuilderEditStateSnapshot;
 begin
-  if not Supports(FState, IRickUIBuilderEditStateSnapshot, LState) then
+  if not Assigned(FState) then
     Exit;
 
-  if LState.HasInvalid then
-    ABehavior.SetInvalid(LState.InvalidValue, LState.InvalidMessage);
-  if LState.HasRequirementMet then
-    ABehavior.SetRequirementMet(LState.RequirementMetValue);
+  if FState.HasInvalid then
+    ABehavior.SetInvalid(FState.InvalidValue, FState.InvalidMessage);
+  if FState.HasRequirementMet then
+    ABehavior.SetRequirementMet(FState.RequirementMetValue);
 end;
 
 procedure TRickUIBuilderEditBuilder.InitializeBehavior(ABehavior: TRickUIBuilderEditBehavior; const AActions: TActionControls);

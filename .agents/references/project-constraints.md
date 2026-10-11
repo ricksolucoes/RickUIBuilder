@@ -147,15 +147,20 @@ Quando uma interface especializada depender do contexto de uma interface princip
 
 ### 9.4 Separação entre contrato e implementação
 
-- interfaces públicas devem permanecer nas units de contratos/interfaces definidas pela arquitetura do projeto;
+- toda interface do framework deve ser declarada em `Rick.UIBuilder.Interfaces.pas`, inclusive contratos auxiliares usados entre implementações;
+- units concretas de implementação não devem declarar novos tipos `interface`;
+- quando uma classe implementar diretamente um contrato do framework, preserve a correspondência nominal `I<Nome>` / `T<Nome>` sempre que esse for o papel real da classe;
+- não crie uma segunda interface auxiliar apenas para expor leitura parcial do mesmo estado quando o contrato existente pode representar esse papel sem ambiguidade;
 - classes concretas permanecem nas units de implementação apropriadas;
 - exemplos/templates podem mostrar as duas partes para explicar a estrutura, mas não autorizam mover o contrato para a implementação concreta;
 - antes de criar ou mover uma interface, respeite boundaries, `uses`, GUIDs e consumidores existentes.
 
-### 9.5 Formatação de assinaturas Delphi
+### 9.5 Formatação de assinaturas e declarações Delphi
 
 - mantenha a assinatura em uma única linha enquanto couber de forma legível;
 - não quebre assinatura mecanicamente por quantidade de parâmetros;
+- mantenha toda declaração de classe `T... = class(...)` em uma única linha, incluindo ancestral e lista de interfaces, por exemplo `TImplementation = class(TInterfacedObject, IImplementation)`;
+- não quebre `class(...)`, ancestral ou lista de interfaces em linhas separadas;
 - quebre em múltiplas linhas somente quando comprimento ou legibilidade realmente exigirem;
 - não compacte múltiplas instruções em uma linha para reduzir `Length` ou outras métricas.
 

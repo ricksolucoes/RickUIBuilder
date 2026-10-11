@@ -66,8 +66,11 @@ Ao tocar facade/interfaces/types/builders/handles:
 - em interfaces fluent, faça operações mutáveis/configuradoras retornarem o contrato apropriado em vez de `procedure`;
 - quando uma interface especializada depender de outra, aplique o padrão Parent/injeção definido em `api-and-interface-design`;
 - não dependa da classe concreta do Parent quando o contrato é suficiente;
-- mantenha contratos públicos separados das classes concretas conforme os boundaries do projeto;
+- declare toda interface do framework em `Rick.UIBuilder.Interfaces.pas`; não crie tipo `interface` em unit concreta de implementação;
+- preserve o par nominal `I<Nome>` / `T<Nome>` quando a classe implementar diretamente o contrato e não crie interface auxiliar redundante para o mesmo papel;
+- mantenha contratos separados das classes concretas conforme os boundaries do projeto;
 - mantenha assinaturas em uma linha enquanto forem legíveis;
+- mantenha toda declaração `T... = class(...)` integralmente em uma única linha, incluindo ancestral e interfaces;
 - diferencie build-time de runtime behavior.
 
 ### 4. Lifetime
@@ -205,7 +208,10 @@ Não descreva cadeia de pensamento.
 - interface especializada recuperando/recriando Parent em vez de recebê-lo por injeção;
 - ciclo forte entre interfaces pai/especializada;
 - default escondendo variantes públicas que deveriam ser overloads;
-- assinatura quebrada sem necessidade real.
+- assinatura quebrada sem necessidade real;
+- declaração `T... = class(...)` quebrada em múltiplas linhas;
+- tipo `interface` declarado em unit concreta em vez de `Rick.UIBuilder.Interfaces.pas`;
+- interface auxiliar duplicando o papel do contrato implementado diretamente.
 
 ## Composition
 

@@ -97,8 +97,12 @@ Essas convenções devem ser auditadas em todo código Delphi criado ou alterado
 - dependency direction entre interfaces;
 - Parent injetado por contrato quando uma interface especializada depende do contexto de origem;
 - `FParent`/referência de retorno modelada sem ciclo forte quando aplicável;
-- contratos públicos separados das implementações concretas;
+- todas as interfaces do framework centralizadas em `Rick.UIBuilder.Interfaces.pas`;
+- ausência de declaração de tipo `interface` em units concretas de implementação;
+- correspondência nominal clara `I<Nome>` / `T<Nome>` nas implementações diretas, sem interface auxiliar redundante;
+- contratos separados das implementações concretas;
 - assinatura em uma linha quando couber de forma legível;
+- toda declaração `T... = class(...)` integralmente em uma única linha, incluindo ancestral e interfaces;
 - runtime/build semantics.
 
 ### 4. Verify verification
@@ -209,7 +213,9 @@ Se não existe, a classificação é `não executado` ou `não confirmado`.
 - interface especializada dependendo da classe concreta do Parent sem necessidade;
 - Parent recuperado por lookup/reconstrução em vez de injeção direta;
 - ciclo forte de reference counting entre Parent e interface especializada;
-- assinatura Delphi quebrada mecanicamente sem necessidade.
+- assinatura Delphi quebrada mecanicamente sem necessidade;
+- declaração `T... = class(...)` quebrada em múltiplas linhas;
+- tipo `interface` criado fora de `Rick.UIBuilder.Interfaces.pas`.
 
 ## Composition
 
