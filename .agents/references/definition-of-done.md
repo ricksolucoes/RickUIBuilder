@@ -24,6 +24,10 @@ Uma tarefa está concluída somente quando **os critérios específicos** e **os
 
 - [ ] Responsabilidades permanecem coesas.
 - [ ] Dependências novas são justificadas.
+- [ ] Dependências entre interfaces foram avaliadas quanto a Dependency Injection e direction.
+- [ ] Quando uma interface especializada depende do contrato pai, o contexto necessário é injetado em vez de recuperado por acoplamento concreto/lookup global.
+- [ ] Relações pai/especializada não introduzem ciclo forte de reference counting.
+- [ ] Contratos públicos permanecem separados das implementações concretas conforme os boundaries do projeto.
 - [ ] Não há abstração criada apenas por simetria ou estética.
 - [ ] Um componente simples não recebeu camadas de componente complexo sem necessidade.
 - [ ] Se uma decisão arquitetural duradoura foi introduzida, ADR/docs foram avaliados.
@@ -31,6 +35,7 @@ Uma tarefa está concluída somente quando **os critérios específicos** e **os
 ## 4. Delphi/Object Pascal
 
 - [ ] Sintaxe/recursos são compatíveis com o projeto ou a versão foi confirmada.
+- [ ] Assinaturas criadas/alteradas permanecem em uma linha quando couberem de forma legível e só são quebradas quando necessário.
 - [ ] `uses` está correto e no bloco apropriado.
 - [ ] Scoped Enums estão qualificados.
 - [ ] GUIDs públicos foram preservados salvo mudança explícita.
@@ -52,7 +57,11 @@ Uma tarefa está concluída somente quando **os critérios específicos** e **os
 
 - [ ] Mudanças públicas foram identificadas como aditivas, compatíveis ou breaking.
 - [ ] Overloads/defaults não criam ambiguidade não intencional.
+- [ ] Variantes semanticamente distintas usam overloads explícitos quando esse é o contrato adequado, em vez de defaults usados apenas para escondê-las.
+- [ ] Overloads simplificados delegam à forma completa quando compartilham a mesma regra.
 - [ ] Builders preservam chaining quando aplicável.
+- [ ] Operações mutáveis/configuradoras de interfaces fluent retornam o contrato apropriado e não usam `procedure` quando precisam continuar a cadeia.
+- [ ] Navegação entre interface principal e especializada mantém continuidade fluent e lifetime corretos quando aplicável.
 - [ ] Handles preservam lifecycle e ownership documentados.
 - [ ] Facade/Types/Interfaces foram atualizados somente quando necessário.
 - [ ] Consumidores, Sample e docs foram revisados quando a API mudou.

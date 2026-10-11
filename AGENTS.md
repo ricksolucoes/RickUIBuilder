@@ -141,6 +141,20 @@ Use, conforme o assunto:
 
 Fontes externas explicam a plataforma; não substituem o contrato específico do RickUIBuilder.
 
+## Delphi API, fluent interfaces e dependências
+
+Regras globais do RickUIBuilder para desenho e implementação de APIs Delphi:
+
+- mantenha assinaturas em uma única linha quando couberem de forma legível; não quebre parâmetros ou retorno mecanicamente;
+- em interfaces fluent, operações mutáveis/configuradoras que participam da cadeia devem retornar o contrato apropriado, em vez de `procedure`;
+- quando a mesma operação possuir formas de chamada semanticamente distintas, prefira `overload` explícito a parâmetro default usado apenas para esconder variantes do contrato;
+- overloads simplificados devem delegar à forma mais completa quando compartilham a mesma regra;
+- quando uma interface especializada depender do contexto de outra interface, modele a relação por Dependency Injection conforme o padrão do projeto, com contrato pai injetado, análise de lifetime/reference counting e retorno ao contrato de origem quando o fluxo exigir;
+- contratos públicos permanecem separados das implementações concretas conforme a arquitetura do repositório; templates de skill ensinam estrutura, não autorizam misturar interface e implementação na mesma unit;
+- nomes usados em templates são placeholders: o código real deve usar vocabulário do domínio e preservar contratos existentes.
+
+A estrutura de implementação e os critérios de decisão estão em `api-and-interface-design`, `project-constraints.md`, `delphi-quality-gates.md` e `definition-of-done.md`.
+
 ## Delphi gates
 
 Para qualquer `.pas` efetivamente modificado:

@@ -42,9 +42,14 @@ Sem esses inputs, marque review como evidence-incomplete em vez de presumir.
 ### 3. Architecture
 
 - responsabilidade está na unit certa?;
+- contratos públicos permanecem separados das implementações concretas?;
 - shared layer recebeu feature-specific logic?;
 - componente simples ganhou camadas por simetria?;
 - dependency direction continua coerente?;
+- interface especializada que depende do Parent recebe o contrato por injeção?;
+- a implementação especializada mantém o Parent pelo contrato apropriado em vez de depender da classe concreta?;
+- existe lookup/reconstrução do Parent que deveria ser injeção direta?;
+- relação pai/especializada introduz ciclo forte de interfaces?;
 - refactor reduz complexidade ou reloca?
 
 ### 4. Delphi Lifetime
@@ -59,8 +64,13 @@ Sem esses inputs, marque review como evidence-incomplete em vez de presumir.
 ### 5. API Compatibility
 
 - signatures/defaults/overloads mudaram?;
+- variantes semanticamente distintas deveriam ser overloads explícitos em vez de default?;
+- overloads simplificados delegam à forma completa quando compartilham a mesma regra?;
 - GUID preservado?;
 - fluent chaining?;
+- operação mutável/configuradora fluent usa retorno de interface em vez de `procedure`?;
+- navegação entre interface principal e especializada preserva o contrato da cadeia?;
+- assinaturas foram quebradas sem necessidade apesar de caberem legivelmente em uma linha?;
 - Build/BuildHandle semantics?;
 - mudança aditiva ou breaking?;
 - docs/Sample consumers atualizados?
@@ -161,6 +171,7 @@ Sem esses inputs, marque review como evidence-incomplete em vez de presumir.
 
 - aprovar porque “tests green”;
 - focar formatting e ignorar lifetime;
+- tratar a regra de assinatura como desculpa para ignorar DI, chaining ou reference counting;
 - pedir interface/pattern por estética;
 - não revisar docs de API pública;
 - aceitar baseline histórica como validação atual;

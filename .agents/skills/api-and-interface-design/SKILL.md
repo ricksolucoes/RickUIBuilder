@@ -43,6 +43,22 @@ Quando o requisito permite e compatibilidade importa, prefira adicionar capacida
 
 Um método deve ter semântica previsível. Evite overloads cuja seleção depende de coerções/ambiguidade difíceis de ler.
 
+### Fluent operations return contracts
+
+Em uma interface fluent, uma operação mutável/configuradora que participa da cadeia deve retornar o contrato apropriado. Não use `procedure` quando a operação precisa permitir continuidade do fluent. `procedure` continua válida fora desse contexto quando esse for o significado correto do contrato.
+
+### Interface dependencies use injected contracts
+
+Quando uma interface especializada depende do contexto de uma interface pai, modele essa relação por contrato e injeção. A implementação especializada recebe a interface pai; não deve reconstruí-la, procurá-la globalmente nem depender da classe concreta apenas para retornar ao fluxo de origem.
+
+### Templates describe structure, not names or unit placement
+
+Nomes apresentados nesta skill são placeholders didáticos. Adapte-os ao domínio real. Interfaces públicas permanecem nas units de contratos/interfaces definidas pelo projeto; classes concretas permanecem nas units de implementação apropriadas.
+
+### Natural Delphi signature formatting
+
+Mantenha a assinatura em uma única linha enquanto couber de forma legível. Não quebre parâmetro ou retorno mecanicamente. Quebre somente quando o comprimento realmente exigir.
+
 ## Process
 
 ### Step 1 — Inventory current contract
@@ -97,17 +113,43 @@ Avalie:
 - exception behavior;
 - runtime versus build-time configuration.
 
-### Step 5 — Interfaces and GUIDs
+### Step 5 — Interfaces, GUIDs e dependency direction
 
-Se adicionar membro a interface pública:
+Se adicionar ou alterar membro de interface pública:
 
 - identifique todos implementadores;
 - identifique consumidores internos;
 - preserve GUID salvo estratégia de versionamento explícita;
 - analise impacto em compatibility do framework;
-- adicione teste de contrato.
+- identifique se existe dependência entre contratos;
+- determine qual contrato é o pai/origem e qual é a interface especializada dependente;
+- determine se a especializada precisa navegar de volta ao contrato de origem;
+- modele lifetime/reference counting antes de escolher referência forte ou não proprietária;
+- adicione teste de contrato quando aplicável.
 
-### Step 6 — Record/enum changes
+Quando houver relação pai → interface especializada → retorno ao pai, use o padrão estrutural descrito em **Parent-aware interface pattern** abaixo.
+
+### Step 6 — Fluent operations, overloads e defaults
+
+Para cada operação pública, classifique-a como:
+
+- consulta/getter;
+- configuração fluent no contrato atual;
+- entrada em interface especializada;
+- retorno ao contrato pai;
+- operação terminal;
+- operação não fluent.
+
+Regras:
+
+- configuração fluent retorna o contrato atual;
+- não use `procedure` para configuração que precisa continuar a cadeia;
+- se a mesma operação possuir formas semanticamente distintas de chamada, avalie `overload` explícito;
+- não use parâmetro default apenas para esconder essas variantes;
+- overloads simplificados devem delegar à forma completa quando compartilham a mesma regra;
+- não crie overloads por simetria quando não houver forma de uso real.
+
+### Step 7 — Record/enum changes
 
 Para config record:
 
@@ -124,7 +166,7 @@ Para enum:
 - `case` statements precisam tratar novo member;
 - `Auto`/fallback semantics precisam ser explícitas quando existirem.
 
-### Step 7 — Build vs runtime
+### Step 8 — Build vs runtime
 
 Pergunte:
 
@@ -135,7 +177,7 @@ Pergunte:
 
 Não misture esses lifecycles silenciosamente.
 
-### Step 8 — Contract tests first
+### Step 9 — Contract tests first
 
 Proteja:
 
@@ -147,13 +189,253 @@ Proteja:
 - invalid input;
 - ownership/lifetime se observável.
 
-### Step 9 — Implement internally
+### Step 10 — Implement internally
 
 Somente depois do contrato estar claro, escolha implementação/cohesion adequada.
 
-### Step 10 — Documentation and Sample
+### Step 11 — Documentation and Sample
 
 Atualize somente quando API final estabilizar. README mostra uso essencial; docs profundas explicam semantics/maintenance.
+
+## Parent-aware interface pattern
+
+Use este padrão quando uma interface especializada precisa do contexto da interface que a originou. Ele é um **template estrutural do projeto**: os nomes são placeholders e devem ser substituídos pelo vocabulário real do domínio.
+
+### 1. Contratos ficam fora da implementação concreta
+
+Os contratos públicos devem permanecer na unit de interfaces/contratos definida pela arquitetura. O exemplo abaixo mostra somente a forma dos contratos:
+
+```delphi
+type
+  iInjected = interface;
+
+  iParent = interface
+    function Injected: iInjected;
+  end;
+
+  iInjected = interface
+    function ToBack: iParent;
+  end;
+```
+
+`iParent`, `iInjected`, `Injected` e `ToBack` são nomes didáticos. Não os copie para código real sem validar a nomenclatura do domínio.
+
+### 2. Implementação simples, sem Parent
+
+Quando a implementação não depende de um contrato pai, use a estrutura simples equivalente ao template base:
+
+```delphi
+type
+  TControllerPadrao = class(TInterfacedObject, iPadrao)
+  protected
+    constructor Create;
+  public
+    destructor Destroy; override;
+    class function New: iPadrao;
+  end;
+```
+
+```delphi
+constructor TControllerPadrao.Create;
+begin
+end;
+
+class function TControllerPadrao.New: iPadrao;
+begin
+  Result := Self.Create;
+end;
+```
+
+Não adicione Parent, overloads ou navegação se a dependência não existe.
+
+### 3. Implementação especializada com Parent injetado
+
+Quando a implementação depende do contrato que a originou, a referência de retorno fica na classe especializada:
+
+```delphi
+type
+  TControllerPadrao = class(TInterfacedObject, iPadrao)
+  private
+    [weak]
+    FParent: iPadraoParent;
+    procedure SetupStart;
+  protected
+    function ToBack: iPadraoParent;
+    constructor Create; overload;
+    constructor Create(const AValue: iPadraoParent); overload;
+  public
+    destructor Destroy; override;
+    class function New: iPadrao; overload;
+    class function New(const AValue: iPadraoParent): iPadrao; overload;
+  end;
+```
+
+Os overloads com e sem Parent só devem coexistir quando os dois modos de construção forem válidos para aquele contrato. `SetupStart` é um detalhe privado de implementação; `procedure` é válida nesse papel porque não pertence ao contrato fluent público.
+
+A inicialização compartilhada deve permanecer em um único ponto quando houver lógica comum:
+
+```delphi
+constructor TControllerPadrao.Create;
+begin
+  SetupStart;
+end;
+
+constructor TControllerPadrao.Create(const AValue: iPadraoParent);
+begin
+  FParent := AValue;
+  SetupStart;
+end;
+```
+
+Factories correspondentes:
+
+```delphi
+class function TControllerPadrao.New: iPadrao;
+begin
+  Result := Self.Create;
+end;
+
+class function TControllerPadrao.New(const AValue: iPadraoParent): iPadrao;
+begin
+  Result := Self.Create(AValue);
+end;
+```
+
+### 4. Retorno ao contrato de origem
+
+Quando a cadeia precisa voltar ao contrato pai, retorne o `FParent` injetado. Não recrie o pai e não procure uma instância global:
+
+```delphi
+function TControllerPadrao.ToBack: iPadraoParent;
+begin
+  if (not Assigned(FParent)) or (FParent = nil) then
+    raise Exception.Create('O Parent da interface não foi informado para retornar.');
+
+  Result := FParent;
+end;
+```
+
+O nome da função de retorno deve seguir o vocabulário aprovado para o domínio. O template demonstra o papel arquitetural, não impõe um identificador global.
+
+### 5. Criação da interface especializada pelo Parent
+
+Quando o contrato pai expõe e mantém a interface especializada, a implementação pai pode criá-la de forma lazy e injetar `Self`:
+
+```delphi
+function TControllerParent.Injected: iInjected;
+begin
+  if not Assigned(FInjected) then
+    FInjected := TControllerInjected.New(Self);
+
+  Result := FInjected;
+end;
+```
+
+Os papéis são distintos:
+
+```text
+Parent implementation
+  mantém FInjected: iInjected
+        ↓ New(Self)
+Injected implementation
+  mantém FParent: iParent [non-owning quando necessário]
+        ↓ retorno
+Parent contract
+```
+
+Não confunda o campo que mantém a interface especializada no pai com `FParent`, que pertence à implementação especializada e representa o contrato de origem.
+
+### 6. Lifetime obrigatório
+
+Se o pai mantém a interface especializada e a especializada mantém uma referência ao pai, existe potencial de ciclo:
+
+```text
+iParent -> iInjected
+   ^          |
+   |----------|
+```
+
+Antes de implementar:
+
+1. confirme a estratégia de reference counting do projeto/versão Delphi;
+2. identifique qual referência é proprietária;
+3. mantenha a referência de retorno ao Parent como não proprietária quando necessário para quebrar o ciclo;
+4. não copie `[weak]` mecanicamente se a compatibilidade não estiver confirmada;
+5. teste/descreva o lifetime conforme o risco da mudança.
+
+### 7. Fluent sobre a interface especializada
+
+Operações configuradoras dentro da interface especializada retornam a própria interface:
+
+```delphi
+function Configure(const AValue: string): iInjected;
+```
+
+Não use:
+
+```delphi
+procedure Configure(const AValue: string);
+```
+
+quando a operação pertence ao encadeamento fluent.
+
+O fluxo conceitual esperado é:
+
+```text
+interface principal
+  -> interface especializada
+       -> configurações especializadas
+       -> retorno ao Parent
+  -> demais configurações da interface principal
+  -> operação terminal
+```
+
+### 8. Overloads como contrato explícito
+
+Quando houver variantes reais da mesma operação, prefira overloads explícitos:
+
+```delphi
+function Configure(AValue: Boolean): iPadrao; overload;
+function Configure(const AMessage: string): iPadrao; overload;
+function Configure(AValue: Boolean; const AMessage: string): iPadrao; overload;
+```
+
+Quando compartilham a mesma regra, delegue os overloads simples ao completo:
+
+```delphi
+function TControllerPadrao.Configure(AValue: Boolean): iPadrao;
+begin
+  Result := Configure(AValue, EmptyStr);
+end;
+
+function TControllerPadrao.Configure(const AMessage: string): iPadrao;
+begin
+  Result := Configure(True, AMessage);
+end;
+```
+
+Não substitua esse contrato por parâmetro default apenas para reduzir a quantidade de assinaturas.
+
+### 9. Formatação das assinaturas
+
+Correto quando couber de forma legível:
+
+```delphi
+function Configure(AValue: Boolean; const AMessage: string): iPadrao;
+constructor Create(const AValue: iPadraoParent); overload;
+class function New(const AValue: iPadraoParent): iPadrao; overload;
+```
+
+Evite quebra mecânica como:
+
+```delphi
+function Configure(
+  AValue: Boolean;
+  const AMessage: string
+): iPadrao;
+```
+
+A quebra só é válida quando o comprimento real prejudicar a leitura.
 
 ## Interface Design Questions
 
@@ -170,9 +452,10 @@ Use overload quando:
 - mesma intenção;
 - inputs alternativos claramente distinguíveis;
 - semântica de retorno idêntica;
-- resolução pelo compiler é clara.
+- resolução pelo compiler é clara;
+- variantes precisam aparecer explicitamente no contrato em vez de ficarem escondidas por default.
 
-Considere nome diferente quando overloads representam operações semanticamente diferentes.
+Quando overloads compartilham a mesma regra, faça as formas simplificadas delegarem à forma completa. Considere nome diferente quando overloads representam operações semanticamente diferentes.
 
 ## Additional Contract Principles
 
@@ -270,6 +553,12 @@ Não crie estratégia de depreciação sem demanda. Quando uma API precisa ser s
 - Handle ganha setter sem comportamento runtime testado;
 - builder post-Build semantics mudam sem documentação;
 - interface expõe concrete implementation desnecessariamente;
+- interface especializada depende da classe concreta do Parent sem necessidade;
+- implementação especializada procura/recria Parent em vez de receber o contrato por injeção;
+- pai e especializada mantêm referências fortes circulares;
+- `procedure` é usada para configuração que deveria continuar o fluent;
+- parâmetro default esconde variantes que deveriam ser overloads explícitos;
+- assinatura é quebrada mecanicamente apesar de caber em uma linha legível;
 - GUID alterado sem breaking strategy.
 
 ## Verification
@@ -278,6 +567,12 @@ Não crie estratégia de depreciação sem demanda. Quando uma API precisa ser s
 - [ ] Need do consumidor está clara.
 - [ ] Compatibilidade foi classificada.
 - [ ] Signature/default/overload semantics são inequívocos.
+- [ ] Variantes públicas foram avaliadas quanto a overload explícito versus default.
+- [ ] Operações configuradoras fluent retornam o contrato correto.
+- [ ] Dependências entre interfaces usam contratos/injeção quando o padrão é aplicável.
+- [ ] Relação Parent/especializada foi revisada quanto a `FParent`, ownership e ciclos fortes.
+- [ ] Contratos permanecem separados das implementações concretas conforme os boundaries do projeto.
+- [ ] Assinaturas permanecem em uma linha quando legíveis.
 - [ ] GUID/interface impact foi revisado.
 - [ ] Build-time vs runtime semantics estão explícitas.
 - [ ] Contract tests protegem a mudança.

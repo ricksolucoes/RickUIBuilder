@@ -60,7 +60,14 @@ Ao tocar facade/interfaces/types/builders/handles:
 - classifique compatibilidade;
 - preserve GUIDs salvo decisão explícita;
 - revise defaults/overloads;
+- prefira overloads explícitos quando variantes semanticamente distintas precisam aparecer no contrato;
+- faça overloads simplificados delegarem à forma completa quando compartilham a mesma regra;
 - preserve fluent chaining;
+- em interfaces fluent, faça operações mutáveis/configuradoras retornarem o contrato apropriado em vez de `procedure`;
+- quando uma interface especializada depender de outra, aplique o padrão Parent/injeção definido em `api-and-interface-design`;
+- não dependa da classe concreta do Parent quando o contrato é suficiente;
+- mantenha contratos públicos separados das classes concretas conforme os boundaries do projeto;
+- mantenha assinaturas em uma linha enquanto forem legíveis;
 - diferencie build-time de runtime behavior.
 
 ### 4. Lifetime
@@ -138,6 +145,18 @@ Somente se consumidor precisa de API runtime persistente após Build.
 
 Somente se existe boundary/contrato público ou desacoplamento real. Um helper privado não precisa virar interface.
 
+### Interface especializada depende do Parent?
+
+Se sim, receba o contrato pai por injeção conforme `api-and-interface-design`. Quando a especializada precisar retornar ao fluxo de origem, mantenha `FParent` com o contrato apropriado e modele explicitamente reference counting/lifetime. Não substitua a injeção por lookup global ou dependência desnecessária da classe concreta.
+
+### Operação faz parte do fluent?
+
+Se for mutável/configuradora e a cadeia precisa continuar, retorne a interface correspondente. Não use `procedure` nesse papel.
+
+### Existem variantes reais da mesma chamada?
+
+Avalie overloads explícitos antes de usar parâmetro default. Se as variantes compartilham a mesma implementação, delegue ao overload mais completo.
+
 ### Criar State/Data/Presentation?
 
 Somente quando responsabilidade existe independentemente e melhora coesão. Não copie ComboBox.
@@ -180,7 +199,13 @@ Não descreva cadeia de pensamento.
 - API muda como efeito colateral;
 - teste só passa após reduzir assertion;
 - método novo excede gates;
-- `.pas` sem BOM.
+- `.pas` sem BOM;
+- `procedure` configuradora quebrando fluent;
+- dependência concreta onde o contrato pai é suficiente;
+- interface especializada recuperando/recriando Parent em vez de recebê-lo por injeção;
+- ciclo forte entre interfaces pai/especializada;
+- default escondendo variantes públicas que deveriam ser overloads;
+- assinatura quebrada sem necessidade real.
 
 ## Composition
 

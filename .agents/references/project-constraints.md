@@ -111,7 +111,55 @@ Perguntas obrigatórias:
 - GUID mudou?
 - documentação/Sample/testes precisam acompanhar?
 
-## 9. Method Toxicity
+## 9. Interfaces fluent, overloads e Dependency Injection
+
+Estas regras valem para APIs Delphi do RickUIBuilder e complementam a análise de compatibilidade da seção anterior.
+
+### 9.1 Interfaces fluent
+
+- operações mutáveis ou configuradoras que façam parte de uma cadeia fluent devem retornar o contrato apropriado da cadeia;
+- não use `procedure` para uma operação que precise preservar o encadeamento fluent;
+- `procedure` continua válida fora desse contexto quando for semanticamente adequada;
+- uma interface especializada deve retornar seu próprio contrato nas operações que permanecem dentro dela;
+- quando o fluxo exigir retorno à interface que originou a especializada, o contrato deve expor uma navegação explícita de retorno, com nome adequado ao domínio;
+- não imponha nomes de template ao código real.
+
+### 9.2 Overloads e parâmetros default
+
+- quando uma mesma operação possuir formas de chamada semanticamente distintas e inequivocamente resolvíveis pelo compilador, prefira `overload` explícito;
+- não use parâmetro default apenas para ocultar variantes que devem aparecer claramente no contrato público;
+- quando as variantes compartilham a mesma regra, overloads simplificados devem delegar à forma mais completa;
+- não duplique lógica entre overloads sem necessidade;
+- não crie overloads apenas por simetria.
+
+### 9.3 Dependências entre interfaces
+
+Quando uma interface especializada depender do contexto de uma interface principal/pai:
+
+- a dependência deve ser expressa pelo contrato da interface pai, não pela classe concreta, salvo impedimento técnico comprovado;
+- a implementação especializada deve receber o contrato pai por injeção, preferencialmente no construtor;
+- a implementação especializada deve manter a referência ao contrato de origem em um campo `FParent` quando precisar navegar de volta a ele;
+- se a interface pai também mantiver a interface especializada, analise obrigatoriamente o ciclo de reference counting e use uma referência de retorno não proprietária compatível com o projeto;
+- criação lazy da interface especializada é permitida quando coerente com o lifecycle;
+- a implementação concreta pode aparecer no composition point necessário para construir a instância, mas consumidores devem operar pelos contratos;
+- não use service locator, global lookup ou reconstrução do pai para substituir uma dependência que pode ser injetada diretamente;
+- não crie interfaces ou DI artificiais quando não existir dependência real.
+
+### 9.4 Separação entre contrato e implementação
+
+- interfaces públicas devem permanecer nas units de contratos/interfaces definidas pela arquitetura do projeto;
+- classes concretas permanecem nas units de implementação apropriadas;
+- exemplos/templates podem mostrar as duas partes para explicar a estrutura, mas não autorizam mover o contrato para a implementação concreta;
+- antes de criar ou mover uma interface, respeite boundaries, `uses`, GUIDs e consumidores existentes.
+
+### 9.5 Formatação de assinaturas Delphi
+
+- mantenha a assinatura em uma única linha enquanto couber de forma legível;
+- não quebre assinatura mecanicamente por quantidade de parâmetros;
+- quebre em múltiplas linhas somente quando comprimento ou legibilidade realmente exigirem;
+- não compacte múltiplas instruções em uma linha para reduzir `Length` ou outras métricas.
+
+## 10. Method Toxicity
 
 Gates do projeto:
 
@@ -129,7 +177,7 @@ Regras:
 - não afirmar aprovação da ferramenta sem relatório correspondente;
 - diferenciar métrica real de avaliação estática.
 
-## 10. Testes
+## 11. Testes
 
 - testes existentes são contratos úteis, mas não prova de cobertura completa;
 - bugfix deve ganhar regressão quando tecnicamente justificável;
@@ -138,7 +186,7 @@ Regras:
 - não enfraqueça assertion para obter verde;
 - não altere expectativa para acomodar bug sem requisito que mude o contrato.
 
-## 11. Build
+## 12. Build
 
 Nunca transforme ausência de compilador em “compilado por inspeção”.
 
@@ -148,7 +196,7 @@ Use termos precisos:
 - `análise estática sem build` — quando aplicável;
 - `build não executado` — quando ambiente não permite.
 
-## 12. Documentação
+## 13. Documentação
 
 Documente somente comportamento implementado no estado final.
 
@@ -156,7 +204,7 @@ README é visão geral. Documentação de domínio deve conter detalhes de arqui
 
 Pares EN/PT-BR devem permanecer semanticamente equivalentes quando existirem.
 
-## 13. Auditoria independente
+## 14. Auditoria independente
 
 Exija revisão separada da implementação em mudanças de risco relevante, especialmente:
 
@@ -170,6 +218,6 @@ Exija revisão separada da implementação em mudanças de risco relevante, espe
 - reorganização extensa;
 - release.
 
-## 14. Entrega
+## 15. Entrega
 
 Entregar somente arquivos efetivamente modificados/criados. Arquivos removidos devem ser listados explicitamente. Não incluir temporários, fontes consultadas, resultados intermediários ou artefatos não solicitados.

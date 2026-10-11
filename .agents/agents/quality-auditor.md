@@ -90,8 +90,15 @@ Essas convenções devem ser auditadas em todo código Delphi criado ou alterado
 
 - compatibility;
 - defaults;
-- overloads;
+- overloads explícitos quando variantes semanticamente distintas exigirem contrato próprio;
+- delegação entre overloads quando compartilham a mesma regra;
 - chaining;
+- operações mutáveis/configuradoras fluent retornando o contrato apropriado em vez de `procedure`;
+- dependency direction entre interfaces;
+- Parent injetado por contrato quando uma interface especializada depende do contexto de origem;
+- `FParent`/referência de retorno modelada sem ciclo forte quando aplicável;
+- contratos públicos separados das implementações concretas;
+- assinatura em uma linha quando couber de forma legível;
 - runtime/build semantics.
 
 ### 4. Verify verification
@@ -196,7 +203,13 @@ Se não existe, a classificação é `não executado` ou `não confirmado`.
 - docs atualizadas antes do código final e não revalidadas;
 - removal esquecida em migração estrutural;
 - pacote contém worktree completo;
-- source file untouched alterado apenas por encoding.
+- source file untouched alterado apenas por encoding;
+- `procedure` configuradora em interface fluent;
+- default usado para esconder overloads contratuais;
+- interface especializada dependendo da classe concreta do Parent sem necessidade;
+- Parent recuperado por lookup/reconstrução em vez de injeção direta;
+- ciclo forte de reference counting entre Parent e interface especializada;
+- assinatura Delphi quebrada mecanicamente sem necessidade.
 
 ## Composition
 
