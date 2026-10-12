@@ -2,9 +2,11 @@
 
 🇺🇸 [English](arquitetura-e-manutencao.md)
 
-Este documento registra as decisões arquiteturais já estabelecidas para o **novo Edit** em construção dentro de `src/Edit/`. Ele é documentação de arquitetura e manutenção; não significa que a migração já esteja concluída.
+Este documento registra as decisões arquiteturais permanentes para o **novo Edit** em construção dentro de `src/Edit/`.
 
-O Edit legado permanece no repositório e continua sendo a implementação validada até que a nova arquitetura seja completamente revisada e aceita pelo responsável pelo projeto.
+Ele não afirma que a migração já esteja concluída. O Edit legado permanece no repositório e continua sendo a implementação validada até que a nova arquitetura seja revisada e aceita pelo responsável pelo projeto.
+
+Para o blueprint detalhado de montagem e dependências, consulte [Montagem e dependências do novo Edit](montagem-e-dependencias.pt-BR.md).
 
 ## Limite da migração
 
@@ -14,48 +16,40 @@ A nova implementação fica em:
 src/Edit/
 ```
 
-A implementação legada permanece fora desse diretório e não deve ser removida nem reescrita como parte da nova arquitetura, a menos que uma tarefa autorize isso explicitamente.
+A implementação legada permanece fora desse diretório e não deve ser removida nem reescrita sem autorização explícita.
 
 O legado pode ser consultado como evidência de comportamento, mas não define a organização física da nova implementação. A nova implementação não deve depender das units legadas do Edit.
 
 ## Fonte de verdade do contrato
 
-O contrato oficial de interfaces do novo Edit é:
+O contrato oficial é:
 
 ```text
 src/Edit/Rick.UIBuilder.Edit.Interfaces.pas
 ```
 
-Todas as interfaces públicas do novo Edit permanecem nessa unit.
+A implementação deve se adaptar ao contrato atual. Conveniência interna não autoriza alterar retorno, parâmetro, overload, GUID, membro, spelling, navegação fluent nem adicionar getter/state/handle auxiliar.
 
-Durante a implementação, esse arquivo é **read-only por padrão**. A implementação deve se adaptar ao contrato existente. A interface só pode ser alterada quando o usuário solicitar explicitamente uma mudança de contrato na tarefa atual.
+A interface só muda mediante solicitação explícita do usuário na tarefa atual.
 
-Conveniência da implementação não autoriza alterar:
+## Entrada e composition root
 
-- retorno de método;
-- parâmetro;
-- overload;
-- GUID;
-- nome de membro;
-- spelling público;
-- navegação fluent;
-- nem adicionar getter, state, runtime, handle ou outro membro público.
+O ponto de entrada externo é `IRickUIBuilderEdit`.
 
-Se o contrato parecer incomum, ele deve ser preservado até existir uma tarefa explícita de alteração contratual.
+A assinatura atual da raiz inclui:
 
-## Boundary de Types
-
-Records, enums e demais types compartilhados do domínio do novo Edit permanecem em:
-
-```text
-src/Edit/Rick.UIBuilder.Edit.Types.pas
+```delphi
+function Parent(AParentConstructor: TFmxObject): IRickUIBuilderEdit;
+function Build: IRickUIBuilderEdit;
 ```
 
-Não declare records, enums, DTOs ou configurações compartilhadas de domínio dentro das units concretas de implementação.
+A implementação de `IRickUIBuilderEdit` é o composition root lógico. Toda a árvore especializada nasce a partir dela e deve permanecer acessível pela navegação já definida no contrato.
 
-## Uma interface pública, uma implementação, uma unit
+O consumidor não deve precisar conhecer classes concretas, helpers internos ou caminhos paralelos de estado.
 
-O novo Edit possui uma regra específica de organização física:
+## Organização 1 → 1 → 1
+
+Para as 28 interfaces públicas do novo Edit:
 
 ```text
 1 interface pública
@@ -65,7 +59,7 @@ O novo Edit possui uma regra específica de organização física:
 1 unit exclusiva de implementação
 ```
 
-Para o contrato atual, isso significa:
+Isto significa:
 
 ```text
 28 interfaces públicas
@@ -75,134 +69,104 @@ Para o contrato atual, isso significa:
 28 units de implementação
 ```
 
-A correspondência nominal deve ser preservada:
+A correspondência nominal permanece clara:
 
 ```text
 I<Nome>
 → T<Nome>
-→ unit exclusiva de implementação
+→ unit exclusiva
 ```
 
-Exemplo:
+Uma unit de implementação pública não deve conter segunda implementação pública, interface, record, enum, DTO ou configuração compartilhada de domínio.
+
+## Types
+
+Os types públicos/compartilhados do novo Edit pertencem a:
 
 ```text
-IRickUIBuilderEditRetangle
-→ TRickUIBuilderEditRetangle
-→ Rick.UIBuilder.Edit.Rectangle.pas
+src/Edit/Rick.UIBuilder.Edit.Types.pas
 ```
 
-Não reagrupe implementações irmãs como Rectangle.Position, Rectangle.Size, Rectangle.Background e Rectangle.Border dentro de uma única unit de implementação.
+A presença desse boundary não autoriza criar records de settings por conveniência. Um type novo exige necessidade comprovada.
 
-Essa regra 1 → 1 → 1 é uma decisão específica do novo Edit. Ela não deve ser generalizada automaticamente para outros componentes do RickUIBuilder.
+## Dependency Injection e contexto
 
-## Infraestrutura interna não faz parte das 28 implementações
+Quando uma interface especializada depende do contexto de outra:
 
-O novo Edit também utiliza classes internas que não correspondem às interfaces públicas. Entre as units já identificadas no trabalho de implementação estão:
+- receba o contrato pai por injeção;
+- mantenha `FParent` somente quando a navegação de retorno exigir;
+- use `[weak]` em linha própria;
+- mantenha a referência descendente no pai por interface;
+- não recrie Parent/origem;
+- não use service locator;
+- não crie `Context` central apenas para transportar estado;
+- não duplique estado que pertence a outra implementação.
 
-```text
-Rick.UIBuilder.Edit.Context.pas
-Rick.UIBuilder.Edit.InputRules.pas
-Rick.UIBuilder.Edit.Control.pas
-Rick.UIBuilder.Edit.Interaction.pas
-Rick.UIBuilder.Edit.Materializer.pas
+Formato obrigatório:
+
+```delphi
+[weak]
+FParent: IRickUIBuilderEditDesigner;
 ```
 
-Essas units são helpers/infraestrutura. Elas não entram na contagem das 28 implementações públicas.
+Os métodos que implementam a interface ficam em `protected`; a superfície `public` da classe concreta deve permanecer mínima.
 
-Não transforme helpers em interfaces apenas para deixar a arquitetura simétrica. Uma nova abstração só deve existir quando houver responsabilidade arquitetural real e o escopo da tarefa autorizar.
+## Estado pertence ao contrato que o representa
 
-## A implementação se adapta ao contrato
+Cada implementação guarda somente o contexto da sua própria responsabilidade.
 
-Quando uma implementação precisar de contexto, estado ou acesso a outro nível da cadeia fluent, não altere a interface para facilitar a navegação.
+Quando uma configuração pode ser aplicada diretamente ao objeto FMX que a interface configura, prefira o próprio objeto como estado efetivo.
 
-A direção esperada é:
+Quando a interface representa múltiplos valores configurados simultaneamente, esses valores podem permanecer como campos da própria implementação correspondente.
 
-```text
-contrato oficial
-        ↓
-implementação concreta
-        ↓
-usa contratos/origem existentes
-para obter o contexto necessário
-```
+Não concentrar o estado do componente inteiro em um record ou classe agregadora apenas para facilitar `Build`.
 
-E não:
+## Helpers não são presumidos
 
-```text
-implementação precisa de algo
-        ↓
-altera interface pública
-        ↓
-adiciona retorno/getter/caminho conveniente
-```
+Nenhuma classe auxiliar é obrigatória por simetria ou por conveniência.
 
-Se a informação necessária já pertence a outra interface, dependa desse contrato existente. Quando existir uma origem/pai clara, forneça o contrato necessário à implementação especializada por Dependency Injection quando aplicável.
+Em particular, implementações anteriores não autorizam automaticamente `Context`, subclasse customizada de `TEdit`, `InputRules`, `Interaction`, `Materializer` ou records agregadores.
 
-Não substitua essa relação por:
+Se durante a implementação surgir uma necessidade que a árvore de contratos não consiga atender, a necessidade deve ser comprovada antes de criar uma nova abstração.
 
-- getter público novo;
-- interface nova apenas para transportar estado;
-- estado duplicado;
-- global ou service locator;
-- recriação do Parent;
-- segundo caminho para o mesmo contexto.
+## Lifetime
 
-Dependency Inversion aqui significa depender do contrato correto que já existe. Não significa criar outra interface por simetria.
+O pai mantém seus filhos especializados por interface. O filho mantém o contrato pai por referência fraca quando precisa retornar na cadeia.
 
-## Exemplo de retorno fluent
+Assim, enquanto a raiz `IRickUIBuilderEdit` estiver referenciada, a árvore descendente de interfaces pode permanecer viva sem criar ciclo forte.
 
-Quando uma interface especializada existente deve retornar ao contrato de origem, a implementação precisa ter acesso a esse contrato de origem.
+`Parent(AParentConstructor)` guarda a referência ao local de montagem para uso de `Build`; uma referência `TFmxObject` simples não transfere ownership nem prolonga automaticamente o lifetime do objeto informado.
 
-Conceitualmente:
+O lifecycle FMX concreto deve ser validado por evidência de código/teste antes de qualquer garantia de ownership.
+
+## Estratégia de implementação
 
 ```text
-MainText
-   ↓ Color
-MainTextColor
-   ↓ Invalid(...)
-MainText
-```
-
-Se `Invalid(...)` está declarado para retornar `IRickUIBuilderEditLabelMainText`, a implementação concreta de Color precisa conseguir retornar esse contrato existente. Ela não deve alterar o método para retornar `IRickUIBuilderEditLabelMainTextColor` apenas porque isso seria mais simples internamente.
-
-O mesmo princípio vale para todo o novo Edit: a interface pública define a navegação; a implementação segue o contrato.
-
-## Estratégia de migração
-
-A migração é deliberadamente incremental:
-
-```text
-legado permanece disponível
-        ↓
-novo contrato/types são estabelecidos em src/Edit/
-        ↓
-novas implementações são construídas e auditadas
-        ↓
+contrato atual
+    ↓
+mapa de dependências
+    ↓
+prova das relações/lifetime
+    ↓
+implementações 1 → 1 → 1
+    ↓
+auditoria independente
+    ↓
 validação Delphi/DUnitX pelo responsável pelo projeto
-        ↓
-somente depois pode ser considerada a substituição/remoção do legado
 ```
 
-Não remova o legado antecipadamente. Não altere Samples, testes, facade, package/project ou comportamento legado em um incremento de implementação, salvo quando a tarefa atual incluir isso explicitamente.
+Não introduzir helper/type para “destravar” uma implementação. Quando houver dificuldade, voltar ao mapa de contratos e demonstrar a dependência real.
 
 ## Repositório e entrega
 
-No trabalho assistido por IA deste projeto:
+- GitHub permanece read-only para o agente;
+- o `main` deve ser reconfirmado antes de cada incremento;
+- o legado permanece até validação explícita;
+- ZIP incremental contém somente arquivos criados/modificados;
+- build/test/toxicity só podem ser declarados quando realmente executados.
 
-- o GitHub é somente leitura para o agente;
-- o `main` atual deve ser confirmado novamente antes de cada novo incremento de implementação;
-- o agente não executa mutações no repositório;
-- o responsável pelo projeto recebe os arquivos/ZIP primeiro e realiza a validação final no Delphi/DUnitX;
-- ZIPs incrementais contêm somente arquivos criados ou efetivamente modificados pela tarefa, preservando os caminhos relativos do repositório;
-- arquivos usados apenas como Fontes do Projeto ChatGPT não são arquivos do repositório, salvo quando também existirem no próprio repositório.
+## Referências
 
-Antes de empacotar um incremento de implementação do Edit, audite dependências, types referenciados, helpers, `Types`, units de implementação e somente os package/project files efetivamente modificados naquele incremento.
-
-## Referências de governança
-
-As regras de processo ficam em `.agents/`, não neste documento. As políticas detalhadas são:
-
-- [`.agents/references/interface-contract-preservation-policy.md`](../../.agents/references/interface-contract-preservation-policy.md) — protege os contratos existentes;
-- [`.agents/references/interface-implementation-unit-policy.md`](../../.agents/references/interface-implementation-unit-policy.md) — protege a organização física 1 → 1 → 1 do novo Edit.
-
-Este documento registra a arquitetura e os limites de manutenção do componente para que essas decisões possam ser recuperadas independentemente do histórico da conversa.
+- [Montagem e dependências do novo Edit](montagem-e-dependencias.pt-BR.md)
+- [Interface Contract Preservation Policy](../../.agents/references/interface-contract-preservation-policy.md)
+- [Interface Implementation Unit Policy](../../.agents/references/interface-implementation-unit-policy.md)
