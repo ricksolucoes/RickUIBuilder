@@ -5,7 +5,8 @@ interface
 uses
   FMX.Edit,
 
-  Rick.UIBuilder.Edit.Interfaces;
+  Rick.UIBuilder.Edit.Interfaces,
+  Rick.UIBuilder.Edit.VisualState;
 
 type
   TRickUIBuilderEditDesignerConfig = class(TInterfacedObject, IRickUIBuilderEditDesignerConfig)
@@ -16,8 +17,9 @@ type
     FClearButton: Boolean;
     FPassword: Boolean;
     FReadOnly: Boolean;
+    FVisualState: TRickUIBuilderEditVisualState;
   protected
-    constructor Create(const AParent: IRickUIBuilderEditDesigner; AControl: TEdit);
+    constructor Create(const AParent: IRickUIBuilderEditDesigner; AControl: TEdit; AVisualState: TRickUIBuilderEditVisualState);
 
     function ClearButton(AValue: Boolean): IRickUIBuilderEditDesignerConfig; overload;
     function ClearButton: IRickUIBuilderEditDesignerConfig; overload;
@@ -27,7 +29,7 @@ type
     function ReadOnly: IRickUIBuilderEditDesignerConfig; overload;
     function ToBack: IRickUIBuilderEditDesigner;
   public
-    class function New(const AParent: IRickUIBuilderEditDesigner; AControl: TEdit): IRickUIBuilderEditDesignerConfig;
+    class function New(const AParent: IRickUIBuilderEditDesigner; AControl: TEdit; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditDesignerConfig;
   end;
 
 implementation
@@ -35,19 +37,20 @@ implementation
 uses
   System.SysUtils;
 
-constructor TRickUIBuilderEditDesignerConfig.Create(const AParent: IRickUIBuilderEditDesigner; AControl: TEdit);
+constructor TRickUIBuilderEditDesignerConfig.Create(const AParent: IRickUIBuilderEditDesigner; AControl: TEdit; AVisualState: TRickUIBuilderEditVisualState);
 begin
   inherited Create;
   FParent := AParent;
   FControl := AControl;
+  FVisualState := AVisualState;
   FClearButton := False;
   FPassword := False;
   FReadOnly := False;
 end;
 
-class function TRickUIBuilderEditDesignerConfig.New(const AParent: IRickUIBuilderEditDesigner; AControl: TEdit): IRickUIBuilderEditDesignerConfig;
+class function TRickUIBuilderEditDesignerConfig.New(const AParent: IRickUIBuilderEditDesigner; AControl: TEdit; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditDesignerConfig;
 begin
-  Result := Self.Create(AParent, AControl);
+  Result := Self.Create(AParent, AControl, AVisualState);
 end;
 
 function TRickUIBuilderEditDesignerConfig.ClearButton(AValue: Boolean): IRickUIBuilderEditDesignerConfig;
@@ -77,6 +80,7 @@ function TRickUIBuilderEditDesignerConfig.ReadOnly(AValue: Boolean): IRickUIBuil
 begin
   FReadOnly := AValue;
   FControl.ReadOnly := AValue;
+  FVisualState.SetReadOnly(AValue);
   Result := Self;
 end;
 

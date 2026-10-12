@@ -126,11 +126,11 @@ begin
   LDesigner := FEdit.Edit;
   LText := LDesigner.Input.Text;
   LText.Value('Texto').Color.Text(TAlphaColors.Blue);
+  Assert.AreEqual<TAlphaColor>(TAlphaColors.Blue, LDesigner.Control.TextSettings.FontColor);
   LText.Size(18).Config.Password.ReadOnly;
   LDesigner.Input.Config.MaxLength(12);
   Assert.AreEqual('Texto', LText.Value);
   Assert.AreEqual<Single>(18, LDesigner.Control.TextSettings.Font.Size);
-  Assert.AreEqual<TAlphaColor>(TAlphaColors.Blue, LDesigner.Control.TextSettings.FontColor);
   Assert.IsTrue(LDesigner.Control.Password);
   Assert.IsTrue(LDesigner.Control.ReadOnly);
   Assert.AreEqual<Integer>(12, LDesigner.Control.MaxLength);

@@ -5,7 +5,8 @@ interface
 uses
   FMX.Objects,
 
-  Rick.UIBuilder.Edit.Interfaces;
+  Rick.UIBuilder.Edit.Interfaces,
+  Rick.UIBuilder.Edit.VisualState;
 
 type
   TRickUIBuilderEditLine = class(TInterfacedObject, IRickUIBuilderEditLine)
@@ -13,15 +14,16 @@ type
     [weak]
     FParent: IRickUIBuilderEdit;
     FControl: TRectangle;
+    FVisualState: TRickUIBuilderEditVisualState;
     FColor: IRickUIBuilderEditLineColor;
   protected
-    constructor Create(const AParent: IRickUIBuilderEdit; AHost: TRectangle);
+    constructor Create(const AParent: IRickUIBuilderEdit; AHost: TRectangle; AVisualState: TRickUIBuilderEditVisualState);
 
     function Thickness(AValue: Single): IRickUIBuilderEditLine;
     function Color: IRickUIBuilderEditLineColor;
     function ToBack: IRickUIBuilderEdit;
   public
-    class function New(const AParent: IRickUIBuilderEdit; AHost: TRectangle): IRickUIBuilderEditLine;
+    class function New(const AParent: IRickUIBuilderEdit; AHost: TRectangle; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditLine;
   end;
 
 implementation
@@ -34,10 +36,11 @@ uses
 
   Rick.UIBuilder.Edit.Line.Color;
 
-constructor TRickUIBuilderEditLine.Create(const AParent: IRickUIBuilderEdit; AHost: TRectangle);
+constructor TRickUIBuilderEditLine.Create(const AParent: IRickUIBuilderEdit; AHost: TRectangle; AVisualState: TRickUIBuilderEditVisualState);
 begin
   inherited Create;
   FParent := AParent;
+  FVisualState := AVisualState;
   FControl := TRectangle.Create(AHost);
   FControl.Parent := AHost;
   FControl.SetBounds(8, 47, AHost.Width - 16, 1);
@@ -47,9 +50,9 @@ begin
   FControl.Visible := False;
 end;
 
-class function TRickUIBuilderEditLine.New(const AParent: IRickUIBuilderEdit; AHost: TRectangle): IRickUIBuilderEditLine;
+class function TRickUIBuilderEditLine.New(const AParent: IRickUIBuilderEdit; AHost: TRectangle; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditLine;
 begin
-  Result := Self.Create(AParent, AHost);
+  Result := Self.Create(AParent, AHost, AVisualState);
 end;
 
 function TRickUIBuilderEditLine.Thickness(AValue: Single): IRickUIBuilderEditLine;
@@ -61,7 +64,7 @@ end;
 function TRickUIBuilderEditLine.Color: IRickUIBuilderEditLineColor;
 begin
   if not Assigned(FColor) then
-    FColor := TRickUIBuilderEditLineColor.New(Self, FControl);
+    FColor := TRickUIBuilderEditLineColor.New(Self, FControl, FVisualState);
   Result := FColor;
 end;
 

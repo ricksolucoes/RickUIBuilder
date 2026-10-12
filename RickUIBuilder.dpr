@@ -32,6 +32,7 @@ uses
   Rick.UIBuilder.Interfaces in 'src\Rick.UIBuilder.Interfaces.pas',
   Rick.UIBuilder in 'src\Rick.UIBuilder.pas',
   Rick.UIBuilder.Types in 'src\Rick.UIBuilder.Types.pas',
+  Rick.UIBuilder.Edit.VisualState in 'src\Edit\Rick.UIBuilder.Edit.VisualState.pas',
   Rick.UIBuilder.Edit.Builder in 'src\Edit\Rick.UIBuilder.Edit.Builder.pas',
   Rick.UIBuilder.Edit.Config.Icons.Colors in 'src\Edit\Rick.UIBuilder.Edit.Config.Icons.Colors.pas',
   Rick.UIBuilder.Edit.Config.Icons in 'src\Edit\Rick.UIBuilder.Edit.Config.Icons.pas',

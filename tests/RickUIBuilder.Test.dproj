@@ -292,6 +292,7 @@
         <DCCReference Include="src\edits\Rick.UIBuilder.Tests.Edit.Foundation.pas"/>
         <DCCReference Include="src\edits\Rick.UIBuilder.Tests.Edit.Fluent.pas"/>
         <DCCReference Include="src\edits\Rick.UIBuilder.Tests.Edit.Controls.pas"/>
+        <DCCReference Include="src\edits\Rick.UIBuilder.Tests.Edit.VisualState.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

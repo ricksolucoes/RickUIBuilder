@@ -1,4 +1,4 @@
-# Edit architecture and maintenance
+﻿# Edit architecture and maintenance
 
 🇧🇷 [Português](arquitetura-e-manutencao.pt-BR.md)
 
@@ -129,6 +129,8 @@ In particular, prior implementation attempts do not automatically authorize a ce
 
 If implementation discovers a need the contract tree cannot satisfy, that need must be proven before creating a new abstraction.
 
+Increment 2B provides that proof for one internal abstraction only: `TRickUIBuilderEditVisualState`. It coordinates Focus/Invalid/ReadOnly flags and notifies visual contracts. It does not store branch colors or configuration and does not replace the state ownership defined by the interface tree.
+
 ## Lifetime
 
 A parent retains specialized children through interfaces. A child keeps the parent contract as a weak reference when it must return up the chain.
@@ -137,7 +139,7 @@ Therefore, while the root `IRickUIBuilderEdit` remains referenced, the descendan
 
 `Parent(AParentConstructor)` retains the assembly-location reference for `Build`; a plain `TFmxObject` reference does not transfer ownership or automatically extend the supplied object's lifetime.
 
-Concrete FMX lifecycle behavior must be validated through code/test evidence before making ownership guarantees.
+For Increment 2B visual state, the helper is attached as an owned component of the root `TRectangle`. It does not retain `IRickUIBuilderEdit`. To preserve only the receivers required by focus events, it keeps strong references to the parent contracts of registered subscribers. Those contracts navigate upward through `[weak]` references, so no strong cycle with the root is introduced. Destroying the visual tree releases the helper and those retained references.
 
 ## Implementation strategy
 

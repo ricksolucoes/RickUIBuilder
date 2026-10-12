@@ -6,7 +6,8 @@ uses
   FMX.Edit,
   FMX.Objects,
 
-  Rick.UIBuilder.Edit.Interfaces;
+  Rick.UIBuilder.Edit.Interfaces,
+  Rick.UIBuilder.Edit.VisualState;
 
 type
   TRickUIBuilderEditDesignerInput = class(TInterfacedObject, IRickUIBuilderEditDesignerInput)
@@ -15,18 +16,19 @@ type
     FParent: IRickUIBuilderEditDesigner;
     FControl: TEdit;
     FBackground: TRectangle;
+    FVisualState: TRickUIBuilderEditVisualState;
     FText: IRickUIBuilderEditDesignerInputText;
     FNumber: IRickUIBuilderEditDesignerInputNumber;
     FConfig: IRickUIBuilderEditDesignerInputConfig;
   protected
-    constructor Create(const AParent: IRickUIBuilderEditDesigner; AControl: TEdit; ABackground: TRectangle);
+    constructor Create(const AParent: IRickUIBuilderEditDesigner; AControl: TEdit; ABackground: TRectangle; AVisualState: TRickUIBuilderEditVisualState);
 
     function Text: IRickUIBuilderEditDesignerInputText;
     function Number: IRickUIBuilderEditDesignerInputNumber;
     function Config: IRickUIBuilderEditDesignerInputConfig;
     function ToBack: IRickUIBuilderEditDesigner;
   public
-    class function New(const AParent: IRickUIBuilderEditDesigner; AControl: TEdit; ABackground: TRectangle): IRickUIBuilderEditDesignerInput;
+    class function New(const AParent: IRickUIBuilderEditDesigner; AControl: TEdit; ABackground: TRectangle; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditDesignerInput;
   end;
 
 implementation
@@ -38,23 +40,24 @@ uses
   Rick.UIBuilder.Edit.Designer.Input.Number,
   Rick.UIBuilder.Edit.Designer.Input.Text;
 
-constructor TRickUIBuilderEditDesignerInput.Create(const AParent: IRickUIBuilderEditDesigner; AControl: TEdit; ABackground: TRectangle);
+constructor TRickUIBuilderEditDesignerInput.Create(const AParent: IRickUIBuilderEditDesigner; AControl: TEdit; ABackground: TRectangle; AVisualState: TRickUIBuilderEditVisualState);
 begin
   inherited Create;
   FParent := AParent;
   FControl := AControl;
   FBackground := ABackground;
+  FVisualState := AVisualState;
 end;
 
-class function TRickUIBuilderEditDesignerInput.New(const AParent: IRickUIBuilderEditDesigner; AControl: TEdit; ABackground: TRectangle): IRickUIBuilderEditDesignerInput;
+class function TRickUIBuilderEditDesignerInput.New(const AParent: IRickUIBuilderEditDesigner; AControl: TEdit; ABackground: TRectangle; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditDesignerInput;
 begin
-  Result := Self.Create(AParent, AControl, ABackground);
+  Result := Self.Create(AParent, AControl, ABackground, AVisualState);
 end;
 
 function TRickUIBuilderEditDesignerInput.Text: IRickUIBuilderEditDesignerInputText;
 begin
   if not Assigned(FText) then
-    FText := TRickUIBuilderEditDesignerInputText.New(Self, FControl, FBackground);
+    FText := TRickUIBuilderEditDesignerInputText.New(Self, FControl, FBackground, FVisualState);
   Result := FText;
 end;
 

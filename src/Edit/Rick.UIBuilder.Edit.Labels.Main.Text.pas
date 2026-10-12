@@ -6,7 +6,8 @@ uses
   FMX.Objects,
   FMX.StdCtrls,
 
-  Rick.UIBuilder.Edit.Interfaces;
+  Rick.UIBuilder.Edit.Interfaces,
+  Rick.UIBuilder.Edit.VisualState;
 
 type
   TRickUIBuilderEditLabelMainText = class(TInterfacedObject, IRickUIBuilderEditLabelMainText)
@@ -14,16 +15,17 @@ type
     [weak]
     FParent: IRickUIBuilderEditLabelMain;
     FControl: TLabel;
+    FVisualState: TRickUIBuilderEditVisualState;
     FColor: IRickUIBuilderEditLabelMainTextColor;
   protected
-    constructor Create(const AParent: IRickUIBuilderEditLabelMain; AHost: TRectangle);
+    constructor Create(const AParent: IRickUIBuilderEditLabelMain; AHost: TRectangle; AVisualState: TRickUIBuilderEditVisualState);
 
     function Value(const AValue: string): IRickUIBuilderEditLabelMainText;
     function Size(AValue: Single): IRickUIBuilderEditLabelMainText;
     function Color: IRickUIBuilderEditLabelMainTextColor;
     function ToBack: IRickUIBuilderEditLabelMain;
   public
-    class function New(const AParent: IRickUIBuilderEditLabelMain; AHost: TRectangle): IRickUIBuilderEditLabelMainText;
+    class function New(const AParent: IRickUIBuilderEditLabelMain; AHost: TRectangle; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditLabelMainText;
   end;
 
 implementation
@@ -35,10 +37,11 @@ uses
 
   Rick.UIBuilder.Edit.Labels.Main.Text.Color;
 
-constructor TRickUIBuilderEditLabelMainText.Create(const AParent: IRickUIBuilderEditLabelMain; AHost: TRectangle);
+constructor TRickUIBuilderEditLabelMainText.Create(const AParent: IRickUIBuilderEditLabelMain; AHost: TRectangle; AVisualState: TRickUIBuilderEditVisualState);
 begin
   inherited Create;
   FParent := AParent;
+  FVisualState := AVisualState;
   FControl := TLabel.Create(AHost);
   FControl.Parent := AHost;
   FControl.SetBounds(12, 3, AHost.Width - 24, 18);
@@ -48,9 +51,9 @@ begin
   FControl.HitTest := False;
 end;
 
-class function TRickUIBuilderEditLabelMainText.New(const AParent: IRickUIBuilderEditLabelMain; AHost: TRectangle): IRickUIBuilderEditLabelMainText;
+class function TRickUIBuilderEditLabelMainText.New(const AParent: IRickUIBuilderEditLabelMain; AHost: TRectangle; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditLabelMainText;
 begin
-  Result := Self.Create(AParent, AHost);
+  Result := Self.Create(AParent, AHost, AVisualState);
 end;
 
 function TRickUIBuilderEditLabelMainText.Value(const AValue: string): IRickUIBuilderEditLabelMainText;
@@ -68,7 +71,7 @@ end;
 function TRickUIBuilderEditLabelMainText.Color: IRickUIBuilderEditLabelMainTextColor;
 begin
   if not Assigned(FColor) then
-    FColor := TRickUIBuilderEditLabelMainTextColor.New(Self, FControl);
+    FColor := TRickUIBuilderEditLabelMainTextColor.New(Self, FControl, FVisualState);
   Result := FColor;
 end;
 

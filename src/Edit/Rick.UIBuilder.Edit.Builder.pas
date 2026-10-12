@@ -6,7 +6,8 @@ uses
   FMX.Objects,
   FMX.Types,
 
-  Rick.UIBuilder.Edit.Interfaces;
+  Rick.UIBuilder.Edit.Interfaces,
+  Rick.UIBuilder.Edit.VisualState;
 
 type
   TRickUIBuilderEdit = class(TInterfacedObject, IRickUIBuilderEdit)
@@ -19,6 +20,8 @@ type
     FEdit: IRickUIBuilderEditDesigner;
     FLine: IRickUIBuilderEditLine;
     FConfig: IRickUIBuilderEditConfig;
+    FVisualState: TRickUIBuilderEditVisualState;
+    procedure PrepareVisualState;
   protected
     constructor Create;
 
@@ -48,13 +51,20 @@ begin
   inherited Create;
   FParentConstructor := nil;
   FRootControl := nil;
+  FVisualState := TRickUIBuilderEditVisualState.Create(nil);
   FBuilt := False;
 end;
 
 destructor TRickUIBuilderEdit.Destroy;
 begin
   if (not FBuilt) and Assigned(FRootControl) then
+  begin
     FRootControl.Free;
+    FVisualState := nil;
+  end
+  else if Assigned(FVisualState) and not Assigned(FVisualState.Owner) then
+    FVisualState.Free;
+  FVisualState := nil;
   FRootControl := nil;
   inherited;
 end;
@@ -68,8 +78,9 @@ function TRickUIBuilderEdit.Rectangle: IRickUIBuilderEditRetangle;
 begin
   if not Assigned(FRectangle) then
   begin
-    FRectangle := TRickUIBuilderEditRetangle.New(Self);
+    FRectangle := TRickUIBuilderEditRetangle.New(Self, FVisualState);
     FRootControl := FRectangle.Control;
+    FVisualState.Attach(FRootControl);
   end;
   Result := FRectangle;
 end;
@@ -77,21 +88,21 @@ end;
 function TRickUIBuilderEdit.Labels: IRickUIBuilderEditLabel;
 begin
   if not Assigned(FLabels) then
-    FLabels := TRickUIBuilderEditLabel.New(Self, Rectangle.Control);
+    FLabels := TRickUIBuilderEditLabel.New(Self, Rectangle.Control, FVisualState);
   Result := FLabels;
 end;
 
 function TRickUIBuilderEdit.Edit: IRickUIBuilderEditDesigner;
 begin
   if not Assigned(FEdit) then
-    FEdit := TRickUIBuilderEditDesigner.New(Self, Rectangle.Control);
+    FEdit := TRickUIBuilderEditDesigner.New(Self, Rectangle.Control, FVisualState);
   Result := FEdit;
 end;
 
 function TRickUIBuilderEdit.Line: IRickUIBuilderEditLine;
 begin
   if not Assigned(FLine) then
-    FLine := TRickUIBuilderEditLine.New(Self, Rectangle.Control);
+    FLine := TRickUIBuilderEditLine.New(Self, Rectangle.Control, FVisualState);
   Result := FLine;
 end;
 
@@ -108,6 +119,16 @@ begin
   Result := Self;
 end;
 
+procedure TRickUIBuilderEdit.PrepareVisualState;
+begin
+  Rectangle.Background;
+  Rectangle.Border;
+  Labels.Main.Text.Color;
+  Edit.Input.Text.Color;
+  Line.Color;
+  FVisualState.Apply;
+end;
+
 function TRickUIBuilderEdit.Build: IRickUIBuilderEdit;
 begin
   Rectangle;
@@ -115,6 +136,7 @@ begin
   Edit;
   Line;
   Config;
+  PrepareVisualState;
   if Assigned(FParentConstructor) then
   begin
     FRootControl.Parent := FParentConstructor;

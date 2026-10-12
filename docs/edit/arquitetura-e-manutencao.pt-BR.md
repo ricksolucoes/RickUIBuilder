@@ -1,4 +1,4 @@
-# Arquitetura e manutenção do Edit
+﻿# Arquitetura e manutenção do Edit
 
 🇺🇸 [English](arquitetura-e-manutencao.md)
 
@@ -129,6 +129,8 @@ Em particular, implementações anteriores não autorizam automaticamente `Conte
 
 Se durante a implementação surgir uma necessidade que a árvore de contratos não consiga atender, a necessidade deve ser comprovada antes de criar uma nova abstração.
 
+O Incremento 2B forneceu essa prova para uma única abstração interna: `TRickUIBuilderEditVisualState`. Ela coordena exclusivamente as flags de Focus/Invalid/ReadOnly e a notificação dos contratos visuais. Não armazena cores nem configurações dos ramos e não substitui o ownership de estado definido pela árvore de interfaces.
+
 ## Lifetime
 
 O pai mantém seus filhos especializados por interface. O filho mantém o contrato pai por referência fraca quando precisa retornar na cadeia.
@@ -137,7 +139,7 @@ Assim, enquanto a raiz `IRickUIBuilderEdit` estiver referenciada, a árvore desc
 
 `Parent(AParentConstructor)` guarda a referência ao local de montagem para uso de `Build`; uma referência `TFmxObject` simples não transfere ownership nem prolonga automaticamente o lifetime do objeto informado.
 
-O lifecycle FMX concreto deve ser validado por evidência de código/teste antes de qualquer garantia de ownership.
+No estado visual do Incremento 2B, o helper é anexado como componente owned pelo `TRectangle` raiz. Ele não mantém `IRickUIBuilderEdit` vivo. Para preservar somente os receivers realmente necessários aos eventos de foco, mantém referências fortes aos contratos-pai dos subscribers registrados. Como esses contratos retornam para cima por referências `[weak]`, não é criado ciclo forte com a raiz. A destruição da árvore visual libera o helper e essas referências.
 
 ## Estratégia de implementação
 

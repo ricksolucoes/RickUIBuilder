@@ -5,7 +5,8 @@ interface
 uses
   FMX.Objects,
 
-  Rick.UIBuilder.Edit.Interfaces;
+  Rick.UIBuilder.Edit.Interfaces,
+  Rick.UIBuilder.Edit.VisualState;
 
 type
   TRickUIBuilderEditLabel = class(TInterfacedObject, IRickUIBuilderEditLabel)
@@ -13,18 +14,19 @@ type
     [weak]
     FParent: IRickUIBuilderEdit;
     FHost: TRectangle;
+    FVisualState: TRickUIBuilderEditVisualState;
     FMain: IRickUIBuilderEditLabelMain;
     FCounter: IRickUIBuilderEditLabelCounter;
     FError: IRickUIBuilderEditLabelError;
   protected
-    constructor Create(const AParent: IRickUIBuilderEdit; AHost: TRectangle);
+    constructor Create(const AParent: IRickUIBuilderEdit; AHost: TRectangle; AVisualState: TRickUIBuilderEditVisualState);
 
     function Main: IRickUIBuilderEditLabelMain;
     function Counter: IRickUIBuilderEditLabelCounter;
     function Error: IRickUIBuilderEditLabelError;
     function ToBack: IRickUIBuilderEdit;
   public
-    class function New(const AParent: IRickUIBuilderEdit; AHost: TRectangle): IRickUIBuilderEditLabel;
+    class function New(const AParent: IRickUIBuilderEdit; AHost: TRectangle; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditLabel;
   end;
 
 implementation
@@ -36,22 +38,23 @@ uses
   Rick.UIBuilder.Edit.Labels.Error,
   Rick.UIBuilder.Edit.Labels.Main;
 
-constructor TRickUIBuilderEditLabel.Create(const AParent: IRickUIBuilderEdit; AHost: TRectangle);
+constructor TRickUIBuilderEditLabel.Create(const AParent: IRickUIBuilderEdit; AHost: TRectangle; AVisualState: TRickUIBuilderEditVisualState);
 begin
   inherited Create;
   FParent := AParent;
   FHost := AHost;
+  FVisualState := AVisualState;
 end;
 
-class function TRickUIBuilderEditLabel.New(const AParent: IRickUIBuilderEdit; AHost: TRectangle): IRickUIBuilderEditLabel;
+class function TRickUIBuilderEditLabel.New(const AParent: IRickUIBuilderEdit; AHost: TRectangle; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditLabel;
 begin
-  Result := Self.Create(AParent, AHost);
+  Result := Self.Create(AParent, AHost, AVisualState);
 end;
 
 function TRickUIBuilderEditLabel.Main: IRickUIBuilderEditLabelMain;
 begin
   if not Assigned(FMain) then
-    FMain := TRickUIBuilderEditLabelMain.New(Self, FHost);
+    FMain := TRickUIBuilderEditLabelMain.New(Self, FHost, FVisualState);
   Result := FMain;
 end;
 

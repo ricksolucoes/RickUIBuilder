@@ -1,4 +1,4 @@
-# New Edit assembly and dependency map
+﻿# New Edit assembly and dependency map
 
 This document records the **implementation blueprint** for the new `Edit`, derived from the current contract in `src/Edit/Rick.UIBuilder.Edit.Interfaces.pas` and the active project governance.
 
@@ -123,9 +123,9 @@ Two different dependencies may be injected:
 
 The second case does not authorize a context bag, service locator, or aggregate settings record. It is direct injection of the concrete dependency that the implementation actually configures.
 
-### 7. No helper exists by default
+### 7. Helpers require proven responsibility
 
-The architecture does not pre-approve:
+The architecture still does not pre-approve:
 
 - `TRickUIBuilderEditContext`;
 - a custom `TEdit` subclass;
@@ -134,7 +134,9 @@ The architecture does not pre-approve:
 - `TRickUIBuilderEditMaterializer`;
 - aggregate configuration records.
 
-Any future helper must have a need proven by the contract/behavior and cannot exist merely because it makes implementation easier.
+Increment 2B proved one specific cross-branch responsibility and introduced `TRickUIBuilderEditVisualState`. This internal helper **is not a Context**: it stores only the active Focus, Invalid and ReadOnly flags, broadcasts state-change notifications, and keeps the focus-event receiver alive after `Build`. Colors remain owned by the specialized contracts that represent them.
+
+Any additional helper still requires a need proven by contract/behavior and cannot exist merely because it makes implementation easier.
 
 ### 8. `Parent` preserves the assembly location reference, not ownership
 
@@ -159,12 +161,12 @@ Because `Build` returns `IRickUIBuilderEdit`, the consumer can retain the root a
 | `IRickUIBuilderEditRetangle` / `TRickUIBuilderEditRetangle` | root | `IRickUIBuilderEdit` | `TRectangle` exposed by `Control` and CornerRadius | Position, Size, Background, Border | `TRectangle` is the natural target for the branch |
 | `IRickUIBuilderEditRetanglePosition` | Rectangle | `IRickUIBuilderEditRetangle` | no duplicated state when writing to `FParent.Control.Position` is sufficient | none | uses the control already exposed by parent contract |
 | `IRickUIBuilderEditRetangleSize` | Rectangle | `IRickUIBuilderEditRetangle` | no duplicated state when writing to `FParent.Control` is sufficient | none | uses the control already exposed by parent contract |
-| `IRickUIBuilderEditRetangleBackground` | Rectangle | `IRickUIBuilderEditRetangle` | Normal/Invalid/ReadOnly values owned by Background | none | state-switch mechanism requires proof before code |
-| `IRickUIBuilderEditRetangleBorder` | Rectangle | `IRickUIBuilderEditRetangle` | Thickness plus Normal/Focus/Invalid/ReadOnly colors | none | state-switch mechanism requires proof before code |
+| `IRickUIBuilderEditRetangleBackground` | Rectangle | `IRickUIBuilderEditRetangle` | Normal/Invalid/ReadOnly values owned by Background | none | receives `VisualState` through DI and resolves only the states it owns |
+| `IRickUIBuilderEditRetangleBorder` | Rectangle | `IRickUIBuilderEditRetangle` | Thickness plus Normal/Focus/Invalid/ReadOnly colors | none | receives `VisualState` through DI; local precedence is Invalid > ReadOnly > Focus > Normal |
 | `IRickUIBuilderEditLabel` | root | `IRickUIBuilderEdit` | label sub-contract references only | Main, Counter, Error | label branch grouping contract |
 | `IRickUIBuilderEditLabelMain` | Labels | `IRickUIBuilderEditLabel` | Text reference | Text | must not accumulate state belonging to Text |
 | `IRickUIBuilderEditLabelMainText` | Main | `IRickUIBuilderEditLabelMain` | Value, Size and internal main-text target | Color | exact FMX target class must be confirmed before coding |
-| `IRickUIBuilderEditLabelMainTextColor` | MainText | `IRickUIBuilderEditLabelMainText` | Text/Invalid/ReadOnly colors | none | Invalid and ReadOnly return `FParent` by contract |
+| `IRickUIBuilderEditLabelMainTextColor` | MainText | `IRickUIBuilderEditLabelMainText` | Text/Invalid/ReadOnly colors | none | participates in `VisualState`; Invalid and ReadOnly still return `FParent` by contract |
 | `IRickUIBuilderEditLabelCounter` | Labels | `IRickUIBuilderEditLabel` | Enabled and internal counter target | none | synchronization with Designer text needs proven mechanism |
 | `IRickUIBuilderEditLabelError` | Labels | `IRickUIBuilderEditLabel` | Text reference | Text | error grouping contract |
 | `IRickUIBuilderEditLabelErrorText` | Error | `IRickUIBuilderEditLabelError` | Value, Color, Spacing and error-message target | Font | Font receives only the target it actually configures |
@@ -172,13 +174,13 @@ Because `Build` returns `IRickUIBuilderEdit`, the consumer can retain the root a
 | `IRickUIBuilderEditDesigner` | root | `IRickUIBuilderEdit` | `TEdit` exposed by `Control` and child-contract references | Input, Validation, Config | logical owner of the edit control |
 | `IRickUIBuilderEditDesignerInput` | Designer | `IRickUIBuilderEditDesigner` | input sub-contract references | Text, Number, Config | input-domain grouping contract |
 | `IRickUIBuilderEditDesignerInputText` | Input | `IRickUIBuilderEditDesignerInput` | Value/Size applied to `TEdit` when possible | Color | Size and ToBack return `FParent.ToBack` (Designer) |
-| `IRickUIBuilderEditDesignerInputTextColor` | Input.Text | `IRickUIBuilderEditDesignerInputText` | Background/Text/ReadOnly colors | none | reaches `TEdit` through existing chain; no contract change needed |
+| `IRickUIBuilderEditDesignerInputTextColor` | Input.Text | `IRickUIBuilderEditDesignerInputText` | Background/Text/ReadOnly colors | none | participates in `VisualState` for ReadOnly only; no Invalid state is invented |
 | `IRickUIBuilderEditDesignerInputNumber` | Input | `IRickUIBuilderEditDesignerInput` | AllowNegative, DecimalPlaces, FormatMode, separators and UseThousandSeparator | none | typing/formatting coordination requires proof |
 | `IRickUIBuilderEditDesignerInputConfig` | Input | `IRickUIBuilderEditDesignerInput` | Preset, CaseMode, UrlCaseMode, MaxLength | none | typing/formatting coordination requires proof |
-| `IRickUIBuilderEditDesignerValidation` | Designer | `IRickUIBuilderEditDesigner` | Required, RequirementIndicator, Feedback, DefaultMessage and Invalid/RequirementMet state | none | contract already exposes state getters; do not create parallel state |
-| `IRickUIBuilderEditDesignerConfig` | Designer | `IRickUIBuilderEditDesigner` | ClearButton, Password, ReadOnly | none | apply directly to Designer/control where a real property exists; auxiliary controls need proof |
+| `IRickUIBuilderEditDesignerValidation` | Designer | `IRickUIBuilderEditDesigner` | Required, RequirementIndicator, Feedback, DefaultMessage and Invalid/RequirementMet state | none | Invalid updates the corresponding `VisualState` flag; contractual getters remain local |
+| `IRickUIBuilderEditDesignerConfig` | Designer | `IRickUIBuilderEditDesigner` | ClearButton, Password, ReadOnly | none | ReadOnly applies to `TEdit` and updates `VisualState`; auxiliary controls still need proof |
 | `IRickUIBuilderEditLine` | root | `IRickUIBuilderEdit` | Thickness and internal line target | Color | exact FMX line type is not assumed yet |
-| `IRickUIBuilderEditLineColor` | Line | `IRickUIBuilderEditLine` | Normal/Focus/Invalid/ReadOnly colors | none | receives the real target created by Line when required |
+| `IRickUIBuilderEditLineColor` | Line | `IRickUIBuilderEditLine` | Normal/Focus/Invalid/ReadOnly colors | none | participates in `VisualState` while retaining its own colors |
 | `IRickUIBuilderEditConfig` | root | `IRickUIBuilderEdit` | Appearance and Icons reference | Icons | do not create `ConfigSettings` merely to mirror the tree |
 | `IRickUIBuilderEditConfigIcons` | Config | `IRickUIBuilderEditConfig` | Size and internal icon targets | Colors, Paths | Colors/Paths receive only the targets they configure |
 | `IRickUIBuilderEditConfigIconColors` | Icons | `IRickUIBuilderEditConfigIcons` | Default/Alert/Clear/Password/Requirement colors | none | no aggregate record if target objects can be injected directly |
@@ -224,41 +226,47 @@ Result := FParent.ToBack;
 
 Do not add a second parent, getter, Context, or alternate return path.
 
-## Points requiring proof before implementation
+## Proven decision — visual-state transitions
 
-The following mechanisms are intentionally unresolved. They must not be solved by convenience while coding.
+Increment 2B resolves Focus, Invalid and ReadOnly coordination without changing public contracts or centralizing configuration.
 
-### 1. Visual-state transitions
+`TRickUIBuilderEditVisualState` is created by the root and injected only into branches that participate in visual-state transitions. It keeps three active flags and a list of internal handlers. `Validation.Invalid`, `Designer.Config.ReadOnly` and `TEdit.OnEnter/OnExit` change those flags; each specialized contract receives the notification and chooses colors only among the states that contract actually owns.
 
-Background, Border, MainTextColor and LineColor hold values for different states, while Validation/Config/focus change the active state.
+For contracts that define every state, precedence is:
 
-A mechanism must be proven without introducing:
+```text
+Invalid > ReadOnly > Focus > Normal
+```
 
-- a central Context;
-- duplicated state;
-- fragile concrete-class casts;
-- a service locator;
-- an unauthorized new interface.
+Precedence does not invent missing states. For example, `Designer.Input.Text.Color` defines Text and ReadOnly colors but has no Invalid color; an Edit that is both Invalid and ReadOnly therefore preserves the ReadOnly text color.
 
-### 2. Input rules
+The helper does not store colors, settings, all branch controls, or domain rules. After `Build`, it is owned by the root `TRectangle` and keeps alive only the parent contracts of registered subscribers, which is sufficient to preserve visual-state handler receivers. Their upward references remain `[weak]`, so the root is not retained and no cycle is created between FMX ownership and reference counting. Destroying the visual tree releases the helper and the retained subscribers.
+
+No central Context, public getter, auxiliary interface, concrete-class cast, or service locator is introduced.
+
+## Points still requiring proof before implementation
+
+The following mechanisms remain unresolved and must not be solved by convenience while coding.
+
+### 1. Input rules
 
 `Input.Number` and `Input.Config` contain data that must cooperate during typing/formatting.
 
 Before introducing a helper such as `InputRules`, prove why the existing `Designer → Input → Text/Number/Config` tree plus the existing `TEdit` cannot own this behavior through DI.
 
-### 3. Runtime events
+### 2. Other runtime events
 
 Do not create `Interaction = class(TComponent)` by default.
 
-Because `Build` returns `IRickUIBuilderEdit` and the root retains children through interfaces, there is a natural lifetime basis for keeping event receivers alive. Explore that model before adding another runtime component.
+The `OnEnter/OnExit` events required exclusively for visual-state transitions now belong to `TRickUIBuilderEditVisualState`. Future input, clear, password, or requirement-indicator events still require their own proof and do not authorize expanding `VisualState` into a generic interaction object.
 
-### 4. Materialization
+### 3. Materialization
 
 Do not create a `Materializer` by default.
 
 First determine whether the root and natural branch owners can create/configure their objects without concentrating all construction responsibilities in another class.
 
-### 5. Additional records
+### 4. Additional records
 
 `Rick.UIBuilder.Edit.Types.pas` currently contains the contract enums.
 

@@ -5,7 +5,8 @@ interface
 uses
   FMX.Objects,
 
-  Rick.UIBuilder.Edit.Interfaces;
+  Rick.UIBuilder.Edit.Interfaces,
+  Rick.UIBuilder.Edit.VisualState;
 
 type
   TRickUIBuilderEditRetangle = class(TInterfacedObject, IRickUIBuilderEditRetangle)
@@ -13,12 +14,13 @@ type
     [weak]
     FParent: IRickUIBuilderEdit;
     FControl: TRectangle;
+    FVisualState: TRickUIBuilderEditVisualState;
     FPosition: IRickUIBuilderEditRetanglePosition;
     FSize: IRickUIBuilderEditRetangleSize;
     FBackground: IRickUIBuilderEditRetangleBackground;
     FBorder: IRickUIBuilderEditRetangleBorder;
   protected
-    constructor Create(const AParent: IRickUIBuilderEdit);
+    constructor Create(const AParent: IRickUIBuilderEdit; AVisualState: TRickUIBuilderEditVisualState);
 
     function Position: IRickUIBuilderEditRetanglePosition;
     function Size: IRickUIBuilderEditRetangleSize;
@@ -28,7 +30,7 @@ type
     function Control: TRectangle;
     function ToBack: IRickUIBuilderEdit;
   public
-    class function New(const AParent: IRickUIBuilderEdit): IRickUIBuilderEditRetangle;
+    class function New(const AParent: IRickUIBuilderEdit; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditRetangle;
   end;
 
 implementation
@@ -42,10 +44,11 @@ uses
   Rick.UIBuilder.Edit.Rectangle.Position,
   Rick.UIBuilder.Edit.Rectangle.Size;
 
-constructor TRickUIBuilderEditRetangle.Create(const AParent: IRickUIBuilderEdit);
+constructor TRickUIBuilderEditRetangle.Create(const AParent: IRickUIBuilderEdit; AVisualState: TRickUIBuilderEditVisualState);
 begin
   inherited Create;
   FParent := AParent;
+  FVisualState := AVisualState;
   FControl := TRectangle.Create(nil);
   FControl.SetBounds(0, 0, 280, 72);
   FControl.Fill.Color := TAlphaColors.White;
@@ -55,9 +58,9 @@ begin
   FControl.YRadius := 8;
 end;
 
-class function TRickUIBuilderEditRetangle.New(const AParent: IRickUIBuilderEdit): IRickUIBuilderEditRetangle;
+class function TRickUIBuilderEditRetangle.New(const AParent: IRickUIBuilderEdit; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditRetangle;
 begin
-  Result := Self.Create(AParent);
+  Result := Self.Create(AParent, AVisualState);
 end;
 
 function TRickUIBuilderEditRetangle.Position: IRickUIBuilderEditRetanglePosition;
@@ -77,14 +80,14 @@ end;
 function TRickUIBuilderEditRetangle.Background: IRickUIBuilderEditRetangleBackground;
 begin
   if not Assigned(FBackground) then
-    FBackground := TRickUIBuilderEditRetangleBackground.New(Self, FControl);
+    FBackground := TRickUIBuilderEditRetangleBackground.New(Self, FControl, FVisualState);
   Result := FBackground;
 end;
 
 function TRickUIBuilderEditRetangle.Border: IRickUIBuilderEditRetangleBorder;
 begin
   if not Assigned(FBorder) then
-    FBorder := TRickUIBuilderEditRetangleBorder.New(Self, FControl);
+    FBorder := TRickUIBuilderEditRetangleBorder.New(Self, FControl, FVisualState);
   Result := FBorder;
 end;
 
