@@ -23,7 +23,10 @@ uses
   Rick.UIBuilder.Tests.Composition in 'src\Rick.UIBuilder.Tests.Composition.pas',
   Rick.UIBuilder.Tests.Facade in 'src\Rick.UIBuilder.Tests.Facade.pas',
   Rick.UIBuilder.Tests.ComboBox in 'src\Rick.UIBuilder.Tests.ComboBox.pas',
-  Rick.UIBuilder.Tests.Edit in 'src\Rick.UIBuilder.Tests.Edit.pas';
+  Rick.UIBuilder.Tests.Edit in 'src\Rick.UIBuilder.Tests.Edit.pas',
+  Rick.UIBuilder.Tests.Edit.Foundation in 'src\edits\Rick.UIBuilder.Tests.Edit.Foundation.pas',
+  Rick.UIBuilder.Tests.Edit.Fluent in 'src\edits\Rick.UIBuilder.Tests.Edit.Fluent.pas',
+  Rick.UIBuilder.Tests.Edit.Controls in 'src\edits\Rick.UIBuilder.Tests.Edit.Controls.pas';
 
 var
   runner      : ITestRunner;
