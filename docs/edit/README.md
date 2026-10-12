@@ -2,6 +2,8 @@
 
 `Edit` is RickUIBuilder's single-line runtime text-input builder.
 
+> This README documents the currently validated legacy/runtime Edit. A new architecture is being built under `src/Edit/` while the legacy implementation remains available. See [Edit architecture and maintenance](arquitetura-e-manutencao.md) for the migration boundaries, contract-preservation rules, and implementation-unit organization.
+
 ## Creation
 
 ```pascal

@@ -57,6 +57,13 @@ Definem **perspectiva, responsabilidade e formato de saída**. Não são routers
 
 Concentram políticas compartilhadas por múltiplas skills. Ex.: Definition of Done, component map, testing policy, Method Toxicity baseline e orchestration patterns.
 
+Duas políticas diferentes governam interfaces do novo `Edit` e não devem ser fundidas:
+
+- [`interface-contract-preservation-policy.md`](references/interface-contract-preservation-policy.md) protege **o contrato**: implementação se adapta à interface existente e a interface só muda mediante solicitação explícita do usuário na tarefa atual;
+- [`interface-implementation-unit-policy.md`](references/interface-implementation-unit-policy.md) protege **a organização física** das 28 implementações públicas do novo `Edit`: uma interface → uma classe concreta → uma unit exclusiva.
+
+Agents, skills e gates devem referenciar/aplicar essas políticas em vez de duplicar toda a justificativa normativa.
+
 ### `templates/`
 
 Padronizam artefatos persistentes. Template não é etapa obrigatória por si só; use quando a tarefa realmente precisa daquele artefato.

@@ -24,8 +24,11 @@ Uma tarefa está concluída somente quando **os critérios específicos** e **os
 
 - [ ] Responsabilidades permanecem coesas.
 - [ ] Dependências novas são justificadas.
-- [ ] Todas as interfaces novas/alteradas do framework estão declaradas em `Rick.UIBuilder.Interfaces.pas`, e nenhuma unit concreta introduziu tipo `interface`.
+- [ ] Interfaces permanecem no boundary oficial do domínio; o novo `Edit` mantém seus contratos em `src/Edit/Rick.UIBuilder.Edit.Interfaces.pas`.
+- [ ] Nenhuma interface existente foi alterada para acomodar a implementação sem autorização explícita da tarefa, conforme [`interface-contract-preservation-policy.md`](interface-contract-preservation-policy.md).
+- [ ] Units concretas não introduziram tipo `interface` fora dos boundaries autorizados.
 - [ ] Implementações diretas preservam correspondência nominal clara `I<Nome>` / `T<Nome>` sem interface auxiliar redundante.
+- [ ] Para as 28 interfaces públicas do novo `Edit`, a regra 1 interface → 1 classe concreta → 1 unit exclusiva foi preservada conforme [`interface-implementation-unit-policy.md`](interface-implementation-unit-policy.md).
 - [ ] Dependências entre interfaces foram avaliadas quanto a Dependency Injection e direction.
 - [ ] Quando uma interface especializada depende do contrato pai, o contexto necessário é injetado em vez de recuperado por acoplamento concreto/lookup global.
 - [ ] Relações pai/especializada não introduzem ciclo forte de reference counting.
@@ -58,6 +61,7 @@ Uma tarefa está concluída somente quando **os critérios específicos** e **os
 ## 6. Public API
 
 - [ ] Mudanças públicas foram identificadas como aditivas, compatíveis ou breaking.
+- [ ] Qualquer mudança de interface existente possui autorização explícita do usuário na tarefa atual.
 - [ ] Overloads/defaults não criam ambiguidade não intencional.
 - [ ] Variantes semanticamente distintas usam overloads explícitos quando esse é o contrato adequado, em vez de defaults usados apenas para escondê-las.
 - [ ] Overloads simplificados delegam à forma completa quando compartilham a mesma regra.

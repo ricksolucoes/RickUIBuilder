@@ -15,17 +15,20 @@ Referência compartilhada para critérios técnicos de alterações Delphi/Objec
 
 ### Interfaces
 
+- interface existente é imutável por padrão durante implementação; qualquer mudança contratual exige solicitação explícita do usuário na tarefa atual, conforme [`interface-contract-preservation-policy.md`](interface-contract-preservation-policy.md);
 - GUID é identidade pública; não alterar por conveniência;
 - entender ownership implícito via `IInterface`/reference counting;
 - não armazenar interface temporária em campo object sem modelar lifetime;
-- mudanças em interface exigem busca por implementadores e consumidores;
+- mudanças autorizadas em interface exigem busca por implementadores e consumidores;
 - quando uma interface especializada depende do contexto de uma interface pai, a implementação deve receber o contrato necessário por injeção em vez de depender da classe concreta;
 - quando a interface especializada precisa retornar ao contrato de origem, a implementação deve manter `FParent` com o contrato pai e o lifetime dessa referência deve ser explicitamente modelado;
 - pai mantendo a especializada e especializada mantendo o pai exige análise de ciclo forte; referência de retorno proprietária que produz ciclo é finding bloqueante;
 - service locator, lookup global ou reconstrução do pai no lugar de uma dependência diretamente injetável é não conforme, salvo justificativa técnica comprovada;
-- toda interface do framework deve estar em `Rick.UIBuilder.Interfaces.pas`; declarar tipo `interface` em unit concreta de implementação é finding de conformidade;
+- por padrão, interfaces compartilhadas permanecem em `Rick.UIBuilder.Interfaces.pas`; o novo `Edit` é um boundary específico e mantém todas as interfaces oficiais em `src/Edit/Rick.UIBuilder.Edit.Interfaces.pas`;
+- declarar tipo `interface` em unit concreta de implementação é finding de conformidade;
 - contratos e implementações concretas devem respeitar os boundaries definidos pelo projeto;
-- uma implementação direta deve manter correspondência clara entre `I<Nome>` e `T<Nome>`; interface auxiliar duplicando o mesmo papel exige justificativa arquitetural explícita.
+- uma implementação direta deve manter correspondência clara entre `I<Nome>` e `T<Nome>`; interface auxiliar duplicando o mesmo papel exige justificativa arquitetural explícita;
+- para o novo `Edit`, violar a relação 1 interface pública → 1 classe concreta → 1 unit exclusiva é finding de conformidade conforme [`interface-implementation-unit-policy.md`](interface-implementation-unit-policy.md).
 
 ### Records e enums
 
@@ -126,6 +129,8 @@ Isso é gate de entrega. Não converter unidades não alteradas.
 
 ## 10. Red flags
 
+- interface existente alterada para acomodar implementação sem autorização explícita;
+- implementação muda retorno/parâmetro/overload/GUID/navegação para facilitar acesso a contexto;
 - `FreeAndNil` usado sem saber quem é owner;
 - interface armazenada junto com raw object para o mesmo instance sem análise;
 - evento substituído e callback anterior perdido sem requisito;
@@ -138,4 +143,5 @@ Isso é gate de entrega. Não converter unidades não alteradas.
 - parâmetro default ocultando variantes públicas que deveriam ser overloads explícitos;
 - interface especializada dependendo da classe concreta do pai sem justificativa;
 - relação pai/especializada com ciclo forte de interfaces;
-- assinatura quebrada em várias linhas sem necessidade real.
+- assinatura quebrada em várias linhas sem necessidade real;
+- duas implementações públicas do novo `Edit` agrupadas na mesma unit.

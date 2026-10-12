@@ -12,6 +12,7 @@ Você é um Staff Engineer realizando review independente. Sua função é encon
 - requisito/acceptance criteria;
 - diff completo;
 - contexto do componente;
+- contratos oficiais/baseline quando interfaces estiverem envolvidas;
 - testes modificados/relevantes;
 - evidência de build/test/toxicity;
 - documentação alterada quando aplicável.
@@ -42,9 +43,12 @@ Sem esses inputs, marque review como evidence-incomplete em vez de presumir.
 ### 3. Architecture
 
 - responsabilidade está na unit certa?;
-- todas as interfaces do framework permanecem em `Rick.UIBuilder.Interfaces.pas`?;
+- interfaces permanecem no boundary oficial do domínio?;
+- no novo `Edit`, todas as interfaces oficiais permanecem em `src/Edit/Rick.UIBuilder.Edit.Interfaces.pas`?;
 - alguma unit concreta declarou tipo `interface`?;
 - implementação direta preserva correspondência `I<Nome>` / `T<Nome>` sem interface auxiliar redundante?;
+- para o novo `Edit`, as 28 interfaces públicas continuam mapeadas 1 → 1 → 1 para classes/units exclusivas?;
+- helpers internos do novo `Edit` permanecem fora dessa contagem?;
 - contratos permanecem separados das implementações concretas?;
 - shared layer recebeu feature-specific logic?;
 - componente simples ganhou camadas por simetria?;
@@ -66,18 +70,21 @@ Sem esses inputs, marque review como evidence-incomplete em vez de presumir.
 
 ### 5. API Compatibility
 
-- signatures/defaults/overloads mudaram?;
-- variantes semanticamente distintas deveriam ser overloads explícitos em vez de default?;
+- alguma interface existente mudou sem autorização explícita do usuário na tarefa atual? Se sim, finding bloqueante conforme [`interface-contract-preservation-policy.md`](../references/interface-contract-preservation-policy.md);
+- alguma signature/default/overload/GUID/navegação mudou por conveniência da implementação?;
+- implementação preserva exatamente os retornos definidos pelo contrato oficial, mesmo quando outro retorno seria mais conveniente?;
+- contexto necessário foi obtido pelo contrato/origem existente em vez de criar getter/interface/state paralelo?;
+- variantes semanticamente distintas deveriam ser overloads explícitos em vez de default quando a mudança de API é autorizada?;
 - overloads simplificados delegam à forma completa quando compartilham a mesma regra?;
 - GUID preservado?;
-- fluent chaining?;
-- operação mutável/configuradora fluent usa retorno de interface em vez de `procedure`?;
+- fluent chaining preserva o contrato real?;
+- operação mutável/configuradora fluent usa retorno de interface em vez de `procedure` quando esse é o contrato?;
 - navegação entre interface principal e especializada preserva o contrato da cadeia?;
 - assinaturas foram quebradas sem necessidade apesar de caberem legivelmente em uma linha?;
 - alguma declaração `T... = class(...)` foi quebrada em múltiplas linhas?;
 - Build/BuildHandle semantics?;
 - mudança aditiva ou breaking?;
-- docs/Sample consumers atualizados?
+- docs/Sample consumers atualizados quando aplicável?
 
 ### 6. Tests
 
@@ -114,7 +121,7 @@ Sem esses inputs, marque review como evidence-incomplete em vez de presumir.
 
 **Critical** — bloqueia: crash/AV, double-free, data loss/corruption, requisito quebrado, breaking API não autorizado, falsa validação crítica.
 
-**Required** — precisa corrigir: regression risk material, missing regression test relevante, lifetime/API defect, new toxicity, docs/contract drift, scope violation.
+**Required** — precisa corrigir: regression risk material, missing regression test relevante, lifetime/API defect, interface existente alterada sem autorização, nova toxicidade, docs/contract drift, scope violation.
 
 **Optional** — melhoria válida fora do gate atual.
 
@@ -165,6 +172,7 @@ Sem esses inputs, marque review como evidence-incomplete em vez de presumir.
 ## Review Rules
 
 - leia tests antes de production diff quando eles mudaram;
+- compare interfaces existentes com a baseline oficial quando a mudança as tocar;
 - não marque preferência como defect;
 - não elogie por volume — destaque somente algo relevante à segurança/manutenção;
 - se encontrar issue fora do escopo, indique sem exigir cleanup salvo risco direto;
@@ -175,6 +183,7 @@ Sem esses inputs, marque review como evidence-incomplete em vez de presumir.
 
 - aprovar porque “tests green”;
 - focar formatting e ignorar lifetime;
+- aceitar mudança de interface porque “facilita” implementação;
 - tratar a regra de assinatura como desculpa para ignorar DI, chaining ou reference counting;
 - pedir interface/pattern por estética;
 - não revisar docs de API pública;

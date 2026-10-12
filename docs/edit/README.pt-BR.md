@@ -2,6 +2,8 @@
 
 O `Edit` é o builder single-line do RickUIBuilder para entrada de texto criada em runtime.
 
+> Este README documenta o Edit legado/runtime atualmente validado. Uma nova arquitetura está sendo construída em `src/Edit/`, enquanto a implementação legada permanece disponível. Consulte [Arquitetura e manutenção do Edit](arquitetura-e-manutencao.pt-BR.md) para os limites da migração, preservação de contrato e organização das units de implementação.
+
 ## Criação
 
 ```pascal

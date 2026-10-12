@@ -1,8 +1,11 @@
-unit Rick.UIBuilder.Edit.Types;
+﻿unit Rick.UIBuilder.Edit.Types;
 
 interface
 
 {$SCOPEDENUMS ON}
+
+uses
+  System.UITypes;
 
 type
   TRickUIBuilderEditPreset = (AllCharacters, CPF, CNPJ, CEP, Email, URL, Phone,
@@ -19,6 +22,8 @@ type
 
   TRickUIBuilderEditAppearance = (Outlined, Underline);
 
+
 implementation
+
 
 end.

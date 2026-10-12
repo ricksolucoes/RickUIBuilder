@@ -289,8 +289,6 @@
         <DCCReference Include="src\Rick.UIBuilder.Tests.Facade.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.Tests.ComboBox.pas"/>
         <DCCReference Include="src\Rick.UIBuilder.Tests.Edit.pas"/>
-        <DCCReference Include="..\src\Edit\Rick.UIBuilder.Edit.Interfaces.pas"/>
-        <DCCReference Include="..\src\Edit\Rick.UIBuilder.Edit.Types.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

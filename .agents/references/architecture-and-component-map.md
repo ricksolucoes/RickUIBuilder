@@ -30,6 +30,8 @@ O `.dproj` identifica Delphi personality, mas isso sozinho não deve ser usado p
 src/Rick.UIBuilder.pas
 src/Rick.UIBuilder.Types.pas
 src/Rick.UIBuilder.Interfaces.pas
+src/Edit/Rick.UIBuilder.Edit.Interfaces.pas
+src/Edit/Rick.UIBuilder.Edit.Types.pas
 ```
 
 ### `Rick.UIBuilder.pas`
@@ -42,7 +44,17 @@ Enums, records, configurações e constants públicos compartilhados. Não deve 
 
 ### `Rick.UIBuilder.Interfaces.pas`
 
-Contratos públicos de builders e handles. Mudanças exigem análise de GUID, implementadores, consumidores e documentação.
+Boundary compartilhado de contratos públicos do framework. Mudanças exigem análise de GUID, implementadores, consumidores e documentação.
+
+Não use essa regra genérica para mover as interfaces da nova arquitetura do `Edit`: esse domínio já possui boundary contratual específico.
+
+### `src/Edit/Rick.UIBuilder.Edit.Interfaces.pas`
+
+Contrato oficial da nova arquitetura do `Edit`. As interfaces existentes nessa unit são imutáveis por padrão durante implementação; a implementação deve se adaptar a elas. Mudança contratual exige solicitação explícita do usuário na tarefa atual.
+
+### `src/Edit/Rick.UIBuilder.Edit.Types.pas`
+
+Boundary de records, enums e demais types compartilhados da nova arquitetura do `Edit`. Types de domínio do novo `Edit` não devem ser declarados dentro das units concretas de implementação.
 
 ## 3. Factory
 
@@ -135,6 +147,10 @@ Antes de alterar ComboBox, leia `docs/combobox/README*` e os documentos específ
 
 ## 9. Edit
 
+O `Edit` está em migração arquitetural. O legado permanece no repositório enquanto a nova implementação não for validada pelo usuário.
+
+### 9.1 Edit legado
+
 ```text
 src/Rick.UIBuilder.Edit.pas
 src/Rick.UIBuilder.Edit.Input.pas
@@ -144,7 +160,30 @@ tests/src/Rick.UIBuilder.Tests.Edit.pas
 docs/edit/**
 ```
 
-Edit é exposto somente pelo Fluent Builder no estado atual: `TRickUIBuilder.Edit` retorna `IRickUIBuilderEdit`, e `Build` retorna `IRickUIBuilderEditHandle`. A Factory pública não expõe `CreateEdit`. Mudanças devem considerar presets/input, materialização visual, Behavior owned pelo Parent e o caráter non-owning do Handle.
+O Edit legado é exposto pelo Fluent Builder no estado atualmente documentado: `TRickUIBuilder.Edit` retorna `IRickUIBuilderEdit`, e `Build` retorna `IRickUIBuilderEditHandle`. A Factory pública não expõe `CreateEdit`. Mudanças no legado permanecem fora do escopo da nova arquitetura salvo solicitação explícita.
+
+### 9.2 Nova arquitetura do Edit
+
+Já pertencem ao `main`:
+
+```text
+src/Edit/Rick.UIBuilder.Edit.Interfaces.pas
+src/Edit/Rick.UIBuilder.Edit.Types.pas
+```
+
+Decisões de arquitetura já estabelecidas:
+
+- `Rick.UIBuilder.Edit.Interfaces.pas` é o contrato oficial e não deve ser alterado para acomodar implementação;
+- `Rick.UIBuilder.Edit.Types.pas` concentra records, enums e demais types compartilhados do novo domínio;
+- as 28 interfaces públicas devem possuir 28 classes concretas correspondentes em 28 units exclusivas de implementação;
+- helpers internos não entram na contagem das 28 implementações públicas e não devem virar interfaces por simetria;
+- quando uma implementação especializada precisar do contexto de outra interface, use o contrato/origem existente por Dependency Injection quando aplicável; não crie getter, interface ou caminho alternativo apenas por conveniência;
+- a nova implementação não deve depender das units legadas do `Edit`;
+- a migração só substitui o legado depois da validação final do usuário.
+
+A organização física detalhada é governada por [`interface-implementation-unit-policy.md`](interface-implementation-unit-policy.md); preservação contratual por [`interface-contract-preservation-policy.md`](interface-contract-preservation-policy.md). Consulte também `docs/edit/arquitetura-e-manutencao*`.
+
+Não trate units de implementação encontradas em pacotes locais/temporários como integrantes do `main` sem confirmar sua presença no repositório.
 
 ## 10. Composition
 
@@ -183,7 +222,7 @@ O Samples atual é um catálogo component-first. Text / Label, Button, Badge, Di
 Para um componente-alvo:
 
 1. localizar entry point público;
-2. localizar interface/type/config associado;
+2. localizar interface/type/config associado e confirmar o boundary oficial do domínio;
 3. localizar builder principal;
 4. localizar units auxiliares;
 5. ler `uses` interface e implementation;
@@ -210,6 +249,8 @@ Considere camadas por responsabilidade, não por template fixo:
 
 “Outro componente tem essa unit” não é justificativa arquitetural.
 
+A regra 1 interface → 1 implementação → 1 unit é uma decisão específica do novo `Edit`; não a replique automaticamente em outros domínios.
+
 ## 15. Trigger de atualização deste mapa
 
 Atualize quando:
@@ -218,4 +259,5 @@ Atualize quando:
 - responsabilidade migrar entre units;
 - novo componente público for adicionado;
 - testes/Sample/docs ganharem nova localização relevante;
-- entry point público mudar.
+- entry point público mudar;
+- um domínio ganhar boundary contratual específico.

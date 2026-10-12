@@ -101,6 +101,10 @@ Arquivos Markdown devem permanecer UTF-8 válido.
 
 Mudanças em facade, interfaces, records, enums, fluent builders e handles exigem análise de compatibilidade.
 
+Interfaces existentes são imutáveis por padrão durante implementação. A implementação deve se adaptar ao contrato; mudança de assinatura, retorno, parâmetro, overload, GUID, membro, spelling público ou navegação fluent exige solicitação explícita do usuário na tarefa atual.
+
+A política completa está em [`interface-contract-preservation-policy.md`](interface-contract-preservation-policy.md).
+
 Perguntas obrigatórias:
 
 - consumidor existente compila?
@@ -143,17 +147,20 @@ Quando uma interface especializada depender do contexto de uma interface princip
 - criação lazy da interface especializada é permitida quando coerente com o lifecycle;
 - a implementação concreta pode aparecer no composition point necessário para construir a instância, mas consumidores devem operar pelos contratos;
 - não use service locator, global lookup ou reconstrução do pai para substituir uma dependência que pode ser injetada diretamente;
-- não crie interfaces ou DI artificiais quando não existir dependência real.
+- não crie interfaces ou DI artificiais quando não existir dependência real;
+- necessidade interna de contexto não autoriza criar getter público, duplicar estado ou alterar o retorno da interface existente.
 
 ### 9.4 Separação entre contrato e implementação
 
-- toda interface do framework deve ser declarada em `Rick.UIBuilder.Interfaces.pas`, inclusive contratos auxiliares usados entre implementações;
+- por padrão, interfaces compartilhadas do framework permanecem em `Rick.UIBuilder.Interfaces.pas`;
+- boundaries específicos já estabelecidos prevalecem sobre a regra genérica; para o novo `Edit`, todas as interfaces oficiais permanecem em `src/Edit/Rick.UIBuilder.Edit.Interfaces.pas`;
 - units concretas de implementação não devem declarar novos tipos `interface`;
 - quando uma classe implementar diretamente um contrato do framework, preserve a correspondência nominal `I<Nome>` / `T<Nome>` sempre que esse for o papel real da classe;
 - não crie uma segunda interface auxiliar apenas para expor leitura parcial do mesmo estado quando o contrato existente pode representar esse papel sem ambiguidade;
 - classes concretas permanecem nas units de implementação apropriadas;
 - exemplos/templates podem mostrar as duas partes para explicar a estrutura, mas não autorizam mover o contrato para a implementação concreta;
-- antes de criar ou mover uma interface, respeite boundaries, `uses`, GUIDs e consumidores existentes.
+- antes de criar ou mover uma interface, respeite boundaries, `uses`, GUIDs e consumidores existentes;
+- para as 28 interfaces públicas do novo `Edit`, aplique [`interface-implementation-unit-policy.md`](interface-implementation-unit-policy.md): uma interface → uma classe concreta → uma unit exclusiva de implementação.
 
 ### 9.5 Formatação de assinaturas e declarações Delphi
 

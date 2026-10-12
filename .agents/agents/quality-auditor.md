@@ -31,8 +31,9 @@ Sem usar resumo do implementador como única fonte:
 1. consulte `AGENTS.md`;
 2. consulte as instruções normativas do projeto aplicáveis;
 3. consulte as skills aplicáveis à mudança;
-4. considere os requisitos explícitos da tarefa atual;
-5. considere regras adicionais estabelecidas pelo usuário para a tarefa ou para o projeto.
+4. para mudanças em interfaces, consulte [`interface-contract-preservation-policy.md`](../references/interface-contract-preservation-policy.md) e, no novo `Edit`, [`interface-implementation-unit-policy.md`](../references/interface-implementation-unit-policy.md);
+5. considere os requisitos explícitos da tarefa atual;
+6. considere regras adicionais estabelecidas pelo usuário para a tarefa ou para o projeto.
 
 A partir dessas fontes, identifique:
 
@@ -88,22 +89,28 @@ Essas convenções devem ser auditadas em todo código Delphi criado ou alterado
 
 #### API
 
-- compatibility;
+- interface existente permaneceu idêntica à baseline quando não houve autorização explícita de mudança contratual;
+- nenhuma assinatura, retorno, parâmetro, overload, GUID, membro, spelling público ou navegação fluent foi alterado para acomodar implementação;
+- implementação usa contratos/origem existentes para contexto em vez de getter/interface/state/caminho paralelo criado por conveniência;
+- compatibility quando houver mudança pública autorizada;
 - defaults;
-- overloads explícitos quando variantes semanticamente distintas exigirem contrato próprio;
+- overloads explícitos quando variantes semanticamente distintas exigirem contrato próprio e a mudança for autorizada;
 - delegação entre overloads quando compartilham a mesma regra;
-- chaining;
-- operações mutáveis/configuradoras fluent retornando o contrato apropriado em vez de `procedure`;
+- chaining conforme contrato real;
+- operações mutáveis/configuradoras fluent retornando o contrato definido pela interface em vez de `procedure` quando aplicável;
 - dependency direction entre interfaces;
 - Parent injetado por contrato quando uma interface especializada depende do contexto de origem;
 - `FParent`/referência de retorno modelada sem ciclo forte quando aplicável;
-- todas as interfaces do framework centralizadas em `Rick.UIBuilder.Interfaces.pas`;
+- interfaces permanecem no boundary oficial do domínio; o novo `Edit` mantém todas as interfaces em `src/Edit/Rick.UIBuilder.Edit.Interfaces.pas`;
 - ausência de declaração de tipo `interface` em units concretas de implementação;
 - correspondência nominal clara `I<Nome>` / `T<Nome>` nas implementações diretas, sem interface auxiliar redundante;
+- no novo `Edit`, 28 interfaces públicas correspondem a 28 classes concretas em 28 units exclusivas; helpers internos não entram nessa contagem;
 - contratos separados das implementações concretas;
 - assinatura em uma linha quando couber de forma legível;
 - toda declaração `T... = class(...)` integralmente em uma única linha, incluindo ancestral e interfaces;
 - runtime/build semantics.
+
+Mudança de interface existente motivada pela conveniência da implementação é finding bloqueante, mesmo que o projeto compile.
 
 ### 4. Verify verification
 
@@ -148,6 +155,7 @@ Se não existe, a classificação é `não executado` ou `não confirmado`.
 - removal list?;
 - temporary files absent?;
 - package paths correct?;
+- arquivos externos/consultados que não pertencem ao repositório foram excluídos do pacote?;
 - checksum if claimed?
 
 ## Finding Severity
@@ -203,10 +211,14 @@ Se não existe, a classificação é `não executado` ou `não confirmado`.
 
 - implementador é única fonte de claims;
 - diff maior que objetivo sem explicação;
+- interface existente alterada sem autorização explícita;
+- implementação muda retorno/assinatura para simplificar navegação;
+- getter/interface/state criado apenas para transportar contexto já disponível por outro contrato;
 - tests green mas nenhum output disponível;
 - docs atualizadas antes do código final e não revalidadas;
 - removal esquecida em migração estrutural;
 - pacote contém worktree completo;
+- pacote contém arquivo externo/consultado que não pertence ao repositório;
 - source file untouched alterado apenas por encoding;
 - `procedure` configuradora em interface fluent;
 - default usado para esconder overloads contratuais;
@@ -215,7 +227,9 @@ Se não existe, a classificação é `não executado` ou `não confirmado`.
 - ciclo forte de reference counting entre Parent e interface especializada;
 - assinatura Delphi quebrada mecanicamente sem necessidade;
 - declaração `T... = class(...)` quebrada em múltiplas linhas;
-- tipo `interface` criado fora de `Rick.UIBuilder.Interfaces.pas`.
+- tipo `interface` criado em unit concreta;
+- interface do novo `Edit` fora de `src/Edit/Rick.UIBuilder.Edit.Interfaces.pas`;
+- duas implementações públicas do novo `Edit` na mesma unit.
 
 ## Composition
 

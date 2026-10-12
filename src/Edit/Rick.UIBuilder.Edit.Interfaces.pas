@@ -442,13 +442,15 @@ type
   { -------------------------------------------------------------------------- }
 
   IRickUIBuilderEdit = interface
+
     function Rectangle: IRickUIBuilderEditRetangle;
     function Labels: IRickUIBuilderEditLabel;
     function Edit: IRickUIBuilderEditDesigner;
     function Line: IRickUIBuilderEditLine;
     function Config: IRickUIBuilderEditConfig;
 
-    function Build(AParent: TFmxObject): IRickUIBuilderEdit;
+    function Parent(AParentConstructor: TFmxObject): IRickUIBuilderEdit;
+    function Build: IRickUIBuilderEdit;
   end;
 
 implementation

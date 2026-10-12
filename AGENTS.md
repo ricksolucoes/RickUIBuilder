@@ -19,6 +19,11 @@ O ComboBox possui documentação profunda em `docs/combobox/`, mas não define a
 - **References** — `.agents/references/`: políticas compartilhadas, component map, quality gates e Definition of Done.
 - **Templates** — `.agents/templates/`: artefatos persistentes somente quando agregam valor.
 
+Políticas obrigatórias para interfaces e implementações:
+
+- [`interface-contract-preservation-policy.md`](.agents/references/interface-contract-preservation-policy.md) — protege contratos existentes contra alterações motivadas pela conveniência da implementação;
+- [`interface-implementation-unit-policy.md`](.agents/references/interface-implementation-unit-policy.md) — protege a organização física das 28 implementações públicas do novo `Edit`.
+
 ## Start-of-task protocol
 
 Antes de editar qualquer arquivo:
@@ -151,12 +156,15 @@ Regras globais do RickUIBuilder para desenho e implementação de APIs Delphi:
 - quando a mesma operação possuir formas de chamada semanticamente distintas, prefira `overload` explícito a parâmetro default usado apenas para esconder variantes do contrato;
 - overloads simplificados devem delegar à forma mais completa quando compartilham a mesma regra;
 - quando uma interface especializada depender do contexto de outra interface, modele a relação por Dependency Injection conforme o padrão do projeto, com contrato pai injetado, análise de lifetime/reference counting e retorno ao contrato de origem quando o fluxo exigir;
-- todas as interfaces do framework devem ser declaradas em `Rick.UIBuilder.Interfaces.pas`; units concretas de implementação não devem declarar tipos `interface`;
+- interfaces existentes são contratos imutáveis por padrão: a implementação se adapta ao contrato; assinatura, retorno, parâmetro, overload, GUID, membro ou navegação fluent só podem mudar mediante solicitação explícita do usuário na tarefa atual;
+- por padrão, contratos do framework permanecem em `Rick.UIBuilder.Interfaces.pas`; boundaries específicos já estabelecidos prevalecem sobre essa regra genérica. No novo `Edit`, todas as interfaces oficiais permanecem em `src/Edit/Rick.UIBuilder.Edit.Interfaces.pas`;
+- units concretas de implementação não devem declarar tipos `interface`;
 - quando existir correspondência direta entre contrato e implementação, preserve o par nominal `I<Nome>` / `T<Nome>` e não crie uma segunda interface auxiliar para representar o mesmo papel sem necessidade arquitetural explícita;
 - contratos permanecem separados das implementações concretas; templates de skill ensinam estrutura, não autorizam misturar interface e implementação na mesma unit;
+- para as 28 interfaces públicas do novo `Edit`, aplique a política específica **1 interface → 1 classe concreta → 1 unit exclusiva de implementação**; helpers internos não entram nessa contagem;
 - nomes usados em templates são placeholders: o código real deve usar vocabulário do domínio e preservar contratos existentes.
 
-A estrutura de implementação e os critérios de decisão estão em `api-and-interface-design`, `project-constraints.md`, `delphi-quality-gates.md` e `definition-of-done.md`.
+A estrutura de implementação e os critérios de decisão estão em `api-and-interface-design`, `project-constraints.md`, `delphi-quality-gates.md`, `definition-of-done.md` e nas duas políticas de interface em `.agents/references/`.
 
 ## Delphi gates
 
