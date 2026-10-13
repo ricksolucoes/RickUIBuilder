@@ -45,7 +45,7 @@ IRickUIBuilderEdit
 │   └── Error
 │       └── Text
 │           └── Font
-├── Edit
+├── Designer
 │   ├── Input
 │   │   ├── Text
 │   │   │   └── Color
@@ -157,7 +157,7 @@ Because `Build` returns `IRickUIBuilderEdit`, the consumer can retain the root a
 
 | Contract / nominal class | Created by | Injected parent dependency | Context owned by the implementation | Children retained | Architectural note |
 |---|---|---|---|---|---|
-| `IRickUIBuilderEdit` / `TRickUIBuilderEdit` | composition entry | none | `Parent` reference and five top-level branch references | Rectangle, Labels, Edit, Line, Config | only external composition root |
+| `IRickUIBuilderEdit` / `TRickUIBuilderEdit` | composition entry | none | `Parent` reference and five top-level branch references | Rectangle, Labels, Designer, Line, Config | only external composition root |
 | `IRickUIBuilderEditRetangle` / `TRickUIBuilderEditRetangle` | root | `IRickUIBuilderEdit` | `TRectangle` exposed by `Control` and CornerRadius | Position, Size, Background, Border | `TRectangle` is the natural target for the branch |
 | `IRickUIBuilderEditRetanglePosition` | Rectangle | `IRickUIBuilderEditRetangle` | no duplicated state when writing to `FParent.Control.Position` is sufficient | none | uses the control already exposed by parent contract |
 | `IRickUIBuilderEditRetangleSize` | Rectangle | `IRickUIBuilderEditRetangle` | no duplicated state when writing to `FParent.Control` is sufficient | none | uses the control already exposed by parent contract |

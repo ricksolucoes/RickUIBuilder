@@ -45,7 +45,7 @@ IRickUIBuilderEdit
 │   └── Error
 │       └── Text
 │           └── Font
-├── Edit
+├── Designer
 │   ├── Input
 │   │   ├── Text
 │   │   │   └── Color
@@ -161,7 +161,7 @@ Uma referência `TFmxObject` simples **não prolonga o lifetime** do objeto info
 
 | Contrato / classe nominal | Criada por | Dependência pai injetada | Contexto que pertence à implementação | Filhos que mantém | Observação arquitetural |
 |---|---|---|---|---|---|
-| `IRickUIBuilderEdit` / `TRickUIBuilderEdit` | entrada da composição | nenhuma | referência de `Parent` e referências dos cinco ramos principais | Rectangle, Labels, Edit, Line, Config | único composition root externo |
+| `IRickUIBuilderEdit` / `TRickUIBuilderEdit` | entrada da composição | nenhuma | referência de `Parent` e referências dos cinco ramos principais | Rectangle, Labels, Designer, Line, Config | único composition root externo |
 | `IRickUIBuilderEditRetangle` / `TRickUIBuilderEditRetangle` | root | `IRickUIBuilderEdit` | `TRectangle` exposto por `Control` e `CornerRadius` | Position, Size, Background, Border | o próprio `TRectangle` é o alvo natural do ramo |
 | `IRickUIBuilderEditRetanglePosition` | Rectangle | `IRickUIBuilderEditRetangle` | nenhum estado duplicado quando puder escrever em `FParent.Control.Position` | nenhum | depende do `Control` já exposto pelo contrato pai |
 | `IRickUIBuilderEditRetangleSize` | Rectangle | `IRickUIBuilderEditRetangle` | nenhum estado duplicado quando puder escrever em `FParent.Control` | nenhum | depende do `Control` já exposto pelo contrato pai |
