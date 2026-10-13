@@ -132,13 +132,13 @@ O segundo caso não autoriza `Context`, service locator ou record agregador. É 
 Continuam não aprovados por padrão:
 
 - `TRickUIBuilderEditContext`;
-- subclasse customizada de `TEdit`;
-- `TRickUIBuilderEditInputRules`;
 - `TRickUIBuilderEditInteraction`;
 - `TRickUIBuilderEditMaterializer`;
 - records agregadores de configuração.
 
 O Incremento 2B comprovou uma responsabilidade transversal específica e introduziu `TRickUIBuilderEditVisualState`. Esse helper interno **não é um Context**: ele guarda somente as flags ativas de `Focus`, `Invalid` e `ReadOnly`, distribui uma notificação de mudança e mantém o receiver dos eventos de foco vivo após `Build`. As cores permanecem nos contratos especializados que as representam.
+
+O Incremento 2C comprovou uma segunda responsabilidade transversal: as regras configuradas por `Input.Number` e `Input.Config` precisam governar a mesma atribuição de `TEdit.Text`. `TRickUIBuilderEditInputRules` foi aprovado somente para esse papel e é uma subclasse interna de `TEdit`, não um objeto de contexto agregado.
 
 Qualquer outro helper futuro continua exigindo necessidade comprovada pelo contrato/comportamento e não pode existir apenas porque simplifica a implementação.
 
@@ -175,12 +175,12 @@ Uma referência `TFmxObject` simples **não prolonga o lifetime** do objeto info
 | `IRickUIBuilderEditLabelError` | Labels | `IRickUIBuilderEditLabel` | referência de Text | Text | agrupador do erro |
 | `IRickUIBuilderEditLabelErrorText` | Error | `IRickUIBuilderEditLabelError` | Value, Color, Spacing e alvo visual da mensagem | Font | Font deve receber apenas o alvo que realmente configura |
 | `IRickUIBuilderEditLabelErrorTextFont` | ErrorText | `IRickUIBuilderEditLabelErrorText` | Family, Size, Styles ou aplicação direta no alvo injetado | nenhum | não precisa de record para três valores locais |
-| `IRickUIBuilderEditDesigner` | root | `IRickUIBuilderEdit` | `TEdit` exposto por `Control` e referências dos subcontratos | Input, Validation, Config | dono lógico do controle de entrada |
-| `IRickUIBuilderEditDesignerInput` | Designer | `IRickUIBuilderEditDesigner` | referências dos subcontratos de input | Text, Number, Config | agrupador do domínio de entrada |
+| `IRickUIBuilderEditDesigner` | root | `IRickUIBuilderEdit` | `TRickUIBuilderEditInputRules`, exposto como `TEdit` por `Control`, e referências dos subcontratos | Input, Validation, Config | cria e possui logicamente o controle runtime de entrada |
+| `IRickUIBuilderEditDesignerInput` | Designer | `IRickUIBuilderEditDesigner` | referências dos subcontratos de input e DI do mesmo alvo `TRickUIBuilderEditInputRules` | Text, Number, Config | distribui o alvo runtime real sem criar Context |
 | `IRickUIBuilderEditDesignerInputText` | Input | `IRickUIBuilderEditDesignerInput` | Value/Size aplicados ao `TEdit` quando possível | Color | `Size` e `ToBack` retornam `FParent.ToBack`, isto é, Designer |
 | `IRickUIBuilderEditDesignerInputTextColor` | Input.Text | `IRickUIBuilderEditDesignerInputText` | Background/Text/ReadOnly colors | nenhum | participa do `VisualState` somente para ReadOnly; não inventa estado Invalid |
-| `IRickUIBuilderEditDesignerInputNumber` | Input | `IRickUIBuilderEditDesignerInput` | AllowNegative, DecimalPlaces, FormatMode, separators e UseThousandSeparator | nenhum | regras de digitação/formatação exigem prova do mecanismo de coordenação |
-| `IRickUIBuilderEditDesignerInputConfig` | Input | `IRickUIBuilderEditDesignerInput` | Preset, CaseMode, UrlCaseMode, MaxLength | nenhum | regras de digitação/formatação exigem prova do mecanismo de coordenação |
+| `IRickUIBuilderEditDesignerInputNumber` | Input | `IRickUIBuilderEditDesignerInput` | aplica AllowNegative, DecimalPlaces, FormatMode, separators e UseThousandSeparator diretamente em `InputRules` | nenhum | não mantém cópia paralela das regras numéricas |
+| `IRickUIBuilderEditDesignerInputConfig` | Input | `IRickUIBuilderEditDesignerInput` | aplica Preset, CaseMode e UrlCaseMode em `InputRules`; MaxLength permanece no próprio `TEdit` | nenhum | compartilha o mesmo alvo runtime de Number sem record agregado |
 | `IRickUIBuilderEditDesignerValidation` | Designer | `IRickUIBuilderEditDesigner` | Required, RequirementIndicator, Feedback, DefaultMessage e estado Invalid/RequirementMet | nenhum | `Invalid` atualiza a flag correspondente no `VisualState`; getters contratuais permanecem locais |
 | `IRickUIBuilderEditDesignerConfig` | Designer | `IRickUIBuilderEditDesigner` | ClearButton, Password e ReadOnly | nenhum | ReadOnly aplica ao `TEdit` e atualiza `VisualState`; controles auxiliares ainda exigem prova |
 | `IRickUIBuilderEditLine` | root | `IRickUIBuilderEdit` | Thickness e alvo visual interno da linha | Color | tipo FMX concreto da linha ainda não é assumido |
@@ -248,29 +248,40 @@ O helper não guarda cores, settings, controles de todos os ramos ou regras de n
 
 Não foram criados `Context`, getter público, interface auxiliar, cast para classe concreta ou service locator.
 
+## Decisão comprovada — regras de input
+
+O Incremento 2C comprovou que `Input.Number` e `Input.Config` precisam cooperar sobre a mesma transição de texto e que o `TEdit` público precisa continuar sendo o alvo efetivo do runtime.
+
+`TRickUIBuilderEditInputRules` é uma subclasse interna de `TEdit`, criada por `Designer` com o `TRectangle` raiz como owner. `Designer.Input` injeta a mesma instância em `Number` e `Config`; esses contratos configuram o alvo diretamente e não guardam uma segunda cópia das regras.
+
+A responsabilidade do runtime fica limitada a:
+
+- máscaras de CPF, CNPJ, CEP, Phone e Mobile;
+- filtragem de IntegerNumber e FloatNumber, incluindo sinal, casas e separadores;
+- filtragem e lowercase de Email;
+- normalização de case de URL conforme `UrlCaseMode`;
+- `CaseMode` para entrada comum;
+- preservação de caret durante a transformação de texto.
+
+`MaxLength` continua sendo aplicado pela propriedade nativa do `TEdit`. O helper não conhece VisualState, labels, validation, ícones ou composição da raiz, não referencia units legadas e não mantém `IRickUIBuilderEdit` vivo.
+
 ## Pontos que ainda exigem prova antes da implementação
 
 Os itens abaixo permanecem sem mecanismo aprovado e não devem ser resolvidos por conveniência durante a codificação.
 
-### 1. Regras de input
-
-`Input.Number` e `Input.Config` possuem dados que precisam cooperar durante digitação/formatação.
-
-Antes de criar helper como `InputRules`, deve ser demonstrado por que a própria árvore `Designer → Input → Text/Number/Config` não consegue assumir essa responsabilidade com DI e o `TEdit` existente.
-
-### 2. Outros eventos runtime
+### 1. Outros eventos runtime
 
 Não criar `Interaction = class(TComponent)` por padrão.
 
 Os eventos `OnEnter/OnExit` necessários exclusivamente à transição visual já pertencem a `TRickUIBuilderEditVisualState`. Eventos futuros de input, clear, password ou requirement indicator continuam exigindo prova própria e não autorizam ampliar `VisualState` para um objeto genérico de interação.
 
-### 3. Materialização
+### 2. Materialização
 
 Não criar `Materializer` por padrão.
 
 Primeiro deve ser verificado se a própria raiz e os owners naturais de cada ramo conseguem criar/configurar seus objetos sem concentrar todas as responsabilidades em uma classe extra.
 
-### 4. Records adicionais
+### 3. Records adicionais
 
 `Rick.UIBuilder.Edit.Types.pas` atualmente contém os enums do contrato.
 

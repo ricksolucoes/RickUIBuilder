@@ -128,13 +128,13 @@ The second case does not authorize a context bag, service locator, or aggregate 
 The architecture still does not pre-approve:
 
 - `TRickUIBuilderEditContext`;
-- a custom `TEdit` subclass;
-- `TRickUIBuilderEditInputRules`;
 - `TRickUIBuilderEditInteraction`;
 - `TRickUIBuilderEditMaterializer`;
 - aggregate configuration records.
 
 Increment 2B proved one specific cross-branch responsibility and introduced `TRickUIBuilderEditVisualState`. This internal helper **is not a Context**: it stores only the active Focus, Invalid and ReadOnly flags, broadcasts state-change notifications, and keeps the focus-event receiver alive after `Build`. Colors remain owned by the specialized contracts that represent them.
+
+Increment 2C proved a second cross-cutting responsibility: rules configured by `Input.Number` and `Input.Config` must govern the same `TEdit.Text` assignment. `TRickUIBuilderEditInputRules` is approved only for that role and is an internal `TEdit` subclass, not an aggregate context object.
 
 Any additional helper still requires a need proven by contract/behavior and cannot exist merely because it makes implementation easier.
 
@@ -171,12 +171,12 @@ Because `Build` returns `IRickUIBuilderEdit`, the consumer can retain the root a
 | `IRickUIBuilderEditLabelError` | Labels | `IRickUIBuilderEditLabel` | Text reference | Text | error grouping contract |
 | `IRickUIBuilderEditLabelErrorText` | Error | `IRickUIBuilderEditLabelError` | Value, Color, Spacing and error-message target | Font | Font receives only the target it actually configures |
 | `IRickUIBuilderEditLabelErrorTextFont` | ErrorText | `IRickUIBuilderEditLabelErrorText` | Family, Size, Styles or direct application to injected target | none | no aggregate record is needed for three local values |
-| `IRickUIBuilderEditDesigner` | root | `IRickUIBuilderEdit` | `TEdit` exposed by `Control` and child-contract references | Input, Validation, Config | logical owner of the edit control |
-| `IRickUIBuilderEditDesignerInput` | Designer | `IRickUIBuilderEditDesigner` | input sub-contract references | Text, Number, Config | input-domain grouping contract |
+| `IRickUIBuilderEditDesigner` | root | `IRickUIBuilderEdit` | `TRickUIBuilderEditInputRules`, exposed as `TEdit` by `Control`, plus child-contract references | Input, Validation, Config | creates and logically owns the runtime input control |
+| `IRickUIBuilderEditDesignerInput` | Designer | `IRickUIBuilderEditDesigner` | input sub-contract references plus DI of the same `TRickUIBuilderEditInputRules` target | Text, Number, Config | distributes the real runtime target without creating a Context |
 | `IRickUIBuilderEditDesignerInputText` | Input | `IRickUIBuilderEditDesignerInput` | Value/Size applied to `TEdit` when possible | Color | Size and ToBack return `FParent.ToBack` (Designer) |
 | `IRickUIBuilderEditDesignerInputTextColor` | Input.Text | `IRickUIBuilderEditDesignerInputText` | Background/Text/ReadOnly colors | none | participates in `VisualState` for ReadOnly only; no Invalid state is invented |
-| `IRickUIBuilderEditDesignerInputNumber` | Input | `IRickUIBuilderEditDesignerInput` | AllowNegative, DecimalPlaces, FormatMode, separators and UseThousandSeparator | none | typing/formatting coordination requires proof |
-| `IRickUIBuilderEditDesignerInputConfig` | Input | `IRickUIBuilderEditDesignerInput` | Preset, CaseMode, UrlCaseMode, MaxLength | none | typing/formatting coordination requires proof |
+| `IRickUIBuilderEditDesignerInputNumber` | Input | `IRickUIBuilderEditDesignerInput` | applies AllowNegative, DecimalPlaces, FormatMode, separators and UseThousandSeparator directly to `InputRules` | none | retains no parallel copy of numeric rules |
+| `IRickUIBuilderEditDesignerInputConfig` | Input | `IRickUIBuilderEditDesignerInput` | applies Preset, CaseMode and UrlCaseMode to `InputRules`; MaxLength remains on the `TEdit` itself | none | shares the same runtime target as Number without an aggregate record |
 | `IRickUIBuilderEditDesignerValidation` | Designer | `IRickUIBuilderEditDesigner` | Required, RequirementIndicator, Feedback, DefaultMessage and Invalid/RequirementMet state | none | Invalid updates the corresponding `VisualState` flag; contractual getters remain local |
 | `IRickUIBuilderEditDesignerConfig` | Designer | `IRickUIBuilderEditDesigner` | ClearButton, Password, ReadOnly | none | ReadOnly applies to `TEdit` and updates `VisualState`; auxiliary controls still need proof |
 | `IRickUIBuilderEditLine` | root | `IRickUIBuilderEdit` | Thickness and internal line target | Color | exact FMX line type is not assumed yet |
@@ -244,29 +244,40 @@ The helper does not store colors, settings, all branch controls, or domain rules
 
 No central Context, public getter, auxiliary interface, concrete-class cast, or service locator is introduced.
 
+## Proven decision — input rules
+
+Increment 2C proved that `Input.Number` and `Input.Config` must cooperate over the same text transition while the public `TEdit` remains the effective runtime target.
+
+`TRickUIBuilderEditInputRules` is an internal `TEdit` subclass created by `Designer` with the root `TRectangle` as owner. `Designer.Input` injects the same instance into `Number` and `Config`; those contracts configure the target directly and do not retain a second copy of rule state.
+
+The runtime responsibility is limited to:
+
+- CPF, CNPJ, CEP, Phone, and Mobile masks;
+- IntegerNumber and FloatNumber filtering, including sign, decimal places, and separators;
+- Email filtering and lowercase normalization;
+- URL case normalization according to `UrlCaseMode`;
+- `CaseMode` for ordinary input;
+- caret preservation while text is transformed.
+
+`MaxLength` continues to use the native `TEdit` property. The helper does not know about VisualState, labels, validation, icons, or root composition, does not reference legacy units, and does not retain `IRickUIBuilderEdit`.
+
 ## Points still requiring proof before implementation
 
 The following mechanisms remain unresolved and must not be solved by convenience while coding.
 
-### 1. Input rules
-
-`Input.Number` and `Input.Config` contain data that must cooperate during typing/formatting.
-
-Before introducing a helper such as `InputRules`, prove why the existing `Designer → Input → Text/Number/Config` tree plus the existing `TEdit` cannot own this behavior through DI.
-
-### 2. Other runtime events
+### 1. Other runtime events
 
 Do not create `Interaction = class(TComponent)` by default.
 
 The `OnEnter/OnExit` events required exclusively for visual-state transitions now belong to `TRickUIBuilderEditVisualState`. Future input, clear, password, or requirement-indicator events still require their own proof and do not authorize expanding `VisualState` into a generic interaction object.
 
-### 3. Materialization
+### 2. Materialization
 
 Do not create a `Materializer` by default.
 
 First determine whether the root and natural branch owners can create/configure their objects without concentrating all construction responsibilities in another class.
 
-### 4. Additional records
+### 3. Additional records
 
 `Rick.UIBuilder.Edit.Types.pas` currently contains the contract enums.
 

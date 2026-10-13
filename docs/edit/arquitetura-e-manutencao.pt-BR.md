@@ -125,11 +125,11 @@ Não concentrar o estado do componente inteiro em um record ou classe agregadora
 
 Nenhuma classe auxiliar é obrigatória por simetria ou por conveniência.
 
-Em particular, implementações anteriores não autorizam automaticamente `Context`, subclasse customizada de `TEdit`, `InputRules`, `Interaction`, `Materializer` ou records agregadores.
+Implementações anteriores não autorizam automaticamente `Context`, `Interaction`, `Materializer` ou records agregadores. Uma abstração interna só é aceita quando existe uma responsabilidade transversal comprovada que a árvore de contratos não consegue representar sozinha sem duplicação de estado.
 
-Se durante a implementação surgir uma necessidade que a árvore de contratos não consiga atender, a necessidade deve ser comprovada antes de criar uma nova abstração.
+O Incremento 2B forneceu essa prova para `TRickUIBuilderEditVisualState`. Ela coordena exclusivamente as flags de Focus/Invalid/ReadOnly e a notificação dos contratos visuais. Não armazena cores nem configurações dos ramos e não substitui o ownership de estado definido pela árvore de interfaces.
 
-O Incremento 2B forneceu essa prova para uma única abstração interna: `TRickUIBuilderEditVisualState`. Ela coordena exclusivamente as flags de Focus/Invalid/ReadOnly e a notificação dos contratos visuais. Não armazena cores nem configurações dos ramos e não substitui o ownership de estado definido pela árvore de interfaces.
+O Incremento 2C forneceu a prova para `TRickUIBuilderEditInputRules`, uma subclasse interna de `TEdit` que é o próprio controle runtime do Designer. Ela coordena somente filtragem, formatação e caret das regras de input compartilhadas por `Input.Number` e `Input.Config`. Os dois contratos recebem esse mesmo alvo por DI; não existe settings record, Context central, cópia paralela de estado nem dependência das units legadas.
 
 ## Lifetime
 
@@ -140,6 +140,8 @@ Assim, enquanto a raiz `IRickUIBuilderEdit` estiver referenciada, a árvore desc
 `Parent(AParentConstructor)` guarda a referência ao local de montagem para uso de `Build`; uma referência `TFmxObject` simples não transfere ownership nem prolonga automaticamente o lifetime do objeto informado.
 
 No estado visual do Incremento 2B, o helper é anexado como componente owned pelo `TRectangle` raiz. Ele não mantém `IRickUIBuilderEdit` vivo. Para preservar somente os receivers realmente necessários aos eventos de foco, mantém referências fortes aos contratos-pai dos subscribers registrados. Como esses contratos retornam para cima por referências `[weak]`, não é criado ciclo forte com a raiz. A destruição da árvore visual libera o helper e essas referências.
+
+No Incremento 2C, `TRickUIBuilderEditInputRules` é o próprio `TEdit` especializado criado com o `TRectangle` raiz como owner. Por isso as regras de entrada permanecem ativas enquanto o controle FMX existir, sem manter interface da raiz ou builder vivo e sem introduzir ciclo de reference counting.
 
 ## Estratégia de implementação
 

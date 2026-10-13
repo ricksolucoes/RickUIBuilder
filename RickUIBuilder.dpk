@@ -62,6 +62,7 @@ contains
   Rick.UIBuilder.Edit.Interfaces in 'src\Edit\Rick.UIBuilder.Edit.Interfaces.pas',
   Rick.UIBuilder.Edit.Types in 'src\Edit\Rick.UIBuilder.Edit.Types.pas',
   Rick.UIBuilder.Edit.VisualState in 'src\Edit\Rick.UIBuilder.Edit.VisualState.pas',
+  Rick.UIBuilder.Edit.InputRules in 'src\Edit\Rick.UIBuilder.Edit.InputRules.pas',
   Rick.UIBuilder.Edit.Builder in 'src\Edit\Rick.UIBuilder.Edit.Builder.pas',
   Rick.UIBuilder.Edit.Rectangle in 'src\Edit\Rick.UIBuilder.Edit.Rectangle.pas',
   Rick.UIBuilder.Edit.Rectangle.Position in 'src\Edit\Rick.UIBuilder.Edit.Rectangle.Position.pas',

@@ -125,11 +125,11 @@ Do not centralize the entire component state in an aggregate record or class sim
 
 No helper class is mandatory by symmetry or convenience.
 
-In particular, prior implementation attempts do not automatically authorize a central Context, custom `TEdit` subclass, `InputRules`, `Interaction`, `Materializer`, or aggregate settings records.
+Prior implementation attempts do not automatically authorize a central Context, `Interaction`, `Materializer`, or aggregate settings records. An internal abstraction is accepted only when a proven cross-cutting responsibility cannot be represented by the contract tree without duplicating state.
 
-If implementation discovers a need the contract tree cannot satisfy, that need must be proven before creating a new abstraction.
+Increment 2B provides that proof for `TRickUIBuilderEditVisualState`. It coordinates Focus/Invalid/ReadOnly flags and notifies visual contracts. It does not store branch colors or configuration and does not replace the state ownership defined by the interface tree.
 
-Increment 2B provides that proof for one internal abstraction only: `TRickUIBuilderEditVisualState`. It coordinates Focus/Invalid/ReadOnly flags and notifies visual contracts. It does not store branch colors or configuration and does not replace the state ownership defined by the interface tree.
+Increment 2C provides the proof for `TRickUIBuilderEditInputRules`, an internal `TEdit` subclass that is the Designer runtime control itself. It coordinates only filtering, formatting, and caret behavior for input rules shared by `Input.Number` and `Input.Config`. Both contracts receive the same target through DI; there is no settings record, central Context, parallel state copy, or dependency on legacy Edit units.
 
 ## Lifetime
 
@@ -140,6 +140,8 @@ Therefore, while the root `IRickUIBuilderEdit` remains referenced, the descendan
 `Parent(AParentConstructor)` retains the assembly-location reference for `Build`; a plain `TFmxObject` reference does not transfer ownership or automatically extend the supplied object's lifetime.
 
 For Increment 2B visual state, the helper is attached as an owned component of the root `TRectangle`. It does not retain `IRickUIBuilderEdit`. To preserve only the receivers required by focus events, it keeps strong references to the parent contracts of registered subscribers. Those contracts navigate upward through `[weak]` references, so no strong cycle with the root is introduced. Destroying the visual tree releases the helper and those retained references.
+
+For Increment 2C, `TRickUIBuilderEditInputRules` is the specialized `TEdit` itself and is created with the root `TRectangle` as owner. Input rules therefore remain active for the lifetime of the FMX control without retaining the root interface or builder and without introducing a reference-counting cycle.
 
 ## Implementation strategy
 

@@ -27,7 +27,8 @@ uses
   Rick.UIBuilder.Tests.Edit.Foundation in 'src\edits\Rick.UIBuilder.Tests.Edit.Foundation.pas',
   Rick.UIBuilder.Tests.Edit.Fluent in 'src\edits\Rick.UIBuilder.Tests.Edit.Fluent.pas',
   Rick.UIBuilder.Tests.Edit.Controls in 'src\edits\Rick.UIBuilder.Tests.Edit.Controls.pas',
-  Rick.UIBuilder.Tests.Edit.VisualState in 'src\edits\Rick.UIBuilder.Tests.Edit.VisualState.pas';
+  Rick.UIBuilder.Tests.Edit.VisualState in 'src\edits\Rick.UIBuilder.Tests.Edit.VisualState.pas',
+  Rick.UIBuilder.Tests.Edit.InputRules in 'src\edits\Rick.UIBuilder.Tests.Edit.InputRules.pas';
 
 var
   runner      : ITestRunner;

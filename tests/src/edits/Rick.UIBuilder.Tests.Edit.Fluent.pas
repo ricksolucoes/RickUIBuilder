@@ -54,12 +54,12 @@ begin
   Assert.IsTrue(FEdit.Labels.Main = FEdit.Labels.Main);
   Assert.IsTrue(FEdit.Labels.Counter = FEdit.Labels.Counter);
   Assert.IsTrue(FEdit.Labels.Error.Text.Font = FEdit.Labels.Error.Text.Font);
-  Assert.IsTrue(FEdit.Edit.Input = FEdit.Edit.Input);
-  Assert.IsTrue(FEdit.Edit.Input.Text.Color = FEdit.Edit.Input.Text.Color);
-  Assert.IsTrue(FEdit.Edit.Input.Number = FEdit.Edit.Input.Number);
-  Assert.IsTrue(FEdit.Edit.Input.Config = FEdit.Edit.Input.Config);
-  Assert.IsTrue(FEdit.Edit.Validation = FEdit.Edit.Validation);
-  Assert.IsTrue(FEdit.Edit.Config = FEdit.Edit.Config);
+  Assert.IsTrue(FEdit.Designer.Input = FEdit.Designer.Input);
+  Assert.IsTrue(FEdit.Designer.Input.Text.Color = FEdit.Designer.Input.Text.Color);
+  Assert.IsTrue(FEdit.Designer.Input.Number = FEdit.Designer.Input.Number);
+  Assert.IsTrue(FEdit.Designer.Input.Config = FEdit.Designer.Input.Config);
+  Assert.IsTrue(FEdit.Designer.Validation = FEdit.Designer.Validation);
+  Assert.IsTrue(FEdit.Designer.Config = FEdit.Designer.Config);
   Assert.IsTrue(FEdit.Line.Color = FEdit.Line.Color);
   Assert.IsTrue(FEdit.Config.Icons = FEdit.Config.Icons);
   Assert.IsTrue(FEdit.Config.Icons.Colors = FEdit.Config.Icons.Colors);
@@ -114,7 +114,7 @@ var
   LInput: IRickUIBuilderEditDesignerInput;
   LText: IRickUIBuilderEditDesignerInputText;
 begin
-  LDesigner := FEdit.Edit;
+  LDesigner := FEdit.Designer;
   LInput := LDesigner.Input;
   LText := LInput.Text;
   Assert.IsTrue(LText.Color.ToBack = LText);
@@ -128,7 +128,7 @@ var
   LDesigner: IRickUIBuilderEditDesigner;
   LInput: IRickUIBuilderEditDesignerInput;
 begin
-  LDesigner := FEdit.Edit;
+  LDesigner := FEdit.Designer;
   LInput := LDesigner.Input;
   Assert.IsTrue(LInput.Number.ToBack = LInput);
   Assert.IsTrue(LInput.Config.ToBack = LInput);
@@ -158,7 +158,7 @@ procedure TRickUIBuilderEditFluentTests.Validation_DeveExporEstadoContratual;
 var
   LValidation: IRickUIBuilderEditDesignerValidation;
 begin
-  LValidation := FEdit.Edit.Validation;
+  LValidation := FEdit.Designer.Validation;
   LValidation.Invalid(True, 'Valor inválido').RequirementMet(True);
   Assert.IsTrue(LValidation.HasInvalid);
   Assert.IsTrue(LValidation.InvalidValue);
@@ -171,7 +171,7 @@ procedure TRickUIBuilderEditFluentTests.Number_MutadoresDevemPreservarFluent;
 var
   LNumber: IRickUIBuilderEditDesignerInputNumber;
 begin
-  LNumber := FEdit.Edit.Input.Number;
+  LNumber := FEdit.Designer.Input.Number;
   Assert.IsTrue(LNumber.AllowNegative = LNumber);
   Assert.IsTrue(LNumber.DecimalPlaces(3) = LNumber);
   Assert.IsTrue(LNumber.FormatMode(TRickUIBuilderEditNumberFormatMode.Custom) = LNumber);

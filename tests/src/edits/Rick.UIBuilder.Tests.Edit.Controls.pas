@@ -123,7 +123,7 @@ var
   LDesigner: IRickUIBuilderEditDesigner;
   LText: IRickUIBuilderEditDesignerInputText;
 begin
-  LDesigner := FEdit.Edit;
+  LDesigner := FEdit.Designer;
   LText := LDesigner.Input.Text;
   LText.Value('Texto').Color.Text(TAlphaColors.Blue);
   Assert.AreEqual<TAlphaColor>(TAlphaColors.Blue, LDesigner.Control.TextSettings.FontColor);

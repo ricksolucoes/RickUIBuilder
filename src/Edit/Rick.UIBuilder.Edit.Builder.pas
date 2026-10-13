@@ -27,7 +27,7 @@ type
 
     function Rectangle: IRickUIBuilderEditRetangle;
     function Labels: IRickUIBuilderEditLabel;
-    function Edit: IRickUIBuilderEditDesigner;
+    function Designer: IRickUIBuilderEditDesigner;
     function Line: IRickUIBuilderEditLine;
     function Config: IRickUIBuilderEditConfig;
     function Parent(AParentConstructor: TFmxObject): IRickUIBuilderEdit;
@@ -92,7 +92,7 @@ begin
   Result := FLabels;
 end;
 
-function TRickUIBuilderEdit.Edit: IRickUIBuilderEditDesigner;
+function TRickUIBuilderEdit.Designer: IRickUIBuilderEditDesigner;
 begin
   if not Assigned(FEdit) then
     FEdit := TRickUIBuilderEditDesigner.New(Self, Rectangle.Control, FVisualState);
@@ -124,7 +124,7 @@ begin
   Rectangle.Background;
   Rectangle.Border;
   Labels.Main.Text.Color;
-  Edit.Input.Text.Color;
+  Designer.Input.Text.Color;
   Line.Color;
   FVisualState.Apply;
 end;
@@ -133,7 +133,7 @@ function TRickUIBuilderEdit.Build: IRickUIBuilderEdit;
 begin
   Rectangle;
   Labels;
-  Edit;
+  Designer;
   Line;
   Config;
   PrepareVisualState;

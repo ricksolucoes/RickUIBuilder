@@ -78,7 +78,7 @@ begin
   LMainColor.Text(_NORMAL_COLOR_);
   LMainColor.Invalid(_INVALID_COLOR_);
   LMainColor.ReadOnly(_READ_ONLY_COLOR_);
-  FEdit.Edit.Input.Text.Color.Text(_NORMAL_COLOR_).ReadOnly(_READ_ONLY_COLOR_);
+  FEdit.Designer.Input.Text.Color.Text(_NORMAL_COLOR_).ReadOnly(_READ_ONLY_COLOR_);
   FEdit.Line.Thickness(_LINE_THICKNESS_);
   FEdit.Line.Color.Normal(_NORMAL_COLOR_).Focus(_FOCUS_COLOR_).Invalid(_INVALID_COLOR_).ReadOnly(_READ_ONLY_COLOR_);
 end;
@@ -120,7 +120,7 @@ procedure TRickUIBuilderEditVisualStateTests.TriggerEnter;
 var
   LControl: TEdit;
 begin
-  LControl := FEdit.Edit.Control;
+  LControl := FEdit.Designer.Control;
   Assert.IsTrue(Assigned(LControl.OnEnter));
   LControl.OnEnter(LControl);
 end;
@@ -129,7 +129,7 @@ procedure TRickUIBuilderEditVisualStateTests.TriggerExit;
 var
   LControl: TEdit;
 begin
-  LControl := FEdit.Edit.Control;
+  LControl := FEdit.Designer.Control;
   Assert.IsTrue(Assigned(LControl.OnExit));
   LControl.OnExit(LControl);
 end;
@@ -147,7 +147,7 @@ begin
   Assert.AreEqual<TAlphaColor>(ABorder, FEdit.Rectangle.Control.Stroke.Color);
   Assert.AreEqual<TAlphaColor>(ALabel, LLabel.TextSettings.FontColor);
   Assert.AreEqual<TAlphaColor>(ALine, LLine.Fill.Color);
-  Assert.AreEqual<TAlphaColor>(AEditText, FEdit.Edit.Control.TextSettings.FontColor);
+  Assert.AreEqual<TAlphaColor>(AEditText, FEdit.Designer.Control.TextSettings.FontColor);
 end;
 
 procedure TRickUIBuilderEditVisualStateTests.Normal_DeveAplicarValoresConfigurados;
@@ -170,7 +170,7 @@ end;
 procedure TRickUIBuilderEditVisualStateTests.Invalid_DeveAplicarCoresDeEstado;
 begin
   ConfigureColors;
-  FEdit.Edit.Validation.Invalid(True);
+  FEdit.Designer.Validation.Invalid(True);
   BuildEdit;
   AssertVisual(_INVALID_COLOR_, _INVALID_COLOR_, _INVALID_COLOR_, _INVALID_COLOR_, _NORMAL_COLOR_);
 end;
@@ -178,7 +178,7 @@ end;
 procedure TRickUIBuilderEditVisualStateTests.ReadOnly_DeveAplicarCoresDeEstado;
 begin
   ConfigureColors;
-  FEdit.Edit.Config.ReadOnly(True);
+  FEdit.Designer.Config.ReadOnly(True);
   BuildEdit;
   AssertVisual(_READ_ONLY_COLOR_, _READ_ONLY_COLOR_, _READ_ONLY_COLOR_, _READ_ONLY_COLOR_, _READ_ONLY_COLOR_);
 end;
@@ -188,12 +188,12 @@ begin
   ConfigureColors;
   BuildEdit;
   TriggerEnter;
-  FEdit.Edit.Config.ReadOnly(True);
-  FEdit.Edit.Validation.Invalid(True);
+  FEdit.Designer.Config.ReadOnly(True);
+  FEdit.Designer.Validation.Invalid(True);
   AssertVisual(_INVALID_COLOR_, _INVALID_COLOR_, _INVALID_COLOR_, _INVALID_COLOR_, _READ_ONLY_COLOR_);
-  FEdit.Edit.Validation.Invalid(False);
+  FEdit.Designer.Validation.Invalid(False);
   AssertVisual(_READ_ONLY_COLOR_, _READ_ONLY_COLOR_, _READ_ONLY_COLOR_, _READ_ONLY_COLOR_, _READ_ONLY_COLOR_);
-  FEdit.Edit.Config.ReadOnly(False);
+  FEdit.Designer.Config.ReadOnly(False);
   AssertVisual(_NORMAL_COLOR_, _FOCUS_COLOR_, _NORMAL_COLOR_, _FOCUS_COLOR_, _NORMAL_COLOR_);
 end;
 
@@ -204,7 +204,7 @@ var
 begin
   ConfigureColors;
   BuildEdit;
-  LControl := FEdit.Edit.Control;
+  LControl := FEdit.Designer.Control;
   LRoot := FEdit.Rectangle.Control;
   FEdit := nil;
   Assert.IsTrue(Assigned(LControl.OnEnter));

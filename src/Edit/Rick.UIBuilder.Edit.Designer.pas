@@ -6,6 +6,7 @@ uses
   FMX.Edit,
   FMX.Objects,
 
+  Rick.UIBuilder.Edit.InputRules,
   Rick.UIBuilder.Edit.Interfaces,
   Rick.UIBuilder.Edit.VisualState;
 
@@ -16,7 +17,7 @@ type
     FParent: IRickUIBuilderEdit;
     FHost: TRectangle;
     FBackground: TRectangle;
-    FControl: TEdit;
+    FControl: TRickUIBuilderEditInputRules;
     FVisualState: TRickUIBuilderEditVisualState;
     FInput: IRickUIBuilderEditDesignerInput;
     FValidation: IRickUIBuilderEditDesignerValidation;
@@ -60,7 +61,7 @@ begin
   FBackground.Stroke.Kind := TBrushKind.None;
   FBackground.HitTest := False;
   FBackground.SendToBack;
-  FControl := TEdit.Create(AHost);
+  FControl := TRickUIBuilderEditInputRules.Create(AHost);
   FControl.Parent := AHost;
   FControl.SetBounds(8, 24, AHost.Width - 16, 24);
   FControl.StyleLookup := 'transparentedit';

@@ -3,8 +3,7 @@
 interface
 
 uses
-  FMX.Edit,
-
+  Rick.UIBuilder.Edit.InputRules,
   Rick.UIBuilder.Edit.Interfaces,
   Rick.UIBuilder.Edit.Types;
 
@@ -13,13 +12,9 @@ type
   private
     [weak]
     FParent: IRickUIBuilderEditDesignerInput;
-    FControl: TEdit;
-    FPreset: TRickUIBuilderEditPreset;
-    FCaseMode: TRickUIBuilderEditCaseMode;
-    FUrlCaseMode: TRickUIBuilderEditUrlCaseMode;
-    FMaxLength: Integer;
+    FInputRules: TRickUIBuilderEditInputRules;
   protected
-    constructor Create(const AParent: IRickUIBuilderEditDesignerInput; AControl: TEdit);
+    constructor Create(const AParent: IRickUIBuilderEditDesignerInput; AInputRules: TRickUIBuilderEditInputRules);
 
     function Preset(AValue: TRickUIBuilderEditPreset): IRickUIBuilderEditDesignerInputConfig;
     function CaseMode(AValue: TRickUIBuilderEditCaseMode): IRickUIBuilderEditDesignerInputConfig;
@@ -27,7 +22,7 @@ type
     function MaxLength(AValue: Integer): IRickUIBuilderEditDesignerInputConfig;
     function ToBack: IRickUIBuilderEditDesignerInput;
   public
-    class function New(const AParent: IRickUIBuilderEditDesignerInput; AControl: TEdit): IRickUIBuilderEditDesignerInputConfig;
+    class function New(const AParent: IRickUIBuilderEditDesignerInput; AInputRules: TRickUIBuilderEditInputRules): IRickUIBuilderEditDesignerInputConfig;
   end;
 
 implementation
@@ -35,44 +30,39 @@ implementation
 uses
   System.SysUtils;
 
-constructor TRickUIBuilderEditDesignerInputConfig.Create(const AParent: IRickUIBuilderEditDesignerInput; AControl: TEdit);
+constructor TRickUIBuilderEditDesignerInputConfig.Create(const AParent: IRickUIBuilderEditDesignerInput; AInputRules: TRickUIBuilderEditInputRules);
 begin
   inherited Create;
   FParent := AParent;
-  FControl := AControl;
-  FPreset := TRickUIBuilderEditPreset.AllCharacters;
-  FCaseMode := TRickUIBuilderEditCaseMode.Preserve;
-  FUrlCaseMode := TRickUIBuilderEditUrlCaseMode.SchemeAndHost;
-  FMaxLength := 0;
+  FInputRules := AInputRules;
 end;
 
-class function TRickUIBuilderEditDesignerInputConfig.New(const AParent: IRickUIBuilderEditDesignerInput; AControl: TEdit): IRickUIBuilderEditDesignerInputConfig;
+class function TRickUIBuilderEditDesignerInputConfig.New(const AParent: IRickUIBuilderEditDesignerInput; AInputRules: TRickUIBuilderEditInputRules): IRickUIBuilderEditDesignerInputConfig;
 begin
-  Result := Self.Create(AParent, AControl);
+  Result := Self.Create(AParent, AInputRules);
 end;
 
 function TRickUIBuilderEditDesignerInputConfig.Preset(AValue: TRickUIBuilderEditPreset): IRickUIBuilderEditDesignerInputConfig;
 begin
-  FPreset := AValue;
+  FInputRules.SetPreset(AValue);
   Result := Self;
 end;
 
 function TRickUIBuilderEditDesignerInputConfig.CaseMode(AValue: TRickUIBuilderEditCaseMode): IRickUIBuilderEditDesignerInputConfig;
 begin
-  FCaseMode := AValue;
+  FInputRules.SetCaseMode(AValue);
   Result := Self;
 end;
 
 function TRickUIBuilderEditDesignerInputConfig.UrlCaseMode(AValue: TRickUIBuilderEditUrlCaseMode): IRickUIBuilderEditDesignerInputConfig;
 begin
-  FUrlCaseMode := AValue;
+  FInputRules.SetUrlCaseMode(AValue);
   Result := Self;
 end;
 
 function TRickUIBuilderEditDesignerInputConfig.MaxLength(AValue: Integer): IRickUIBuilderEditDesignerInputConfig;
 begin
-  FMaxLength := AValue;
-  FControl.MaxLength := AValue;
+  FInputRules.MaxLength := AValue;
   Result := Self;
 end;
 

@@ -445,7 +445,7 @@ type
 
     function Rectangle: IRickUIBuilderEditRetangle;
     function Labels: IRickUIBuilderEditLabel;
-    function Edit: IRickUIBuilderEditDesigner;
+    function Designer: IRickUIBuilderEditDesigner;
     function Line: IRickUIBuilderEditLine;
     function Config: IRickUIBuilderEditConfig;
 

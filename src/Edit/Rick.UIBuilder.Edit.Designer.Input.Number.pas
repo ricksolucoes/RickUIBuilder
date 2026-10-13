@@ -3,6 +3,7 @@
 interface
 
 uses
+  Rick.UIBuilder.Edit.InputRules,
   Rick.UIBuilder.Edit.Interfaces,
   Rick.UIBuilder.Edit.Types;
 
@@ -11,14 +12,9 @@ type
   private
     [weak]
     FParent: IRickUIBuilderEditDesignerInput;
-    FAllowNegative: Boolean;
-    FDecimalPlaces: Integer;
-    FFormatMode: TRickUIBuilderEditNumberFormatMode;
-    FDecimalSeparator: Char;
-    FThousandSeparator: Char;
-    FUseThousandSeparator: Boolean;
+    FInputRules: TRickUIBuilderEditInputRules;
   protected
-    constructor Create(const AParent: IRickUIBuilderEditDesignerInput);
+    constructor Create(const AParent: IRickUIBuilderEditDesignerInput; AInputRules: TRickUIBuilderEditInputRules);
 
     function AllowNegative(AValue: Boolean): IRickUIBuilderEditDesignerInputNumber; overload;
     function AllowNegative: IRickUIBuilderEditDesignerInputNumber; overload;
@@ -30,7 +26,7 @@ type
     function UseThousandSeparator: IRickUIBuilderEditDesignerInputNumber; overload;
     function ToBack: IRickUIBuilderEditDesignerInput;
   public
-    class function New(const AParent: IRickUIBuilderEditDesignerInput): IRickUIBuilderEditDesignerInputNumber;
+    class function New(const AParent: IRickUIBuilderEditDesignerInput; AInputRules: TRickUIBuilderEditInputRules): IRickUIBuilderEditDesignerInputNumber;
   end;
 
 implementation
@@ -38,26 +34,21 @@ implementation
 uses
   System.SysUtils;
 
-constructor TRickUIBuilderEditDesignerInputNumber.Create(const AParent: IRickUIBuilderEditDesignerInput);
+constructor TRickUIBuilderEditDesignerInputNumber.Create(const AParent: IRickUIBuilderEditDesignerInput; AInputRules: TRickUIBuilderEditInputRules);
 begin
   inherited Create;
   FParent := AParent;
-  FAllowNegative := False;
-  FDecimalPlaces := 2;
-  FFormatMode := TRickUIBuilderEditNumberFormatMode.Locale;
-  FDecimalSeparator := #0;
-  FThousandSeparator := #0;
-  FUseThousandSeparator := False;
+  FInputRules := AInputRules;
 end;
 
-class function TRickUIBuilderEditDesignerInputNumber.New(const AParent: IRickUIBuilderEditDesignerInput): IRickUIBuilderEditDesignerInputNumber;
+class function TRickUIBuilderEditDesignerInputNumber.New(const AParent: IRickUIBuilderEditDesignerInput; AInputRules: TRickUIBuilderEditInputRules): IRickUIBuilderEditDesignerInputNumber;
 begin
-  Result := Self.Create(AParent);
+  Result := Self.Create(AParent, AInputRules);
 end;
 
 function TRickUIBuilderEditDesignerInputNumber.AllowNegative(AValue: Boolean): IRickUIBuilderEditDesignerInputNumber;
 begin
-  FAllowNegative := AValue;
+  FInputRules.SetAllowNegative(AValue);
   Result := Self;
 end;
 
@@ -68,31 +59,31 @@ end;
 
 function TRickUIBuilderEditDesignerInputNumber.DecimalPlaces(AValue: Integer): IRickUIBuilderEditDesignerInputNumber;
 begin
-  FDecimalPlaces := AValue;
+  FInputRules.SetDecimalPlaces(AValue);
   Result := Self;
 end;
 
 function TRickUIBuilderEditDesignerInputNumber.FormatMode(AValue: TRickUIBuilderEditNumberFormatMode): IRickUIBuilderEditDesignerInputNumber;
 begin
-  FFormatMode := AValue;
+  FInputRules.SetFormatMode(AValue);
   Result := Self;
 end;
 
 function TRickUIBuilderEditDesignerInputNumber.DecimalSeparator(AValue: Char): IRickUIBuilderEditDesignerInputNumber;
 begin
-  FDecimalSeparator := AValue;
+  FInputRules.SetDecimalSeparator(AValue);
   Result := Self;
 end;
 
 function TRickUIBuilderEditDesignerInputNumber.ThousandSeparator(AValue: Char): IRickUIBuilderEditDesignerInputNumber;
 begin
-  FThousandSeparator := AValue;
+  FInputRules.SetThousandSeparator(AValue);
   Result := Self;
 end;
 
 function TRickUIBuilderEditDesignerInputNumber.UseThousandSeparator(AValue: Boolean): IRickUIBuilderEditDesignerInputNumber;
 begin
-  FUseThousandSeparator := AValue;
+  FInputRules.SetUseThousandSeparator(AValue);
   Result := Self;
 end;
 

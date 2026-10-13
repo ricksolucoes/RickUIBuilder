@@ -50,7 +50,7 @@ procedure TRickUIBuilderEditFoundationTests.Root_DeveCachearRamosPrincipais;
 begin
   Assert.IsTrue(FEdit.Rectangle = FEdit.Rectangle);
   Assert.IsTrue(FEdit.Labels = FEdit.Labels);
-  Assert.IsTrue(FEdit.Edit = FEdit.Edit);
+  Assert.IsTrue(FEdit.Designer = FEdit.Designer);
   Assert.IsTrue(FEdit.Line = FEdit.Line);
   Assert.IsTrue(FEdit.Config = FEdit.Config);
 end;
@@ -67,7 +67,7 @@ end;
 procedure TRickUIBuilderEditFoundationTests.Build_DeveManterDesignerDentroDoContainer;
 begin
   FEdit.Parent(FHost).Build;
-  Assert.IsTrue(FEdit.Edit.Control.Parent = FEdit.Rectangle.Control);
+  Assert.IsTrue(FEdit.Designer.Control.Parent = FEdit.Rectangle.Control);
 end;
 
 procedure TRickUIBuilderEditFoundationTests.ParentLiberado_ToBackDeveFalhar;
