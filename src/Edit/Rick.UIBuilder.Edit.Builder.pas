@@ -17,7 +17,7 @@ type
     FBuilt: Boolean;
     FRectangle: IRickUIBuilderEditRetangle;
     FLabels: IRickUIBuilderEditLabel;
-    FEdit: IRickUIBuilderEditDesigner;
+    FDesigner: IRickUIBuilderEditDesigner;
     FLine: IRickUIBuilderEditLine;
     FConfig: IRickUIBuilderEditConfig;
     FVisualState: TRickUIBuilderEditVisualState;
@@ -94,9 +94,9 @@ end;
 
 function TRickUIBuilderEdit.Designer: IRickUIBuilderEditDesigner;
 begin
-  if not Assigned(FEdit) then
-    FEdit := TRickUIBuilderEditDesigner.New(Self, Rectangle.Control, FVisualState);
-  Result := FEdit;
+  if not Assigned(FDesigner) then
+    FDesigner := TRickUIBuilderEditDesigner.New(Self, Rectangle.Control, FVisualState);
+  Result := FDesigner;
 end;
 
 function TRickUIBuilderEdit.Line: IRickUIBuilderEditLine;
