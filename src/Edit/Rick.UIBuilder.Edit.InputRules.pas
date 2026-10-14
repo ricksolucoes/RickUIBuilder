@@ -35,6 +35,12 @@ type
     FVisibilityOffPath: TPath;
     FRequirementMetPath: TPath;
     FRequirementNotMetPath: TPath;
+    FAlertPath: TPath;
+    FErrorLabel: TLabel;
+    FFeedback: TRickUIBuilderEditInvalidFeedback;
+    FDefaultMessage: string;
+    FInvalid: Boolean;
+    FInvalidMessage: string;
     FClearButtonEnabled: Boolean;
     FPasswordEnabled: Boolean;
     FRequirementIndicatorEnabled: Boolean;
@@ -75,6 +81,8 @@ type
     procedure UpdateClearPath;
     procedure UpdatePasswordPaths;
     procedure UpdateRequirementPaths;
+    function ResolvedInvalidMessage: string;
+    procedure UpdateValidationFeedback;
     procedure RefreshTextInteractions;
   protected
     procedure SetText(const AValue: string); override;
@@ -90,12 +98,16 @@ type
     procedure SetThousandSeparator(AValue: Char);
     procedure SetUseThousandSeparator(AValue: Boolean);
     procedure BindCounter(ACounter: TLabel);
-    procedure BindActionPaths(AClearPath, AVisibilityPath, AVisibilityOffPath, ARequirementMetPath, ARequirementNotMetPath: TPath);
+    procedure BindErrorLabel(AErrorLabel: TLabel);
+    procedure BindActionPaths(AAlertPath, AClearPath, AVisibilityPath, AVisibilityOffPath, ARequirementMetPath, ARequirementNotMetPath: TPath);
     procedure SetCounterEnabled(AValue: Boolean);
     procedure SetClearButtonEnabled(AValue: Boolean);
     procedure SetPasswordEnabled(AValue: Boolean);
     procedure SetReadOnlyValue(AValue: Boolean);
     procedure SetRequirementState(AIndicatorEnabled, AMet: Boolean);
+    procedure SetFeedback(AValue: TRickUIBuilderEditInvalidFeedback);
+    procedure SetDefaultMessage(const AValue: string);
+    procedure SetInvalidState(AValue: Boolean; const AMessage: string);
     procedure SetMaxLengthValue(AValue: Integer);
   end;
 
@@ -117,6 +129,10 @@ begin
   FDecimalSeparator := #0;
   FThousandSeparator := #0;
   FUseThousandSeparator := False;
+  FFeedback := TRickUIBuilderEditInvalidFeedback.AlertAndIcon;
+  FDefaultMessage := EmptyStr;
+  FInvalid := False;
+  FInvalidMessage := EmptyStr;
   FInputConfigured := False;
   OnChangeTracking := HandleChangeTracking;
 end;
@@ -128,8 +144,15 @@ begin
   UpdateCounter;
 end;
 
-procedure TRickUIBuilderEditInputRules.BindActionPaths(AClearPath, AVisibilityPath, AVisibilityOffPath, ARequirementMetPath, ARequirementNotMetPath: TPath);
+procedure TRickUIBuilderEditInputRules.BindErrorLabel(AErrorLabel: TLabel);
 begin
+  FErrorLabel := AErrorLabel;
+  UpdateValidationFeedback;
+end;
+
+procedure TRickUIBuilderEditInputRules.BindActionPaths(AAlertPath, AClearPath, AVisibilityPath, AVisibilityOffPath, ARequirementMetPath, ARequirementNotMetPath: TPath);
+begin
+  FAlertPath := AAlertPath;
   FClearPath := AClearPath;
   FVisibilityPath := AVisibilityPath;
   FVisibilityOffPath := AVisibilityOffPath;
@@ -144,6 +167,7 @@ begin
   UpdateClearPath;
   UpdatePasswordPaths;
   UpdateRequirementPaths;
+  UpdateValidationFeedback;
 end;
 
 procedure TRickUIBuilderEditInputRules.SetCounterEnabled(AValue: Boolean);
@@ -178,6 +202,25 @@ begin
   FRequirementIndicatorEnabled := AIndicatorEnabled;
   FRequirementMet := AMet;
   UpdateRequirementPaths;
+end;
+
+procedure TRickUIBuilderEditInputRules.SetFeedback(AValue: TRickUIBuilderEditInvalidFeedback);
+begin
+  FFeedback := AValue;
+  UpdateValidationFeedback;
+end;
+
+procedure TRickUIBuilderEditInputRules.SetDefaultMessage(const AValue: string);
+begin
+  FDefaultMessage := AValue;
+  UpdateValidationFeedback;
+end;
+
+procedure TRickUIBuilderEditInputRules.SetInvalidState(AValue: Boolean; const AMessage: string);
+begin
+  FInvalid := AValue;
+  FInvalidMessage := AMessage;
+  UpdateValidationFeedback;
 end;
 
 procedure TRickUIBuilderEditInputRules.SetMaxLengthValue(AValue: Integer);
@@ -241,6 +284,31 @@ begin
     Exit;
   FRequirementMetPath.Visible := FRequirementIndicatorEnabled and FRequirementMet;
   FRequirementNotMetPath.Visible := FRequirementIndicatorEnabled and not FRequirementMet;
+end;
+
+function TRickUIBuilderEditInputRules.ResolvedInvalidMessage: string;
+begin
+  Result := FInvalidMessage;
+  if Result = EmptyStr then
+    Result := FDefaultMessage;
+end;
+
+procedure TRickUIBuilderEditInputRules.UpdateValidationFeedback;
+var
+  LMessage: string;
+begin
+  LMessage := EmptyStr;
+  if FInvalid then
+    LMessage := ResolvedInvalidMessage;
+  if Assigned(FErrorLabel) then
+  begin
+    FErrorLabel.Text := LMessage;
+    FErrorLabel.Visible := FInvalid and (LMessage <> EmptyStr) and
+      (FFeedback <> TRickUIBuilderEditInvalidFeedback.IconOnly);
+  end;
+  if Assigned(FAlertPath) then
+    FAlertPath.Visible := FInvalid and
+      (FFeedback <> TRickUIBuilderEditInvalidFeedback.AlertOnly);
 end;
 
 procedure TRickUIBuilderEditInputRules.RefreshTextInteractions;

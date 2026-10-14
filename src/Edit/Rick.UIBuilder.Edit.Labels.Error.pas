@@ -5,6 +5,7 @@ interface
 uses
   FMX.Objects,
 
+  Rick.UIBuilder.Edit.InputRules,
   Rick.UIBuilder.Edit.Interfaces;
 
 type
@@ -13,14 +14,15 @@ type
     [weak]
     FParent: IRickUIBuilderEditLabel;
     FHost: TRectangle;
+    FInputRules: TRickUIBuilderEditInputRules;
     FText: IRickUIBuilderEditLabelErrorText;
   protected
-    constructor Create(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle);
+    constructor Create(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules);
 
     function Text: IRickUIBuilderEditLabelErrorText;
     function ToBack: IRickUIBuilderEditLabel;
   public
-    class function New(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle): IRickUIBuilderEditLabelError;
+    class function New(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules): IRickUIBuilderEditLabelError;
   end;
 
 implementation
@@ -30,22 +32,23 @@ uses
 
   Rick.UIBuilder.Edit.Labels.Error.Text;
 
-constructor TRickUIBuilderEditLabelError.Create(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle);
+constructor TRickUIBuilderEditLabelError.Create(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules);
 begin
   inherited Create;
   FParent := AParent;
   FHost := AHost;
+  FInputRules := AInputRules;
 end;
 
-class function TRickUIBuilderEditLabelError.New(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle): IRickUIBuilderEditLabelError;
+class function TRickUIBuilderEditLabelError.New(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules): IRickUIBuilderEditLabelError;
 begin
-  Result := Self.Create(AParent, AHost);
+  Result := Self.Create(AParent, AHost, AInputRules);
 end;
 
 function TRickUIBuilderEditLabelError.Text: IRickUIBuilderEditLabelErrorText;
 begin
   if not Assigned(FText) then
-    FText := TRickUIBuilderEditLabelErrorText.New(Self, FHost);
+    FText := TRickUIBuilderEditLabelErrorText.New(Self, FHost, FInputRules);
   Result := FText;
 end;
 

@@ -15,8 +15,6 @@ type
     FParent: IRickUIBuilderEditDesigner;
     FRequired: Boolean;
     FRequirementIndicator: Boolean;
-    FFeedback: TRickUIBuilderEditInvalidFeedback;
-    FDefaultMessage: string;
     FHasInvalid: Boolean;
     FInvalid: Boolean;
     FInvalidMessage: string;
@@ -61,8 +59,6 @@ begin
   FVisualState := AVisualState;
   FRequired := False;
   FRequirementIndicator := False;
-  FFeedback := TRickUIBuilderEditInvalidFeedback.AlertAndIcon;
-  FDefaultMessage := EmptyStr;
   FHasInvalid := False;
   FInvalid := False;
   FInvalidMessage := EmptyStr;
@@ -100,13 +96,13 @@ end;
 
 function TRickUIBuilderEditDesignerValidation.Feedback(AValue: TRickUIBuilderEditInvalidFeedback): IRickUIBuilderEditDesignerValidation;
 begin
-  FFeedback := AValue;
+  FInputRules.SetFeedback(AValue);
   Result := Self;
 end;
 
 function TRickUIBuilderEditDesignerValidation.DefaultMessage(const AValue: string): IRickUIBuilderEditDesignerValidation;
 begin
-  FDefaultMessage := AValue;
+  FInputRules.SetDefaultMessage(AValue);
   Result := Self;
 end;
 
@@ -125,6 +121,7 @@ begin
   FHasInvalid := True;
   FInvalid := AValue;
   FInvalidMessage := AMessage;
+  FInputRules.SetInvalidState(AValue, AMessage);
   FVisualState.SetInvalid(AValue);
   Result := Self;
 end;

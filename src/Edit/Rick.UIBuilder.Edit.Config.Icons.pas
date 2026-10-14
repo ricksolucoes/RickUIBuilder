@@ -52,7 +52,7 @@ begin
   CreatePaths(AHost);
   HidePaths;
   ApplySize(20);
-  AInputRules.BindActionPaths(FClear, FVisibility, FVisibilityOff, FRequirementMet, FRequirementNotMet);
+  AInputRules.BindActionPaths(FAlert, FClear, FVisibility, FVisibilityOff, FRequirementMet, FRequirementNotMet);
 end;
 
 procedure TRickUIBuilderEditConfigIcons.CreatePaths(AHost: TRectangle);

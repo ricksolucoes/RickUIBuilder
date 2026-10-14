@@ -295,6 +295,7 @@
         <DCCReference Include="src\edits\Rick.UIBuilder.Tests.Edit.VisualState.pas"/>
         <DCCReference Include="src\edits\Rick.UIBuilder.Tests.Edit.InputRules.pas"/>
         <DCCReference Include="src\edits\Rick.UIBuilder.Tests.Edit.Interaction.pas"/>
+        <DCCReference Include="src\edits\Rick.UIBuilder.Tests.Edit.ValidationFeedback.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

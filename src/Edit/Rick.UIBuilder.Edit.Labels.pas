@@ -71,7 +71,7 @@ end;
 function TRickUIBuilderEditLabel.Error: IRickUIBuilderEditLabelError;
 begin
   if not Assigned(FError) then
-    FError := TRickUIBuilderEditLabelError.New(Self, FHost);
+    FError := TRickUIBuilderEditLabelError.New(Self, FHost, FInputRules);
   Result := FError;
 end;
 

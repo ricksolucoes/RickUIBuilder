@@ -7,6 +7,7 @@ uses
   FMX.StdCtrls,
   System.UITypes,
 
+  Rick.UIBuilder.Edit.InputRules,
   Rick.UIBuilder.Edit.Interfaces;
 
 type
@@ -17,7 +18,7 @@ type
     FControl: TLabel;
     FFont: IRickUIBuilderEditLabelErrorTextFont;
   protected
-    constructor Create(const AParent: IRickUIBuilderEditLabelError; AHost: TRectangle);
+    constructor Create(const AParent: IRickUIBuilderEditLabelError; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules);
 
     function Value(AValue: string): IRickUIBuilderEditLabelErrorText;
     function Color(AValue: TAlphaColor): IRickUIBuilderEditLabelErrorText;
@@ -25,7 +26,7 @@ type
     function Font: IRickUIBuilderEditLabelErrorTextFont;
     function ToBack: IRickUIBuilderEditLabelError;
   public
-    class function New(const AParent: IRickUIBuilderEditLabelError; AHost: TRectangle): IRickUIBuilderEditLabelErrorText;
+    class function New(const AParent: IRickUIBuilderEditLabelError; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules): IRickUIBuilderEditLabelErrorText;
   end;
 
 implementation
@@ -37,7 +38,7 @@ uses
 
   Rick.UIBuilder.Edit.Labels.Error.Text.Font;
 
-constructor TRickUIBuilderEditLabelErrorText.Create(const AParent: IRickUIBuilderEditLabelError; AHost: TRectangle);
+constructor TRickUIBuilderEditLabelErrorText.Create(const AParent: IRickUIBuilderEditLabelError; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules);
 begin
   inherited Create;
   FParent := AParent;
@@ -49,11 +50,12 @@ begin
   FControl.TextSettings.FontColor := $FFD93025;
   FControl.Visible := False;
   FControl.HitTest := False;
+  AInputRules.BindErrorLabel(FControl);
 end;
 
-class function TRickUIBuilderEditLabelErrorText.New(const AParent: IRickUIBuilderEditLabelError; AHost: TRectangle): IRickUIBuilderEditLabelErrorText;
+class function TRickUIBuilderEditLabelErrorText.New(const AParent: IRickUIBuilderEditLabelError; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules): IRickUIBuilderEditLabelErrorText;
 begin
-  Result := Self.Create(AParent, AHost);
+  Result := Self.Create(AParent, AHost, AInputRules);
 end;
 
 function TRickUIBuilderEditLabelErrorText.Value(AValue: string): IRickUIBuilderEditLabelErrorText;
