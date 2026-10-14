@@ -6,6 +6,7 @@ uses
   FMX.Objects,
   FMX.StdCtrls,
 
+  Rick.UIBuilder.Edit.InputRules,
   Rick.UIBuilder.Edit.Interfaces;
 
 type
@@ -14,15 +15,15 @@ type
     [weak]
     FParent: IRickUIBuilderEditLabel;
     FControl: TLabel;
-    FEnabled: Boolean;
+    FInputRules: TRickUIBuilderEditInputRules;
   protected
-    constructor Create(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle);
+    constructor Create(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules);
 
     function Enabled(AValue: Boolean): IRickUIBuilderEditLabelCounter; overload;
     function Enabled: IRickUIBuilderEditLabelCounter; overload;
     function ToBack: IRickUIBuilderEditLabel;
   public
-    class function New(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle): IRickUIBuilderEditLabelCounter;
+    class function New(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules): IRickUIBuilderEditLabelCounter;
   end;
 
 implementation
@@ -32,11 +33,11 @@ uses
 
   FMX.Types;
 
-constructor TRickUIBuilderEditLabelCounter.Create(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle);
+constructor TRickUIBuilderEditLabelCounter.Create(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules);
 begin
   inherited Create;
   FParent := AParent;
-  FEnabled := False;
+  FInputRules := AInputRules;
   FControl := TLabel.Create(AHost);
   FControl.Parent := AHost;
   FControl.SetBounds(AHost.Width - 72, AHost.Height - 20, 64, 16);
@@ -44,17 +45,17 @@ begin
   FControl.TextSettings.Font.Size := 11;
   FControl.Visible := False;
   FControl.HitTest := False;
+  FInputRules.BindCounter(FControl);
 end;
 
-class function TRickUIBuilderEditLabelCounter.New(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle): IRickUIBuilderEditLabelCounter;
+class function TRickUIBuilderEditLabelCounter.New(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules): IRickUIBuilderEditLabelCounter;
 begin
-  Result := Self.Create(AParent, AHost);
+  Result := Self.Create(AParent, AHost, AInputRules);
 end;
 
 function TRickUIBuilderEditLabelCounter.Enabled(AValue: Boolean): IRickUIBuilderEditLabelCounter;
 begin
-  FEnabled := AValue;
-  FControl.Visible := AValue;
+  FInputRules.SetCounterEnabled(AValue);
   Result := Self;
 end;
 

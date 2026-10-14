@@ -5,6 +5,7 @@ interface
 uses
   FMX.Objects,
 
+  Rick.UIBuilder.Edit.InputRules,
   Rick.UIBuilder.Edit.Interfaces;
 
 type
@@ -24,14 +25,14 @@ type
     procedure HidePaths;
     procedure ApplySize(AValue: Single);
   protected
-    constructor Create(const AParent: IRickUIBuilderEditConfig; AHost: TRectangle);
+    constructor Create(const AParent: IRickUIBuilderEditConfig; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules);
 
     function Size(AValue: Single): IRickUIBuilderEditConfigIcons;
     function Colors: IRickUIBuilderEditConfigIconColors;
     function Paths: IRickUIBuilderEditConfigIconPaths;
     function ToBack: IRickUIBuilderEditConfig;
   public
-    class function New(const AParent: IRickUIBuilderEditConfig; AHost: TRectangle): IRickUIBuilderEditConfigIcons;
+    class function New(const AParent: IRickUIBuilderEditConfig; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules): IRickUIBuilderEditConfigIcons;
   end;
 
 implementation
@@ -44,13 +45,14 @@ uses
   Rick.UIBuilder.Edit.Config.Icons.Colors,
   Rick.UIBuilder.Edit.Config.Icons.Paths;
 
-constructor TRickUIBuilderEditConfigIcons.Create(const AParent: IRickUIBuilderEditConfig; AHost: TRectangle);
+constructor TRickUIBuilderEditConfigIcons.Create(const AParent: IRickUIBuilderEditConfig; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules);
 begin
   inherited Create;
   FParent := AParent;
   CreatePaths(AHost);
   HidePaths;
   ApplySize(20);
+  AInputRules.BindActionPaths(FClear, FVisibility, FVisibilityOff, FRequirementMet, FRequirementNotMet);
 end;
 
 procedure TRickUIBuilderEditConfigIcons.CreatePaths(AHost: TRectangle);
@@ -79,9 +81,9 @@ begin
   FRequirementNotMet.Visible := False;
 end;
 
-class function TRickUIBuilderEditConfigIcons.New(const AParent: IRickUIBuilderEditConfig; AHost: TRectangle): IRickUIBuilderEditConfigIcons;
+class function TRickUIBuilderEditConfigIcons.New(const AParent: IRickUIBuilderEditConfig; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules): IRickUIBuilderEditConfigIcons;
 begin
-  Result := Self.Create(AParent, AHost);
+  Result := Self.Create(AParent, AHost, AInputRules);
 end;
 
 procedure TRickUIBuilderEditConfigIcons.ApplySize(AValue: Single);

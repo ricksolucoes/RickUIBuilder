@@ -5,6 +5,7 @@ interface
 uses
   FMX.Objects,
 
+  Rick.UIBuilder.Edit.InputRules,
   Rick.UIBuilder.Edit.Interfaces,
   Rick.UIBuilder.Edit.VisualState;
 
@@ -14,19 +15,20 @@ type
     [weak]
     FParent: IRickUIBuilderEdit;
     FHost: TRectangle;
+    FInputRules: TRickUIBuilderEditInputRules;
     FVisualState: TRickUIBuilderEditVisualState;
     FMain: IRickUIBuilderEditLabelMain;
     FCounter: IRickUIBuilderEditLabelCounter;
     FError: IRickUIBuilderEditLabelError;
   protected
-    constructor Create(const AParent: IRickUIBuilderEdit; AHost: TRectangle; AVisualState: TRickUIBuilderEditVisualState);
+    constructor Create(const AParent: IRickUIBuilderEdit; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules; AVisualState: TRickUIBuilderEditVisualState);
 
     function Main: IRickUIBuilderEditLabelMain;
     function Counter: IRickUIBuilderEditLabelCounter;
     function Error: IRickUIBuilderEditLabelError;
     function ToBack: IRickUIBuilderEdit;
   public
-    class function New(const AParent: IRickUIBuilderEdit; AHost: TRectangle; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditLabel;
+    class function New(const AParent: IRickUIBuilderEdit; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditLabel;
   end;
 
 implementation
@@ -38,17 +40,18 @@ uses
   Rick.UIBuilder.Edit.Labels.Error,
   Rick.UIBuilder.Edit.Labels.Main;
 
-constructor TRickUIBuilderEditLabel.Create(const AParent: IRickUIBuilderEdit; AHost: TRectangle; AVisualState: TRickUIBuilderEditVisualState);
+constructor TRickUIBuilderEditLabel.Create(const AParent: IRickUIBuilderEdit; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules; AVisualState: TRickUIBuilderEditVisualState);
 begin
   inherited Create;
   FParent := AParent;
   FHost := AHost;
+  FInputRules := AInputRules;
   FVisualState := AVisualState;
 end;
 
-class function TRickUIBuilderEditLabel.New(const AParent: IRickUIBuilderEdit; AHost: TRectangle; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditLabel;
+class function TRickUIBuilderEditLabel.New(const AParent: IRickUIBuilderEdit; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditLabel;
 begin
-  Result := Self.Create(AParent, AHost, AVisualState);
+  Result := Self.Create(AParent, AHost, AInputRules, AVisualState);
 end;
 
 function TRickUIBuilderEditLabel.Main: IRickUIBuilderEditLabelMain;
@@ -61,7 +64,7 @@ end;
 function TRickUIBuilderEditLabel.Counter: IRickUIBuilderEditLabelCounter;
 begin
   if not Assigned(FCounter) then
-    FCounter := TRickUIBuilderEditLabelCounter.New(Self, FHost);
+    FCounter := TRickUIBuilderEditLabelCounter.New(Self, FHost, FInputRules);
   Result := FCounter;
 end;
 

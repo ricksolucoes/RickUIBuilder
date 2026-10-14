@@ -3,6 +3,7 @@
 interface
 
 uses
+  Rick.UIBuilder.Edit.InputRules,
   Rick.UIBuilder.Edit.Interfaces,
   Rick.UIBuilder.Edit.Types,
   Rick.UIBuilder.Edit.VisualState;
@@ -21,9 +22,10 @@ type
     FInvalidMessage: string;
     FHasRequirementMet: Boolean;
     FRequirementMet: Boolean;
+    FInputRules: TRickUIBuilderEditInputRules;
     FVisualState: TRickUIBuilderEditVisualState;
   protected
-    constructor Create(const AParent: IRickUIBuilderEditDesigner; AVisualState: TRickUIBuilderEditVisualState);
+    constructor Create(const AParent: IRickUIBuilderEditDesigner; AInputRules: TRickUIBuilderEditInputRules; AVisualState: TRickUIBuilderEditVisualState);
 
     function Required(AValue: Boolean): IRickUIBuilderEditDesignerValidation; overload;
     function Required: IRickUIBuilderEditDesignerValidation; overload;
@@ -43,7 +45,7 @@ type
     function RequirementMetValue: Boolean;
     function ToBack: IRickUIBuilderEditDesigner;
   public
-    class function New(const AParent: IRickUIBuilderEditDesigner; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditDesignerValidation;
+    class function New(const AParent: IRickUIBuilderEditDesigner; AInputRules: TRickUIBuilderEditInputRules; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditDesignerValidation;
   end;
 
 implementation
@@ -51,10 +53,11 @@ implementation
 uses
   System.SysUtils;
 
-constructor TRickUIBuilderEditDesignerValidation.Create(const AParent: IRickUIBuilderEditDesigner; AVisualState: TRickUIBuilderEditVisualState);
+constructor TRickUIBuilderEditDesignerValidation.Create(const AParent: IRickUIBuilderEditDesigner; AInputRules: TRickUIBuilderEditInputRules; AVisualState: TRickUIBuilderEditVisualState);
 begin
   inherited Create;
   FParent := AParent;
+  FInputRules := AInputRules;
   FVisualState := AVisualState;
   FRequired := False;
   FRequirementIndicator := False;
@@ -67,9 +70,9 @@ begin
   FRequirementMet := False;
 end;
 
-class function TRickUIBuilderEditDesignerValidation.New(const AParent: IRickUIBuilderEditDesigner; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditDesignerValidation;
+class function TRickUIBuilderEditDesignerValidation.New(const AParent: IRickUIBuilderEditDesigner; AInputRules: TRickUIBuilderEditInputRules; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditDesignerValidation;
 begin
-  Result := Self.Create(AParent, AVisualState);
+  Result := Self.Create(AParent, AInputRules, AVisualState);
 end;
 
 function TRickUIBuilderEditDesignerValidation.Required(AValue: Boolean): IRickUIBuilderEditDesignerValidation;
@@ -86,6 +89,7 @@ end;
 function TRickUIBuilderEditDesignerValidation.RequirementIndicator(AValue: Boolean): IRickUIBuilderEditDesignerValidation;
 begin
   FRequirementIndicator := AValue;
+  FInputRules.SetRequirementState(FRequirementIndicator, FRequirementMet);
   Result := Self;
 end;
 
@@ -144,6 +148,7 @@ function TRickUIBuilderEditDesignerValidation.RequirementMet(AValue: Boolean): I
 begin
   FHasRequirementMet := True;
   FRequirementMet := AValue;
+  FInputRules.SetRequirementState(FRequirementIndicator, FRequirementMet);
   Result := Self;
 end;
 

@@ -42,6 +42,7 @@ implementation
 uses
   Rick.UIBuilder.Edit.Config,
   Rick.UIBuilder.Edit.Designer,
+  Rick.UIBuilder.Edit.InputRules,
   Rick.UIBuilder.Edit.Labels,
   Rick.UIBuilder.Edit.Line,
   Rick.UIBuilder.Edit.Rectangle;
@@ -86,9 +87,14 @@ begin
 end;
 
 function TRickUIBuilderEdit.Labels: IRickUIBuilderEditLabel;
+var
+  LInputRules: TRickUIBuilderEditInputRules;
 begin
   if not Assigned(FLabels) then
-    FLabels := TRickUIBuilderEditLabel.New(Self, Rectangle.Control, FVisualState);
+  begin
+    LInputRules := TRickUIBuilderEditInputRules(Designer.Control);
+    FLabels := TRickUIBuilderEditLabel.New(Self, Rectangle.Control, LInputRules, FVisualState);
+  end;
   Result := FLabels;
 end;
 
@@ -107,9 +113,14 @@ begin
 end;
 
 function TRickUIBuilderEdit.Config: IRickUIBuilderEditConfig;
+var
+  LInputRules: TRickUIBuilderEditInputRules;
 begin
   if not Assigned(FConfig) then
-    FConfig := TRickUIBuilderEditConfig.New(Self, Rectangle.Control);
+  begin
+    LInputRules := TRickUIBuilderEditInputRules(Designer.Control);
+    FConfig := TRickUIBuilderEditConfig.New(Self, Rectangle.Control, LInputRules);
+  end;
   Result := FConfig;
 end;
 

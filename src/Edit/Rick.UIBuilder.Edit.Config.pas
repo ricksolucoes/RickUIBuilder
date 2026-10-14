@@ -5,6 +5,7 @@ interface
 uses
   FMX.Objects,
 
+  Rick.UIBuilder.Edit.InputRules,
   Rick.UIBuilder.Edit.Interfaces,
   Rick.UIBuilder.Edit.Types;
 
@@ -14,16 +15,17 @@ type
     [weak]
     FParent: IRickUIBuilderEdit;
     FHost: TRectangle;
+    FInputRules: TRickUIBuilderEditInputRules;
     FAppearance: TRickUIBuilderEditAppearance;
     FIcons: IRickUIBuilderEditConfigIcons;
   protected
-    constructor Create(const AParent: IRickUIBuilderEdit; AHost: TRectangle);
+    constructor Create(const AParent: IRickUIBuilderEdit; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules);
 
     function Appearance(AValue: TRickUIBuilderEditAppearance): IRickUIBuilderEditConfig;
     function Icons: IRickUIBuilderEditConfigIcons;
     function ToBack: IRickUIBuilderEdit;
   public
-    class function New(const AParent: IRickUIBuilderEdit; AHost: TRectangle): IRickUIBuilderEditConfig;
+    class function New(const AParent: IRickUIBuilderEdit; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules): IRickUIBuilderEditConfig;
   end;
 
 implementation
@@ -33,17 +35,18 @@ uses
 
   Rick.UIBuilder.Edit.Config.Icons;
 
-constructor TRickUIBuilderEditConfig.Create(const AParent: IRickUIBuilderEdit; AHost: TRectangle);
+constructor TRickUIBuilderEditConfig.Create(const AParent: IRickUIBuilderEdit; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules);
 begin
   inherited Create;
   FParent := AParent;
   FHost := AHost;
+  FInputRules := AInputRules;
   FAppearance := TRickUIBuilderEditAppearance.Outlined;
 end;
 
-class function TRickUIBuilderEditConfig.New(const AParent: IRickUIBuilderEdit; AHost: TRectangle): IRickUIBuilderEditConfig;
+class function TRickUIBuilderEditConfig.New(const AParent: IRickUIBuilderEdit; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules): IRickUIBuilderEditConfig;
 begin
-  Result := Self.Create(AParent, AHost);
+  Result := Self.Create(AParent, AHost, AInputRules);
 end;
 
 function TRickUIBuilderEditConfig.Appearance(AValue: TRickUIBuilderEditAppearance): IRickUIBuilderEditConfig;
@@ -55,7 +58,7 @@ end;
 function TRickUIBuilderEditConfig.Icons: IRickUIBuilderEditConfigIcons;
 begin
   if not Assigned(FIcons) then
-    FIcons := TRickUIBuilderEditConfigIcons.New(Self, FHost);
+    FIcons := TRickUIBuilderEditConfigIcons.New(Self, FHost, FInputRules);
   Result := FIcons;
 end;
 

@@ -6,6 +6,8 @@ interface
 
 uses
   FMX.Edit,
+  FMX.Objects,
+  FMX.StdCtrls,
   System.Classes,
 
   Rick.UIBuilder.Edit.Types;
@@ -27,6 +29,16 @@ type
     FPendingCaret: Integer;
     FCaretUpdateQueued: Boolean;
     FPendingGoToEnd: Boolean;
+    FCounter: TLabel;
+    FClearPath: TPath;
+    FVisibilityPath: TPath;
+    FVisibilityOffPath: TPath;
+    FRequirementMetPath: TPath;
+    FRequirementNotMetPath: TPath;
+    FClearButtonEnabled: Boolean;
+    FPasswordEnabled: Boolean;
+    FRequirementIndicatorEnabled: Boolean;
+    FRequirementMet: Boolean;
     procedure ApplyPendingCaret;
     procedure QueueCaretUpdate(ACaret: Integer; AGoToEnd: Boolean = False);
     function IsAppendingAtEnd(const AOldText, ANewText: string): Boolean;
@@ -56,6 +68,14 @@ type
     function FindUrlBoundary(const AValue: string): Integer;
     function ApplyUrlCase(const AValue: string): string;
     function FormatTypedValue(const AValue: string): string;
+    procedure HandleChangeTracking(ASender: TObject);
+    procedure HandleClearClick(ASender: TObject);
+    procedure HandlePasswordClick(ASender: TObject);
+    procedure UpdateCounter;
+    procedure UpdateClearPath;
+    procedure UpdatePasswordPaths;
+    procedure UpdateRequirementPaths;
+    procedure RefreshTextInteractions;
   protected
     procedure SetText(const AValue: string); override;
   public
@@ -69,6 +89,14 @@ type
     procedure SetDecimalSeparator(AValue: Char);
     procedure SetThousandSeparator(AValue: Char);
     procedure SetUseThousandSeparator(AValue: Boolean);
+    procedure BindCounter(ACounter: TLabel);
+    procedure BindActionPaths(AClearPath, AVisibilityPath, AVisibilityOffPath, ARequirementMetPath, ARequirementNotMetPath: TPath);
+    procedure SetCounterEnabled(AValue: Boolean);
+    procedure SetClearButtonEnabled(AValue: Boolean);
+    procedure SetPasswordEnabled(AValue: Boolean);
+    procedure SetReadOnlyValue(AValue: Boolean);
+    procedure SetRequirementState(AIndicatorEnabled, AMet: Boolean);
+    procedure SetMaxLengthValue(AValue: Integer);
   end;
 
 implementation
@@ -90,6 +118,135 @@ begin
   FThousandSeparator := #0;
   FUseThousandSeparator := False;
   FInputConfigured := False;
+  OnChangeTracking := HandleChangeTracking;
+end;
+
+
+procedure TRickUIBuilderEditInputRules.BindCounter(ACounter: TLabel);
+begin
+  FCounter := ACounter;
+  UpdateCounter;
+end;
+
+procedure TRickUIBuilderEditInputRules.BindActionPaths(AClearPath, AVisibilityPath, AVisibilityOffPath, ARequirementMetPath, ARequirementNotMetPath: TPath);
+begin
+  FClearPath := AClearPath;
+  FVisibilityPath := AVisibilityPath;
+  FVisibilityOffPath := AVisibilityOffPath;
+  FRequirementMetPath := ARequirementMetPath;
+  FRequirementNotMetPath := ARequirementNotMetPath;
+  FClearPath.OnClick := HandleClearClick;
+  FVisibilityPath.OnClick := HandlePasswordClick;
+  FVisibilityOffPath.OnClick := HandlePasswordClick;
+  FClearPath.HitTest := True;
+  FVisibilityPath.HitTest := True;
+  FVisibilityOffPath.HitTest := True;
+  UpdateClearPath;
+  UpdatePasswordPaths;
+  UpdateRequirementPaths;
+end;
+
+procedure TRickUIBuilderEditInputRules.SetCounterEnabled(AValue: Boolean);
+begin
+  if not Assigned(FCounter) then
+    Exit;
+  FCounter.Visible := AValue;
+  UpdateCounter;
+end;
+
+procedure TRickUIBuilderEditInputRules.SetClearButtonEnabled(AValue: Boolean);
+begin
+  FClearButtonEnabled := AValue;
+  UpdateClearPath;
+end;
+
+procedure TRickUIBuilderEditInputRules.SetPasswordEnabled(AValue: Boolean);
+begin
+  FPasswordEnabled := AValue;
+  Password := AValue;
+  UpdatePasswordPaths;
+end;
+
+procedure TRickUIBuilderEditInputRules.SetReadOnlyValue(AValue: Boolean);
+begin
+  ReadOnly := AValue;
+  UpdateClearPath;
+end;
+
+procedure TRickUIBuilderEditInputRules.SetRequirementState(AIndicatorEnabled, AMet: Boolean);
+begin
+  FRequirementIndicatorEnabled := AIndicatorEnabled;
+  FRequirementMet := AMet;
+  UpdateRequirementPaths;
+end;
+
+procedure TRickUIBuilderEditInputRules.SetMaxLengthValue(AValue: Integer);
+begin
+  MaxLength := AValue;
+  UpdateCounter;
+end;
+
+procedure TRickUIBuilderEditInputRules.HandleChangeTracking(ASender: TObject);
+begin
+  RefreshTextInteractions;
+end;
+
+procedure TRickUIBuilderEditInputRules.HandleClearClick(ASender: TObject);
+begin
+  if not FClearButtonEnabled or ReadOnly then
+    Exit;
+  Text := EmptyStr;
+  SetFocus;
+end;
+
+procedure TRickUIBuilderEditInputRules.HandlePasswordClick(ASender: TObject);
+begin
+  if not FPasswordEnabled then
+    Exit;
+  Password := not Password;
+  UpdatePasswordPaths;
+  SetFocus;
+end;
+
+procedure TRickUIBuilderEditInputRules.UpdateCounter;
+begin
+  if not Assigned(FCounter) then
+    Exit;
+  if (not FCounter.Visible) or (MaxLength <= 0) then
+  begin
+    FCounter.Text := EmptyStr;
+    Exit;
+  end;
+  FCounter.Text := Format('%d/%d', [Length(Text), MaxLength]);
+end;
+
+procedure TRickUIBuilderEditInputRules.UpdateClearPath;
+begin
+  if not Assigned(FClearPath) then
+    Exit;
+  FClearPath.Visible := FClearButtonEnabled and not ReadOnly and (Text <> EmptyStr);
+end;
+
+procedure TRickUIBuilderEditInputRules.UpdatePasswordPaths;
+begin
+  if not Assigned(FVisibilityPath) or not Assigned(FVisibilityOffPath) then
+    Exit;
+  FVisibilityPath.Visible := FPasswordEnabled and not Password;
+  FVisibilityOffPath.Visible := FPasswordEnabled and Password;
+end;
+
+procedure TRickUIBuilderEditInputRules.UpdateRequirementPaths;
+begin
+  if not Assigned(FRequirementMetPath) or not Assigned(FRequirementNotMetPath) then
+    Exit;
+  FRequirementMetPath.Visible := FRequirementIndicatorEnabled and FRequirementMet;
+  FRequirementNotMetPath.Visible := FRequirementIndicatorEnabled and not FRequirementMet;
+end;
+
+procedure TRickUIBuilderEditInputRules.RefreshTextInteractions;
+begin
+  UpdateClearPath;
+  UpdateCounter;
 end;
 
 procedure TRickUIBuilderEditInputRules.SetPreset(AValue: TRickUIBuilderEditPreset);

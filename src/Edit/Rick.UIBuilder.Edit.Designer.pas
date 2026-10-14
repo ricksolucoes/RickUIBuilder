@@ -86,7 +86,7 @@ end;
 function TRickUIBuilderEditDesigner.Validation: IRickUIBuilderEditDesignerValidation;
 begin
   if not Assigned(FValidation) then
-    FValidation := TRickUIBuilderEditDesignerValidation.New(Self, FVisualState);
+    FValidation := TRickUIBuilderEditDesignerValidation.New(Self, FControl, FVisualState);
   Result := FValidation;
 end;
 

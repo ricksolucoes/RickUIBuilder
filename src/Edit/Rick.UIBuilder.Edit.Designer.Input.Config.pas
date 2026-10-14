@@ -62,7 +62,7 @@ end;
 
 function TRickUIBuilderEditDesignerInputConfig.MaxLength(AValue: Integer): IRickUIBuilderEditDesignerInputConfig;
 begin
-  FInputRules.MaxLength := AValue;
+  FInputRules.SetMaxLengthValue(AValue);
   Result := Self;
 end;
 
