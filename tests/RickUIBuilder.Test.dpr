@@ -31,7 +31,8 @@ uses
   Rick.UIBuilder.Tests.Edit.InputRules in 'src\edits\Rick.UIBuilder.Tests.Edit.InputRules.pas',
   Rick.UIBuilder.Tests.Edit.Interaction in 'src\edits\Rick.UIBuilder.Tests.Edit.Interaction.pas',
   Rick.UIBuilder.Tests.Edit.ValidationFeedback in 'src\edits\Rick.UIBuilder.Tests.Edit.ValidationFeedback.pas',
-  Rick.UIBuilder.Tests.Edit.CompletionValidation in 'src\edits\Rick.UIBuilder.Tests.Edit.CompletionValidation.pas';
+  Rick.UIBuilder.Tests.Edit.CompletionValidation in 'src\edits\Rick.UIBuilder.Tests.Edit.CompletionValidation.pas',
+  Rick.UIBuilder.Tests.Edit.Appearance in 'src\edits\Rick.UIBuilder.Tests.Edit.Appearance.pas';
 
 var
   runner      : ITestRunner;

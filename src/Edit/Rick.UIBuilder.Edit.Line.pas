@@ -22,7 +22,9 @@ type
     function ToBack: IRickUIBuilderEdit;
   public
     class function New(const AParent: IRickUIBuilderEdit;
-      AHost: TRectangle): IRickUIBuilderEditLine;
+      AHost: TRectangle): IRickUIBuilderEditLine; overload;
+    class function New(const AParent: IRickUIBuilderEdit; AHost: TRectangle;
+      out AControl: TRectangle): IRickUIBuilderEditLine; overload;
   end;
 
 implementation
@@ -52,6 +54,16 @@ class function TRickUIBuilderEditLine.New(const AParent: IRickUIBuilderEdit;
   AHost: TRectangle): IRickUIBuilderEditLine;
 begin
   Result := Self.Create(AParent, AHost);
+end;
+
+class function TRickUIBuilderEditLine.New(const AParent: IRickUIBuilderEdit;
+  AHost: TRectangle; out AControl: TRectangle): IRickUIBuilderEditLine;
+var
+  LInstance: TRickUIBuilderEditLine;
+begin
+  LInstance := TRickUIBuilderEditLine.Create(AParent, AHost);
+  AControl := LInstance.FControl;
+  Result := LInstance;
 end;
 
 function TRickUIBuilderEditLine.Thickness(AValue: Single): IRickUIBuilderEditLine;

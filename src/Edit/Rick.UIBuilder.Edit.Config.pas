@@ -14,51 +14,70 @@ type
     [weak]
     FParent: IRickUIBuilderEdit;
     FHost: TRectangle;
+    FLineControl: TRectangle;
     FPaths: array[0..5] of TPath;
     FAppearance: TRickUIBuilderEditAppearance;
     FIcons: IRickUIBuilderEditConfigIcons;
+    procedure ApplyAppearance;
   protected
-    constructor Create(const AParent: IRickUIBuilderEdit; AHost: TRectangle;
-      const APaths: array of TPath);
+    constructor Create(const AParent: IRickUIBuilderEdit; AHost,
+      ALineControl: TRectangle; const APaths: array of TPath);
 
     function Appearance(AValue: TRickUIBuilderEditAppearance): IRickUIBuilderEditConfig;
     function Icons: IRickUIBuilderEditConfigIcons;
     function ToBack: IRickUIBuilderEdit;
   public
-    class function New(const AParent: IRickUIBuilderEdit; AHost: TRectangle;
-      const APaths: array of TPath): IRickUIBuilderEditConfig;
+    class function New(const AParent: IRickUIBuilderEdit; AHost,
+      ALineControl: TRectangle; const APaths: array of TPath): IRickUIBuilderEditConfig;
   end;
 
 implementation
 
 uses
+  FMX.Graphics,
   System.SysUtils,
 
   Rick.UIBuilder.Edit.Config.Icons;
 
 constructor TRickUIBuilderEditConfig.Create(const AParent: IRickUIBuilderEdit;
-  AHost: TRectangle; const APaths: array of TPath);
+  AHost, ALineControl: TRectangle; const APaths: array of TPath);
 var
   LIndex: Integer;
 begin
   inherited Create;
   FParent := AParent;
   FHost := AHost;
+  FLineControl := ALineControl;
   for LIndex := Low(FPaths) to High(FPaths) do
     FPaths[LIndex] := APaths[LIndex];
   FAppearance := TRickUIBuilderEditAppearance.Outlined;
+  ApplyAppearance;
 end;
 
 class function TRickUIBuilderEditConfig.New(const AParent: IRickUIBuilderEdit;
-  AHost: TRectangle; const APaths: array of TPath): IRickUIBuilderEditConfig;
+  AHost, ALineControl: TRectangle;
+  const APaths: array of TPath): IRickUIBuilderEditConfig;
 begin
-  Result := Self.Create(AParent, AHost, APaths);
+  Result := Self.Create(AParent, AHost, ALineControl, APaths);
+end;
+
+procedure TRickUIBuilderEditConfig.ApplyAppearance;
+begin
+  if FAppearance = TRickUIBuilderEditAppearance.Underline then
+  begin
+    FHost.Stroke.Kind := TBrushKind.None;
+    FLineControl.Visible := True;
+    Exit;
+  end;
+  FHost.Stroke.Kind := TBrushKind.Solid;
+  FLineControl.Visible := False;
 end;
 
 function TRickUIBuilderEditConfig.Appearance(
   AValue: TRickUIBuilderEditAppearance): IRickUIBuilderEditConfig;
 begin
   FAppearance := AValue;
+  ApplyAppearance;
   Result := Self;
 end;
 

@@ -13,6 +13,7 @@ type
   private
     FParentConstructor: TFmxObject;
     FRootControl: TRectangle;
+    FLineControl: TRectangle;
     FBuilt: Boolean;
     FRectangle: IRickUIBuilderEditRetangle;
     FLabels: IRickUIBuilderEditLabel;
@@ -52,6 +53,7 @@ begin
   inherited Create;
   FParentConstructor := nil;
   FRootControl := nil;
+  FLineControl := nil;
   FBuilt := False;
 end;
 
@@ -59,6 +61,7 @@ destructor TRickUIBuilderEdit.Destroy;
 begin
   FConfig := nil;
   FLine := nil;
+  FLineControl := nil;
   FLabels := nil;
   FDesigner := nil;
   FRectangle := nil;
@@ -128,7 +131,7 @@ begin
   if not Assigned(FLine) then
   begin
     EnsureSharedControls;
-    FLine := TRickUIBuilderEditLine.New(Self, FRootControl);
+    FLine := TRickUIBuilderEditLine.New(Self, FRootControl, FLineControl);
   end;
   Result := FLine;
 end;
@@ -138,7 +141,9 @@ begin
   if not Assigned(FConfig) then
   begin
     EnsureSharedControls;
-    FConfig := TRickUIBuilderEditConfig.New(Self, FRootControl, FPaths);
+    Line;
+    FConfig := TRickUIBuilderEditConfig.New(Self, FRootControl, FLineControl,
+      FPaths);
   end;
   Result := FConfig;
 end;
