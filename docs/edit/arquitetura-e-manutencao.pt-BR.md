@@ -121,15 +121,20 @@ Quando a interface representa múltiplos valores configurados simultaneamente, e
 
 Não concentrar o estado do componente inteiro em um record ou classe agregadora apenas para facilitar `Build`.
 
-## Helpers não são presumidos
+## Classes auxiliares não fazem parte da arquitetura do novo Edit
 
-Nenhuma classe auxiliar é obrigatória por simetria ou por conveniência.
+A implementação atual segue rigidamente a correspondência 1 → 1 → 1. Não existem classes próprias de produção fora das 28 implementações correspondentes às interfaces públicas.
 
-Implementações anteriores não autorizam automaticamente `Context`, `Interaction`, `Materializer` ou records agregadores. Uma abstração interna só é aceita quando existe uma responsabilidade transversal comprovada que a árvore de contratos não consegue representar sozinha sem duplicação de estado.
+`TRickUIBuilderEditVisualState` e `TRickUIBuilderEditInputRules`, usados em incrementos anteriores, foram removidos. As responsabilidades foram redistribuídas para os contratos que já as representam:
 
-O Incremento 2B forneceu essa prova para `TRickUIBuilderEditVisualState`. Ela coordena exclusivamente as flags de Focus/Invalid/ReadOnly e a notificação dos contratos visuais. Não armazena cores nem configurações dos ramos e não substitui o ownership de estado definido pela árvore de interfaces.
+- estados e feedback de validação pertencem a `IRickUIBuilderEditDesignerValidation`;
+- `ClearButton`, `Password` e `ReadOnly` pertencem a `IRickUIBuilderEditDesignerConfig`;
+- máscaras, case, URL e `MaxLength` pertencem a `IRickUIBuilderEditDesignerInputConfig`;
+- regras numéricas pertencem a `IRickUIBuilderEditDesignerInputNumber`;
+- cada implementação visual mantém somente suas próprias cores e resolve seu estado usando `IRickUIBuilderEditDesignerValidation` e o `TEdit` compartilhado;
+- `TEdit`, `TLabel`, `TPath` e `TRectangle` são controles FMX de infraestrutura e podem ser injetados diretamente quando são o alvo real da implementação.
 
-O Incremento 2C forneceu a prova para `TRickUIBuilderEditInputRules`, uma subclasse interna de `TEdit` que é o próprio controle runtime do Designer. Ela coordena somente filtragem, formatação e caret das regras de input compartilhadas por `Input.Number` e `Input.Config`. Os dois contratos recebem esse mesmo alvo por DI; não existe settings record, Context central, cópia paralela de estado nem dependência das units legadas.
+Não criar `Context`, `State`, `Runtime`, `Interaction`, `Coordinator`, `Manager`, `Materializer`, service locator ou outra classe própria auxiliar para transportar estado entre ramos.
 
 ## Lifetime
 
@@ -139,9 +144,11 @@ Assim, enquanto a raiz `IRickUIBuilderEdit` estiver referenciada, a árvore desc
 
 `Parent(AParentConstructor)` guarda a referência ao local de montagem para uso de `Build`; uma referência `TFmxObject` simples não transfere ownership nem prolonga automaticamente o lifetime do objeto informado.
 
-No estado visual do Incremento 2B, o helper é anexado como componente owned pelo `TRectangle` raiz. Ele não mantém `IRickUIBuilderEdit` vivo. Para preservar somente os receivers realmente necessários aos eventos de foco, mantém referências fortes aos contratos-pai dos subscribers registrados. Como esses contratos retornam para cima por referências `[weak]`, não é criado ciclo forte com a raiz. A destruição da árvore visual libera o helper e essas referências.
+O `TEdit` runtime é criado por `TRickUIBuilderEditDesigner` com o `TRectangle` raiz como owner. Implementações legítimas que precisam permanecer como receivers de eventos durante o lifetime do controle são componentes owned pelo próprio `TEdit`. Elas continuam sendo as classes concretas correspondentes às interfaces existentes; não existe helper adicional para lifetime.
 
-No Incremento 2C, `TRickUIBuilderEditInputRules` é o próprio `TEdit` especializado criado com o `TRectangle` raiz como owner. Por isso as regras de entrada permanecem ativas enquanto o controle FMX existir, sem manter interface da raiz ou builder vivo e sem introduzir ciclo de reference counting.
+Os handlers `OnEnter`, `OnExit` e `OnChangeTracking` são encadeados pelas implementações que realmente possuem aquele comportamento. O estado `Invalid` permanece em `IRickUIBuilderEditDesignerValidation`, `ReadOnly` permanece no `TEdit`, e o estado de foco usado pelos contratos visuais é mantido localmente somente pelos contratos que possuem a variação `Focus`.
+
+As implementações visuais mantêm `IRickUIBuilderEditDesignerValidation` quando precisam consultar `Invalid` depois que a interface raiz foi liberada. As referências de navegação para o pai permanecem `[weak]`, evitando ciclo de reference counting.
 
 ## Estratégia de implementação
 

@@ -3,10 +3,10 @@
 interface
 
 uses
+  FMX.Edit,
   FMX.Objects,
 
-  Rick.UIBuilder.Edit.Interfaces,
-  Rick.UIBuilder.Edit.VisualState;
+  Rick.UIBuilder.Edit.Interfaces;
 
 type
   TRickUIBuilderEditLabelMain = class(TInterfacedObject, IRickUIBuilderEditLabelMain)
@@ -14,15 +14,18 @@ type
     [weak]
     FParent: IRickUIBuilderEditLabel;
     FHost: TRectangle;
-    FVisualState: TRickUIBuilderEditVisualState;
+    FEdit: TEdit;
+    FValidation: IRickUIBuilderEditDesignerValidation;
     FText: IRickUIBuilderEditLabelMainText;
   protected
-    constructor Create(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle; AVisualState: TRickUIBuilderEditVisualState);
+    constructor Create(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle;
+      AEdit: TEdit; const AValidation: IRickUIBuilderEditDesignerValidation);
 
     function Text: IRickUIBuilderEditLabelMainText;
     function ToBack: IRickUIBuilderEditLabel;
   public
-    class function New(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditLabelMain;
+    class function New(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle;
+      AEdit: TEdit; const AValidation: IRickUIBuilderEditDesignerValidation): IRickUIBuilderEditLabelMain;
   end;
 
 implementation
@@ -32,23 +35,28 @@ uses
 
   Rick.UIBuilder.Edit.Labels.Main.Text;
 
-constructor TRickUIBuilderEditLabelMain.Create(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle; AVisualState: TRickUIBuilderEditVisualState);
+constructor TRickUIBuilderEditLabelMain.Create(
+  const AParent: IRickUIBuilderEditLabel; AHost: TRectangle; AEdit: TEdit;
+  const AValidation: IRickUIBuilderEditDesignerValidation);
 begin
   inherited Create;
   FParent := AParent;
   FHost := AHost;
-  FVisualState := AVisualState;
+  FEdit := AEdit;
+  FValidation := AValidation;
 end;
 
-class function TRickUIBuilderEditLabelMain.New(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditLabelMain;
+class function TRickUIBuilderEditLabelMain.New(
+  const AParent: IRickUIBuilderEditLabel; AHost: TRectangle; AEdit: TEdit;
+  const AValidation: IRickUIBuilderEditDesignerValidation): IRickUIBuilderEditLabelMain;
 begin
-  Result := Self.Create(AParent, AHost, AVisualState);
+  Result := Self.Create(AParent, AHost, AEdit, AValidation);
 end;
 
 function TRickUIBuilderEditLabelMain.Text: IRickUIBuilderEditLabelMainText;
 begin
   if not Assigned(FText) then
-    FText := TRickUIBuilderEditLabelMainText.New(Self, FHost, FVisualState);
+    FText := TRickUIBuilderEditLabelMainText.New(Self, FHost, FEdit, FValidation);
   Result := FText;
 end;
 

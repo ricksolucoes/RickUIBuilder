@@ -3,27 +3,41 @@
 interface
 
 uses
-  Rick.UIBuilder.Edit.InputRules,
+  FMX.Edit,
+  FMX.Objects,
+  FMX.StdCtrls,
+
   Rick.UIBuilder.Edit.Interfaces,
-  Rick.UIBuilder.Edit.Types,
-  Rick.UIBuilder.Edit.VisualState;
+  Rick.UIBuilder.Edit.Types;
 
 type
   TRickUIBuilderEditDesignerValidation = class(TInterfacedObject, IRickUIBuilderEditDesignerValidation)
   private
     [weak]
     FParent: IRickUIBuilderEditDesigner;
+    FControl: TEdit;
+    FAlertPath: TPath;
+    FRequirementMetPath: TPath;
+    FRequirementNotMetPath: TPath;
+    FErrorLabel: TLabel;
     FRequired: Boolean;
     FRequirementIndicator: Boolean;
+    FFeedback: TRickUIBuilderEditInvalidFeedback;
+    FDefaultMessage: string;
     FHasInvalid: Boolean;
     FInvalid: Boolean;
     FInvalidMessage: string;
     FHasRequirementMet: Boolean;
     FRequirementMet: Boolean;
-    FInputRules: TRickUIBuilderEditInputRules;
-    FVisualState: TRickUIBuilderEditVisualState;
+    function FindErrorLabel: TLabel;
+    function ResolvedInvalidMessage: string;
+    procedure UpdateRequirementPaths;
+    procedure UpdateErrorFeedback(const AMessage: string);
+    procedure UpdateValidationFeedback;
+    procedure RefreshVisuals;
   protected
-    constructor Create(const AParent: IRickUIBuilderEditDesigner; AInputRules: TRickUIBuilderEditInputRules; AVisualState: TRickUIBuilderEditVisualState);
+    constructor Create(const AParent: IRickUIBuilderEditDesigner; AControl: TEdit;
+      const APaths: array of TPath);
 
     function Required(AValue: Boolean): IRickUIBuilderEditDesignerValidation; overload;
     function Required: IRickUIBuilderEditDesignerValidation; overload;
@@ -43,22 +57,31 @@ type
     function RequirementMetValue: Boolean;
     function ToBack: IRickUIBuilderEditDesigner;
   public
-    class function New(const AParent: IRickUIBuilderEditDesigner; AInputRules: TRickUIBuilderEditInputRules; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditDesignerValidation;
+    class function New(const AParent: IRickUIBuilderEditDesigner; AControl: TEdit;
+      const APaths: array of TPath): IRickUIBuilderEditDesignerValidation;
   end;
 
 implementation
 
 uses
+  System.Classes,
   System.SysUtils;
 
-constructor TRickUIBuilderEditDesignerValidation.Create(const AParent: IRickUIBuilderEditDesigner; AInputRules: TRickUIBuilderEditInputRules; AVisualState: TRickUIBuilderEditVisualState);
+constructor TRickUIBuilderEditDesignerValidation.Create(
+  const AParent: IRickUIBuilderEditDesigner; AControl: TEdit;
+  const APaths: array of TPath);
 begin
   inherited Create;
   FParent := AParent;
-  FInputRules := AInputRules;
-  FVisualState := AVisualState;
+  FControl := AControl;
+  FAlertPath := APaths[0];
+  FRequirementMetPath := APaths[4];
+  FRequirementNotMetPath := APaths[5];
+  FErrorLabel := nil;
   FRequired := False;
   FRequirementIndicator := False;
+  FFeedback := TRickUIBuilderEditInvalidFeedback.AlertAndIcon;
+  FDefaultMessage := EmptyStr;
   FHasInvalid := False;
   FInvalid := False;
   FInvalidMessage := EmptyStr;
@@ -66,12 +89,83 @@ begin
   FRequirementMet := False;
 end;
 
-class function TRickUIBuilderEditDesignerValidation.New(const AParent: IRickUIBuilderEditDesigner; AInputRules: TRickUIBuilderEditInputRules; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditDesignerValidation;
+class function TRickUIBuilderEditDesignerValidation.New(
+  const AParent: IRickUIBuilderEditDesigner; AControl: TEdit;
+  const APaths: array of TPath): IRickUIBuilderEditDesignerValidation;
 begin
-  Result := Self.Create(AParent, AInputRules, AVisualState);
+  Result := Self.Create(AParent, AControl, APaths);
 end;
 
-function TRickUIBuilderEditDesignerValidation.Required(AValue: Boolean): IRickUIBuilderEditDesignerValidation;
+function TRickUIBuilderEditDesignerValidation.FindErrorLabel: TLabel;
+var
+  LIndex: Integer;
+begin
+  Result := FErrorLabel;
+  if Assigned(Result) then
+    Exit;
+  for LIndex := 0 to FControl.ComponentCount - 1 do
+    if FControl.Components[LIndex] is TLabel then
+    begin
+      FErrorLabel := TLabel(FControl.Components[LIndex]);
+      Exit(FErrorLabel);
+    end;
+end;
+
+procedure TRickUIBuilderEditDesignerValidation.UpdateRequirementPaths;
+begin
+  FRequirementMetPath.Visible := FRequirementIndicator and FRequirementMet;
+  FRequirementNotMetPath.Visible := FRequirementIndicator and not FRequirementMet;
+end;
+
+function TRickUIBuilderEditDesignerValidation.ResolvedInvalidMessage: string;
+begin
+  Result := FInvalidMessage;
+  if Result = EmptyStr then
+    Result := FDefaultMessage;
+end;
+
+procedure TRickUIBuilderEditDesignerValidation.UpdateErrorFeedback(
+  const AMessage: string);
+var
+  LErrorLabel: TLabel;
+begin
+  LErrorLabel := FindErrorLabel;
+  if not Assigned(LErrorLabel) then
+    Exit;
+  if FInvalid and (AMessage <> EmptyStr) and
+    (FFeedback <> TRickUIBuilderEditInvalidFeedback.IconOnly) then
+  begin
+    LErrorLabel.Text := AMessage;
+    LErrorLabel.Visible := True;
+    Exit;
+  end;
+  if Assigned(LErrorLabel) then
+  begin
+    LErrorLabel.Text := AMessage;
+    LErrorLabel.Visible := False;
+  end;
+end;
+
+procedure TRickUIBuilderEditDesignerValidation.UpdateValidationFeedback;
+var
+  LMessage: string;
+begin
+  LMessage := EmptyStr;
+  if FInvalid then
+    LMessage := ResolvedInvalidMessage;
+  UpdateErrorFeedback(LMessage);
+  FAlertPath.Visible := FInvalid and
+    (FFeedback <> TRickUIBuilderEditInvalidFeedback.AlertOnly);
+end;
+
+procedure TRickUIBuilderEditDesignerValidation.RefreshVisuals;
+begin
+  if Assigned(FControl.OnEnter) then
+    FControl.OnEnter(nil);
+end;
+
+function TRickUIBuilderEditDesignerValidation.Required(
+  AValue: Boolean): IRickUIBuilderEditDesignerValidation;
 begin
   FRequired := AValue;
   Result := Self;
@@ -82,10 +176,11 @@ begin
   Result := Required(True);
 end;
 
-function TRickUIBuilderEditDesignerValidation.RequirementIndicator(AValue: Boolean): IRickUIBuilderEditDesignerValidation;
+function TRickUIBuilderEditDesignerValidation.RequirementIndicator(
+  AValue: Boolean): IRickUIBuilderEditDesignerValidation;
 begin
   FRequirementIndicator := AValue;
-  FInputRules.SetRequirementState(FRequirementIndicator, FRequirementMet);
+  UpdateRequirementPaths;
   Result := Self;
 end;
 
@@ -94,35 +189,42 @@ begin
   Result := RequirementIndicator(True);
 end;
 
-function TRickUIBuilderEditDesignerValidation.Feedback(AValue: TRickUIBuilderEditInvalidFeedback): IRickUIBuilderEditDesignerValidation;
+function TRickUIBuilderEditDesignerValidation.Feedback(
+  AValue: TRickUIBuilderEditInvalidFeedback): IRickUIBuilderEditDesignerValidation;
 begin
-  FInputRules.SetFeedback(AValue);
+  FFeedback := AValue;
+  UpdateValidationFeedback;
   Result := Self;
 end;
 
-function TRickUIBuilderEditDesignerValidation.DefaultMessage(const AValue: string): IRickUIBuilderEditDesignerValidation;
+function TRickUIBuilderEditDesignerValidation.DefaultMessage(
+  const AValue: string): IRickUIBuilderEditDesignerValidation;
 begin
-  FInputRules.SetDefaultMessage(AValue);
+  FDefaultMessage := AValue;
+  UpdateValidationFeedback;
   Result := Self;
 end;
 
-function TRickUIBuilderEditDesignerValidation.Invalid(AValue: Boolean): IRickUIBuilderEditDesignerValidation;
+function TRickUIBuilderEditDesignerValidation.Invalid(
+  AValue: Boolean): IRickUIBuilderEditDesignerValidation;
 begin
   Result := Invalid(AValue, EmptyStr);
 end;
 
-function TRickUIBuilderEditDesignerValidation.Invalid(const AMessage: string): IRickUIBuilderEditDesignerValidation;
+function TRickUIBuilderEditDesignerValidation.Invalid(
+  const AMessage: string): IRickUIBuilderEditDesignerValidation;
 begin
   Result := Invalid(True, AMessage);
 end;
 
-function TRickUIBuilderEditDesignerValidation.Invalid(AValue: Boolean; const AMessage: string): IRickUIBuilderEditDesignerValidation;
+function TRickUIBuilderEditDesignerValidation.Invalid(AValue: Boolean;
+  const AMessage: string): IRickUIBuilderEditDesignerValidation;
 begin
   FHasInvalid := True;
   FInvalid := AValue;
   FInvalidMessage := AMessage;
-  FInputRules.SetInvalidState(AValue, AMessage);
-  FVisualState.SetInvalid(AValue);
+  UpdateValidationFeedback;
+  RefreshVisuals;
   Result := Self;
 end;
 
@@ -141,11 +243,12 @@ begin
   Result := FInvalidMessage;
 end;
 
-function TRickUIBuilderEditDesignerValidation.RequirementMet(AValue: Boolean): IRickUIBuilderEditDesignerValidation;
+function TRickUIBuilderEditDesignerValidation.RequirementMet(
+  AValue: Boolean): IRickUIBuilderEditDesignerValidation;
 begin
   FHasRequirementMet := True;
   FRequirementMet := AValue;
-  FInputRules.SetRequirementState(FRequirementIndicator, FRequirementMet);
+  UpdateRequirementPaths;
   Result := Self;
 end;
 

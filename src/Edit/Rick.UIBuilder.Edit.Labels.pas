@@ -3,11 +3,10 @@
 interface
 
 uses
+  FMX.Edit,
   FMX.Objects,
 
-  Rick.UIBuilder.Edit.InputRules,
-  Rick.UIBuilder.Edit.Interfaces,
-  Rick.UIBuilder.Edit.VisualState;
+  Rick.UIBuilder.Edit.Interfaces;
 
 type
   TRickUIBuilderEditLabel = class(TInterfacedObject, IRickUIBuilderEditLabel)
@@ -15,20 +14,22 @@ type
     [weak]
     FParent: IRickUIBuilderEdit;
     FHost: TRectangle;
-    FInputRules: TRickUIBuilderEditInputRules;
-    FVisualState: TRickUIBuilderEditVisualState;
+    FEdit: TEdit;
+    FValidation: IRickUIBuilderEditDesignerValidation;
     FMain: IRickUIBuilderEditLabelMain;
     FCounter: IRickUIBuilderEditLabelCounter;
     FError: IRickUIBuilderEditLabelError;
   protected
-    constructor Create(const AParent: IRickUIBuilderEdit; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules; AVisualState: TRickUIBuilderEditVisualState);
+    constructor Create(const AParent: IRickUIBuilderEdit; AHost: TRectangle;
+      AEdit: TEdit; const AValidation: IRickUIBuilderEditDesignerValidation);
 
     function Main: IRickUIBuilderEditLabelMain;
     function Counter: IRickUIBuilderEditLabelCounter;
     function Error: IRickUIBuilderEditLabelError;
     function ToBack: IRickUIBuilderEdit;
   public
-    class function New(const AParent: IRickUIBuilderEdit; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditLabel;
+    class function New(const AParent: IRickUIBuilderEdit; AHost: TRectangle;
+      AEdit: TEdit; const AValidation: IRickUIBuilderEditDesignerValidation): IRickUIBuilderEditLabel;
   end;
 
 implementation
@@ -40,38 +41,42 @@ uses
   Rick.UIBuilder.Edit.Labels.Error,
   Rick.UIBuilder.Edit.Labels.Main;
 
-constructor TRickUIBuilderEditLabel.Create(const AParent: IRickUIBuilderEdit; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules; AVisualState: TRickUIBuilderEditVisualState);
+constructor TRickUIBuilderEditLabel.Create(const AParent: IRickUIBuilderEdit;
+  AHost: TRectangle; AEdit: TEdit;
+  const AValidation: IRickUIBuilderEditDesignerValidation);
 begin
   inherited Create;
   FParent := AParent;
   FHost := AHost;
-  FInputRules := AInputRules;
-  FVisualState := AVisualState;
+  FEdit := AEdit;
+  FValidation := AValidation;
 end;
 
-class function TRickUIBuilderEditLabel.New(const AParent: IRickUIBuilderEdit; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditLabel;
+class function TRickUIBuilderEditLabel.New(const AParent: IRickUIBuilderEdit;
+  AHost: TRectangle; AEdit: TEdit;
+  const AValidation: IRickUIBuilderEditDesignerValidation): IRickUIBuilderEditLabel;
 begin
-  Result := Self.Create(AParent, AHost, AInputRules, AVisualState);
+  Result := Self.Create(AParent, AHost, AEdit, AValidation);
 end;
 
 function TRickUIBuilderEditLabel.Main: IRickUIBuilderEditLabelMain;
 begin
   if not Assigned(FMain) then
-    FMain := TRickUIBuilderEditLabelMain.New(Self, FHost, FVisualState);
+    FMain := TRickUIBuilderEditLabelMain.New(Self, FHost, FEdit, FValidation);
   Result := FMain;
 end;
 
 function TRickUIBuilderEditLabel.Counter: IRickUIBuilderEditLabelCounter;
 begin
   if not Assigned(FCounter) then
-    FCounter := TRickUIBuilderEditLabelCounter.New(Self, FHost, FInputRules);
+    FCounter := TRickUIBuilderEditLabelCounter.New(Self, FHost, FEdit);
   Result := FCounter;
 end;
 
 function TRickUIBuilderEditLabel.Error: IRickUIBuilderEditLabelError;
 begin
   if not Assigned(FError) then
-    FError := TRickUIBuilderEditLabelError.New(Self, FHost, FInputRules);
+    FError := TRickUIBuilderEditLabelError.New(Self, FHost, FEdit, FValidation);
   Result := FError;
 end;
 

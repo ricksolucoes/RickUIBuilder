@@ -6,8 +6,7 @@ uses
   FMX.Objects,
   FMX.Types,
 
-  Rick.UIBuilder.Edit.Interfaces,
-  Rick.UIBuilder.Edit.VisualState;
+  Rick.UIBuilder.Edit.Interfaces;
 
 type
   TRickUIBuilderEdit = class(TInterfacedObject, IRickUIBuilderEdit)
@@ -20,8 +19,10 @@ type
     FDesigner: IRickUIBuilderEditDesigner;
     FLine: IRickUIBuilderEditLine;
     FConfig: IRickUIBuilderEditConfig;
-    FVisualState: TRickUIBuilderEditVisualState;
-    procedure PrepareVisualState;
+    FPaths: array[0..5] of TPath;
+    procedure EnsureSharedControls;
+    procedure CreateSharedPaths;
+    procedure PrepareVisualAppearance;
   protected
     constructor Create;
 
@@ -42,7 +43,6 @@ implementation
 uses
   Rick.UIBuilder.Edit.Config,
   Rick.UIBuilder.Edit.Designer,
-  Rick.UIBuilder.Edit.InputRules,
   Rick.UIBuilder.Edit.Labels,
   Rick.UIBuilder.Edit.Line,
   Rick.UIBuilder.Edit.Rectangle;
@@ -52,20 +52,18 @@ begin
   inherited Create;
   FParentConstructor := nil;
   FRootControl := nil;
-  FVisualState := TRickUIBuilderEditVisualState.Create(nil);
   FBuilt := False;
 end;
 
 destructor TRickUIBuilderEdit.Destroy;
 begin
+  FConfig := nil;
+  FLine := nil;
+  FLabels := nil;
+  FDesigner := nil;
+  FRectangle := nil;
   if (not FBuilt) and Assigned(FRootControl) then
-  begin
     FRootControl.Free;
-    FVisualState := nil;
-  end
-  else if Assigned(FVisualState) and not Assigned(FVisualState.Owner) then
-    FVisualState.Free;
-  FVisualState := nil;
   FRootControl := nil;
   inherited;
 end;
@@ -79,47 +77,69 @@ function TRickUIBuilderEdit.Rectangle: IRickUIBuilderEditRetangle;
 begin
   if not Assigned(FRectangle) then
   begin
-    FRectangle := TRickUIBuilderEditRetangle.New(Self, FVisualState);
+    FRectangle := TRickUIBuilderEditRetangle.New(Self);
     FRootControl := FRectangle.Control;
-    FVisualState.Attach(FRootControl);
   end;
   Result := FRectangle;
 end;
 
-function TRickUIBuilderEdit.Labels: IRickUIBuilderEditLabel;
+procedure TRickUIBuilderEdit.CreateSharedPaths;
 var
-  LInputRules: TRickUIBuilderEditInputRules;
+  LIndex: Integer;
 begin
-  if not Assigned(FLabels) then
+  for LIndex := Low(FPaths) to High(FPaths) do
   begin
-    LInputRules := TRickUIBuilderEditInputRules(Designer.Control);
-    FLabels := TRickUIBuilderEditLabel.New(Self, Rectangle.Control, LInputRules, FVisualState);
+    FPaths[LIndex] := TPath.Create(FRootControl);
+    FPaths[LIndex].Parent := FRootControl;
+    FPaths[LIndex].Visible := False;
   end;
-  Result := FLabels;
+end;
+
+procedure TRickUIBuilderEdit.EnsureSharedControls;
+begin
+  Rectangle;
+  if not Assigned(FPaths[0]) then
+    CreateSharedPaths;
 end;
 
 function TRickUIBuilderEdit.Designer: IRickUIBuilderEditDesigner;
 begin
   if not Assigned(FDesigner) then
-    FDesigner := TRickUIBuilderEditDesigner.New(Self, Rectangle.Control, FVisualState);
+  begin
+    EnsureSharedControls;
+    FDesigner := TRickUIBuilderEditDesigner.New(Self, FRootControl, FPaths);
+  end;
   Result := FDesigner;
+end;
+
+function TRickUIBuilderEdit.Labels: IRickUIBuilderEditLabel;
+begin
+  if not Assigned(FLabels) then
+  begin
+    EnsureSharedControls;
+    FLabels := TRickUIBuilderEditLabel.New(Self, FRootControl, Designer.Control,
+      Designer.Validation);
+  end;
+  Result := FLabels;
 end;
 
 function TRickUIBuilderEdit.Line: IRickUIBuilderEditLine;
 begin
   if not Assigned(FLine) then
-    FLine := TRickUIBuilderEditLine.New(Self, Rectangle.Control, FVisualState);
+  begin
+    EnsureSharedControls;
+    FLine := TRickUIBuilderEditLine.New(Self, FRootControl, Designer.Control,
+      Designer.Validation);
+  end;
   Result := FLine;
 end;
 
 function TRickUIBuilderEdit.Config: IRickUIBuilderEditConfig;
-var
-  LInputRules: TRickUIBuilderEditInputRules;
 begin
   if not Assigned(FConfig) then
   begin
-    LInputRules := TRickUIBuilderEditInputRules(Designer.Control);
-    FConfig := TRickUIBuilderEditConfig.New(Self, Rectangle.Control, LInputRules);
+    EnsureSharedControls;
+    FConfig := TRickUIBuilderEditConfig.New(Self, FRootControl, FPaths);
   end;
   Result := FConfig;
 end;
@@ -130,24 +150,25 @@ begin
   Result := Self;
 end;
 
-procedure TRickUIBuilderEdit.PrepareVisualState;
+procedure TRickUIBuilderEdit.PrepareVisualAppearance;
 begin
   Rectangle.Background;
   Rectangle.Border;
   Labels.Main.Text.Color;
   Designer.Input.Text.Color;
   Line.Color;
-  FVisualState.Apply;
+  if Assigned(Designer.Control.OnEnter) then
+    Designer.Control.OnEnter(nil);
 end;
 
 function TRickUIBuilderEdit.Build: IRickUIBuilderEdit;
 begin
   Rectangle;
-  Labels;
   Designer;
+  Labels;
   Line;
   Config;
-  PrepareVisualState;
+  PrepareVisualAppearance;
   if Assigned(FParentConstructor) then
   begin
     FRootControl.Parent := FParentConstructor;

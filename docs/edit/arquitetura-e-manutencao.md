@@ -121,15 +121,20 @@ When an interface represents multiple configured values simultaneously, those va
 
 Do not centralize the entire component state in an aggregate record or class simply to make `Build` easier.
 
-## Helpers are not assumed
+## Auxiliary classes are not part of the new Edit architecture
 
-No helper class is mandatory by symmetry or convenience.
+The current implementation follows the 1 → 1 → 1 correspondence rigidly. There are no project-owned production classes beyond the 28 concrete implementations corresponding to the public interfaces.
 
-Prior implementation attempts do not automatically authorize a central Context, `Interaction`, `Materializer`, or aggregate settings records. An internal abstraction is accepted only when a proven cross-cutting responsibility cannot be represented by the contract tree without duplicating state.
+`TRickUIBuilderEditVisualState` and `TRickUIBuilderEditInputRules`, used by earlier increments, have been removed. Their responsibilities now belong to the existing contracts that represent them:
 
-Increment 2B provides that proof for `TRickUIBuilderEditVisualState`. It coordinates Focus/Invalid/ReadOnly flags and notifies visual contracts. It does not store branch colors or configuration and does not replace the state ownership defined by the interface tree.
+- validation state and feedback belong to `IRickUIBuilderEditDesignerValidation`;
+- `ClearButton`, `Password`, and `ReadOnly` belong to `IRickUIBuilderEditDesignerConfig`;
+- masks, case handling, URL handling, and `MaxLength` belong to `IRickUIBuilderEditDesignerInputConfig`;
+- numeric rules belong to `IRickUIBuilderEditDesignerInputNumber`;
+- each visual implementation owns only its own colors and resolves state through `IRickUIBuilderEditDesignerValidation` and the shared `TEdit`;
+- `TEdit`, `TLabel`, `TPath`, and `TRectangle` are FMX infrastructure controls and may be injected directly when they are the actual target of an implementation.
 
-Increment 2C provides the proof for `TRickUIBuilderEditInputRules`, an internal `TEdit` subclass that is the Designer runtime control itself. It coordinates only filtering, formatting, and caret behavior for input rules shared by `Input.Number` and `Input.Config`. Both contracts receive the same target through DI; there is no settings record, central Context, parallel state copy, or dependency on legacy Edit units.
+Do not introduce a project-owned `Context`, `State`, `Runtime`, `Interaction`, `Coordinator`, `Manager`, `Materializer`, service locator, or other helper class to move state between branches.
 
 ## Lifetime
 
@@ -139,9 +144,11 @@ Therefore, while the root `IRickUIBuilderEdit` remains referenced, the descendan
 
 `Parent(AParentConstructor)` retains the assembly-location reference for `Build`; a plain `TFmxObject` reference does not transfer ownership or automatically extend the supplied object's lifetime.
 
-For Increment 2B visual state, the helper is attached as an owned component of the root `TRectangle`. It does not retain `IRickUIBuilderEdit`. To preserve only the receivers required by focus events, it keeps strong references to the parent contracts of registered subscribers. Those contracts navigate upward through `[weak]` references, so no strong cycle with the root is introduced. Destroying the visual tree releases the helper and those retained references.
+The runtime `TEdit` is created by `TRickUIBuilderEditDesigner` with the root `TRectangle` as owner. Legitimate interface implementations that must remain event receivers for the lifetime of the control are components owned by that same `TEdit`. They remain the concrete classes corresponding to existing interfaces; no additional lifetime helper exists.
 
-For Increment 2C, `TRickUIBuilderEditInputRules` is the specialized `TEdit` itself and is created with the root `TRectangle` as owner. Input rules therefore remain active for the lifetime of the FMX control without retaining the root interface or builder and without introducing a reference-counting cycle.
+`OnEnter`, `OnExit`, and `OnChangeTracking` handlers are chained by the implementations that actually own those behaviors. `Invalid` state remains in `IRickUIBuilderEditDesignerValidation`, `ReadOnly` remains on the `TEdit`, and focus state is retained locally only by visual contracts that actually expose a `Focus` variation.
+
+Visual implementations retain `IRickUIBuilderEditDesignerValidation` when they must still read `Invalid` after the root interface has been released. Their upward navigation references remain `[weak]`, avoiding a reference-counting cycle.
 
 ## Implementation strategy
 

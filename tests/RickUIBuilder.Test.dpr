@@ -30,7 +30,8 @@ uses
   Rick.UIBuilder.Tests.Edit.VisualState in 'src\edits\Rick.UIBuilder.Tests.Edit.VisualState.pas',
   Rick.UIBuilder.Tests.Edit.InputRules in 'src\edits\Rick.UIBuilder.Tests.Edit.InputRules.pas',
   Rick.UIBuilder.Tests.Edit.Interaction in 'src\edits\Rick.UIBuilder.Tests.Edit.Interaction.pas',
-  Rick.UIBuilder.Tests.Edit.ValidationFeedback in 'src\edits\Rick.UIBuilder.Tests.Edit.ValidationFeedback.pas';
+  Rick.UIBuilder.Tests.Edit.ValidationFeedback in 'src\edits\Rick.UIBuilder.Tests.Edit.ValidationFeedback.pas',
+  Rick.UIBuilder.Tests.Edit.CompletionValidation in 'src\edits\Rick.UIBuilder.Tests.Edit.CompletionValidation.pas';
 
 var
   runner      : ITestRunner;

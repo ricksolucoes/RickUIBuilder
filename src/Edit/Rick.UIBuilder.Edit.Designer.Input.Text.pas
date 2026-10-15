@@ -6,8 +6,7 @@ uses
   FMX.Edit,
   FMX.Objects,
 
-  Rick.UIBuilder.Edit.Interfaces,
-  Rick.UIBuilder.Edit.VisualState;
+  Rick.UIBuilder.Edit.Interfaces;
 
 type
   TRickUIBuilderEditDesignerInputText = class(TInterfacedObject, IRickUIBuilderEditDesignerInputText)
@@ -16,10 +15,10 @@ type
     FParent: IRickUIBuilderEditDesignerInput;
     FControl: TEdit;
     FBackground: TRectangle;
-    FVisualState: TRickUIBuilderEditVisualState;
     FColor: IRickUIBuilderEditDesignerInputTextColor;
   protected
-    constructor Create(const AParent: IRickUIBuilderEditDesignerInput; AControl: TEdit; ABackground: TRectangle; AVisualState: TRickUIBuilderEditVisualState);
+    constructor Create(const AParent: IRickUIBuilderEditDesignerInput;
+      AControl: TEdit; ABackground: TRectangle);
 
     function Value(const AValue: string): IRickUIBuilderEditDesignerInputText; overload;
     function Value: string; overload;
@@ -27,7 +26,8 @@ type
     function Size(AValue: Single): IRickUIBuilderEditDesigner;
     function ToBack: IRickUIBuilderEditDesigner;
   public
-    class function New(const AParent: IRickUIBuilderEditDesignerInput; AControl: TEdit; ABackground: TRectangle; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditDesignerInputText;
+    class function New(const AParent: IRickUIBuilderEditDesignerInput;
+      AControl: TEdit; ABackground: TRectangle): IRickUIBuilderEditDesignerInputText;
   end;
 
 implementation
@@ -37,21 +37,25 @@ uses
 
   Rick.UIBuilder.Edit.Designer.Input.Text.Color;
 
-constructor TRickUIBuilderEditDesignerInputText.Create(const AParent: IRickUIBuilderEditDesignerInput; AControl: TEdit; ABackground: TRectangle; AVisualState: TRickUIBuilderEditVisualState);
+constructor TRickUIBuilderEditDesignerInputText.Create(
+  const AParent: IRickUIBuilderEditDesignerInput; AControl: TEdit;
+  ABackground: TRectangle);
 begin
   inherited Create;
   FParent := AParent;
   FControl := AControl;
   FBackground := ABackground;
-  FVisualState := AVisualState;
 end;
 
-class function TRickUIBuilderEditDesignerInputText.New(const AParent: IRickUIBuilderEditDesignerInput; AControl: TEdit; ABackground: TRectangle; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditDesignerInputText;
+class function TRickUIBuilderEditDesignerInputText.New(
+  const AParent: IRickUIBuilderEditDesignerInput; AControl: TEdit;
+  ABackground: TRectangle): IRickUIBuilderEditDesignerInputText;
 begin
-  Result := Self.Create(AParent, AControl, ABackground, AVisualState);
+  Result := Self.Create(AParent, AControl, ABackground);
 end;
 
-function TRickUIBuilderEditDesignerInputText.Value(const AValue: string): IRickUIBuilderEditDesignerInputText;
+function TRickUIBuilderEditDesignerInputText.Value(
+  const AValue: string): IRickUIBuilderEditDesignerInputText;
 begin
   FControl.Text := AValue;
   Result := Self;
@@ -65,11 +69,13 @@ end;
 function TRickUIBuilderEditDesignerInputText.Color: IRickUIBuilderEditDesignerInputTextColor;
 begin
   if not Assigned(FColor) then
-    FColor := TRickUIBuilderEditDesignerInputTextColor.New(Self, FControl, FBackground, FVisualState);
+    FColor := TRickUIBuilderEditDesignerInputTextColor.New(Self, FControl,
+      FBackground);
   Result := FColor;
 end;
 
-function TRickUIBuilderEditDesignerInputText.Size(AValue: Single): IRickUIBuilderEditDesigner;
+function TRickUIBuilderEditDesignerInputText.Size(
+  AValue: Single): IRickUIBuilderEditDesigner;
 begin
   FControl.TextSettings.Font.Size := AValue;
   Result := ToBack;

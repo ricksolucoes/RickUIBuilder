@@ -5,31 +5,37 @@ interface
 uses
   FMX.Edit,
   FMX.Objects,
+  System.Classes,
   System.UITypes,
 
-  Rick.UIBuilder.Edit.Interfaces,
-  Rick.UIBuilder.Edit.VisualState;
+  Rick.UIBuilder.Edit.Interfaces;
 
 type
-  TRickUIBuilderEditDesignerInputTextColor = class(TInterfacedObject, IRickUIBuilderEditDesignerInputTextColor)
+  TRickUIBuilderEditDesignerInputTextColor = class(TComponent, IRickUIBuilderEditDesignerInputTextColor)
   private
     [weak]
     FParent: IRickUIBuilderEditDesignerInputText;
     FControl: TEdit;
     FBackground: TRectangle;
-    FVisualState: TRickUIBuilderEditVisualState;
     FTextColor: TAlphaColor;
     FReadOnlyColor: TAlphaColor;
-    procedure ApplyState(ASender: TObject);
+    FPreviousEnter: TNotifyEvent;
+    FPreviousExit: TNotifyEvent;
+    procedure ApplyState;
+    procedure HandleEnter(ASender: TObject);
+    procedure HandleExit(ASender: TObject);
   protected
-    constructor Create(const AParent: IRickUIBuilderEditDesignerInputText; AControl: TEdit; ABackground: TRectangle; AVisualState: TRickUIBuilderEditVisualState);
+    constructor Create(const AParent: IRickUIBuilderEditDesignerInputText;
+      AControl: TEdit; ABackground: TRectangle); reintroduce;
 
     function Background(AValue: TAlphaColor): IRickUIBuilderEditDesignerInputTextColor;
     function Text(AValue: TAlphaColor): IRickUIBuilderEditDesignerInputTextColor;
     function ReadOnly(AValue: TAlphaColor): IRickUIBuilderEditDesignerInputTextColor;
     function ToBack: IRickUIBuilderEditDesignerInputText;
   public
-    class function New(const AParent: IRickUIBuilderEditDesignerInputText; AControl: TEdit; ABackground: TRectangle; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditDesignerInputTextColor;
+    destructor Destroy; override;
+    class function New(const AParent: IRickUIBuilderEditDesignerInputText;
+      AControl: TEdit; ABackground: TRectangle): IRickUIBuilderEditDesignerInputTextColor;
   end;
 
 implementation
@@ -37,49 +43,82 @@ implementation
 uses
   System.SysUtils;
 
-constructor TRickUIBuilderEditDesignerInputTextColor.Create(const AParent: IRickUIBuilderEditDesignerInputText; AControl: TEdit; ABackground: TRectangle; AVisualState: TRickUIBuilderEditVisualState);
+constructor TRickUIBuilderEditDesignerInputTextColor.Create(
+  const AParent: IRickUIBuilderEditDesignerInputText; AControl: TEdit;
+  ABackground: TRectangle);
 begin
-  inherited Create;
+  inherited Create(AControl);
   FParent := AParent;
   FControl := AControl;
   FBackground := ABackground;
-  FVisualState := AVisualState;
   FTextColor := TAlphaColors.Black;
   FReadOnlyColor := $FFB8B8B8;
-  FVisualState.RegisterHandler(ApplyState, AParent);
-  ApplyState(nil);
+  FPreviousEnter := FControl.OnEnter;
+  FPreviousExit := FControl.OnExit;
+  FControl.OnEnter := HandleEnter;
+  FControl.OnExit := HandleExit;
+  ApplyState;
 end;
 
-class function TRickUIBuilderEditDesignerInputTextColor.New(const AParent: IRickUIBuilderEditDesignerInputText; AControl: TEdit; ABackground: TRectangle; AVisualState: TRickUIBuilderEditVisualState): IRickUIBuilderEditDesignerInputTextColor;
+destructor TRickUIBuilderEditDesignerInputTextColor.Destroy;
 begin
-  Result := Self.Create(AParent, AControl, ABackground, AVisualState);
+  if Assigned(FControl) and not (csDestroying in FControl.ComponentState) then
+  begin
+    FControl.OnEnter := FPreviousEnter;
+    FControl.OnExit := FPreviousExit;
+  end;
+  inherited;
 end;
 
-procedure TRickUIBuilderEditDesignerInputTextColor.ApplyState(ASender: TObject);
+class function TRickUIBuilderEditDesignerInputTextColor.New(
+  const AParent: IRickUIBuilderEditDesignerInputText; AControl: TEdit;
+  ABackground: TRectangle): IRickUIBuilderEditDesignerInputTextColor;
 begin
-  if FVisualState.IsReadOnly then
+  Result := Self.Create(AParent, AControl, ABackground);
+end;
+
+procedure TRickUIBuilderEditDesignerInputTextColor.ApplyState;
+begin
+  if FControl.ReadOnly then
     FControl.TextSettings.FontColor := FReadOnlyColor
   else
     FControl.TextSettings.FontColor := FTextColor;
 end;
 
-function TRickUIBuilderEditDesignerInputTextColor.Background(AValue: TAlphaColor): IRickUIBuilderEditDesignerInputTextColor;
+procedure TRickUIBuilderEditDesignerInputTextColor.HandleEnter(ASender: TObject);
+begin
+  ApplyState;
+  if Assigned(FPreviousEnter) then
+    FPreviousEnter(ASender);
+end;
+
+procedure TRickUIBuilderEditDesignerInputTextColor.HandleExit(ASender: TObject);
+begin
+  ApplyState;
+  if Assigned(FPreviousExit) then
+    FPreviousExit(ASender);
+end;
+
+function TRickUIBuilderEditDesignerInputTextColor.Background(
+  AValue: TAlphaColor): IRickUIBuilderEditDesignerInputTextColor;
 begin
   FBackground.Fill.Color := AValue;
   Result := Self;
 end;
 
-function TRickUIBuilderEditDesignerInputTextColor.Text(AValue: TAlphaColor): IRickUIBuilderEditDesignerInputTextColor;
+function TRickUIBuilderEditDesignerInputTextColor.Text(
+  AValue: TAlphaColor): IRickUIBuilderEditDesignerInputTextColor;
 begin
   FTextColor := AValue;
-  ApplyState(nil);
+  ApplyState;
   Result := Self;
 end;
 
-function TRickUIBuilderEditDesignerInputTextColor.ReadOnly(AValue: TAlphaColor): IRickUIBuilderEditDesignerInputTextColor;
+function TRickUIBuilderEditDesignerInputTextColor.ReadOnly(
+  AValue: TAlphaColor): IRickUIBuilderEditDesignerInputTextColor;
 begin
   FReadOnlyColor := AValue;
-  ApplyState(nil);
+  ApplyState;
   Result := Self;
 end;
 

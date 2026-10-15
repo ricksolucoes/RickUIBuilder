@@ -3,41 +3,48 @@
 interface
 
 uses
+  FMX.Edit,
   FMX.Objects,
   FMX.StdCtrls,
+  System.Classes,
 
-  Rick.UIBuilder.Edit.InputRules,
   Rick.UIBuilder.Edit.Interfaces;
 
 type
-  TRickUIBuilderEditLabelCounter = class(TInterfacedObject, IRickUIBuilderEditLabelCounter)
+  TRickUIBuilderEditLabelCounter = class(TComponent, IRickUIBuilderEditLabelCounter)
   private
     [weak]
     FParent: IRickUIBuilderEditLabel;
     FControl: TLabel;
-    FInputRules: TRickUIBuilderEditInputRules;
+    FEdit: TEdit;
+    FPreviousChangeTracking: TNotifyEvent;
+    procedure HandleChangeTracking(ASender: TObject);
+    procedure UpdateCounter;
   protected
-    constructor Create(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules);
+    constructor Create(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle;
+      AEdit: TEdit); reintroduce;
 
     function Enabled(AValue: Boolean): IRickUIBuilderEditLabelCounter; overload;
     function Enabled: IRickUIBuilderEditLabelCounter; overload;
     function ToBack: IRickUIBuilderEditLabel;
   public
-    class function New(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules): IRickUIBuilderEditLabelCounter;
+    destructor Destroy; override;
+    class function New(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle;
+      AEdit: TEdit): IRickUIBuilderEditLabelCounter;
   end;
 
 implementation
 
 uses
-  System.SysUtils,
+  FMX.Types,
+  System.SysUtils;
 
-  FMX.Types;
-
-constructor TRickUIBuilderEditLabelCounter.Create(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules);
+constructor TRickUIBuilderEditLabelCounter.Create(
+  const AParent: IRickUIBuilderEditLabel; AHost: TRectangle; AEdit: TEdit);
 begin
-  inherited Create;
+  inherited Create(AEdit);
   FParent := AParent;
-  FInputRules := AInputRules;
+  FEdit := AEdit;
   FControl := TLabel.Create(AHost);
   FControl.Parent := AHost;
   FControl.SetBounds(AHost.Width - 72, AHost.Height - 20, 64, 16);
@@ -45,17 +52,47 @@ begin
   FControl.TextSettings.Font.Size := 11;
   FControl.Visible := False;
   FControl.HitTest := False;
-  FInputRules.BindCounter(FControl);
+  FPreviousChangeTracking := FEdit.OnChangeTracking;
+  FEdit.OnChangeTracking := HandleChangeTracking;
+  UpdateCounter;
 end;
 
-class function TRickUIBuilderEditLabelCounter.New(const AParent: IRickUIBuilderEditLabel; AHost: TRectangle; AInputRules: TRickUIBuilderEditInputRules): IRickUIBuilderEditLabelCounter;
+destructor TRickUIBuilderEditLabelCounter.Destroy;
 begin
-  Result := Self.Create(AParent, AHost, AInputRules);
+  if Assigned(FEdit) and not (csDestroying in FEdit.ComponentState) then
+    FEdit.OnChangeTracking := FPreviousChangeTracking;
+  inherited;
 end;
 
-function TRickUIBuilderEditLabelCounter.Enabled(AValue: Boolean): IRickUIBuilderEditLabelCounter;
+class function TRickUIBuilderEditLabelCounter.New(
+  const AParent: IRickUIBuilderEditLabel; AHost: TRectangle;
+  AEdit: TEdit): IRickUIBuilderEditLabelCounter;
 begin
-  FInputRules.SetCounterEnabled(AValue);
+  Result := Self.Create(AParent, AHost, AEdit);
+end;
+
+procedure TRickUIBuilderEditLabelCounter.HandleChangeTracking(ASender: TObject);
+begin
+  if Assigned(FPreviousChangeTracking) then
+    FPreviousChangeTracking(ASender);
+  UpdateCounter;
+end;
+
+procedure TRickUIBuilderEditLabelCounter.UpdateCounter;
+begin
+  if (not FControl.Visible) or (FEdit.MaxLength <= 0) then
+  begin
+    FControl.Text := EmptyStr;
+    Exit;
+  end;
+  FControl.Text := Format('%d/%d', [Length(FEdit.Text), FEdit.MaxLength]);
+end;
+
+function TRickUIBuilderEditLabelCounter.Enabled(
+  AValue: Boolean): IRickUIBuilderEditLabelCounter;
+begin
+  FControl.Visible := AValue;
+  UpdateCounter;
   Result := Self;
 end;
 
