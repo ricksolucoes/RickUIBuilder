@@ -128,8 +128,7 @@ begin
   if not Assigned(FLine) then
   begin
     EnsureSharedControls;
-    FLine := TRickUIBuilderEditLine.New(Self, FRootControl, Designer.Control,
-      Designer.Validation);
+    FLine := TRickUIBuilderEditLine.New(Self, FRootControl);
   end;
   Result := FLine;
 end;

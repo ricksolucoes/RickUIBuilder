@@ -93,7 +93,7 @@ When a child must return its parent contract, it keeps `FParent` weak:
 FParent: IRickUIBuilderEditDesigner;
 ```
 
-The parent stores the child through its corresponding interface. `TInterfacedObject` implementations use reference counting; `TComponent` event receivers follow `TEdit` ownership. The upward `[weak]` reference avoids a strong cycle while preserving fluent navigation.
+The parent stores the child through its corresponding interface. `TInterfacedObject` implementations use reference counting; `TComponent` event receivers are owned by the FMX runtime tree appropriate to their lifetime. The upward `[weak]` reference avoids a strong cycle while preserving fluent navigation.
 
 ### 5. Dependency Injection carries the real dependency
 
@@ -109,14 +109,14 @@ There is no `Context`, service locator, aggregate settings record, or project-ow
 
 FMX events do not justify a helper class.
 
-Implementations that must survive as event receivers are the concrete classes corresponding to existing interfaces. When needed, those implementations derive from `TComponent` and are owned by the runtime `TEdit`.
+Event receivers remain the concrete classes corresponding to existing interfaces. When lifetime must follow the FMX tree directly, those implementations derive from `TComponent` and are owned by the appropriate control. `Designer.Validation` remains a `TInterfacedObject` and is kept alive by existing interface references; `Line.Color` is owned by the root `TRectangle` so it can exist before the `TEdit` and observe its insertion through `TComponent.Notification`.
 
 Handlers preserve and chain the previously installed handler:
 
-- `OnChangeTracking`: input configuration, counter, and clear button;
-- `OnEnter` / `OnExit`: visual contracts reacting to Focus/ReadOnly/Invalid;
+- `OnChangeTracking`: input configuration, counter, clear button, and clearing automatic invalid state when the value is edited again;
+- `OnEnter` / `OnExit`: visual contracts reacting to Focus/ReadOnly/Invalid and completion validation when the control exits;
 - `OnClick`: clear and password visibility;
-- `OnValidate` / `OnValidating`: cooperation between `Input.Config` and `Input.Number` over the same `TEdit`.
+- `OnValidate` / `OnValidating`: cooperation between `Input.Config` and `Input.Number` for numeric rules; `Validation` also uses `OnValidating` as an internal completion query identified by the `TEdit` owner in `Sender` as an internal marker.
 
 There is no project-owned event dispatcher.
 
@@ -154,11 +154,11 @@ These objects use FMX ownership and do not carry domain state outside the respon
 | `IRickUIBuilderEditDesignerInputText` | Value/Size | `TEdit` |
 | `IRickUIBuilderEditDesignerInputTextColor` | Background/Text/ReadOnly | `TEdit`, background |
 | `IRickUIBuilderEditDesignerInputNumber` | numeric rules | `TEdit`, `OnValidate`, `OnValidating` |
-| `IRickUIBuilderEditDesignerInputConfig` | Preset, masks, CaseMode, UrlCaseMode, MaxLength and caret | `TEdit`, `IRickUIBuilderEditDesignerInput` |
-| `IRickUIBuilderEditDesignerValidation` | Required, RequirementIndicator, Feedback, Invalid and RequirementMet | `TEdit`, alert/requirement paths, lazy error label |
+| `IRickUIBuilderEditDesignerInputConfig` | Preset, masks, CaseMode, UrlCaseMode, MaxLength, caret and preset completion | `TEdit`, `IRickUIBuilderEditDesignerInput`, `OnValidating` |
+| `IRickUIBuilderEditDesignerValidation` | Required, Completion Validation, Feedback, Invalid and RequirementMet | `TEdit`, `OnExit`, `OnChangeTracking`, alert/requirement paths, lazy error label |
 | `IRickUIBuilderEditDesignerConfig` | ClearButton, Password, ReadOnly | `TEdit`, clear/visibility paths |
-| `IRickUIBuilderEditLine` | Thickness and internal line target | `TEdit`, Validation |
-| `IRickUIBuilderEditLineColor` | Normal/Focus/Invalid/ReadOnly | `TEdit`, Validation |
+| `IRickUIBuilderEditLine` | Thickness and internal line target | root `TRectangle` |
+| `IRickUIBuilderEditLineColor` | Normal/Focus/Invalid/ReadOnly | root `TRectangle`; lazily observed `TEdit`; Validation resolved once the control exists |
 | `IRickUIBuilderEditConfig` | Appearance and Icons | shared paths |
 | `IRickUIBuilderEditConfigIcons` | Size and Colors/Paths grouping | shared paths |
 | `IRickUIBuilderEditConfigIconColors` | path colors | `TPath` |
@@ -234,6 +234,16 @@ The runtime target is a normal `TEdit` created by `TRickUIBuilderEditDesigner`.
 
 For numeric presets, `Input.Config` materializes `Input.Number` through the existing parent interface. Both contracts operate on the same `TEdit`; numeric validation is exposed through the control validation cycle, without a concrete-class cast or intermediary project-owned class.
 
+## Completion Validation
+
+`IRickUIBuilderEditDesignerValidation` chains `OnExit` to decide automatic invalid state. Empty values are evaluated with `Trim`: when `Required` is active, empty or whitespace-only input is invalid; otherwise empty input remains valid.
+
+For non-empty values, Validation materializes `Input.Config` through the existing interface navigation and queries completion through the same `TEdit.OnValidating`, passing the edit owner in `Sender` as an internal marker. `Input.Config` recognizes only that owner identity as a completion query; ordinary FMX validation uses the edit itself as sender and internal numeric calls keep `Sender=nil` and follow the normal `Input.Number` chain. This requires no GUID, `Supports`, concrete-class cast, tag, Context object, or auxiliary helper.
+
+`Input.Config` keeps the preset rule it already owns: masks must be complete, Email requires a valid local part and domain, and URL requires a valid authority with a supported scheme when a scheme is present.
+
+Automatic invalid state is separate from consumer-supplied `Invalid(...)`. A later edit clears only the automatic state through `OnChangeTracking`; an explicit `Invalid(...)` remains active until explicitly changed. `InvalidValue` exposes the effective state to visual contracts without changing `HasInvalid` or `InvalidMessage`, which continue to describe the explicit contract state.
+
 ## Counter, clear, password and requirement
 
 These responsibilities are no longer centralized in a generic runtime object:
@@ -268,11 +278,11 @@ The `TPath` instances are the same objects configured by `IRickUIBuilderEditConf
 
 The component must keep reacting to events after the root interface is released while the FMX tree remains alive.
 
-Implementations corresponding to interfaces that receive events may therefore be components owned by the `TEdit`. This does not create an extra class and does not retain the root through a strong parent reference.
+Receivers that need FMX ownership remain `TComponent`: `Input.Config` and the control-bound visual contracts are owned by the `TEdit`; `Line.Color` is owned by the root `TRectangle` because it may be materialized before the `TEdit`.
 
-Visual contracts that need to read `Invalid` retain `IRickUIBuilderEditDesignerValidation`; upward navigation references remain `[weak]`.
+`Designer.Validation` remains a `TInterfacedObject`. While the builder exists, Designer retains its interface. After `Build`, the visual receivers materialized by the composition root retain `IRickUIBuilderEditDesignerValidation`, keeping the `OnExit`/`OnChangeTracking` receiver alive for the FMX tree lifetime. This avoids turning Validation into a non-reference-counted `TComponent`.
 
-During `TEdit` destruction, receivers do not attempt to restore handlers on the owner while `csDestroying` is active.
+`Line.Color` continues to use `TComponent.Notification` and free notification exclusively to observe a `TEdit` created after it. Upward navigation references remain `[weak]`.
 
 ## Rules that remain prohibited
 

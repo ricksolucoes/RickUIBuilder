@@ -3,7 +3,6 @@
 interface
 
 uses
-  FMX.Edit,
   FMX.Objects,
 
   Rick.UIBuilder.Edit.Interfaces;
@@ -14,19 +13,16 @@ type
     [weak]
     FParent: IRickUIBuilderEdit;
     FControl: TRectangle;
-    FEdit: TEdit;
-    FValidation: IRickUIBuilderEditDesignerValidation;
     FColor: IRickUIBuilderEditLineColor;
   protected
-    constructor Create(const AParent: IRickUIBuilderEdit; AHost: TRectangle;
-      AEdit: TEdit; const AValidation: IRickUIBuilderEditDesignerValidation);
+    constructor Create(const AParent: IRickUIBuilderEdit; AHost: TRectangle);
 
     function Thickness(AValue: Single): IRickUIBuilderEditLine;
     function Color: IRickUIBuilderEditLineColor;
     function ToBack: IRickUIBuilderEdit;
   public
-    class function New(const AParent: IRickUIBuilderEdit; AHost: TRectangle;
-      AEdit: TEdit; const AValidation: IRickUIBuilderEditDesignerValidation): IRickUIBuilderEditLine;
+    class function New(const AParent: IRickUIBuilderEdit;
+      AHost: TRectangle): IRickUIBuilderEditLine;
   end;
 
 implementation
@@ -39,13 +35,10 @@ uses
   Rick.UIBuilder.Edit.Line.Color;
 
 constructor TRickUIBuilderEditLine.Create(const AParent: IRickUIBuilderEdit;
-  AHost: TRectangle; AEdit: TEdit;
-  const AValidation: IRickUIBuilderEditDesignerValidation);
+  AHost: TRectangle);
 begin
   inherited Create;
   FParent := AParent;
-  FEdit := AEdit;
-  FValidation := AValidation;
   FControl := TRectangle.Create(AHost);
   FControl.Parent := AHost;
   FControl.SetBounds(8, 47, AHost.Width - 16, 1);
@@ -56,10 +49,9 @@ begin
 end;
 
 class function TRickUIBuilderEditLine.New(const AParent: IRickUIBuilderEdit;
-  AHost: TRectangle; AEdit: TEdit;
-  const AValidation: IRickUIBuilderEditDesignerValidation): IRickUIBuilderEditLine;
+  AHost: TRectangle): IRickUIBuilderEditLine;
 begin
-  Result := Self.Create(AParent, AHost, AEdit, AValidation);
+  Result := Self.Create(AParent, AHost);
 end;
 
 function TRickUIBuilderEditLine.Thickness(AValue: Single): IRickUIBuilderEditLine;
@@ -71,7 +63,7 @@ end;
 function TRickUIBuilderEditLine.Color: IRickUIBuilderEditLineColor;
 begin
   if not Assigned(FColor) then
-    FColor := TRickUIBuilderEditLineColor.New(Self, FControl, FEdit, FValidation);
+    FColor := TRickUIBuilderEditLineColor.New(Self, FControl);
   Result := FColor;
 end;
 

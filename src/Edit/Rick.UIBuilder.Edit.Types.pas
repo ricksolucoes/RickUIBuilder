@@ -8,6 +8,8 @@ uses
   System.UITypes;
 
 type
+  TRickNotifyEvent = procedure(Sender: TObject) of object;
+
   TRickUIBuilderEditPreset = (AllCharacters, CPF, CNPJ, CEP, Email, URL, Phone,
     Mobile, IntegerNumber, FloatNumber, TextNoAccents, TextPunctuationNoAccents,
     TextWithAccents, TextPunctuationWithAccents);

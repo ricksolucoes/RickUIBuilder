@@ -6,6 +6,7 @@ interface
 
 uses
   FMX.Edit,
+  FMX.Text,
   System.Classes,
 
   Rick.UIBuilder.Edit.Interfaces,
@@ -26,6 +27,7 @@ type
     FCaretUpdateQueued: Boolean;
     FPendingGoToEnd: Boolean;
     FPreviousChangeTracking: TNotifyEvent;
+    FPreviousValidating: TValidateTextEvent;
     procedure ApplyPendingCaret;
     procedure QueueCaretUpdate(ACaret: Integer; AGoToEnd: Boolean = False);
     function IsAppendingAtEnd(const AOldText, ANewText: string): Boolean;
@@ -36,6 +38,12 @@ type
     function IsEmailCharAllowed(AChar: Char; AIndex, AAtIndex: Integer): Boolean;
     function FindEmailSeparator(const AValue: string): Integer;
     function IsEmailAllowed(const AValue: string): Boolean;
+    function IsEmailLocalBoundaryValid(const AValue: string): Boolean;
+    function IsEmailLocalPart(const AValue: string): Boolean;
+    function IsHostLabelBoundaryValid(const AValue: string): Boolean;
+    function IsHostLabel(const AValue: string): Boolean;
+    function IsEmailDomain(const AValue: string): Boolean;
+    function IsEmailComplete(const AValue: string): Boolean;
     function IsCnpjBaseChar(AChar: Char): Boolean;
     function IsMaskSeparator(AChar: Char): Boolean;
     function IsCnpjTypingAllowed(const AValue: string): Boolean;
@@ -50,10 +58,29 @@ type
     function ApplyCase(const AValue: string): string;
     function FindUrlBoundary(const AValue: string): Integer;
     function ApplyUrlCase(const AValue: string): string;
+    function IsPortValid(const AValue: string): Boolean;
+    function IsIPv4PartValid(const AValue: string): Boolean;
+    function IsIPv4Valid(const AValue: string): Boolean;
+    function IsIPv6Group(const AValue: string): Boolean;
+    function HasMultipleDoubleColon(const AValue: string): Boolean;
+    function CountIPv6Groups(const AValue: string): Integer;
+    function IsIPv6Valid(const AValue: string): Boolean;
+    function IsDomainHostValid(const AValue: string): Boolean;
+    function IsUrlHostValid(const AValue: string): Boolean;
+    function IsBracketedAuthorityValid(const AValue: string): Boolean;
+    function IsHostPortAuthorityValid(const AValue: string): Boolean;
+    function IsUrlAuthorityValid(const AValue: string): Boolean;
+    function StripUrlScheme(var AValue: string): Boolean;
+    function EarlierBoundary(AExisting, ACandidate: Integer): Integer;
+    function FindAuthorityBoundary(const AValue: string): Integer;
+    function IsUrlComplete(const AValue: string): Boolean;
+    function HasCompleteMask(const AValue: string): Boolean;
+    function IsCompleteValue(const AValue: string): Boolean;
     function FormatTypedValue(const AValue: string): string;
     function ResolveNumericValue(const AValue: string): string;
     function ResolveTextValue(const AValue: string): string;
     procedure HandleChangeTracking(ASender: TObject);
+    procedure HandleValidating(ASender: TObject; var AText: string);
     procedure RefreshTracking;
   protected
     constructor Create(const AParent: IRickUIBuilderEditDesignerInput;
@@ -74,6 +101,7 @@ implementation
 
 uses
   System.Character,
+  System.StrUtils,
   System.SysUtils;
 
 constructor TRickUIBuilderEditDesignerInputConfig.Create(
@@ -91,13 +119,18 @@ begin
   FCaretUpdateQueued := False;
   FPendingGoToEnd := False;
   FPreviousChangeTracking := FControl.OnChangeTracking;
+  FPreviousValidating := FControl.OnValidating;
   FControl.OnChangeTracking := HandleChangeTracking;
+  FControl.OnValidating := HandleValidating;
 end;
 
 destructor TRickUIBuilderEditDesignerInputConfig.Destroy;
 begin
   if Assigned(FControl) and not (csDestroying in FControl.ComponentState) then
+  begin
     FControl.OnChangeTracking := FPreviousChangeTracking;
+    FControl.OnValidating := FPreviousValidating;
+  end;
   inherited;
 end;
 
@@ -229,6 +262,90 @@ begin
     if not IsEmailCharAllowed(AValue[LIndex], LIndex, LAtIndex) then
       Exit(False);
   Result := True;
+end;
+
+function TRickUIBuilderEditDesignerInputConfig.IsEmailLocalBoundaryValid(
+  const AValue: string): Boolean;
+begin
+  if AValue.IsEmpty then
+    Exit(False);
+  if AValue[1] = '.' then
+    Exit(False);
+  if AValue[Length(AValue)] = '.' then
+    Exit(False);
+  Result := Pos('..', AValue) = 0;
+end;
+
+function TRickUIBuilderEditDesignerInputConfig.IsEmailLocalPart(
+  const AValue: string): Boolean;
+var
+  LChar: Char;
+begin
+  if not IsEmailLocalBoundaryValid(AValue) then
+    Exit(False);
+  for LChar in AValue do
+    if not (IsEmailAtext(LChar) or (LChar = '.')) then
+      Exit(False);
+  Result := True;
+end;
+
+function TRickUIBuilderEditDesignerInputConfig.IsHostLabelBoundaryValid(
+  const AValue: string): Boolean;
+begin
+  if AValue.IsEmpty then
+    Exit(False);
+  if Length(AValue) > 63 then
+    Exit(False);
+  if AValue[1] = '-' then
+    Exit(False);
+  Result := AValue[Length(AValue)] <> '-';
+end;
+
+function TRickUIBuilderEditDesignerInputConfig.IsHostLabel(
+  const AValue: string): Boolean;
+var
+  LChar: Char;
+begin
+  if not IsHostLabelBoundaryValid(AValue) then
+    Exit(False);
+  for LChar in AValue do
+    if not (LChar.IsLetterOrDigit or (LChar = '-')) then
+      Exit(False);
+  Result := True;
+end;
+
+function TRickUIBuilderEditDesignerInputConfig.IsEmailDomain(
+  const AValue: string): Boolean;
+var
+  LLabel: string;
+  LLabels: TArray<string>;
+begin
+  if AValue.IsEmpty then
+    Exit(False);
+  LLabels := AValue.Split(['.']);
+  for LLabel in LLabels do
+    if not IsHostLabel(LLabel) then
+      Exit(False);
+  Result := True;
+end;
+
+function TRickUIBuilderEditDesignerInputConfig.IsEmailComplete(
+  const AValue: string): Boolean;
+var
+  LAtIndex: Integer;
+  LDomain: string;
+  LLocal: string;
+begin
+  LAtIndex := FindEmailSeparator(AValue);
+  if LAtIndex <= 1 then
+    Exit(False);
+  LLocal := Copy(AValue, 1, LAtIndex - 1);
+  LDomain := Copy(AValue, LAtIndex + 1, MaxInt);
+  if TEncoding.UTF8.GetByteCount(LLocal) > 64 then
+    Exit(False);
+  if TEncoding.UTF8.GetByteCount(AValue) > 254 then
+    Exit(False);
+  Result := IsEmailLocalPart(LLocal) and IsEmailDomain(LDomain);
 end;
 
 function TRickUIBuilderEditDesignerInputConfig.IsCnpjBaseChar(AChar: Char): Boolean;
@@ -447,6 +564,267 @@ begin
     Copy(AValue, LBoundary, MaxInt);
 end;
 
+function TRickUIBuilderEditDesignerInputConfig.IsPortValid(
+  const AValue: string): Boolean;
+var
+  LChar: Char;
+  LPort: Integer;
+begin
+  if AValue.Trim.IsEmpty then
+    Exit(False);
+  for LChar in AValue do
+    if not LChar.IsDigit then
+      Exit(False);
+  Result := TryStrToInt(AValue, LPort) and (LPort >= 0) and (LPort <= 65535);
+end;
+
+function TRickUIBuilderEditDesignerInputConfig.IsIPv4PartValid(
+  const AValue: string): Boolean;
+var
+  LValue: Integer;
+begin
+  if AValue.Trim.IsEmpty then
+    Exit(False);
+  if Length(AValue) > 3 then
+    Exit(False);
+  if not TryStrToInt(AValue, LValue) then
+    Exit(False);
+  if LValue < 0 then
+    Exit(False);
+  Result := LValue <= 255;
+end;
+
+function TRickUIBuilderEditDesignerInputConfig.IsIPv4Valid(
+  const AValue: string): Boolean;
+var
+  LPart: string;
+  LParts: TArray<string>;
+begin
+  LParts := AValue.Split(['.']);
+  if Length(LParts) <> 4 then
+    Exit(False);
+  for LPart in LParts do
+    if not IsIPv4PartValid(LPart) then
+      Exit(False);
+  Result := True;
+end;
+
+function TRickUIBuilderEditDesignerInputConfig.IsIPv6Group(
+  const AValue: string): Boolean;
+var
+  LChar: Char;
+begin
+  if AValue.IsEmpty or (Length(AValue) > 4) then
+    Exit(False);
+  for LChar in AValue do
+    if not CharInSet(LChar, ['0'..'9', 'a'..'f', 'A'..'F']) then
+      Exit(False);
+  Result := True;
+end;
+
+function TRickUIBuilderEditDesignerInputConfig.HasMultipleDoubleColon(
+  const AValue: string): Boolean;
+var
+  LFirst: Integer;
+begin
+  LFirst := Pos('::', AValue);
+  if LFirst = 0 then
+    Exit(False);
+  Result := Pos('::', Copy(AValue, LFirst + 2, MaxInt)) > 0;
+end;
+
+function TRickUIBuilderEditDesignerInputConfig.CountIPv6Groups(
+  const AValue: string): Integer;
+var
+  LPart: string;
+  LParts: TArray<string>;
+begin
+  Result := 0;
+  LParts := AValue.Split([':']);
+  for LPart in LParts do
+    if not LPart.IsEmpty then
+    begin
+      if not IsIPv6Group(LPart) then
+        Exit(-1);
+      Inc(Result);
+    end;
+end;
+
+function TRickUIBuilderEditDesignerInputConfig.IsIPv6Valid(
+  const AValue: string): Boolean;
+var
+  LCount: Integer;
+  LHasCompression: Boolean;
+begin
+  if AValue.Trim.IsEmpty or HasMultipleDoubleColon(AValue) then
+    Exit(False);
+  LCount := CountIPv6Groups(AValue);
+  if LCount < 0 then
+    Exit(False);
+  LHasCompression := Pos('::', AValue) > 0;
+  if LHasCompression then
+    Exit(LCount < 8);
+  Result := LCount = 8;
+end;
+
+function TRickUIBuilderEditDesignerInputConfig.IsDomainHostValid(
+  const AValue: string): Boolean;
+var
+  LLabel: string;
+  LLabels: TArray<string>;
+begin
+  if AValue.Trim.IsEmpty then
+    Exit(False);
+  if SameText(AValue, 'localhost') then
+    Exit(True);
+  LLabels := AValue.Split(['.']);
+  if Length(LLabels) < 2 then
+    Exit(False);
+  for LLabel in LLabels do
+    if not IsHostLabel(LLabel) then
+      Exit(False);
+  Result := True;
+end;
+
+function TRickUIBuilderEditDesignerInputConfig.IsUrlHostValid(
+  const AValue: string): Boolean;
+begin
+  if AValue.Trim.IsEmpty then
+    Exit(False);
+  if IsIPv4Valid(AValue) then
+    Exit(True);
+  if (Pos('.', AValue) > 0) and AValue[1].IsDigit then
+    Exit(False);
+  Result := IsDomainHostValid(AValue);
+end;
+
+function TRickUIBuilderEditDesignerInputConfig.IsBracketedAuthorityValid(
+  const AValue: string): Boolean;
+var
+  LCloseBracket: Integer;
+  LPort: string;
+begin
+  LCloseBracket := Pos(']', AValue);
+  if LCloseBracket = 0 then
+    Exit(False);
+  if not IsIPv6Valid(Copy(AValue, 2, LCloseBracket - 2)) then
+    Exit(False);
+  LPort := Copy(AValue, LCloseBracket + 1, MaxInt);
+  if LPort.IsEmpty then
+    Exit(True);
+  if LPort[1] <> ':' then
+    Exit(False);
+  Result := IsPortValid(Copy(LPort, 2, MaxInt));
+end;
+
+function TRickUIBuilderEditDesignerInputConfig.IsHostPortAuthorityValid(
+  const AValue: string): Boolean;
+var
+  LColon: Integer;
+  LHost: string;
+  LPort: string;
+begin
+  LColon := LastDelimiter(':', AValue);
+  if LColon = 0 then
+    Exit(IsUrlHostValid(AValue));
+  LHost := Copy(AValue, 1, LColon - 1);
+  if Pos(':', LHost) > 0 then
+    Exit(False);
+  LPort := Copy(AValue, LColon + 1, MaxInt);
+  Result := IsUrlHostValid(LHost) and IsPortValid(LPort);
+end;
+
+function TRickUIBuilderEditDesignerInputConfig.IsUrlAuthorityValid(
+  const AValue: string): Boolean;
+begin
+  if AValue.Trim.IsEmpty or (Pos('@', AValue) > 0) then
+    Exit(False);
+  if AValue[1] = '[' then
+    Exit(IsBracketedAuthorityValid(AValue));
+  Result := IsHostPortAuthorityValid(AValue);
+end;
+
+function TRickUIBuilderEditDesignerInputConfig.StripUrlScheme(
+  var AValue: string): Boolean;
+begin
+  Result := True;
+  if Pos('://', AValue) = 0 then
+    Exit;
+  if StartsText('https://', AValue) then
+    Delete(AValue, 1, Length('https://'))
+  else if StartsText('http://', AValue) then
+    Delete(AValue, 1, Length('http://'))
+  else
+    Result := False;
+end;
+
+function TRickUIBuilderEditDesignerInputConfig.EarlierBoundary(
+  AExisting, ACandidate: Integer): Integer;
+begin
+  Result := AExisting;
+  if ACandidate = 0 then
+    Exit;
+  if ACandidate < AExisting then
+    Result := ACandidate;
+end;
+
+function TRickUIBuilderEditDesignerInputConfig.FindAuthorityBoundary(
+  const AValue: string): Integer;
+begin
+  Result := Length(AValue) + 1;
+  Result := EarlierBoundary(Result, Pos('/', AValue));
+  Result := EarlierBoundary(Result, Pos('?', AValue));
+  Result := EarlierBoundary(Result, Pos('#', AValue));
+end;
+
+function TRickUIBuilderEditDesignerInputConfig.IsUrlComplete(
+  const AValue: string): Boolean;
+var
+  LAuthority: string;
+  LValue: string;
+begin
+  LValue := AValue;
+  if LValue.Trim.IsEmpty or (LValue <> LValue.Trim) then
+    Exit(False);
+  if not StripUrlScheme(LValue) then
+    Exit(False);
+  LAuthority := Copy(LValue, 1, FindAuthorityBoundary(LValue) - 1);
+  Result := IsUrlAuthorityValid(LAuthority);
+end;
+
+function TRickUIBuilderEditDesignerInputConfig.HasCompleteMask(
+  const AValue: string): Boolean;
+begin
+  case FPreset of
+    TRickUIBuilderEditPreset.CPF: Result := Length(AValue) = 14;
+    TRickUIBuilderEditPreset.CNPJ: Result := Length(AValue) = 18;
+    TRickUIBuilderEditPreset.CEP: Result := Length(AValue) = 9;
+    TRickUIBuilderEditPreset.Phone: Result := Length(AValue) in [9, 14];
+    TRickUIBuilderEditPreset.Mobile: Result := Length(AValue) in [11, 16];
+  else
+    Result := True;
+  end;
+end;
+
+function TRickUIBuilderEditDesignerInputConfig.IsCompleteValue(
+  const AValue: string): Boolean;
+var
+  LFormatted: string;
+begin
+  if FPreset in [TRickUIBuilderEditPreset.CPF, TRickUIBuilderEditPreset.CNPJ,
+    TRickUIBuilderEditPreset.CEP, TRickUIBuilderEditPreset.Phone,
+    TRickUIBuilderEditPreset.Mobile] then
+  begin
+    LFormatted := FormatTypedValue(AValue);
+    Exit((AValue = LFormatted) and HasCompleteMask(LFormatted));
+  end;
+  if FPreset = TRickUIBuilderEditPreset.Email then
+    Exit(IsEmailComplete(AValue));
+  if FPreset = TRickUIBuilderEditPreset.URL then
+    Exit(IsUrlComplete(AValue));
+  Result := True;
+end;
+
 function TRickUIBuilderEditDesignerInputConfig.FormatTypedValue(
   const AValue: string): string;
 begin
@@ -513,6 +891,19 @@ begin
   FLastAcceptedText := FControl.Text;
   if Assigned(FPreviousChangeTracking) then
     FPreviousChangeTracking(ASender);
+end;
+
+procedure TRickUIBuilderEditDesignerInputConfig.HandleValidating(
+  ASender: TObject; var AText: string);
+begin
+  if ASender = FControl.Owner then
+  begin
+    if not IsCompleteValue(AText) then
+      AText := EmptyStr;
+    Exit;
+  end;
+  if Assigned(FPreviousValidating) then
+    FPreviousValidating(ASender, AText);
 end;
 
 procedure TRickUIBuilderEditDesignerInputConfig.RefreshTracking;

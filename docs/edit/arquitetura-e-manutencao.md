@@ -129,8 +129,9 @@ The current implementation follows the 1 → 1 → 1 correspondence rigidly. The
 
 - validation state and feedback belong to `IRickUIBuilderEditDesignerValidation`;
 - `ClearButton`, `Password`, and `ReadOnly` belong to `IRickUIBuilderEditDesignerConfig`;
-- masks, case handling, URL handling, and `MaxLength` belong to `IRickUIBuilderEditDesignerInputConfig`;
+- masks, case handling, URL handling, `MaxLength`, and preset completion belong to `IRickUIBuilderEditDesignerInputConfig`;
 - numeric rules belong to `IRickUIBuilderEditDesignerInputNumber`;
+- `Required`, automatic Completion Validation state, and feedback belong to `IRickUIBuilderEditDesignerValidation`;
 - each visual implementation owns only its own colors and resolves state through `IRickUIBuilderEditDesignerValidation` and the shared `TEdit`;
 - `TEdit`, `TLabel`, `TPath`, and `TRectangle` are FMX infrastructure controls and may be injected directly when they are the actual target of an implementation.
 
@@ -144,11 +145,11 @@ Therefore, while the root `IRickUIBuilderEdit` remains referenced, the descendan
 
 `Parent(AParentConstructor)` retains the assembly-location reference for `Build`; a plain `TFmxObject` reference does not transfer ownership or automatically extend the supplied object's lifetime.
 
-The runtime `TEdit` is created by `TRickUIBuilderEditDesigner` with the root `TRectangle` as owner. Legitimate interface implementations that must remain event receivers for the lifetime of the control are components owned by that same `TEdit`. They remain the concrete classes corresponding to existing interfaces; no additional lifetime helper exists.
+The runtime `TEdit` is created by `TRickUIBuilderEditDesigner` with the root `TRectangle` as owner. Control-bound event receivers that require FMX ownership remain `TComponent` implementations owned by the appropriate runtime control. `Designer.Validation` remains a reference-counted `TInterfacedObject`: Designer retains it while the builder is alive, and the visual receivers materialized by the composition root retain `IRickUIBuilderEditDesignerValidation` after `Build`. `IRickUIBuilderEditLineColor` is owned by the root `TRectangle` because it can be materialized before the `TEdit` exists; it observes `TEdit` insertion through the native `TComponent.Notification` mechanism and then chains `OnEnter`/`OnExit`.
 
-`OnEnter`, `OnExit`, and `OnChangeTracking` handlers are chained by the implementations that actually own those behaviors. `Invalid` state remains in `IRickUIBuilderEditDesignerValidation`, `ReadOnly` remains on the `TEdit`, and focus state is retained locally only by visual contracts that actually expose a `Focus` variation.
+`OnEnter`, `OnExit`, `OnChangeTracking`, and `OnValidating` handlers are chained by the implementations that own those behaviors. Completion Validation uses `OnExit` to evaluate Required/completion and `OnChangeTracking` to clear only automatic invalid state. For non-empty values, Validation materializes `Input.Config` through the existing interface navigation and issues an internal completion query through `TEdit.OnValidating`, using the edit owner as the private sender marker. `Input.Config` recognizes only that owner identity; ordinary FMX validation uses the edit itself as sender and numeric internal validation keeps `Sender=nil`. No GUID, `Supports`, concrete-class cast, tag, Context object, or auxiliary helper is introduced.
 
-Visual implementations retain `IRickUIBuilderEditDesignerValidation` when they must still read `Invalid` after the root interface has been released. Their upward navigation references remain `[weak]`, avoiding a reference-counting cycle.
+Explicit `Invalid` state remains in `IRickUIBuilderEditDesignerValidation`, preset-specific completion remains in `Input.Config`, `ReadOnly` remains on the `TEdit`, and focus state is retained locally only by visual contracts that actually expose a `Focus` variation. Upward navigation references remain `[weak]`, avoiding a reference-counting cycle.
 
 ## Implementation strategy
 

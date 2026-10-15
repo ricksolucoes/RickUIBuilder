@@ -26,15 +26,23 @@ type
     FDefaultMessage: string;
     FHasInvalid: Boolean;
     FInvalid: Boolean;
+    FAutomaticInvalid: Boolean;
     FInvalidMessage: string;
     FHasRequirementMet: Boolean;
     FRequirementMet: Boolean;
+    FPreviousExit: TRickNotifyEvent;
+    FPreviousChangeTracking: TRickNotifyEvent;
+    procedure BindEvents;
     function FindErrorLabel: TLabel;
+    function IsCompletionInvalid: Boolean;
     function ResolvedInvalidMessage: string;
+    procedure SetAutomaticInvalid(AValue: Boolean);
     procedure UpdateRequirementPaths;
     procedure UpdateErrorFeedback(const AMessage: string);
     procedure UpdateValidationFeedback;
     procedure RefreshVisuals;
+    procedure HandleExit(ASender: TObject);
+    procedure HandleChangeTracking(ASender: TObject);
   protected
     constructor Create(const AParent: IRickUIBuilderEditDesigner; AControl: TEdit;
       const APaths: array of TPath);
@@ -64,7 +72,6 @@ type
 implementation
 
 uses
-  System.Classes,
   System.SysUtils;
 
 constructor TRickUIBuilderEditDesignerValidation.Create(
@@ -84,9 +91,19 @@ begin
   FDefaultMessage := EmptyStr;
   FHasInvalid := False;
   FInvalid := False;
+  FAutomaticInvalid := False;
   FInvalidMessage := EmptyStr;
   FHasRequirementMet := False;
   FRequirementMet := False;
+  BindEvents;
+end;
+
+procedure TRickUIBuilderEditDesignerValidation.BindEvents;
+begin
+  FPreviousExit := FControl.OnExit;
+  FPreviousChangeTracking := FControl.OnChangeTracking;
+  FControl.OnExit := HandleExit;
+  FControl.OnChangeTracking := HandleChangeTracking;
 end;
 
 class function TRickUIBuilderEditDesignerValidation.New(
@@ -111,6 +128,47 @@ begin
     end;
 end;
 
+function TRickUIBuilderEditDesignerValidation.IsCompletionInvalid: Boolean;
+var
+  LValue: string;
+begin
+  if FControl.Text.Trim.IsEmpty then
+    Exit(FRequired);
+  if Assigned(FParent) then
+    FParent.Input.Config;
+  LValue := FControl.Text;
+  if Assigned(FControl.OnValidating) then
+    FControl.OnValidating(FControl.Owner, LValue);
+  Result := LValue = EmptyStr;
+end;
+
+procedure TRickUIBuilderEditDesignerValidation.SetAutomaticInvalid(
+  AValue: Boolean);
+begin
+  if FAutomaticInvalid = AValue then
+    Exit;
+  FAutomaticInvalid := AValue;
+  UpdateValidationFeedback;
+  RefreshVisuals;
+end;
+
+procedure TRickUIBuilderEditDesignerValidation.HandleExit(ASender: TObject);
+begin
+  if Assigned(ASender) then
+    SetAutomaticInvalid(IsCompletionInvalid);
+  if Assigned(FPreviousExit) then
+    FPreviousExit(ASender);
+end;
+
+procedure TRickUIBuilderEditDesignerValidation.HandleChangeTracking(
+  ASender: TObject);
+begin
+  if Assigned(ASender) and FAutomaticInvalid then
+    SetAutomaticInvalid(False);
+  if Assigned(FPreviousChangeTracking) then
+    FPreviousChangeTracking(ASender);
+end;
+
 procedure TRickUIBuilderEditDesignerValidation.UpdateRequirementPaths;
 begin
   FRequirementMetPath.Visible := FRequirementIndicator and FRequirementMet;
@@ -119,9 +177,9 @@ end;
 
 function TRickUIBuilderEditDesignerValidation.ResolvedInvalidMessage: string;
 begin
-  Result := FInvalidMessage;
-  if Result = EmptyStr then
-    Result := FDefaultMessage;
+  Result := FDefaultMessage;
+  if FInvalid and (FInvalidMessage <> EmptyStr) then
+    Result := FInvalidMessage;
 end;
 
 procedure TRickUIBuilderEditDesignerValidation.UpdateErrorFeedback(
@@ -132,18 +190,9 @@ begin
   LErrorLabel := FindErrorLabel;
   if not Assigned(LErrorLabel) then
     Exit;
-  if FInvalid and (AMessage <> EmptyStr) and
-    (FFeedback <> TRickUIBuilderEditInvalidFeedback.IconOnly) then
-  begin
-    LErrorLabel.Text := AMessage;
-    LErrorLabel.Visible := True;
-    Exit;
-  end;
-  if Assigned(LErrorLabel) then
-  begin
-    LErrorLabel.Text := AMessage;
-    LErrorLabel.Visible := False;
-  end;
+  LErrorLabel.Text := AMessage;
+  LErrorLabel.Visible := InvalidValue and (AMessage <> EmptyStr) and
+    (FFeedback <> TRickUIBuilderEditInvalidFeedback.IconOnly);
 end;
 
 procedure TRickUIBuilderEditDesignerValidation.UpdateValidationFeedback;
@@ -151,10 +200,10 @@ var
   LMessage: string;
 begin
   LMessage := EmptyStr;
-  if FInvalid then
+  if InvalidValue then
     LMessage := ResolvedInvalidMessage;
   UpdateErrorFeedback(LMessage);
-  FAlertPath.Visible := FInvalid and
+  FAlertPath.Visible := InvalidValue and
     (FFeedback <> TRickUIBuilderEditInvalidFeedback.AlertOnly);
 end;
 
@@ -223,6 +272,8 @@ begin
   FHasInvalid := True;
   FInvalid := AValue;
   FInvalidMessage := AMessage;
+  if not AValue then
+    FAutomaticInvalid := False;
   UpdateValidationFeedback;
   RefreshVisuals;
   Result := Self;
@@ -235,7 +286,7 @@ end;
 
 function TRickUIBuilderEditDesignerValidation.InvalidValue: Boolean;
 begin
-  Result := FInvalid;
+  Result := FInvalid or FAutomaticInvalid;
 end;
 
 function TRickUIBuilderEditDesignerValidation.InvalidMessage: string;
