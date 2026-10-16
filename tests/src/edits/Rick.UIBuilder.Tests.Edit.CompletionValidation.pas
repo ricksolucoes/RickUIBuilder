@@ -37,6 +37,7 @@ type
     [Test] procedure Required_VazioDeveInvalidarAoSair;
     [Test] procedure Required_EspacosDevemInvalidarAoSair;
     [Test] procedure Required_PreenchidoDevePermanecerValido;
+    [Test] procedure Required_DesabilitadoAposHabilitarDevePermanecerValido;
     [Test] procedure CPF_IncompletoDeveInvalidarAoSair;
     [Test] procedure CPF_CompletoDevePermanecerValido;
     [Test] procedure CNPJ_IncompletoDeveInvalidarAoSair;
@@ -181,6 +182,16 @@ begin
   PrepareValidation;
   FEdit.Designer.Validation.Required;
   FEdit.Designer.Input.Text.Value('Preenchido');
+  BuildEdit;
+  ExitEdit;
+  AssertValidFeedback;
+end;
+
+procedure TRickUIBuilderEditCompletionValidationTests.
+  Required_DesabilitadoAposHabilitarDevePermanecerValido;
+begin
+  PrepareValidation;
+  FEdit.Designer.Validation.Required.Required(False);
   BuildEdit;
   ExitEdit;
   AssertValidFeedback;

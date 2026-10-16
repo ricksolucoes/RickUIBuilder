@@ -194,6 +194,10 @@ begin
   Assert.IsTrue(LClear.Visible);
   FEdit.Designer.Clear;
   Assert.IsFalse(LClear.Visible);
+  SetInput('abc');
+  Assert.IsTrue(LClear.Visible);
+  FEdit.Designer.Config.ClearButton(False);
+  Assert.IsFalse(LClear.Visible);
 end;
 
 procedure TRickUIBuilderEditInteractionTests.ClearButton_ClickDeveLimparTextoESeOcultar;
@@ -253,6 +257,10 @@ begin
   Assert.IsTrue(FEdit.Designer.Control.Password);
   Assert.IsFalse(LVisibility.Visible);
   Assert.IsTrue(LVisibilityOff.Visible);
+  FEdit.Designer.Config.Password(False);
+  Assert.IsFalse(FEdit.Designer.Control.Password);
+  Assert.IsFalse(LVisibility.Visible);
+  Assert.IsFalse(LVisibilityOff.Visible);
 end;
 
 procedure TRickUIBuilderEditInteractionTests.Password_ClickDeveAlternarEstadoEPaths;
@@ -372,6 +380,9 @@ begin
   Assert.IsNotNull(LMet);
   Assert.IsNotNull(LNotMet);
   Assert.IsTrue(LMet.Visible);
+  Assert.IsFalse(LNotMet.Visible);
+  FEdit.Designer.Validation.RequirementIndicator(False);
+  Assert.IsFalse(LMet.Visible);
   Assert.IsFalse(LNotMet.Visible);
 end;
 

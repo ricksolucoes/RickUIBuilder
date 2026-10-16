@@ -25,6 +25,7 @@ type
     [Test] procedure Counter_EnabledDeveAlterarVisibilidade;
     [Test] procedure Line_SettersDiretosDevemAtualizarControle;
     [Test] procedure Icons_SettersDiretosDevemAtualizarPath;
+    [Test] procedure Icons_SizeEColorsDevemAtualizarTodosOsPaths;
   end;
 
 implementation
@@ -88,6 +89,33 @@ begin
     end;
 end;
 
+function CountPathsByColor(AParent: TFmxObject;
+  AColor: TAlphaColor): Integer;
+var
+  LIndex: Integer;
+begin
+  Result := 0;
+  for LIndex := 0 to AParent.ChildrenCount - 1 do
+    if (AParent.Children[LIndex] is TPath) and
+      (TPath(AParent.Children[LIndex]).Fill.Color = AColor) then
+      Inc(Result);
+end;
+
+function CountPathsBySize(AParent: TFmxObject; ASize: Single): Integer;
+var
+  LIndex: Integer;
+  LPath: TPath;
+begin
+  Result := 0;
+  for LIndex := 0 to AParent.ChildrenCount - 1 do
+    if AParent.Children[LIndex] is TPath then
+    begin
+      LPath := TPath(AParent.Children[LIndex]);
+      if (LPath.Width = ASize) and (LPath.Height = ASize) then
+        Inc(Result);
+    end;
+end;
+
 procedure TRickUIBuilderEditControlsTests.Setup;
 begin
   FEdit := TRickUIBuilderEdit.New;
@@ -125,8 +153,12 @@ var
 begin
   LDesigner := FEdit.Designer;
   LText := LDesigner.Input.Text;
-  LText.Value('Texto').Color.Text(TAlphaColors.Blue);
-  Assert.AreEqual<TAlphaColor>(TAlphaColors.Blue, LDesigner.Control.TextSettings.FontColor);
+  LText.Value('Texto').Color.Background(TAlphaColors.Green)
+    .Text(TAlphaColors.Blue);
+  Assert.AreEqual<TAlphaColor>(TAlphaColors.Green,
+    FindFirstRectangle(FEdit.Rectangle.Control).Fill.Color);
+  Assert.AreEqual<TAlphaColor>(TAlphaColors.Blue,
+    LDesigner.Control.TextSettings.FontColor);
   LText.Size(18).Config.Password.ReadOnly;
   LDesigner.Input.Config.MaxLength(12);
   Assert.AreEqual('Texto', LText.Value);
@@ -153,12 +185,15 @@ procedure TRickUIBuilderEditControlsTests.LabelError_SettersDiretosDevemAtualiza
 var
   LLabel: TLabel;
 begin
-  FEdit.Labels.Error.Text.Value('Erro').Color(TAlphaColors.Red).Spacing(7).Font.Size(13);
+  FEdit.Labels.Error.Text.Value('Erro').Color(TAlphaColors.Red).Spacing(7)
+    .Font.Family('Arial').Size(13).Styles([TFontStyle.fsBold]);
   LLabel := FindLabelByText(FEdit.Rectangle.Control, 'Erro');
   Assert.IsNotNull(LLabel);
   Assert.AreEqual<TAlphaColor>(TAlphaColors.Red, LLabel.TextSettings.FontColor);
   Assert.AreEqual<Single>(55, LLabel.Position.Y);
   Assert.AreEqual<Single>(13, LLabel.TextSettings.Font.Size);
+  Assert.AreEqual('Arial', LLabel.TextSettings.Font.Family);
+  Assert.IsTrue(TFontStyle.fsBold in LLabel.TextSettings.Font.Style);
 end;
 
 procedure TRickUIBuilderEditControlsTests.Counter_EnabledDeveAlterarVisibilidade;
@@ -194,6 +229,35 @@ begin
   Assert.AreEqual<Single>(26, LPath.Width);
   Assert.AreEqual<Single>(26, LPath.Height);
   Assert.IsFalse(LPath.Data.Data.Trim.IsEmpty);
+end;
+
+procedure TRickUIBuilderEditControlsTests.Icons_SizeEColorsDevemAtualizarTodosOsPaths;
+const
+  _ICON_SIZE_: Single = 26;
+  _ICON_DEFAULT_COLOR_: TAlphaColor = $FF102030;
+  _ICON_ALERT_COLOR_: TAlphaColor = $FF203040;
+  _ICON_CLEAR_COLOR_: TAlphaColor = $FF304050;
+  _ICON_PASSWORD_COLOR_: TAlphaColor = $FF405060;
+  _ICON_REQUIREMENT_COLOR_: TAlphaColor = $FF506070;
+var
+  LColors: IRickUIBuilderEditConfigIconColors;
+begin
+  LColors := FEdit.Config.Icons.Size(_ICON_SIZE_).Colors
+    .Default(_ICON_DEFAULT_COLOR_);
+  Assert.AreEqual<Integer>(6,
+    CountPathsBySize(FEdit.Rectangle.Control, _ICON_SIZE_));
+  Assert.AreEqual<Integer>(6,
+    CountPathsByColor(FEdit.Rectangle.Control, _ICON_DEFAULT_COLOR_));
+  LColors.Alert(_ICON_ALERT_COLOR_).Clear(_ICON_CLEAR_COLOR_)
+    .Password(_ICON_PASSWORD_COLOR_).Requirement(_ICON_REQUIREMENT_COLOR_);
+  Assert.AreEqual<Integer>(1,
+    CountPathsByColor(FEdit.Rectangle.Control, _ICON_ALERT_COLOR_));
+  Assert.AreEqual<Integer>(1,
+    CountPathsByColor(FEdit.Rectangle.Control, _ICON_CLEAR_COLOR_));
+  Assert.AreEqual<Integer>(2,
+    CountPathsByColor(FEdit.Rectangle.Control, _ICON_PASSWORD_COLOR_));
+  Assert.AreEqual<Integer>(2,
+    CountPathsByColor(FEdit.Rectangle.Control, _ICON_REQUIREMENT_COLOR_));
 end;
 
 initialization

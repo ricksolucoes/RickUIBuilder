@@ -22,6 +22,7 @@ type
     [Test] procedure Rectangle_DeveNavegarParaOrigem;
     [Test] procedure LabelsMainColor_DeveNavegarParaOrigem;
     [Test] procedure LabelsErrorFont_DeveNavegarParaOrigem;
+    [Test] procedure Labels_DeveNavegarParaOrigem;
     [Test] procedure DesignerInputText_DeveRetornarDesignerConformeContrato;
     [Test] procedure DesignerFilhos_DeveNavegarParaOrigem;
     [Test] procedure LineEConfig_DeveNavegarParaOrigem;
@@ -108,6 +109,15 @@ begin
   Assert.IsTrue(LError.ToBack = FEdit.Labels);
 end;
 
+procedure TRickUIBuilderEditFluentTests.Labels_DeveNavegarParaOrigem;
+var
+  LLabels: IRickUIBuilderEditLabel;
+begin
+  LLabels := FEdit.Labels;
+  Assert.IsTrue(LLabels.Counter.ToBack = LLabels);
+  Assert.IsTrue(LLabels.ToBack = FEdit);
+end;
+
 procedure TRickUIBuilderEditFluentTests.DesignerInputText_DeveRetornarDesignerConformeContrato;
 var
   LDesigner: IRickUIBuilderEditDesigner;
@@ -160,6 +170,7 @@ var
 begin
   LValidation := FEdit.Designer.Validation;
   LValidation.Invalid(True, 'Valor inválido').RequirementMet(True);
+  Assert.IsTrue(LValidation.RequirementMet = LValidation);
   Assert.IsTrue(LValidation.HasInvalid);
   Assert.IsTrue(LValidation.InvalidValue);
   Assert.AreEqual('Valor inválido', LValidation.InvalidMessage);

@@ -164,6 +164,10 @@ begin
   BuildEdit;
   TypeInput('-10');
   AssertTextExact('-10', InputValue);
+  ClearInput;
+  FEdit.Designer.Input.Number.AllowNegative(False);
+  TypeInput('-10');
+  AssertTextExact('10', InputValue);
 end;
 
 procedure TRickUIBuilderEditInputRulesTests.IntegerNumber_DeveRejeitarCaracterNaoNumerico;
@@ -199,6 +203,10 @@ begin
   BuildEdit;
   TypeInput('1.234,56');
   AssertTextExact('1.234,56', InputValue);
+  ClearInput;
+  FEdit.Designer.Input.Number.UseThousandSeparator(False);
+  TypeInput('1.234,56');
+  AssertTextExact('1234,56', InputValue);
 end;
 
 procedure TRickUIBuilderEditInputRulesTests.Email_DeveConverterParaLowercase;

@@ -29,6 +29,7 @@ type
     [Setup] procedure Setup;
     [TearDown] procedure TearDown;
     [Test] procedure Outlined_PadraoDeveExibirBordaEOcultarLinha;
+    [Test] procedure Outlined_AposUnderlineDeveRestaurarBordaEOcultarLinha;
     [Test] procedure Underline_DeveOcultarBordaEExibirLinhaNormal;
     [Test] procedure Underline_ThicknessDeveDefinirAlturaDaLinha;
     [Test] procedure Underline_FocusDeveUsarCorDeFocoERestaurarNormal;
@@ -138,6 +139,22 @@ begin
   BuildEdit;
   LLine := UnderlineControl;
   Assert.IsNotNull(LLine);
+  Assert.IsFalse(LLine.Visible);
+  Assert.AreNotEqual(Integer(TBrushKind.None),
+    Integer(FEdit.Rectangle.Control.Stroke.Kind));
+end;
+
+procedure TRickUIBuilderEditAppearanceTests.
+  Outlined_AposUnderlineDeveRestaurarBordaEOcultarLinha;
+var
+  LLine: TRectangle;
+begin
+  ConfigureUnderline;
+  BuildEdit;
+  LLine := UnderlineControl;
+  Assert.IsNotNull(LLine);
+  Assert.IsTrue(LLine.Visible);
+  FEdit.Config.Appearance(TRickUIBuilderEditAppearance.Outlined);
   Assert.IsFalse(LLine.Visible);
   Assert.AreNotEqual(Integer(TBrushKind.None),
     Integer(FEdit.Rectangle.Control.Stroke.Kind));
