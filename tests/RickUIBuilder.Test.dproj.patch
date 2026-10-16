@@ -1,0 +1,11 @@
+--- a/tests/RickUIBuilder.Test.dproj
++++ b/tests/RickUIBuilder.Test.dproj
+@@ -296,8 +296,9 @@
+         <DCCReference Include="src\edits\Rick.UIBuilder.Tests.Edit.InputRules.pas"/>
+         <DCCReference Include="src\edits\Rick.UIBuilder.Tests.Edit.Interaction.pas"/>
+         <DCCReference Include="src\edits\Rick.UIBuilder.Tests.Edit.ValidationFeedback.pas"/>
+         <DCCReference Include="src\edits\Rick.UIBuilder.Tests.Edit.CompletionValidation.pas"/>
++        <DCCReference Include="src\edits\Rick.UIBuilder.Tests.Edit.Appearance.pas"/>
+         <BuildConfiguration Include="Base">
+             <Key>Base</Key>
+         </BuildConfiguration>
